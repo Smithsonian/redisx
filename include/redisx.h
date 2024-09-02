@@ -3,6 +3,8 @@
  *
  * \date May 4, 2018
  * \author Attila Kovacs
+ *
+ *   RedisX public definition and prototypes.
  */
 
 #ifndef REDISX_H_
@@ -13,14 +15,67 @@
 
 #include "xchange.h"
 
-#define REDIS_TCP_PORT          6379    ///< TCP/IP port on which Redis server listens to clients.
-#define REDIS_TCP_BUF              0    ///< (bytes), <= 0 to use system default.
+// Configuration constants ------------------------------------------------------->
+#ifndef REDIS_TCP_PORT
+#  define REDIS_TCP_PORT          6379    ///< TCP/IP port on which Redis server listens to clients.
+#endif
 
-// These are serve as array indices. The order does not matter, but they must span 0-2.
-#define INTERACTIVE_CHANNEL         0   ///< \hideinitializer Redis channel number for interactive queries
-#define PIPELINE_CHANNEL            1   ///< \hideinitializer Redis channel number for pipelined transfers
-#define SUBSCRIPTION_CHANNEL        2   ///< \hideinitializer Redis channel number for PUB/SUB messages
-#define REDIS_CHANNELS              3   ///< \hideinitializer The number of channels a Redis instance has.
+#ifndef REDIS_TCP_BUF
+#  define REDIS_TCP_BUF              0    ///< (bytes), <= 0 to use system default.
+#endif
+
+#ifndef REDIS_CMDBUF_SIZE
+/// (bytes) Size of many internal arrays, and the max. send size. At least ~16 bytes...
+#  define REDIS_CMDBUF_SIZE            8192
+#endif
+
+#ifndef REDIS_RCV_CHUNK_SIZE
+/// (bytes) Redis receive buffer size.
+#  define REDIS_RCV_CHUNK_SIZE         8192
+#endif
+
+#ifndef REDISX_LISTENER_REL_PRIORITY
+/// [0.0:1.0] Listener priority as fraction of available range
+/// You may want to set it quite high to ensure that the receive buffer is promptly cleared.
+#  define REDISX_LISTENER_REL_PRIORITY       (0.9)
+#endif
+
+// Various exposed constants ----------------------------------------------------->
+
+/// API major version
+#define REDISX_MAJOR_VERSION  0
+
+/// API minor version
+#define REDISX_MINOR_VERSION  9
+
+/// Integer sub version of the release
+#define REDISX_PATCHLEVEL     0
+
+/// Additional release information in version, e.g. "-1", or "-rc1".
+#define REDISX_RELEASE_STRING "-devel"
+
+/// \cond PRIVATE
+
+#ifdef str_2
+#  undef str_2
+#endif
+
+/// Stringify level 2 macro
+#define str_2(s) str_1(s)
+
+#ifdef str_1
+#  undef str_1
+#endif
+
+/// Stringify level 1 macro
+#define str_1(s) #s
+
+/// \endcond
+
+/// The version string for this library
+/// \hideinitializer
+#define REDISX_VERSION_STRING str_2(REDISX_MAJOR_VERSION) "." str_2(REDISX_MINOR_VERSION) \
+                                  "." str_2(REDISX_PATCHLEVEL) REDISX_RELEASE_STRING
 
 // These are the first character ID's for the standard RESP interface implemented by Redis.
 #define RESP_ARRAY              '*'     ///< \hideinitializer RESP array type
@@ -37,12 +92,21 @@
 #define REDIS_UNEXPECTED_RESP       (-105)  ///< \hideinitializer Got a Redis response of a different type than expected
 #define REDIS_UNEXPECTED_ARRAY_SIZE (-106)  ///< \hideinitializer Got a Redis response with different number of elements than expected.
 
-#define REDIS_TIMEOUT_SECONDS           3   ///< (seconds) Abort with an error if cannot send before this timeout (<=0 for not timeout)
-#define REDIS_SIMPLE_STRING_SIZE      256   ///< Only store up to this many characters from Redis confirms and errors.
-#define REDIS_CMDBUF_SIZE            8192   ///< Size of many internal arrays, and the max. send size. At least ~16 bytes...
-#define REDIS_RCV_CHUNK_SIZE         8192   ///< (bytes) Redis receive buffer size.
+/**
+ * RedisX channel IDs. RedisX uses up to three separate connections to the server: (1) an interactive client, in which
+ * each query is a full round trip, (2) a pipeline clinet, in which queries are submitted in bulk, and responses
+ * arrive asynchronously, and (3) a substription client devoted to PUB/SUB requests and push messages. Not all clients
+ * are typically initialized at start. The interactive channel is always connected; the pipeline client can be selected
+ * when connecting to the server; and the subscription client is connected as needed to process PUB/SUB requests.
+ */
+enum redisx_channel {
+  INTERACTIVE_CHANNEL = 0,   ///< \hideinitializer Redis channel number for interactive queries
+  PIPELINE_CHANNEL,          ///< \hideinitializer Redis channel number for pipelined transfers
+  SUBSCRIPTION_CHANNEL       ///< \hideinitializer Redis channel number for PUB/SUB messages
+};
 
-#define SCAN_INITIAL_STORE_CAPACITY   256   ///< Number of Redis keys to allocate initially when using SCAN to get list of keywords
+#define  REDIS_CHANNELS     (SUBSCRIPTION_CHANNEL + 1)  ///< \hideinitializer The number of channels a Redis instance has.
+
 
 /**
  * \brief Structure that represents a Redis response (RESP format).
@@ -51,7 +115,8 @@
  */
 typedef struct RESP {
   char type;                    ///< RESP_ARRAY, RESP_INT ...
-  int n;                        ///< Either the integer value of a RESP_INT response, or the dimension of the value field.
+  int n;                        ///< Either the integer value of a RESP_INT response, or the dimension of
+                                ///< the value field.
   void *value;                  ///< Pointer to text (char *) content to an array of components (RESP**)...
 } RESP;
 
@@ -97,23 +162,27 @@ typedef struct Redis {
 } Redis;
 
 /**
- * A type of function that handles Redis PUB/SUB messages. These functions should follow a set of basic rules:
+ * A type of function that handles Redis PUB/SUB messages. These functions should follow a set of
+ * basic rules:
  *
  * <ul>
- * <li>The call should return promptly and never block. If it has blocking calls or if extended processing is
- * required, the function should simply place a copy of the necessary information on a queue and process queued
- * entries in a separate thread. (The call arguments will not persist beyond the scope of the call, so don't
- * attempt to place them directly in a queue.)</li>
+ * <li>The call should return promptly and never block for significant periors. If it has blocking
+ * calls or if extended processing is required, the function should simply place a copy of the
+ * necessary information on a queue and process queued entries in a separate thread. (The call
+ * arguments will not persist beyond the scope of the call, so don't attempt to place them
+ * directly in a queue.)</li>
  *
- * <li>The subscriber call should not attempt to modify or free() the strings it is called with. The same strings
- * maybe used by other subscribers, and thus modifying their content would produce unpredictable results with those
- * subscribers.</li>
+ * <li>The subscriber call should not attempt to modify or free() the strings it is called with.
+ * The same strings maybe used by other subscribers, and thus modifying their content would
+ * produce unpredictable results with those subscribers.</li>
  *
- * <li>If the call needs to manipulate the supplied string arguments, it should operate on copies (e.g. obtained via
+ * <li>If the call needs to manipulate the supplied string arguments, it should operate on copies
+ * (e.g. obtained via
  * xStringCopy()).</li>
  *
- * <li>The caller should free up any temporary resources it allocates, including copies of the argument strings,
- * before returning. However, it should never call free() on the supplied arguments directly.</li>
+ * <li>The caller should free up any temporary resources it allocates, including copies of the
+ * argument strings, before returning. However, it should never call free() on the supplied
+ * arguments directly.</li>
  * </ul>
  *
  * @param pattern  The subscription pattern for which this notification came for
@@ -132,11 +201,17 @@ typedef struct Redis {
  */
 typedef void (*RedisSubscriberCall)(const char *pattern, const char *channel, const char *msg, int length);
 
-int hostnameToIP(const char *hostName, char *ip);
-char *redisxGetHostName();
-void redisxSetHostName(const char *name);
 
-void redisxSetPassword(Redis *redis, const char *passwd);
+/**
+ * User-specified callback function for handling RedisX errors.
+ *
+ * @param redis     Pointer to the RedisX instance
+ * @param channel   the channel over which the error occurred
+ * @param op        the name/ID of the operation where the error occurred.
+ */
+typedef void (*RedisErrorHandler)(Redis *redis, enum redisx_channel channel, const char *op);
+
+int simpleHostnameToIP(const char *hostName, char *ip);
 
 void redisxSetVerbose(boolean value);
 boolean redisxIsVerbose();
@@ -144,7 +219,10 @@ boolean redisxIsVerbose();
 void redisxSetTcpBuf(int size);
 int redisxGetTcpBuf();
 
-int redisxSetTransmitErrorHandler(Redis *redis, void (*f)(Redis *redis, int channel, const char *op));
+void redisxSetPort(Redis *redis, int port);
+void redisxSetPassword(Redis *redis, const char *passwd);
+
+int redisxSetTransmitErrorHandler(Redis *redis, RedisErrorHandler f);
 
 Redis *redisxInit(const char *server);
 void redisxDestroy(Redis *redis);
@@ -154,14 +232,14 @@ int redisxReconnect(Redis *redis, boolean usePipeline);
 boolean redisxIsConnected(Redis *redis);
 boolean redisxHasPipeline(Redis *redis);
 
-RedisClient *redisxGetClient(Redis *redis, int channel);
+RedisClient *redisxGetClient(Redis *redis, enum redisx_channel channel);
 
-void redisxAddConnectHook(Redis *redis, const void (*setupCall)(void));
-void redisxRemoveConnectHook(Redis *redis, const void (*setupCall)(void));
+void redisxAddConnectHook(Redis *redis, void (*setupCall)(Redis *));
+void redisxRemoveConnectHook(Redis *redis, void (*setupCall)(Redis *));
 void redisxClearConnectHooks(Redis *redis);
 
-void redisxAddDisconnectHook(Redis *redis, const void (*cleanupCall)(void));
-void redisxRemoveDisconnectHook(Redis *redis, const void (*cleanupCall)(void));
+void redisxAddDisconnectHook(Redis *redis, void (*cleanupCall)(Redis *));
+void redisxRemoveDisconnectHook(Redis *redis, void (*cleanupCall)(Redis *));
 void redisxClearDisconnectHooks(Redis *redis);
 
 RESP *redisxRequest(Redis *redis, const char *command, const char *arg1, const char *arg2, const char *arg3, int *status);
@@ -175,6 +253,8 @@ char **redisxGetKeys(Redis *redis, const char *table, int *n);
 char **redisxScanKeys(Redis *redis, const char *pattern, int *n, int *status);
 void redisxSetScanCount(Redis *redis, int count);
 int redisxGetScanCount(Redis *redis);
+void redisxDestroyEntries(RedisEntry *entries, int count);
+void redisxDestroyKeys(char **keys, int count);
 
 int redisxSetPipelineConsumer(Redis *redis, void (*f)(RESP *));
 
@@ -201,13 +281,12 @@ void redisxDestroyRESP(RESP *resp);
 // Locks for async calls
 int redisxLockClient(RedisClient *cl);
 int redisxLockEnabled(RedisClient *cl);
-RedisClient *redisxGetLockedClient(Redis *redis);
 int redisxUnlockClient(RedisClient *cl);
 
 // Asynchronous access routines (use within redisxLockClient()/ redisxUnlockClient() blocks)...
 int redisxSendRequestAsync(RedisClient *cl, const char *command, const char *arg1, const char *arg2, const char *arg3);
 int redisxSendArrayRequestAsync(RedisClient *cl, char *args[], int length[], int n);
-int redisxSendValueAsync(RedisClient *cl, const char *table, const char *key, const char *value, boolean confirm);
+int redisxSetValueAsync(RedisClient *cl, const char *table, const char *key, const char *value, boolean confirm);
 RESP *redisxReadReplyAsync(RedisClient *cl);
 int redisxIgnoreReplyAsync(RedisClient *cl);
 int redisxSkipReplyAsync(RedisClient *cl);
@@ -217,8 +296,10 @@ int redisxPublishAsync(Redis *redis, const char *channel, const char *data, int 
 int redisxError(const char *func, int errorCode);
 const char* redisxErrorDescription(int code);
 
-// The following is not available on Lynx, since it needs fnmatch...
-#if !(__Lynx__ && __powerpc__)
+// The following is not available on prior to the POSIX.1-2008 standard
+// We'll use the __STDC_VERSION__ constant as a proxy to see if fnmatch is available
+#if __STDC_VERSION__ > 201112L
 int redisxDeleteEntries(Redis *redis, const char *pattern);
 #endif
+
 #endif /* REDISX_H_ */

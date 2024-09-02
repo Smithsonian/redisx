@@ -1,0 +1,41 @@
+name: Build
+
+on: 
+  push:
+    paths:
+      - 'src/**'
+      - 'include/**'
+      - 'Makefile'
+      - '*.mk'
+      - '.github/workflows/build.yml'
+
+jobs:
+
+  build:
+    name: Build library
+
+    runs-on: ubuntu-latest
+    env:
+      CC: gcc
+      XCHANGE: xchange
+    steps:
+    - name: Check out RedisX
+      uses: actions/checkout@v4
+      
+    - name: Check out xchange 
+      uses: actions/checkout@v4
+      with:
+        repository: Smithsonian/xchange
+        path: xchange
+    
+    - name: Build static library	
+      run: make static
+      
+    - name: Build xchange dependency
+      run: make -C xchange shared
+      
+    - name: Build shared library
+      run: make shared   
+
+      
+   

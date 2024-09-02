@@ -1,0 +1,12 @@
+**/apidoc
+**/obj
+**/bin
+**/dep
+**/lib
+*.d
+*.o
+*~
+*.swp
+README-orig.md
+TODO
+xchange/**
