@@ -1,3 +1,14 @@
+![Build Status](https://github.com/Smithsonian/SuperNOVAS/actions/workflows/build.yml/badge.svg)
+![Static Analysis](https://github.com/Smithsonian/SuperNOVAS/actions/workflows/check.yml/badge.svg)
+
+<picture>
+  <source srcset="resources/CfA-logo-dark.png" alt="CfA logo" media="(prefers-color-scheme: dark)"/>
+  <source srcset="resources/CfA-logo.png" alt="CfA logo" media="(prefers-color-scheme: light)"/>
+  <img src="resources/CfA-logo.png" alt="CfA logo" width="400" height="67" align="right"/>
+</picture>
+<br clear="all">
+
+
 # RedisX
 
 A simple, light-weight C/C++ Redis client.
