@@ -12,8 +12,8 @@ on:
       - 'Doxyfile'
       - '*.md'
       - '.github/workflows/dox.yml'
-      
-jobs:   
+
+jobs:
 
   apidocs:
     name: Generate API documentation
@@ -26,43 +26,48 @@ jobs:
 
     - name: install doxygen
       run: sudo apt-get install doxygen
-   
+
     - name: Check out RedisX
       uses: actions/checkout@v4
-      with: 
-      	path: redisx
-    
-    - name: Check out xchange 
+
+    - name: Generate docs
+      run: make local-dox
+
+  site-update:
+    name: Update github pages
+    needs: apidocs
+    if: github.repository_owner == 'Smithsonian' && (github.event_name == 'release' || contains(github.event.head_commit.message, 'site update'))
+
+    runs-on: ubuntu-latest
+    steps:
+
+    - name: Checkout source
+      uses: actions/checkout@v4
+      with:
+        repository: Smithsonian/redisx
+        path: redisx
+
+    - name: Check out xchange
       uses: actions/checkout@v4
       with:
         repository: Smithsonian/xchange
         path: xchange
-        
-    - name: Generate xchange docs
-      run: make -C xchange dox
-        
-    - name: Generate docs
-      run: make -C redisx dox
- 
-  site-update:
-    name: Update github pages
-    working-directory: ./redisx
-    needs: apidocs
-    if: github.repository_owner == 'Smithsonian' && (github.event_name == 'release' || contains(github.event.head_commit.message, 'site update'))
- 
-    runs-on: ubuntu-latest
-    steps:
-    
-    - name: Checkout source
-      uses: actions/checkout@v4
-        
+
     - name: Generate headless README
-      run: make README-orig.md
-        
-    - uses: mattnotmitt/doxygen-action@v1.9.8
+      run: make -C redisx README-orig.md
+
+    - name: Generate xchange apidocs
+      uses: mattnotmitt/doxygen-action@v1.9.8
       with:
         additional-packages: font-roboto
-       
+        working-directory: ./xchange
+
+    - name: Generate RedisX apidocs
+      uses: mattnotmitt/doxygen-action@v1.9.8
+      with:
+        additional-packages: font-roboto
+        working-directory: ./redisx
+
     - name: Checkout gh-pages
       uses: actions/checkout@v4
       with:
@@ -70,20 +75,20 @@ jobs:
         path: site
 
     - name: Assert site/doc/
-      run: mkdir -p site/doc 
+      run: mkdir -p site/doc
 
     - name: Copy README
       run: |
-        echo '<img src="/xchange/resources/CfA-logo.png" alt="CfA logo" width="400" height="67" align="right">' > site/doc/README.md
+        echo '<img src="/redisx/resources/CfA-logo.png" alt="CfA logo" width="400" height="67" align="right">' > site/doc/README.md
         echo '<br clear="all">' >> site/doc/README.md
-        cat README-orig.md >> site/doc/README.md
-        
+        cat redisx/README-orig.md >> site/doc/README.md
+
     - name: Copy CHANGELOG
-      run: cp CHANGELOG.md site/doc/
-      
+      run: cp redisx/CHANGELOG.md site/doc/
+
     - name: Copy API documentation
-      run: cp -a apidoc site/
-        
+      run: cp -a redisx/apidoc site/
+
     - name: Push to pages
       run: |
         cd site
@@ -91,19 +96,18 @@ jobs:
         git config --global user.name "github-actions"
         git add -A
         git commit -m "[automated site update]" && git push || true
-        
-        
+
+
   changelog-update:
     name: Update CHANGELOG on github pages
-    working-directory: ./redisx
     if: github.repository_owner == 'Smithsonian' && contains(github.event.head_commit.message, 'changelog update')
-   
+
     runs-on: ubuntu-latest
     steps:
-    
+
     - name: Checkout source
       uses: actions/checkout@v4
-       
+
     - name: Checkout gh-pages
       uses: actions/checkout@v4
       with:
@@ -111,11 +115,11 @@ jobs:
         path: site
 
     - name: Assert site/doc/
-      run: mkdir -p site/doc 
-        
+      run: mkdir -p site/doc
+
     - name: Copy CHANGELOG
       run: cp CHANGELOG.md site/doc/
-        
+
     - name: Push to pages
       run: |
         cd site
@@ -123,6 +127,4 @@ jobs:
         git config --global user.name "github-actions"
         git add -A
         git commit -m "[automated site update]" && git push || true
-    
- 
-        
+

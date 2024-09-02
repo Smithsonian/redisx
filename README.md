@@ -1,5 +1,11 @@
-![Build Status](https://github.com/Smithsonian/SuperNOVAS/actions/workflows/build.yml/badge.svg)
-![Static Analysis](https://github.com/Smithsonian/SuperNOVAS/actions/workflows/check.yml/badge.svg)
+![Build Status](https://github.com/Smithsonian/redisx/actions/workflows/build.yml/badge.svg)
+![Static Analysis](https://github.com/Smithsonian/redisx/actions/workflows/check.yml/badge.svg)
+<a href="https://smithsonian.github.io/redisx/apidoc/html/files.html">
+ ![API documentation](https://github.com/Smithsonian/redisx/actions/workflows/dox.yml/badge.svg)
+</a>
+<a href="https://smithsonian.github.io/redisx/index.html">
+ ![Project page](https://github.com/Smithsonian/redisx/actions/workflows/pages/pages-build-deployment/badge.svg)
+</a>
 
 <picture>
   <source srcset="resources/CfA-logo-dark.png" alt="CfA logo" media="(prefers-color-scheme: dark)"/>
@@ -16,9 +22,9 @@ A simple, light-weight C/C++ Redis client.
 ## Table of Contents
 
  - [Introduction](#introduction)
- - [Pre-requisites](#pre-requisites)
- - [Buildding RedisX](#building-redisx)
- - [Managing Redis server connetions](#managing-redis-server-connections)
+ - [Prerequisites](#prerequisites)
+ - [Building RedisX](#building-redisx)
+ - [Managing Redis server connections](#managing-redis-server-connections)
  - [Simple Redis queries](#simple-redis-queries)
  - [Atomic execution blocks and LUA scripts](#atomic-transaction-blocks-and-lua-scripts)
  - [Publish/subscribe (PUB/SUB) support](#publish-subscribe-support)
@@ -58,8 +64,8 @@ There are no official releases of __RedisX__ yet. An initial 1.0.0 release is ex
 
 -----------------------------------------------------------------------------
 
-<a name="pre-requisites"></a>
-## Pre-requisites
+<a name="prerequisites"></a>
+## Prerequisites
 
 The [Smithsonian/xchange](https://github.com/Smithsonian/xchange) library is both a build and a runtime dependency of 
 RedisX.
@@ -360,6 +366,7 @@ with the approrpiate mutex locked to prevent concurrency issues.
   // other requests concurrently...
   redisxLockEnabled(pipe);
 
+  // -------------------------------------------------------------------------
   // Submit a whole bunch of asynchronous requests, e.g. from a loop...
   for (...) {
     int status = redisxSendRequestAsync(pipe, ...);
@@ -374,6 +381,7 @@ with the approrpiate mutex locked to prevent concurrency issues.
       ...
     }
   }
+  // -------------------------------------------------------------------------
   
   // Release the exclusive lock on the pipeline channel, so
   // other threads may use it now that we sent off our requests...
@@ -693,10 +701,34 @@ subscriber function as appropriate (provided no other subscription needs it) via
 <a name="error-handling"></a>
 ## Error handling
 
+Error handling of RedisX is an extension of that of __xchange__, with further error codes defined in `redisx.h`. 
+The RedisX functions that return an error status (either directly, or into the integer designated by a pointer 
+argument), can be inspected by `redisxErrorDescription()`, e.g.:
+
+```c
+  Redis *redis ...
+  int status = redisxSetValue(...);
+  if (status != X_SUCCESS) {
+    // Ooops, something went wrong...
+    fprintf(stderr, "WARNING! set value: %s", redisErrorDescription(status));
+    ...
+  }
+```
+ 
+
 -----------------------------------------------------------------------------
 
 <a name="debug-support"></a>
 ## Debug support
+
+The __xchange__ library provides two macros: `xvprintf()` and `xdprintf()`, for printing verbose and debug messages
+to `stderr`. Both work just like `printf()`, but they are conditional on verbosity being enabled via 
+`xSetVerbose(boolean)` and the global variable `xDebug` being `TRUE` (non-zero), respectively. Applications using 
+__xchange__ may use these macros to produce their own verbose and/or debugging outputs conditional on the same global 
+settings. 
+
+You can also turn debug messages by defining the `DEBUG` constant for the compiler, e.g. by adding `-DDEBUG` to 
+`CFLAGS` prior to calling `make`. 
 
 -----------------------------------------------------------------------------
 
