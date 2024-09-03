@@ -1,5 +1,5 @@
 <?xml version='1.0' encoding='UTF-8' standalone='yes' ?>
-<tagfile doxygen_version="1.10.0" doxygen_gitid="GIT-NOTFOUND">
+<tagfile doxygen_version="1.9.8">
   <compound kind="file">
     <name>redisx.h</name>
     <path>include/</path>

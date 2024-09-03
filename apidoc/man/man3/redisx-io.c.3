@@ -67,7 +67,7 @@ Basic I/O (send/receive) functions for the RedisX library\&.
 .SH "Function Documentation"
 .PP 
 .SS "int redisxAbortBlockAsync (\fBRedisClient\fP * cl)"
-Abort an atomic transaction block\&. It sends \fRDISCARD\fP\&.
+Abort an atomic transaction block\&. It sends \fCDISCARD\fP\&.
 .PP
 \fBParameters\fP
 .RS 4
@@ -131,7 +131,7 @@ A freshly allocated \fBRESP\fP array containing the \fBRedis\fP response, or NUL
 .PP
 References \fBRedis::interactive\fP, \fBredisxError()\fP, \fBredisxLockEnabled()\fP, \fBredisxReadReplyAsync()\fP, \fBredisxSendArrayRequestAsync()\fP, \fBredisxUnlockClient()\fP, \fBX_NULL\fP, \fBX_SUCCESS\fP, and \fBxvprintf\fP\&.
 .SS "\fBRESP\fP * redisxExecBlockAsync (\fBRedisClient\fP * cl)"
-Finish and execute an atomic transaction block\&. It sends \fREXEC\fP, skips through all \fROK\fP and \fRQUEUED\fP acknowledgements, and returns the reply to the transaction block itself\&.
+Finish and execute an atomic transaction block\&. It sends \fCEXEC\fP, skips through all \fCOK\fP and \fCQUEUED\fP acknowledgements, and returns the reply to the transaction block itself\&.
 .PP
 \fBParameters\fP
 .RS 4
@@ -257,7 +257,7 @@ References \fBredisxSendArrayRequestAsync()\fP, \fBX_NAME_INVALID\fP, \fBX_NO_IN
 .SS "int redisxSkipReplyAsync (\fBRedisClient\fP * cl)"
 Instructs \fBRedis\fP to skip sending a reply for the next command\&.
 .PP
-Sends \fRCLIENT REPLY SKIP\fP
+Sends \fCCLIENT REPLY SKIP\fP
 .PP
 \fBParameters\fP
 .RS 4
@@ -280,9 +280,9 @@ X_NULL      if the client is NULL\&.
 .PP
 References \fBredisxError()\fP, \fBTRUE\fP, \fBX_NULL\fP, and \fBX_SUCCESS\fP\&.
 .SS "int redisxStartBlockAsync (\fBRedisClient\fP * cl)"
-Starts an atomic \fBRedis\fP transaction block, by sending \fRMULTI\fP on the specified client connection\&. \fBRedis\fP transaction blocks behave just like scripts (in fact they are effectively improptu scripts themselves)\&. As such the rules of \fBRedis\fP scripting apply, such as you cannot call LUA from within a transaction block (which is a real pity\&.\&.\&.)
+Starts an atomic \fBRedis\fP transaction block, by sending \fCMULTI\fP on the specified client connection\&. \fBRedis\fP transaction blocks behave just like scripts (in fact they are effectively improptu scripts themselves)\&. As such the rules of \fBRedis\fP scripting apply, such as you cannot call LUA from within a transaction block (which is a real pity\&.\&.\&.)
 .PP
-Once you start a transaction block you may ignore all acknowledgedments such as \fROK\fP and \fRQUEUED\fP responses that \fBRedis\fP sends back\&. These will be 'processed' in bulk by redisEndBlockAsync(), at the end of the transaction block\&.
+Once you start a transaction block you may ignore all acknowledgedments such as \fCOK\fP and \fCQUEUED\fP responses that \fBRedis\fP sends back\&. These will be 'processed' in bulk by redisEndBlockAsync(), at the end of the transaction block\&.
 .PP
 \fBParameters\fP
 .RS 4
