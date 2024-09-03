@@ -45,6 +45,12 @@ repository on GitHub.
 
 There are no official releases of __RedisX__ yet. An initial 1.0.0 release is expected in late 2024 or early 2025.
 
+Some related links:
+
+ - [API documentation](https://smithsonian.github.io/redisx/apidoc/html/files.html)
+ - [Project page](https://smithsonian.github.io/redisx) on github.io
+
+
 -----------------------------------------------------------------------------
 
 <a name="prerequisites"></a>
