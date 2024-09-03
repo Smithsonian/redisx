@@ -53,10 +53,9 @@ var NAVTREE =
         [ "Broadcasting messages", "index.html#autotoc_md30", null ],
         [ "Subscriptions", "index.html#autotoc_md31", null ]
       ] ],
-      [ "Implementing further Redis commands", "index.html#autotoc_md33", null ],
-      [ "Error handling", "index.html#autotoc_md35", null ],
-      [ "Debug support", "index.html#autotoc_md37", null ],
-      [ "Future plans", "index.html#autotoc_md39", null ],
+      [ "Error handling", "index.html#autotoc_md33", null ],
+      [ "Debug support", "index.html#autotoc_md35", null ],
+      [ "Future plans", "index.html#autotoc_md37", null ],
       [ "[Unreleased]", "../../xchange/apidoc/html/md_CHANGELOG.html#autotoc_md1", null ]
     ] ],
     [ "Contributing to RedisX", "../../xchange/apidoc/html/md_CONTRIBUTING.html", null ],

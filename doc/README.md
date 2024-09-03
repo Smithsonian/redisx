@@ -11,7 +11,6 @@ A simple, light-weight C/C++ Redis client.
  - [Simple Redis queries](#simple-redis-queries)
  - [Atomic execution blocks and LUA scripts](#atomic-transaction-blocks-and-lua-scripts)
  - [Publish/subscribe (PUB/SUB) support](#publish-subscribe-support)
- - [Implementing further Redis commands](#implementing-further-redis-commands)
  - [Error handling](#error-handling)
  - [Debug support](#debug-support)
  - [Future plans](#future-plans)
@@ -386,8 +385,16 @@ with the approrpiate mutex locked to prevent concurrency issues.
  - [Execution blocks](#execution-blocks)
  - [LUA script loading and execution](#lua-script-loading-and-execution)
 
+Sometimes you want to ececute a series of Redis command atomically, such that nothing else may alter the database 
+while the set of commands execute, so they may return a coherent state. For example, you want to set or query a 
+collection of related variables so they change together and are reported together. You have two choices. (1) you
+can execute the Redis commands in an execution block, or else (2) load a LUA script onto the Redis server and call 
+it with some parameters (possibly many times over).
+
 <a name="execution-blocks"></a>
 ### Execution blocks
+
+Execution blocks offer a fairly simple way of bunching 
 
 ```c
   Redis *redis = ...;
@@ -421,8 +428,19 @@ with the approrpiate mutex locked to prevent concurrency issues.
   ... 
 ```
 
+If at any point things don't go accoring to plan in the middle of the block, you can call `redisAbortBlockAsync()` to
+abort and discard all prior commands submitted in the execution block already.
+
 <a name="lua-script-loading-and-execution"></a>
 ### LUA script loading and execution
+
+LUA scripting offers a more capable version of executing more complex routines on the Redis server. LUA is a scripting
+language akin to python, and allows you to add extra logic, string manipulation etc to your Redis queries. Best of all, 
+once you upload the script to the server, it can reduce network traffic significantly by not having to repeatedly 
+submit the same set of Redis commands every single time. LUA scipts also get executed very efficiently on the server, 
+and produce only the result you want/need.
+
+Assuming you have prepared your LUA script, you can upload it to the Redis server as:
 
 ```c
   Redis *redis = ...
@@ -437,6 +455,9 @@ with the approrpiate mutex locked to prevent concurrency issues.
   }
 ```
 
+Redis will refer to the script by its SHA1 sum, so it's important keep a record of it. You'll call the script with
+its SHA1 sum, a set of redis keys the script may use, and a set of other parameters it might need.
+
 ```c
   Redis *redis = ...
   int status;
@@ -450,6 +471,9 @@ with the approrpiate mutex locked to prevent concurrency issues.
 
 Clearly, if you have additional Redis key arguments and/or parameters to pass to the script, you'll have to use 
 `redisxArrayRequest()`, instead.
+
+One thing to keep in mind about LUA scripts is that they are not persistent. They are lost each time the Redis 
+server is restarted.
 
 -----------------------------------------------------------------------------
 
@@ -680,10 +704,6 @@ messages to the subscription channel or pattern, and by removing the `my_event_p
 appropriate (provided no other subscription needs it) via `redisxRemoveSubscriber()`.
 
 
------------------------------------------------------------------------------
-
-<a name="implementing-further-redis-commands"></a>
-## Implementing further Redis commands 
 
 -----------------------------------------------------------------------------
 

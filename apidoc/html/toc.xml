@@ -25,10 +25,9 @@
       <topic label="Broadcasting messages" href="index.html#autotoc_md30"/>
       <topic label="Subscriptions" href="index.html#autotoc_md31"/>
     </topic>
-    <topic label="Implementing further Redis commands" href="index.html#autotoc_md33"/>
-    <topic label="Error handling" href="index.html#autotoc_md35"/>
-    <topic label="Debug support" href="index.html#autotoc_md37"/>
-    <topic label="Future plans" href="index.html#autotoc_md39"/>
+    <topic label="Error handling" href="index.html#autotoc_md33"/>
+    <topic label="Debug support" href="index.html#autotoc_md35"/>
+    <topic label="Future plans" href="index.html#autotoc_md37"/>
   </topic>
   <topic label="Changelog" href="md_CHANGELOG.html">
     <topic label="[Unreleased]" href="md_CHANGELOG.html#autotoc_md1"/>

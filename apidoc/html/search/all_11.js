@@ -14,5 +14,5 @@ var searchData=
   ['subscription_11',['subscription',['../structRedis.html#aa4878fb8cef61468ee8e7426a973a75c',1,'Redis']]],
   ['subscription_5fchannel_12',['SUBSCRIPTION_CHANNEL',['../redisx_8h.html#a5349b7340813fbd1e32d04ed650bc3d9ab4a900f2efbd24a3307f89b5e2474462',1,'redisx.h']]],
   ['subscriptions_13',['Subscriptions',['../index.html#autotoc_md31',1,'']]],
-  ['support_14',['support',['../index.html#autotoc_md37',1,'Debug support'],['../index.html#autotoc_md29',1,'Publish/subscribe (PUB/SUB) support']]]
+  ['support_14',['support',['../index.html#autotoc_md35',1,'Debug support'],['../index.html#autotoc_md29',1,'Publish/subscribe (PUB/SUB) support']]]
 ];

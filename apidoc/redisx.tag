@@ -1282,7 +1282,6 @@
     <docanchor file="index.html">publish-subscribe-support</docanchor>
     <docanchor file="index.html">broadcasting-messages</docanchor>
     <docanchor file="index.html">subscriptions</docanchor>
-    <docanchor file="index.html">implementing-further-redis-commands</docanchor>
     <docanchor file="index.html">error-handling</docanchor>
     <docanchor file="index.html">debug-support</docanchor>
     <docanchor file="index.html">future-plans</docanchor>
