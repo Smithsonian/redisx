@@ -645,7 +645,8 @@ Execution blocks offer a fairly simple way of bunching
   Redis *redis = ...;
   RESP *result;
   
-  // Obtain the client on which to execute the block, e.g. the INTERACTIVE_CHANNEL
+  // Obtain a lock on the client on which to execute the block.
+  // e.g. the INTERACTIVE_CHANNEL
   RedisClient *cl = redisxGetClient(redis, INTERACTIVE_CHANNEL);
   
   int status = redisxLockEnabled(cl);
@@ -673,7 +674,7 @@ Execution blocks offer a fairly simple way of bunching
   ... 
 ```
 
-If at any point things don't go accoring to plan in the middle of the block, you can call `redisAbortBlockAsync()` to
+If at any point things don't go according to plan in the middle of the block, you can call `redisAbortBlockAsync()` to
 abort and discard all prior commands submitted in the execution block already.
 
 <a name="lua-script-loading-and-execution"></a>
