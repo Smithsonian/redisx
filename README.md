@@ -37,7 +37,7 @@ A simple, light-weight C/C++ Redis client.
 <a name="introduction"></a>
 ## Introduction
 
-__RedisX__ is a light-weight [Redis](https://redis.io) client for C/C++. AS such it should also work with Redis forks 
+__RedisX__ is a light-weight [Redis](https://redis.io) client for C/C++. As such, it should also work with Redis forks 
 / clones like [Dragonfly](https://dragonfly.io) or [Valkey](https://valkey.io). It supports both interactive and 
 pipelined Redis queries, managing and processing subscriptions. It also supports atomic execution blocks and LUA 
 scripts loading. It can be used with one or more distinct Redis servers simultaneously.
@@ -723,8 +723,8 @@ argument), can be inspected by `redisxErrorDescription()`, e.g.:
 
 The __xchange__ library provides two macros: `xvprintf()` and `xdprintf()`, for printing verbose and debug messages
 to `stderr`. Both work just like `printf()`, but they are conditional on verbosity being enabled via 
-`xSetVerbose(boolean)` and the global variable `xDebug` being `TRUE` (non-zero), respectively. Applications using 
-__xchange__ may use these macros to produce their own verbose and/or debugging outputs conditional on the same global 
+`redisxSetVerbose(boolean)` and the global variable `xDebug` being `TRUE` (non-zero), respectively. Applications using 
+__RedisX__ may use these macros to produce their own verbose and/or debugging outputs conditional on the same global 
 settings. 
 
 You can also turn debug messages by defining the `DEBUG` constant for the compiler, e.g. by adding `-DDEBUG` to 
@@ -734,4 +734,18 @@ You can also turn debug messages by defining the `DEBUG` constant for the compil
 
 <a name="future-plans"></a>
 ## Future plans
+
+Some obvious ways the library could evolve and grow in the not too distant future:
+
+ - Automated regression testing and coverage tracking.
+ - Support for the [RESP3](https://github.com/antirez/RESP3/blob/master/spec.md) standard and Redis `HELLO`.
+ - Support for Redis sentinel, high-availability server configurations.
+ - TLS support (perhaps...)
+ - Add more high-level redis commands, e.g. for lists, streams, etc.
+ - Improved debug capabilities (e.g. with built-in error traces)
+ - Improved error handling (e.g. by consistently setting `errno` beyond just the __RedisX__ error status).
+
+If you have an idea for a must have feature, please let me (Attila) know. Pull requests, for new features or fixes to
+existing ones are especially welcome! 
+ 
 
