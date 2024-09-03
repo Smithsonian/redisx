@@ -157,7 +157,7 @@ Building RedisX</h2>
 <p>The RedisX library can be built either as a shared (<code>libredisx.so[.1]</code>) and as a static (<code>libredisx.a</code>) library, depending on what suites your needs best.</p>
 <p>You can configure the build, either by editing <code>config.mk</code> or else by defining the relevant environment variables prior to invoking <code>make</code>. The following build variables can be configured:</p>
 <ul>
-<li><code>XCHANGE</code>: the root of the location where the <a href="https://github.com/Smithsonian/xchange">Smithsonian/xchange</a> is installed. It expects to find <code><a class="elRef" href="../../xchange/apidoc/html/xchange_8h.html">xchange.h</a></code> under <code>$(XCHANGE)/include</code> and <code>libxchange.so</code> under <code>$(XCHANGE)/lib</code> or else in the default <code>LD_LIBRARY_PATH</code>.</li>
+<li><code>XCHANGE</code>: the root of the location where the <a href="https://github.com/Smithsonian/xchange">Smithsonian/xchange</a> library is installed. It expects to find <code><a class="elRef" href="../../xchange/apidoc/html/xchange_8h.html">xchange.h</a></code> under <code>$(XCHANGE)/include</code> and <code>libxchange.so</code> under <code>$(XCHANGE)/lib</code> or else in the default <code>LD_LIBRARY_PATH</code>.</li>
 <li><code>CC</code>: The C compiler to use (default: <code>gcc</code>).</li>
 <li><code>CPPFLAGS</code>: C pre-processor flags, such as externally defined compiler constants.</li>
 <li><code>CFLAGS</code>: Flags to pass onto the C compiler (default: <code>-Os -Wall</code>). Note, <code>-Iinclude</code> will be added automatically.</li>
