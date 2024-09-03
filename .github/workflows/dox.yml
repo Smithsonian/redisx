@@ -54,14 +54,17 @@ jobs:
         repository: Smithsonian/xchange
         path: xchange
 
-    - name: Generate headless README
-      run: make -C redisx README-orig.md
-
+    - name: Generate headless README for xchange
+      run: make -C xchange README-orig.md
+      
     - name: Generate xchange apidocs
       uses: mattnotmitt/doxygen-action@v1.9.8
       with:
         additional-packages: font-roboto
         working-directory: ./xchange
+
+    - name: Generate headless README for RedisX
+      run: make -C redisx README-orig.md
 
     - name: Generate RedisX apidocs
       uses: mattnotmitt/doxygen-action@v1.9.8
