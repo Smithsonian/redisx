@@ -52,7 +52,7 @@ and PUB/SUB. Future releases may add further higher-level functionality based on
 
 The library maintains up to three separate connections (channels) for each separate Redis server instance used: (1) an 
 interactive client for sequential round-trip transactions, (2) a pipeline client for bulk queries and asynchronous 
-background processing, and (3) a subscription client for PUB/SUB requests and notofocations. The interactive client is 
+background processing, and (3) a subscription client for PUB/SUB requests and notifications. The interactive client is 
 always connected, the pipeline client is connected only if explicitly requested at the time of establishing the server 
 connection, while the subscription client is connected only as needed.
 
@@ -84,18 +84,18 @@ RedisX.
 The RedisX library can be built either as a shared (`libredisx.so[.1]`) and as a static (`libredisx.a`) library, 
 depending on what suites your needs best.
 
-You can configure the build, either by editing `config.mk` or else by defining the relevany environment variables 
+You can configure the build, either by editing `config.mk` or else by defining the relevant environment variables 
 prior to invoking `make`. The following build variables can be configured:
 
  - `XCHANGE`: the root of the location where the [Smithsonian/xchange](https://github.com/Smithsonian/xchange) is
    installed. It expects to find `xchange.h` under `$(XCHANGE)/include` and `libxchange.so` under `$(XCHANGE)/lib`
    or else in the default `LD_LIBRARY_PATH`.
    
- - `CC`: The C compiler to use (default: gcc).
+ - `CC`: The C compiler to use (default: `gcc`).
 
  - `CPPFLAGS`: C pre-processor flags, such as externally defined compiler constants.
  
- - `CFLAGS`: Flags to pass onto the C compiler (default: -Os -Wall). Note, `-Iinclude` will be added automatically.
+ - `CFLAGS`: Flags to pass onto the C compiler (default: `-Os -Wall`). Note, `-Iinclude` will be added automatically.
    
  - `LDFLAGS`: Linker flags (default is `-lm`).
 
@@ -176,7 +176,7 @@ synchronous and asynchronous requests (and responses).
 <a name="disconnecting"></a>
 ### Disconnecting
 
-Whne you are done with a specific Redis server, you should disconnect from it:
+When you are done with a specific Redis server, you should disconnect from it:
 
 ```c
   Redis *redis = ...
@@ -282,7 +282,7 @@ as is (without making copies), e.g.:
 <a name="interactive-transactions"></a>
 ### Interactive transactions
 
-The simplest wat for running a few Redis queries is to do it in interactive mode:
+The simplest way for running a few Redis queries is to do it in interactive mode:
 
 ```c
   Redis *redis = ...
@@ -326,12 +326,12 @@ with that response (or `NULL` if there was an error).
 <a name="pipelined-transactions"></a>
 ### Pipelined transactions
 
-Depending on round-trip times over the network, interactive queries may be suitable for running yp to a few hundred 
+Depending on round-trip times over the network, interactive queries may be suitable for running up to a few hundred 
 (or a few thousand) queries per second. For higher throughput (up to millions Redis transactions per second) you may 
 need to access the Redis database in pipelined mode.
 
 In pipeline mode, requests are sent to the Redis server in quick succession without waiting for responses to return 
-for each one individually. Responses are then processed by a designated callback function in the background.
+for each one individually. Responses are then processed in the background by a designated callback function.
 
 ```c
   // Your own function to process responses to pipelined requests...
@@ -478,10 +478,10 @@ Clearly, if you have additional Redis key arguments and/or parameters to pass to
 <a name="getting-and-setting-keyed-values"></a>
 ### Getting and setting keyed values
 
-Key/value pairs are the bread and butter of Redis. They come in two variaties There are top-level key-value pairs, and
-there are key-value pairs organized into hash tables, where the table name is a top-level key, but the fields in the
-table are not. The RedisX library offers a unified approach for dealing with key/value pairs, whether they are top
-level or hash-tables. Simply, a table name `NULL` is used to refer to top-level keys.
+Key/value pairs are the bread and butter of Redis. They come in two variaties: (1) there are top-level key-value 
+pairs, and (2) there are key-value pairs organized into hash tables, where the table name is a top-level key, but the 
+fields in the table are not. The RedisX library offers a unified approach for dealing with key/value pairs, whether 
+they are top level or hash-tables. Simply, a table name `NULL` is used to refer to top-level keys.
 
 Retrieving individual keyed values is simple:
 
@@ -539,7 +539,7 @@ In the above example we have set the value using the interactive client to Redis
 return only after confirmation is received from the server. As such, a subsequent `redisxGetValue()` of the same
 table/key will be guaranteed to return the updated value always. However, we could have set the new value 
 asynchronously over the pipeline connection (by using `TRUE` as the last argument). In that case, the call will return 
-as soon as the request was sent to Redis (but not confirmed, not possibly transmitted yet!). As such a subsequent 
+as soon as the request was sent to Redis (but not confirmed, nor possibly transmitted yet!). As such, a subsequent 
 `redisxGetValue()` on the same key/value field may race the request in transit, and may return the previous value on 
 occasion. So, it's important to remember that while pipelining can make setting multiple Redis fields very efficient, 
 we have to be careful about retrieving the same values afterwards from the same program thread. (Arguably, however, 
@@ -562,7 +562,7 @@ transactions that are guaranteed to not block the Redis server long, so it may r
 also. For the caller the result is the same, the only difference being that the result is computed via a series of 
 quick Redis queries rather than with one potentially very expensive query.
 
-For example to retrieve all top-level Redis keys, sorted alphabetically, using the scanning approach, you may write 
+For example, to retrieve all top-level Redis keys, sorted alphabetically, using the scanning approach, you may write 
 something like:
 
 ```c
@@ -645,8 +645,7 @@ notification on a completely different channel arrives. Still, each `RedisSubscr
 further check the notifying channel name as appropriate to ensure that it is in fact qualified to deal with a given 
 message.
 
-Here is an example `RedisSubscriberCall` implementation to process messages whose channel names start with 
-`"event:"`:
+Here is an example `RedisSubscriberCall` implementation to process messages:
 
 ```c
   void my_event_processor(const char *pattern, const char *channel, const char *msg, long len) {
@@ -675,8 +674,8 @@ Once the function is defined, you can activate it via:
   }
 ```
 
-Once the processing function is registered, we can start subsribing to specific channels and/or channel patterns (see
-the Redis `SUBSCRIBE` and `PSUBSCRIBE` commands for details).
+We should also start subsribing to specific channels and/or channel patterns (seethe Redis `SUBSCRIBE` and 
+`PSUBSCRIBE` commands for details).
 
 ```c
   Redis *redis = ...
@@ -692,9 +691,9 @@ the Redis `SUBSCRIBE` and `PSUBSCRIBE` commands for details).
 Now, we are capturing and processing all messages published to channels whose name begins with `"event:"`, using our
 custom `my_event_processor` function.
 
-To end the subscription, we trace back the same steps in reverse oder, calling `redisxUnsubscribe()` first to stop
-the delivery of further messages to the subscription channel or pattern, and then removing the `my_event_procesor` 
-subscriber function as appropriate (provided no other subscription needs it) via `redisxRemoveSubscriber()`.
+To end the subscription, we trace back the same steps by calling `redisxUnsubscribe()` to stop receiving further 
+messages to the subscription channel or pattern, and by removing the `my_event_procesor` subscriber function as 
+appropriate (provided no other subscription needs it) via `redisxRemoveSubscriber()`.
 
 
 -----------------------------------------------------------------------------
