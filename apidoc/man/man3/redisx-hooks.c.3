@@ -1,0 +1,124 @@
+.TH "src/redisx-hooks.c" 3 "Version v0.9" "RedisX" \" -*- nroff -*-
+.ad l
+.nh
+.SH NAME
+src/redisx-hooks.c
+.SH SYNOPSIS
+.br
+.PP
+.SS "Functions"
+
+.in +1c
+.ti -1c
+.RI "void \fBredisxAddConnectHook\fP (\fBRedis\fP *redis, void(*setupCall)(\fBRedis\fP *))"
+.br
+.ti -1c
+.RI "void \fBredisxAddDisconnectHook\fP (\fBRedis\fP *redis, void(*cleanupCall)(\fBRedis\fP *))"
+.br
+.ti -1c
+.RI "void \fBredisxClearConnectHooks\fP (\fBRedis\fP *redis)"
+.br
+.ti -1c
+.RI "void \fBredisxClearDisconnectHooks\fP (\fBRedis\fP *redis)"
+.br
+.ti -1c
+.RI "void \fBredisxRemoveConnectHook\fP (\fBRedis\fP *redis, void(*setupCall)(\fBRedis\fP *))"
+.br
+.ti -1c
+.RI "void \fBredisxRemoveDisconnectHook\fP (\fBRedis\fP *redis, void(*cleanupCall)(\fBRedis\fP *))"
+.br
+.in -1c
+.SH "Detailed Description"
+.PP 
+
+.PP
+\fBDate\fP
+.RS 4
+Created on Aug 26, 2024 
+.RE
+.PP
+\fBAuthor\fP
+.RS 4
+Attila Kovacs
+.RE
+.PP
+A set of functions to manage callback hooks for the RedisX library\&. 
+.SH "Function Documentation"
+.PP 
+.SS "void redisxAddConnectHook (\fBRedis\fP * redis, void(*)(\fBRedis\fP *) setupCall)"
+Adds a connect call hook, provided it is not already part of the setup routine\&.
+.PP
+\fBParameters\fP
+.RS 4
+\fIredis\fP Pointer to a \fBRedis\fP instance\&. 
+.br
+\fIsetupCall\fP User-specified callback routine to be called after the \fBRedis\fP instance has been connected\&. It will be passed a pointer to the \fBRedis\fP instance, which triggered the call by having established connection\&. 
+.RE
+.PP
+
+.PP
+References \fBxvprintf\fP\&.
+.SS "void redisxAddDisconnectHook (\fBRedis\fP * redis, void(*)(\fBRedis\fP *) cleanupCall)"
+Adds a cleanup call, provided it is not already part of the cleanup routine, for when the specified \fBRedis\fP instance is disconnected\&.
+.PP
+\fBParameters\fP
+.RS 4
+\fIredis\fP Pointer to a \fBRedis\fP instance\&. 
+.br
+\fIcleanupCall\fP User specified function to call when \fBRedis\fP is disconnected\&. It will be passed a pointer to the \fBRedis\fP instance, which triggered the call by having disconnected from the \fBRedis\fP server\&. 
+.RE
+.PP
+
+.PP
+References \fBxvprintf\fP\&.
+.SS "void redisxClearConnectHooks (\fBRedis\fP * redis)"
+Removes all connect hooks, that is no user callbacks will be made when the specifed \fBRedis\fP instance is connected\&.
+.PP
+\fBParameters\fP
+.RS 4
+\fIredis\fP Pointer to a \fBRedis\fP instance\&. 
+.RE
+.PP
+
+.PP
+References \fBxvprintf\fP\&.
+.SS "void redisxClearDisconnectHooks (\fBRedis\fP * redis)"
+Removes all disconnect hooks, that is no user-specified callbacks will be made when the specified \fBRedis\fP instance is disconnected\&.
+.PP
+\fBParameters\fP
+.RS 4
+\fIredis\fP Pointer to a \fBRedis\fP instance\&. 
+.RE
+.PP
+
+.PP
+References \fBxvprintf\fP\&.
+.SS "void redisxRemoveConnectHook (\fBRedis\fP * redis, void(*)(\fBRedis\fP *) setupCall)"
+Removes a connect call hook\&.
+.PP
+\fBParameters\fP
+.RS 4
+\fIredis\fP Pointer to a \fBRedis\fP instance\&. 
+.br
+\fIsetupCall\fP User-specified callback routine to be called after the \fBRedis\fP instance has been connected\&. 
+.RE
+.PP
+
+.PP
+References \fBxvprintf\fP\&.
+.SS "void redisxRemoveDisconnectHook (\fBRedis\fP * redis, void(*)(\fBRedis\fP *) cleanupCall)"
+Removes a cleanup call hook for when the \fBRedis\fP instance is disconnected\&.
+.PP
+\fBParameters\fP
+.RS 4
+\fIredis\fP Pointer to a \fBRedis\fP instance\&. 
+.br
+\fIcleanupCall\fP User specified function to call when \fBRedis\fP is disconnected\&. 
+.RE
+.PP
+
+.PP
+References \fBxvprintf\fP\&.
+.SH "Author"
+.PP 
+Generated automatically by Doxygen for RedisX from the source code\&.

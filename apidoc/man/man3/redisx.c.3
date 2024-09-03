@@ -1,0 +1,322 @@
+.TH "src/redisx.c" 3 "Version v0.9" "RedisX" \" -*- nroff -*-
+.ad l
+.nh
+.SH NAME
+src/redisx.c \- A \fBRedis\fP client library that compiles on older and newer platforms alike, such as LynxOS 3\&.1\&.0 PowerPCs\&. It is quite full featured, supporting multiple \fBRedis\fP instances, pipelining, user-specified connect and disconnect hooks, multiple user-specified subscription listeners, and user-specified pipeline processors\&.  
+
+.SH SYNOPSIS
+.br
+.PP
+.SS "Functions"
+
+.in +1c
+.ti -1c
+.RI "int \fBredisxCheckDestroyRESP\fP (\fBRESP\fP *resp, char expectedType, int expectedSize)"
+.br
+.ti -1c
+.RI "int \fBredisxCheckRESP\fP (const \fBRESP\fP *resp, char expectedType, int expectedSize)"
+.br
+.ti -1c
+.RI "void \fBredisxDestroy\fP (\fBRedis\fP *redis)"
+.br
+.ti -1c
+.RI "void \fBredisxDestroyRESP\fP (\fBRESP\fP *resp)"
+.br
+.ti -1c
+.RI "int \fBredisxError\fP (const char *func, int errorCode)"
+.br
+.ti -1c
+.RI "const char * \fBredisxErrorDescription\fP (int code)"
+.br
+.ti -1c
+.RI "int \fBredisxGetTime\fP (\fBRedis\fP *redis, struct timespec *t)"
+.br
+.ti -1c
+.RI "int \fBredisxIgnoreReplyAsync\fP (\fBRedisClient\fP *cl)"
+.br
+.ti -1c
+.RI "\fBRedis\fP * \fBredisxInit\fP (const char *server)"
+.br
+.ti -1c
+.RI "\fBboolean\fP \fBredisxIsVerbose\fP ()"
+.br
+.ti -1c
+.RI "int \fBredisxLoadScript\fP (\fBRedis\fP *redis, const char *script, char **sha1)"
+.br
+.ti -1c
+.RI "void \fBredisxSetPassword\fP (\fBRedis\fP *redis, const char *passwd)"
+.br
+.ti -1c
+.RI "int \fBredisxSetPipelineConsumer\fP (\fBRedis\fP *redis, void(*f)(\fBRESP\fP *))"
+.br
+.ti -1c
+.RI "int \fBredisxSetTransmitErrorHandler\fP (\fBRedis\fP *redis, \fBRedisErrorHandler\fP f)"
+.br
+.ti -1c
+.RI "void \fBredisxSetVerbose\fP (\fBboolean\fP value)"
+.br
+.in -1c
+.SH "Detailed Description"
+.PP 
+A \fBRedis\fP client library that compiles on older and newer platforms alike, such as LynxOS 3\&.1\&.0 PowerPCs\&. It is quite full featured, supporting multiple \fBRedis\fP instances, pipelining, user-specified connect and disconnect hooks, multiple user-specified subscription listeners, and user-specified pipeline processors\&. 
+
+
+.PP
+\fBDate\fP
+.RS 4
+May 4, 2018 
+.RE
+.PP
+\fBAuthor\fP
+.RS 4
+Attila Kovacs
+.RE
+.PP
+
+.SH "Function Documentation"
+.PP 
+.SS "int redisxCheckDestroyRESP (\fBRESP\fP * resp, char expectedType, int expectedSize)"
+Like \fBredisxCheckRESP()\fP, but it also destroys the \fBRESP\fP in case of an error\&.
+.PP
+\fBParameters\fP
+.RS 4
+\fIresp\fP Pointer to the \fBRESP\fP structure from \fBRedis\fP\&. 
+.br
+\fIexpectedType\fP The \fBRESP\fP type expected (e\&.g\&. RESP_ARRAY) or 0 if not checking type\&. 
+.br
+\fIexpectedSize\fP The expected size of the \fBRESP\fP (array or bytes) or <=0 to skip checking
+.RE
+.PP
+\fBReturns\fP
+.RS 4
+The return value of \fBredisxCheckRESP()\fP\&.
+.RE
+.PP
+\fBSee also\fP
+.RS 4
+\fBredisxCheckRESP()\fP 
+.RE
+.PP
+
+.PP
+References \fBredisxCheckRESP()\fP, and \fBredisxDestroyRESP()\fP\&.
+.SS "int redisxCheckRESP (const \fBRESP\fP * resp, char expectedType, int expectedSize)"
+Checks a \fBRedis\fP \fBRESP\fP for NULL values or unexpected values\&.
+.PP
+\fBParameters\fP
+.RS 4
+\fIresp\fP Pointer to the \fBRESP\fP structure from \fBRedis\fP\&. 
+.br
+\fIexpectedType\fP The \fBRESP\fP type expected (e\&.g\&. RESP_ARRAY) or 0 if not checking type\&. 
+.br
+\fIexpectedSize\fP The expected size of the \fBRESP\fP (array or bytes) or <=0 to skip checking
+.RE
+.PP
+\fBReturns\fP
+.RS 4
+X_SUCCESS (0) if the \fBRESP\fP passes the tests, or X_PARSE_ERROR if the \fBRESP\fP is NULL (garbled response)\&. REDIS_NULL if \fBRedis\fP returned (nil), REDIS_UNEXPECTED_TYPE if got a reply of a different type than expected REDIS_UNEXPECTED_ARRAY_SIZE if got a reply of different size than expected\&.
+.RE
+.PP
+or the error returned in resp->n\&. 
+.PP
+References \fBRESP::n\fP, \fBREDIS_NULL\fP, \fBREDIS_UNEXPECTED_ARRAY_SIZE\fP, \fBREDIS_UNEXPECTED_RESP\fP, \fBRESP_INT\fP, \fBRESP::type\fP, \fBRESP::value\fP, \fBX_PARSE_ERROR\fP, and \fBX_SUCCESS\fP\&.
+.SS "void redisxDestroy (\fBRedis\fP * redis)"
+Destroys a \fBRedis\fP intance, disconnecting any clients that may be connected, and freeing all resources used by that \fBRedis\fP instance\&.
+.PP
+\fBParameters\fP
+.RS 4
+\fIredis\fP Pointer to a \fBRedis\fP instance\&. 
+.RE
+.PP
+
+.PP
+References \fBREDIS_CHANNELS\fP, \fBredisxDisconnect()\fP, and \fBredisxIsConnected()\fP\&.
+.SS "void redisxDestroyRESP (\fBRESP\fP * resp)"
+Frees up the resources used by a \fBRESP\fP structure that was dynamically allocated\&. The call will segfault if the same \fBRESP\fP is destroyed twice or if the argument is a static allocation\&.
+.PP
+\fBParameters\fP
+.RS 4
+\fIresp\fP Pointer to the \fBRESP\fP structure to be destroyed, which may be NULL (no action taken)\&. 
+.RE
+.PP
+
+.PP
+References \fBRESP::n\fP, \fBredisxDestroyRESP()\fP, \fBRESP_ARRAY\fP, \fBRESP::type\fP, and \fBRESP::value\fP\&.
+.SS "int redisxError (const char * func, int errorCode)"
+Prints a descriptive error message to stderr, and returns the error code\&.
+.PP
+\fBParameters\fP
+.RS 4
+\fIfunc\fP A string that describes the function or location where the error occurred\&. 
+.br
+\fIerrorCode\fP The error code that describes the failure\&.
+.RE
+.PP
+\fBReturns\fP
+.RS 4
+the error code\&. 
+.RE
+.PP
+
+.PP
+References \fBMAX_DEBUG_ERROR_COUNT\fP, \fBREDIS_INCOMPLETE_TRANSFER\fP, \fBredisxErrorDescription()\fP, and \fBxDebug\fP\&.
+.SS "const char * redisxErrorDescription (int code)"
+Returns a string description for one of the RM error codes\&.
+.PP
+\fBParameters\fP
+.RS 4
+\fIcode\fP One of the error codes defined in 'rm\&.h' or in 'redisrm\&.h' (e\&.g\&. X_NO_PIPELINE)
+.RE
+.PP
+\fBReturns\fP
+.RS 4
+A constant string with the error description\&. 
+.RE
+.PP
+
+.PP
+References \fBREDIS_ERROR\fP, \fBREDIS_INCOMPLETE_TRANSFER\fP, \fBREDIS_INVALID_CHANNEL\fP, \fBREDIS_NULL\fP, \fBREDIS_UNEXPECTED_ARRAY_SIZE\fP, \fBREDIS_UNEXPECTED_RESP\fP, and \fBxErrorDescription()\fP\&.
+.SS "int redisxGetTime (\fBRedis\fP * redis, struct timespec * t)"
+Returns the current time on the \fBRedis\fP server instance\&.
+.PP
+\fBParameters\fP
+.RS 4
+\fIredis\fP Pointer to a \fBRedis\fP instance\&. 
+.br
+\fIt\fP Pointer to a timespec structure in which to return the server time\&. 
+.RE
+.PP
+\fBReturns\fP
+.RS 4
+X_SUCCESS (0) if successful, or X_NULL if either argument is NULL, or X_PARSE_ERROR if could not parse the response, or another error returned by \fBredisxCheckRESP()\fP\&. 
+.RE
+.PP
+
+.PP
+References \fBredisxCheckDestroyRESP()\fP, \fBredisxCheckRESP()\fP, \fBredisxDestroyRESP()\fP, \fBredisxError()\fP, \fBredisxRequest()\fP, \fBRESP_ARRAY\fP, \fBRESP_BULK_STRING\fP, \fBRESP::value\fP, \fBX_NULL\fP, \fBX_PARSE_ERROR\fP, and \fBX_SUCCESS\fP\&.
+.SS "int redisxIgnoreReplyAsync (\fBRedisClient\fP * cl)"
+Silently consumes a reply from the specified \fBRedis\fP channel\&.
+.PP
+\fBParameters\fP
+.RS 4
+\fIcl\fP Pointer to a \fBRedis\fP channel\&.
+.RE
+.PP
+\fBReturns\fP
+.RS 4
+X_SUCCESS if a response was successfully consumed, or REDIS_NULL if a valid response could not be obtained\&. 
+.RE
+.PP
+
+.PP
+References \fBREDIS_NULL\fP, \fBredisxDestroyRESP()\fP, \fBredisxError()\fP, \fBredisxReadReplyAsync()\fP, \fBX_NULL\fP, and \fBX_SUCCESS\fP\&.
+.SS "\fBRedis\fP * redisxInit (const char * server)"
+Initializes the \fBRedis\fP client library, and sets the hostname or IP address for the \fBRedis\fP server\&.
+.PP
+\fBParameters\fP
+.RS 4
+\fIserver\fP Server host name or numeric IP address, e\&.g\&. '127\&.0\&.0\&.1'
+.RE
+.PP
+\fBReturns\fP
+.RS 4
+X_SUCCESS or X_FAILURE if the IP address is invalid\&. X_NULL if the IP address is NULL\&. 
+.RE
+.PP
+
+.PP
+References \fBFALSE\fP, \fBRedis::id\fP, \fBRedis::interactive\fP, \fBINTERACTIVE_CHANNEL\fP, \fBRedis::pipeline\fP, \fBPIPELINE_CHANNEL\fP, \fBREDIS_CHANNELS\fP, \fBREDIS_TCP_PORT\fP, \fBsimpleHostnameToIP()\fP, \fBRedis::subscription\fP, \fBSUBSCRIPTION_CHANNEL\fP, \fBTRUE\fP, and \fBxStringCopyOf()\fP\&.
+.SS "\fBboolean\fP redisxIsVerbose ()"
+Checks id verbose reporting is enabled\&.
+.PP
+\fBReturns\fP
+.RS 4
+TRUE if verbose reporting is enabled, otherwise FALSE\&. 
+.RE
+.PP
+
+.PP
+References \fBxIsVerbose()\fP\&.
+.SS "int redisxLoadScript (\fBRedis\fP * redis, const char * script, char ** sha1)"
+Loads a LUA script into \fBRedis\fP, returning it's SHA1 hash to use as it's call ID\&.
+.PP
+\fBParameters\fP
+.RS 4
+\fIredis\fP Pointer to a \fBRedis\fP instance\&. 
+.br
+\fIscript\fP String containing the full LUA script\&. 
+.br
+\fIsha1\fP Buffer into which SHA1 key returned by \fBRedis\fP to use as call ID\&. (It must be at least 41 bytes, and will be string terminated)\&. By default it will return an empty string\&.
+.RE
+.PP
+\fBReturns\fP
+.RS 4
+X_SUCCESS (0) if the script has been successfully loaded into \fBRedis\fP, or X_NULL if the \fBRedis\fP instance is NULL X_NAME_INVALID if the script is NULL or empty\&. REDIS_UNEXPECTED_RESP if received a \fBRedis\fP reponse of the wrong type,
+.RE
+.PP
+ot an error returned by \fBredisxRequest()\fP\&. 
+.PP
+References \fBredisxCheckDestroyRESP()\fP, \fBredisxDestroyRESP()\fP, \fBredisxError()\fP, \fBredisxRequest()\fP, \fBRESP_BULK_STRING\fP, \fBRESP::value\fP, \fBX_NAME_INVALID\fP, \fBX_NULL\fP, and \fBX_SUCCESS\fP\&.
+.SS "void redisxSetPassword (\fBRedis\fP * redis, const char * passwd)"
+Sets the password to use for authenticating on the \fBRedis\fP server after connection\&. See the AUTH \fBRedis\fP command for more explanation\&. Naturally, you need to call this prior to connecting your \fBRedis\fP instance to have the desired effect\&.
+.PP
+\fBParameters\fP
+.RS 4
+\fIredis\fP Pointer to the \fBRedis\fP instance for which to set credentials 
+.br
+\fIpasswd\fP the password to use for authenticating on the server, or NULL to clear a previously configured password\&. 
+.RE
+.PP
+
+.PP
+References \fBxStringCopyOf()\fP\&.
+.SS "int redisxSetPipelineConsumer (\fBRedis\fP * redis, void(*)(\fBRESP\fP *) f)"
+Sets the function processing valid pipeline responses\&.
+.PP
+\fBParameters\fP
+.RS 4
+\fIredis\fP Pointer to a \fBRedis\fP instance\&. 
+.br
+\fIf\fP T he function that processes a single argument of type \fBRESP\fP pointer\&.
+.RE
+.PP
+\fBReturns\fP
+.RS 4
+X_SUCCESS (0) if successful, or X_NULL if the \fBRedis\fP instance is NULL\&. 
+.RE
+.PP
+
+.PP
+References \fBredisxError()\fP, \fBX_NULL\fP, and \fBX_SUCCESS\fP\&.
+.SS "int redisxSetTransmitErrorHandler (\fBRedis\fP * redis, \fBRedisErrorHandler\fP f)"
+Sets the user-specific error handler to call if a socket level trasmit error occurs\&. It replaces any prior handlers set earlier\&.
+.PP
+\fBParameters\fP
+.RS 4
+\fIredis\fP The \fBRedis\fP instance to configure\&. 
+.br
+\fIf\fP The error handler function, which is called with the pointer to the redis instance that had the errror, the redis channel index (e\&.g\&. REDIS_INTERACTIVE_CHANNEL) and the operation (e\&.g\&. 'send' or 'read') that failed\&. Note, that the call may be made with the affected \fBRedis\fP channel being in a locked state\&. As such the handler should not directly attempt to change the connection state of the \fBRedis\fP instance\&. Any calls that require exlusive access to the affected channel should instead be spawn off into a separate thread, which can obtain the necessary lock when it is released\&.
+.RE
+.PP
+\fBReturns\fP
+.RS 4
+X_SUCCESS if the handler was successfully configured, or X_NULL if the \fBRedis\fP instance is NULL\&. 
+.RE
+.PP
+
+.PP
+References \fBX_NULL\fP, and \fBX_SUCCESS\fP\&.
+.SS "void redisxSetVerbose (\fBboolean\fP value)"
+Enable or disable verbose reporting of all \fBRedis\fP operations (and possibly some details of them)\&. Reporting is done on the standard output (stdout)\&. It may be useful when debugging programs that use the redisx interface\&. Verbose reporting is DISABLED by default\&.
+.PP
+\fBParameters\fP
+.RS 4
+\fIvalue\fP TRUE to enable verbose reporting, or FALSE to disable\&. 
+.RE
+.PP
+
+.PP
+References \fBxSetVerbose()\fP\&.
+.SH "Author"
+.PP 
+Generated automatically by Doxygen for RedisX from the source code\&.

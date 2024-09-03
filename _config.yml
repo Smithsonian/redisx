@@ -1,0 +1,27 @@
+theme: jekyll-theme-Tactile
+author: Attila Kovacs
+github_username: attipaci
+title: RedisX
+description: A light-weight Redis client library for C/C++
+show_downloads: false
+#google_analytics: G-D69CXTY2CJ
+url: "https://smithsonian.github.io"
+read_time: true
+titles_from_headings:
+  strip_title: true
+plugins:
+  - jekyll-sitemap
+  - jekyll-titles-from-headings
+  - jekyll-toc
+defaults:
+  # Exclude search pages from sitemap
+  - scope:
+      path: apidoc/html/search/**
+    values:
+      sitemap: false
+  # Exclude google site verification from sitemap
+  - scope:
+      path: google*.html
+    values:
+      sitemap: false
+

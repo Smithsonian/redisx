@@ -1,0 +1,287 @@
+.TH "src/redisx-sub.c" 3 "Version v0.9" "RedisX" \" -*- nroff -*-
+.ad l
+.nh
+.SH NAME
+src/redisx-sub.c
+.SH SYNOPSIS
+.br
+.PP
+.SS "Functions"
+
+.in +1c
+.ti -1c
+.RI "void \fBredisxAddSubscriber\fP (\fBRedis\fP *redis, const char *channelStem, \fBRedisSubscriberCall\fP f)"
+.br
+.ti -1c
+.RI "int \fBredisxClearSubscribers\fP (\fBRedis\fP *redis)"
+.br
+.ti -1c
+.RI "void \fBredisxEndSubscription\fP (\fBRedis\fP *redis)"
+.br
+.ti -1c
+.RI "int \fBredisxNotify\fP (\fBRedis\fP *redis, const char *channel, const char *message)"
+.br
+.ti -1c
+.RI "int \fBredisxPublish\fP (\fBRedis\fP *redis, const char *channel, const char *data, int length)"
+.br
+.ti -1c
+.RI "int \fBredisxPublishAsync\fP (\fBRedis\fP *redis, const char *channel, const char *data, int length)"
+.br
+.ti -1c
+.RI "int \fBredisxRemoveSubscribers\fP (\fBRedis\fP *redis, \fBRedisSubscriberCall\fP f)"
+.br
+.ti -1c
+.RI "int \fBredisxSubscribe\fP (\fBRedis\fP *redis, const char *pattern)"
+.br
+.ti -1c
+.RI "int \fBredisxUnsubscribe\fP (\fBRedis\fP *redis, const char *pattern)"
+.br
+.in -1c
+.SH "Detailed Description"
+.PP 
+
+.PP
+\fBDate\fP
+.RS 4
+Created on Aug 26, 2024 
+.RE
+.PP
+\fBAuthor\fP
+.RS 4
+Attila Kovacs
+.RE
+.PP
+PUB/SUB functions for the RedisX library\&. 
+.SH "Function Documentation"
+.PP 
+.SS "void redisxAddSubscriber (\fBRedis\fP * redis, const char * channelStem, \fBRedisSubscriberCall\fP f)"
+Add a targeted subscriber processing function to the list of functions that process \fBRedis\fP PUB/SUB responses\&. You will still have to subscribe the relevant PUB/SUB messages from redis separately, using \fBredisxSubscribe()\fP before any messages are delivered to this client\&. If the subscriber with the same callback function and channel stem is already added, this call simply return and will NOT create a duplicate enry\&. However, the same callback may be added multiple times with different channel stems (which pre-filter what messages each of the callbacks may get)\&.
+.PP
+\fBParameters\fP
+.RS 4
+\fIredis\fP Pointer to a \fBRedis\fP instance\&. 
+.br
+\fIchannelStem\fP If NULL, the consumer will receive all \fBRedis\fP messages published to the given channel\&. Otherwise, the consumer will be notified only if the incoming channel begins with the specified stem\&. 
+.br
+\fIf\fP A function that consumes subscription messages\&.
+.RE
+.PP
+\fBSee also\fP
+.RS 4
+\fBredisxRemoveSubscribers()\fP 
+.PP
+\fBredisxSubscribe()\fP 
+.RE
+.PP
+
+.PP
+References \fBxdprintf\fP, \fBxStringCopyOf()\fP, and \fBxvprintf\fP\&.
+.SS "int redisxClearSubscribers (\fBRedis\fP * redis)"
+Stops the custom consumption of PUB/SUB messages from \fBRedis\fP\&.
+.PP
+\fBParameters\fP
+.RS 4
+\fIredis\fP Pointer to a \fBRedis\fP instance\&.
+.RE
+.PP
+\fBReturns\fP
+.RS 4
+X_SUCCESS (0) if successful, or X_NULL if the redis instance is NULL\&. 
+.RE
+.PP
+
+.PP
+References \fBredisxError()\fP, \fBX_NULL\fP, and \fBxvprintf\fP\&.
+.SS "void redisxEndSubscription (\fBRedis\fP * redis)"
+Unsubscribes from all channels, stops the subscription listener thread, and closes the subscription client connection\&.
+.PP
+\fBParameters\fP
+.RS 4
+\fIredis\fP Pointer to a \fBRedis\fP instance\&.
+.RE
+.PP
+\fBSee also\fP
+.RS 4
+\fBredisxUnsubscribe()\fP 
+.RE
+.PP
+
+.SS "int redisxNotify (\fBRedis\fP * redis, const char * channel, const char * message)"
+Sends a regular string terminated \fBRedis\fP PUB/SUB message on the specified channel\&. Same as \fBredisxPublish()\fP with the length argument set to the length of the string message\&. \fBRedis\fP must be connected before attempting to send messages\&.
+.PP
+\fBParameters\fP
+.RS 4
+\fIredis\fP Pointer to a \fBRedis\fP instance\&. 
+.br
+\fIchannel\fP \fBRedis\fP PUB/SUB channel on which to notify 
+.br
+\fImessage\fP Message to send\&.
+.RE
+.PP
+\fBReturns\fP
+.RS 4
+X_SUCCESS if the message was successfullt sent\&. X_NO_INIT if the \fBRedis\fP library was not initialized via initRedis()\&. X_NO_SERVICE if there was a connection problem\&. PARSE_ERROR if the \fBRedis\fP response could not be confirmed\&. or the errno returned by send();
+.RE
+.PP
+\fBSee also\fP
+.RS 4
+\fBredisxPublish()\fP 
+.PP
+\fBredisxPublishAsync()\fP 
+.PP
+\fBredisxSubscribe()\fP 
+.RE
+.PP
+
+.PP
+References \fBredisxPublish()\fP\&.
+.SS "int redisxPublish (\fBRedis\fP * redis, const char * channel, const char * data, int length)"
+Sends a generic \fBRedis\fP PUB/SUB message on the specified channel\&. \fBRedis\fP must be connected before attempting to send messages\&. It will send the message over the pipeline client if it is avaiable, or else over the interactive client\&.
+.PP
+\fBParameters\fP
+.RS 4
+\fIredis\fP Pointer to a \fBRedis\fP instance\&. 
+.br
+\fIchannel\fP \fBRedis\fP PUB/SUB channel on which to notify 
+.br
+\fIdata\fP Data to send\&. 
+.br
+\fIlength\fP Bytes of data to send, or 0 to determine automatically with strlen()\&.
+.RE
+.PP
+\fBReturns\fP
+.RS 4
+X_SUCCESS if the message was successfullt sent\&. X_NO_INIT if the \fBRedis\fP library was not initialized via initRedis()\&. X_NO_SERVICE if there was a connection problem\&. PARSE_ERROR if the \fBRedis\fP response could not be confirmed\&. or the errno returned by send()\&.
+.RE
+.PP
+\fBSee also\fP
+.RS 4
+\fBredisxNotify()\fP 
+.PP
+\fBredisxPublishAsync()\fP 
+.PP
+\fBredisxSubscribe()\fP 
+.RE
+.PP
+
+.PP
+References \fBRedis::id\fP, \fBRedis::interactive\fP, \fBredisxError()\fP, \fBredisxLockEnabled()\fP, \fBredisxPublishAsync()\fP, \fBredisxUnlockClient()\fP, \fBX_NULL\fP, \fBX_SUCCESS\fP, and \fBxvprintf\fP\&.
+.SS "int redisxPublishAsync (\fBRedis\fP * redis, const char * channel, const char * data, int length)"
+Sends a \fBRedis\fP notification asynchronously using the \fBRedis\fP 'PUBLISH' command\&. The caller should have an exclusive lock on the interactive \fBRedis\fP channel before calling this\&.
+.PP
+\fBParameters\fP
+.RS 4
+\fIredis\fP Pointer to a \fBRedis\fP instance\&. 
+.br
+\fIchannel\fP \fBRedis\fP PUB/SUB channel on which to notify 
+.br
+\fIdata\fP Message body data\&. 
+.br
+\fIlength\fP Bytes of message data to send, ot 0 to determine automatically with strlen()\&.
+.RE
+.PP
+\fBReturns\fP
+.RS 4
+X_SUCCESS (0) if successful, or else X_NULL if the redis instance is NULL X_NAME_INVALID if the PUB/SUB channel is null or empty
+.RE
+.PP
+or an error code returned by \fBredisxSendArrayRequestAsync()\fP\&.
+.PP
+\fBSee also\fP
+.RS 4
+\fBredisxPublish()\fP 
+.PP
+\fBredisxNotify()\fP 
+.RE
+.PP
+
+.PP
+References \fBRedis::interactive\fP, \fBredisxError()\fP, \fBredisxSendArrayRequestAsync()\fP, \fBredisxSkipReplyAsync()\fP, \fBX_NAME_INVALID\fP, \fBX_NULL\fP, and \fBX_SUCCESS\fP\&.
+.SS "int redisxRemoveSubscribers (\fBRedis\fP * redis, \fBRedisSubscriberCall\fP f)"
+Removes all instances of a subscribe consumer function from the current list of consumers\&. This calls only deactivates the specified processing callback function(s), without stopping the delivery of associated messages\&. To stop \fBRedis\fP sending messages that are no longer being processed, you should also call \fBredisxUnsubscribe()\fP as appropriate\&.
+.PP
+\fBParameters\fP
+.RS 4
+\fIredis\fP Pointer to a \fBRedis\fP instance\&. 
+.br
+\fIf\fP The consumer function to remove from the list of active subscribers\&.
+.RE
+.PP
+\fBReturns\fP
+.RS 4
+The number of instances of f() that have been removed from the list of subscribers\&.
+.RE
+.PP
+\fBSee also\fP
+.RS 4
+\fBredisxAddSubscriber()\fP 
+.PP
+\fBredisxClearSubscribers()\fP 
+.PP
+redisxUnsubscrive() 
+.RE
+.PP
+
+.PP
+References \fBredisxError()\fP, \fBX_NULL\fP, and \fBxvprintf\fP\&.
+.SS "int redisxSubscribe (\fBRedis\fP * redis, const char * pattern)"
+Subscribe to a specific \fBRedis\fP channel\&. The call will also start the subscription listener thread to processing incoming subscription messages\&. Subscribing only enabled the delivery of the messages to this client without any actions on these messages\&. In order to process the messages for your subscriptons, you will also want to call \fBredisxAddSubscriber()\fP to add your custom processor function(s)\&.
+.PP
+\fBParameters\fP
+.RS 4
+\fIredis\fP Pointer to a \fBRedis\fP instance\&. 
+.br
+\fIpattern\fP The Channel pattern to subscribe to, e\&.g\&. 'acc1', or 'acc*'\&.\&.\&.
+.RE
+.PP
+\fBReturns\fP
+.RS 4
+X_SUCCESS if successfully subscribed to the \fBRedis\fP distribution channel\&. X_NO_SERVICE if there is no active connection to the \fBRedis\fP server\&. X_NULL if the channel argument is NULL
+.RE
+.PP
+\fBSee also\fP
+.RS 4
+\fBredisxAddSubscriber()\fP 
+.PP
+\fBredisxUnsubscribe()\fP 
+.PP
+\fBredisxNotify()\fP 
+.PP
+\fBredisxPublish()\fP 
+.PP
+\fBredisxPublishAsync()\fP 
+.RE
+.PP
+
+.PP
+References \fBredisxError()\fP, \fBredisxLockEnabled()\fP, \fBredisxSendRequestAsync()\fP, \fBredisxUnlockClient()\fP, \fBRedis::subscription\fP, \fBX_NULL\fP, and \fBX_SUCCESS\fP\&.
+.SS "int redisxUnsubscribe (\fBRedis\fP * redis, const char * pattern)"
+Unsubscribe from one or all \fBRedis\fP PUB/SUB channel(s)\&. If there are no active subscriptions when \fBRedis\fP confirms the unsubscrive command, the subscription listener thread will also conclude automatically\&. Unsubscribing will stop delivery of mesasages for the affected channels but any associated processing callbacks remain registered, until redisxRemovesubscribers() is called to deactive them as appropriate\&.
+.PP
+\fBParameters\fP
+.RS 4
+\fIredis\fP Pointer to a \fBRedis\fP instance\&. 
+.br
+\fIpattern\fP The channel pattern, or NULL to unsubscribe all channels and patterns\&.
+.RE
+.PP
+\fBReturns\fP
+.RS 4
+X_SUCCESS if successfully subscribed to the \fBRedis\fP distribution channel\&. X_NO_SERVICE if there is no active connection to the \fBRedis\fP server\&.
+.RE
+.PP
+\fBSee also\fP
+.RS 4
+\fBredisxSubscribe()\fP 
+.PP
+redisxEndSubscribe() 
+.PP
+\fBredisxRemoveSubscribers()\fP 
+.RE
+.PP
+
+.PP
+References \fBredisxError()\fP, \fBredisxLockEnabled()\fP, \fBredisxSendRequestAsync()\fP, \fBredisxUnlockClient()\fP, \fBRedis::subscription\fP, \fBX_NULL\fP, and \fBX_SUCCESS\fP\&.
+.SH "Author"
+.PP 
+Generated automatically by Doxygen for RedisX from the source code\&.

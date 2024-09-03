@@ -1,0 +1,46 @@
+.TH "RESP" 3 "Version v0.9" "RedisX" \" -*- nroff -*-
+.ad l
+.nh
+.SH NAME
+RESP \- Structure that represents a \fBRedis\fP response (\fBRESP\fP format)\&.  
+
+.SH SYNOPSIS
+.br
+.PP
+.PP
+\fR#include <redisx\&.h>\fP
+.SS "Data Fields"
+
+.in +1c
+.ti -1c
+.RI "int \fBn\fP"
+.br
+.ti -1c
+.RI "char \fBtype\fP"
+.br
+.RI "RESP_ARRAY, RESP_INT \&.\&.\&. "
+.ti -1c
+.RI "void * \fBvalue\fP"
+.br
+.RI "Pointer to text (char *) content to an array of components (RESP**)\&.\&.\&. "
+.in -1c
+.SH "Detailed Description"
+.PP 
+Structure that represents a \fBRedis\fP response (\fBRESP\fP format)\&. 
+
+
+.PP
+\fBSee also\fP
+.RS 4
+\fBredisxDestroyRESP()\fP 
+.RE
+.PP
+
+.SH "Field Documentation"
+.PP 
+.SS "int n"
+Either the integer value of a RESP_INT response, or the dimension of the value field\&. 
+
+.SH "Author"
+.PP 
+Generated automatically by Doxygen for RedisX from the source code\&.

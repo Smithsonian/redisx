@@ -1,0 +1,49 @@
+.TH "Redis" 3 "Version v0.9" "RedisX" \" -*- nroff -*-
+.ad l
+.nh
+.SH NAME
+Redis \- Structure that represents a \fBRedis\fP database instance, with one or more \fBRedisClient\fP connections\&.  
+
+.SH SYNOPSIS
+.br
+.PP
+.PP
+\fR#include <redisx\&.h>\fP
+.SS "Data Fields"
+
+.in +1c
+.ti -1c
+.RI "char * \fBid\fP"
+.br
+.RI "The string ID of the \fBRedis\fP server\&. Default is IP, e\&.g\&. '127\&.0\&.0\&.1'\&. "
+.ti -1c
+.RI "\fBRedisClient\fP * \fBinteractive\fP"
+.br
+.RI "Pointer to the interactive client connection\&. "
+.ti -1c
+.RI "\fBRedisClient\fP * \fBpipeline\fP"
+.br
+.RI "Pointer to the pipeline client connection\&. "
+.ti -1c
+.RI "\fBRedisClient\fP * \fBsubscription\fP"
+.br
+.RI "Pointer to the subscription client connection\&. "
+.in -1c
+.SH "Detailed Description"
+.PP 
+Structure that represents a \fBRedis\fP database instance, with one or more \fBRedisClient\fP connections\&. 
+
+
+.PP
+\fBSee also\fP
+.RS 4
+\fBredisxInit()\fP 
+.PP
+\fBredisxDestroy()\fP 
+.RE
+.PP
+
+
+.SH "Author"
+.PP 
+Generated automatically by Doxygen for RedisX from the source code\&.
