@@ -13,17 +13,17 @@
       <topic label="Interactive transactions" href="index.html#autotoc_md18"/>
       <topic label="Pipelined transactions" href="index.html#autotoc_md19"/>
     </topic>
-    <topic label="Atomic execution blocks and LUA scripts" href="index.html#autotoc_md21">
-      <topic label="Execution blocks" href="index.html#autotoc_md22"/>
-      <topic label="LUA script loading and execution" href="index.html#autotoc_md23"/>
+    <topic label="Accessing key / value data" href="index.html#autotoc_md21">
+      <topic label="Getting and setting keyed values" href="index.html#autotoc_md22"/>
+      <topic label="Listing and Scanning" href="index.html#autotoc_md23"/>
     </topic>
-    <topic label="Accessing key / value data" href="index.html#autotoc_md25">
-      <topic label="Getting and setting keyed values" href="index.html#autotoc_md26"/>
-      <topic label="Listing and Scanning" href="index.html#autotoc_md27"/>
+    <topic label="Publish/subscribe (PUB/SUB) support" href="index.html#autotoc_md25">
+      <topic label="Broadcasting messages" href="index.html#autotoc_md26"/>
+      <topic label="Subscriptions" href="index.html#autotoc_md27"/>
     </topic>
-    <topic label="Publish/subscribe (PUB/SUB) support" href="index.html#autotoc_md29">
-      <topic label="Broadcasting messages" href="index.html#autotoc_md30"/>
-      <topic label="Subscriptions" href="index.html#autotoc_md31"/>
+    <topic label="Atomic execution blocks and LUA scripts" href="index.html#autotoc_md29">
+      <topic label="Execution blocks" href="index.html#autotoc_md30"/>
+      <topic label="LUA script loading and execution" href="index.html#autotoc_md31"/>
     </topic>
     <topic label="Error handling" href="index.html#autotoc_md33"/>
     <topic label="Debug support" href="index.html#autotoc_md35"/>

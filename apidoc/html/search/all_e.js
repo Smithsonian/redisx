@@ -7,6 +7,6 @@ var searchData=
   ['plans_4',['Future plans',['../index.html#autotoc_md37',1,'']]],
   ['prerequisites_5',['Prerequisites',['../index.html#autotoc_md6',1,'']]],
   ['priv_6',['priv',['../../../xchange/apidoc/html/structXLookupTable.html#a8b6505c37d4ff95854b8b00527e4d9fa',1,'XLookupTable']]],
-  ['pub_20sub_20support_7',['Publish/subscribe (PUB/SUB) support',['../index.html#autotoc_md29',1,'']]],
-  ['publish_20subscribe_20pub_20sub_20support_8',['Publish/subscribe (PUB/SUB) support',['../index.html#autotoc_md29',1,'']]]
+  ['pub_20sub_20support_7',['Publish/subscribe (PUB/SUB) support',['../index.html#autotoc_md25',1,'']]],
+  ['publish_20subscribe_20pub_20sub_20support_8',['Publish/subscribe (PUB/SUB) support',['../index.html#autotoc_md25',1,'']]]
 ];

@@ -41,17 +41,17 @@ var NAVTREE =
         [ "Interactive transactions", "index.html#autotoc_md18", null ],
         [ "Pipelined transactions", "index.html#autotoc_md19", null ]
       ] ],
-      [ "Atomic execution blocks and LUA scripts", "index.html#autotoc_md21", [
-        [ "Execution blocks", "index.html#autotoc_md22", null ],
-        [ "LUA script loading and execution", "index.html#autotoc_md23", null ]
+      [ "Accessing key / value data", "index.html#autotoc_md21", [
+        [ "Getting and setting keyed values", "index.html#autotoc_md22", null ],
+        [ "Listing and Scanning", "index.html#autotoc_md23", null ]
       ] ],
-      [ "Accessing key / value data", "index.html#autotoc_md25", [
-        [ "Getting and setting keyed values", "index.html#autotoc_md26", null ],
-        [ "Listing and Scanning", "index.html#autotoc_md27", null ]
+      [ "Publish/subscribe (PUB/SUB) support", "index.html#autotoc_md25", [
+        [ "Broadcasting messages", "index.html#autotoc_md26", null ],
+        [ "Subscriptions", "index.html#autotoc_md27", null ]
       ] ],
-      [ "Publish/subscribe (PUB/SUB) support", "index.html#autotoc_md29", [
-        [ "Broadcasting messages", "index.html#autotoc_md30", null ],
-        [ "Subscriptions", "index.html#autotoc_md31", null ]
+      [ "Atomic execution blocks and LUA scripts", "index.html#autotoc_md29", [
+        [ "Execution blocks", "index.html#autotoc_md30", null ],
+        [ "LUA script loading and execution", "index.html#autotoc_md31", null ]
       ] ],
       [ "Error handling", "index.html#autotoc_md33", null ],
       [ "Debug support", "index.html#autotoc_md35", null ],

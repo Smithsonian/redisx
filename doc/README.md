@@ -9,8 +9,8 @@ A simple, light-weight C/C++ Redis client.
  - [Building RedisX](#building-redisx)
  - [Managing Redis server connections](#managing-redis-server-connections)
  - [Simple Redis queries](#simple-redis-queries)
- - [Atomic execution blocks and LUA scripts](#atomic-transaction-blocks-and-lua-scripts)
  - [Publish/subscribe (PUB/SUB) support](#publish-subscribe-support)
+ - [Atomic execution blocks and LUA scripts](#atomic-transaction-blocks-and-lua-scripts)
  - [Error handling](#error-handling)
  - [Debug support](#debug-support)
  - [Future plans](#future-plans)
@@ -379,104 +379,6 @@ with the approrpiate mutex locked to prevent concurrency issues.
 
 -----------------------------------------------------------------------------
 
-<a name="atomic-transaction-blocks-and-lua-scripts"></a>
-## Atomic execution blocks and LUA scripts
-
- - [Execution blocks](#execution-blocks)
- - [LUA script loading and execution](#lua-script-loading-and-execution)
-
-Sometimes you want to ececute a series of Redis command atomically, such that nothing else may alter the database 
-while the set of commands execute, so they may return a coherent state. For example, you want to set or query a 
-collection of related variables so they change together and are reported together. You have two choices. (1) you
-can execute the Redis commands in an execution block, or else (2) load a LUA script onto the Redis server and call 
-it with some parameters (possibly many times over).
-
-<a name="execution-blocks"></a>
-### Execution blocks
-
-Execution blocks offer a fairly simple way of bunching 
-
-```c
-  Redis *redis = ...;
-  RESP *result;
-  
-  // Obtain the client on which to execute the block, e.g. the INTERACTIVE_CHANNEL
-  RedisClient *cl = redisxGetClient(redis, INTERACTIVE_CHANNEL);
-  
-  int status = redisxLockEnabled(cl);
-  if (status != X_SUCCESS) {
-    // Abort: we don't have exclusive access to the client
-    return;
-  }
-
-  // -------------------------------------------------------------------------
-  // Start an atomic execution block
-  redisxStartBlockAsync(cl);
-  
-  // Send a number of Async requests
-  redisxSendRequestAsync(cl, ...);
-  ...
-
-  // Execute the block of commands above atomically, and get the resulting RESP
-  result = redisxExecBlockAsync(cl);
-  // -------------------------------------------------------------------------
-  
-  // Release exlusive access to the client
-  redisxUnlockClient(cl);
-  
-  // Inspect the RESP, etc...
-  ... 
-```
-
-If at any point things don't go accoring to plan in the middle of the block, you can call `redisAbortBlockAsync()` to
-abort and discard all prior commands submitted in the execution block already.
-
-<a name="lua-script-loading-and-execution"></a>
-### LUA script loading and execution
-
-LUA scripting offers a more capable version of executing more complex routines on the Redis server. LUA is a scripting
-language akin to python, and allows you to add extra logic, string manipulation etc to your Redis queries. Best of all, 
-once you upload the script to the server, it can reduce network traffic significantly by not having to repeatedly 
-submit the same set of Redis commands every single time. LUA scipts also get executed very efficiently on the server, 
-and produce only the result you want/need.
-
-Assuming you have prepared your LUA script, you can upload it to the Redis server as:
-
-```c
-  Redis *redis = ...
-  char *script = ...         // The LUA script as a 0-terminated string.
-  char *scriptSHA1 = NULL;   // We'll store the SHA1 sum of the script here
-
-  // Load the script onto the Redis server
-  int status = redixLoadScript(redis, script, &scriptSHA);
-  if(status != X_SUCCESS) {
-    // Oops, something went wrong...
-    ...
-  }
-```
-
-Redis will refer to the script by its SHA1 sum, so it's important keep a record of it. You'll call the script with
-its SHA1 sum, a set of redis keys the script may use, and a set of other parameters it might need.
-
-```c
-  Redis *redis = ...
-  int status;
-  
-  // Execute the script, with one redis key argument (and no parameters)...
-  RESP *r = redisxRequest("EVALSHA", SHA1, "1", "my-redis-key-argument", &status);
-
-  // Check status and inspect RESP
-  ...
-```
-
-Clearly, if you have additional Redis key arguments and/or parameters to pass to the script, you'll have to use 
-`redisxArrayRequest()`, instead.
-
-One thing to keep in mind about LUA scripts is that they are not persistent. They are lost each time the Redis 
-server is restarted.
-
------------------------------------------------------------------------------
-
 <a name="accessing-key-value-data"></a>
 ## Accessing key / value data
 
@@ -703,6 +605,103 @@ To end the subscription, we trace back the same steps by calling `redisxUnsubscr
 messages to the subscription channel or pattern, and by removing the `my_event_procesor` subscriber function as 
 appropriate (provided no other subscription needs it) via `redisxRemoveSubscriber()`.
 
+-----------------------------------------------------------------------------
+
+<a name="atomic-transaction-blocks-and-lua-scripts"></a>
+## Atomic execution blocks and LUA scripts
+
+ - [Execution blocks](#execution-blocks)
+ - [LUA script loading and execution](#lua-script-loading-and-execution)
+
+Sometimes you want to ececute a series of Redis command atomically, such that nothing else may alter the database 
+while the set of commands execute, so they may return a coherent state. For example, you want to set or query a 
+collection of related variables so they change together and are reported together. You have two choices. (1) you
+can execute the Redis commands in an execution block, or else (2) load a LUA script onto the Redis server and call 
+it with some parameters (possibly many times over).
+
+<a name="execution-blocks"></a>
+### Execution blocks
+
+Execution blocks offer a fairly simple way of bunching 
+
+```c
+  Redis *redis = ...;
+  RESP *result;
+  
+  // Obtain the client on which to execute the block, e.g. the INTERACTIVE_CHANNEL
+  RedisClient *cl = redisxGetClient(redis, INTERACTIVE_CHANNEL);
+  
+  int status = redisxLockEnabled(cl);
+  if (status != X_SUCCESS) {
+    // Abort: we don't have exclusive access to the client
+    return;
+  }
+
+  // -------------------------------------------------------------------------
+  // Start an atomic execution block
+  redisxStartBlockAsync(cl);
+  
+  // Send a number of Async requests
+  redisxSendRequestAsync(cl, ...);
+  ...
+
+  // Execute the block of commands above atomically, and get the resulting RESP
+  result = redisxExecBlockAsync(cl);
+  // -------------------------------------------------------------------------
+  
+  // Release exlusive access to the client
+  redisxUnlockClient(cl);
+  
+  // Inspect the RESP, etc...
+  ... 
+```
+
+If at any point things don't go accoring to plan in the middle of the block, you can call `redisAbortBlockAsync()` to
+abort and discard all prior commands submitted in the execution block already.
+
+<a name="lua-script-loading-and-execution"></a>
+### LUA script loading and execution
+
+LUA scripting offers a more capable version of executing more complex routines on the Redis server. LUA is a scripting
+language akin to python, and allows you to add extra logic, string manipulation etc to your Redis queries. Best of all, 
+once you upload the script to the server, it can reduce network traffic significantly by not having to repeatedly 
+submit the same set of Redis commands every single time. LUA scipts also get executed very efficiently on the server, 
+and produce only the result you want/need.
+
+Assuming you have prepared your LUA script, you can upload it to the Redis server as:
+
+```c
+  Redis *redis = ...
+  char *script = ...         // The LUA script as a 0-terminated string.
+  char *scriptSHA1 = NULL;   // We'll store the SHA1 sum of the script here
+
+  // Load the script onto the Redis server
+  int status = redixLoadScript(redis, script, &scriptSHA);
+  if(status != X_SUCCESS) {
+    // Oops, something went wrong...
+    ...
+  }
+```
+
+Redis will refer to the script by its SHA1 sum, so it's important keep a record of it. You'll call the script with
+its SHA1 sum, a set of redis keys the script may use, and a set of other parameters it might need.
+
+```c
+  Redis *redis = ...
+  int status;
+  
+  // Execute the script, with one redis key argument (and no parameters)...
+  RESP *r = redisxRequest("EVALSHA", SHA1, "1", "my-redis-key-argument", &status);
+
+  // Check status and inspect RESP
+  ...
+```
+
+Clearly, if you have additional Redis key arguments and/or parameters to pass to the script, you'll have to use 
+`redisxArrayRequest()`, instead.
+
+One thing to keep in mind about LUA scripts is that they are not persistent. They are lost each time the Redis 
+server is restarted.
 
 
 -----------------------------------------------------------------------------
