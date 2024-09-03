@@ -22,7 +22,7 @@ __Downloads__
 
  - [Releases](https://github.com/Smithsonian/redisx/releases) from GitHub
  - Doxygen [tag file](apidoc/redisx.tag) (`redisx.tag`) for linking 
-   your [Doxygen](https://www.doxygen.nl/) documentation to that of __xchange__
+   your [Doxygen](https://www.doxygen.nl/) documentation to that of __RedisX__
 
 
 __Documentation__
