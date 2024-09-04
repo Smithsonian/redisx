@@ -790,7 +790,7 @@ its SHA1 sum, a set of redis keys the script may use, and a set of other paramet
   int status;
   
   // Execute the script, with one redis key argument (and no parameters)...
-  RESP *r = redisxRequest("EVALSHA", SHA1, "1", "my-redis-key-argument", &status);
+  RESP *r = redisxRequest("EVALSHA", scriptSHA1, "1", "my-redis-key-argument", &status);
 
   // Check status and inspect RESP
   ...

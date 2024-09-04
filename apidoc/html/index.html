@@ -649,7 +649,7 @@ LUA script loading and execution</h3>
 <div class="line">int status;</div>
 <div class="line"> </div>
 <div class="line"><span class="comment">// Execute the script, with one redis key argument (and no parameters)...</span></div>
-<div class="line"><a class="code hl_struct" href="structRESP.html">RESP</a> *r = <a class="code hl_function" href="redisx_8c.html#a09092bd97eead5c5fa73fa0d9241018c">redisxRequest</a>(<span class="stringliteral">&quot;EVALSHA&quot;</span>, SHA1, <span class="stringliteral">&quot;1&quot;</span>, <span class="stringliteral">&quot;my-redis-key-argument&quot;</span>, &amp;status);</div>
+<div class="line"><a class="code hl_struct" href="structRESP.html">RESP</a> *r = <a class="code hl_function" href="redisx_8c.html#a09092bd97eead5c5fa73fa0d9241018c">redisxRequest</a>(<span class="stringliteral">&quot;EVALSHA&quot;</span>, scriptSHA1, <span class="stringliteral">&quot;1&quot;</span>, <span class="stringliteral">&quot;my-redis-key-argument&quot;</span>, &amp;status);</div>
 <div class="line"> </div>
 <div class="line"><span class="comment">// Check status and inspect RESP</span></div>
 <div class="line">...</div>
