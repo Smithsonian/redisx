@@ -11,8 +11,6 @@
 #ifndef REDISX_PRIV_H_
 #define REDISX_PRIV_H_
 
-
-
 /// \cond PRIVATE
 
 #include <pthread.h>

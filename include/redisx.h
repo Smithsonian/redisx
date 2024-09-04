@@ -25,7 +25,7 @@
 #endif
 
 #ifndef REDIS_CMDBUF_SIZE
-/// (bytes) Size of many internal arrays, and the max. send size. At least ~16 bytes...
+/// (bytes) Size of many internal arrays, and the max. send chunk size. At least ~16 bytes...
 #  define REDIS_CMDBUF_SIZE               8192
 #endif
 

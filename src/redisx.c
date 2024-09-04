@@ -41,10 +41,6 @@ typedef struct ServerLink {
 static ServerLink *serverList;
 static pthread_mutex_t serverLock = PTHREAD_MUTEX_INITIALIZER;
 
-
-// The response listener threads...
-static pthread_attr_t threadConfig;
-
 /// \endcond
 
 /// \cond PRIVATE
@@ -226,7 +222,6 @@ Redis *redisxInit(const char *server) {
 
   if(!isInitialized) {
     // Initialize the thread attributes once only to avoid segfaulting...
-    pthread_attr_init(&threadConfig);
     atexit(rShutdownAsync);
     isInitialized = TRUE;
   }
@@ -801,7 +796,7 @@ int rStartSubscriptionListenerAsync(Redis *redis) {
 
   p->isSubscriptionListenerEnabled = TRUE;
 
-  if (pthread_create(&p->subscriptionListenerTID, &threadConfig, RedisSubscriptionListener, redis) == -1) {
+  if (pthread_create(&p->subscriptionListenerTID, NULL, RedisSubscriptionListener, redis) == -1) {
     perror("ERROR! Redis-X : pthread_create SubscriptionListener");
     p->isSubscriptionListenerEnabled = FALSE;
     return -1;
@@ -834,7 +829,7 @@ int rStartPipelineListenerAsync(Redis *redis) {
 
   p->isPipelineListenerEnabled = TRUE;
 
-  if (pthread_create(&p->pipelineListenerTID, &threadConfig, RedisPipelineListener, redis) == -1) {
+  if (pthread_create(&p->pipelineListenerTID, NULL, RedisPipelineListener, redis) == -1) {
     perror("ERROR! Redis-X : pthread_create PipelineListener");
     p->isPipelineListenerEnabled = FALSE;
     return -1;
