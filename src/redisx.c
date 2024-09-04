@@ -476,7 +476,6 @@ static void rAffirmDB(Redis *redis) {
  * @param confirm     Whether to wait for confirmation from Redis, and check the response.
  * @return            X_SUCCESS (0) if successful, or
  *                    X_NULL if the redis argument is NULL,
- *                    X_NO_INIT if the redis instance is not connected,
  *                    X_INCOMPLETE if there is an active subscription channel that cannot be switched or
  *                    one of the channels could not confirm the switch, or
  *                    else another error code (&lt;0) from redisx.h / xchange.h.
@@ -485,21 +484,21 @@ static void rAffirmDB(Redis *redis) {
  * @sa redisxLockEnabled()
  */
 int redisxSelectDB(Redis *redis, int idx, boolean confirm) {
-  static const char *funcName = "redisxSelectDB()";
-
   RedisPrivate *p;
   enum redisx_channel c;
   int status = X_SUCCESS;
 
-  if(!redis) return redisxError(funcName, X_NULL);
-  if(!redisxIsConnected(redis)) return redisxError(funcName, X_NO_INIT);
+  if(!redis) return redisxError("redisxSelectDB()", X_NULL);
 
   p = (RedisPrivate *) redis->priv;
-
   if(p->dbIndex == idx) return X_SUCCESS;
 
-  redisxAddConnectHook(redis, rAffirmDB);
   p->dbIndex = idx;
+
+  if(idx) redisxAddConnectHook(redis, rAffirmDB);
+  else redisxRemoveConnectHook(redis, rAffirmDB);
+
+  if(!redisxIsConnected(redis)) return X_SUCCESS;
 
   for(c = 0; c < REDISX_CHANNELS; c++) {
     RedisClient *cl = redisxGetClient(redis, c);
