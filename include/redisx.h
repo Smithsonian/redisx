@@ -17,27 +17,31 @@
 
 // Configuration constants ------------------------------------------------------->
 #ifndef REDIS_TCP_PORT
-#  define REDIS_TCP_PORT          6379    ///< TCP/IP port on which Redis server listens to clients.
+#  define REDIS_TCP_PORT                  6379    ///< TCP/IP port on which Redis server listens to clients.
 #endif
 
 #ifndef REDIS_TCP_BUF
-#  define REDIS_TCP_BUF              0    ///< (bytes), <= 0 to use system default.
+#  define REDIS_TCP_BUF                   0       ///< (bytes), <= 0 to use system default.
 #endif
 
 #ifndef REDIS_CMDBUF_SIZE
 /// (bytes) Size of many internal arrays, and the max. send size. At least ~16 bytes...
-#  define REDIS_CMDBUF_SIZE            8192
+#  define REDIS_CMDBUF_SIZE               8192
 #endif
 
 #ifndef REDIS_RCV_CHUNK_SIZE
 /// (bytes) Redis receive buffer size.
-#  define REDIS_RCV_CHUNK_SIZE         8192
+#  define REDIS_RCV_CHUNK_SIZE            8192
+#endif
+
+#ifndef REDISX_SET_LISTENER_PRIORITY
+#  define REDISX_SET_LISTENER_PRIORITY    FALSE   ///< Whether to explicitly set listener thread priorities
 #endif
 
 #ifndef REDISX_LISTENER_REL_PRIORITY
 /// [0.0:1.0] Listener priority as fraction of available range
 /// You may want to set it quite high to ensure that the receive buffer is promptly cleared.
-#  define REDISX_LISTENER_REL_PRIORITY       (0.5)
+#  define REDISX_LISTENER_REL_PRIORITY    (0.5)
 #endif
 
 // Various exposed constants ----------------------------------------------------->

@@ -24,7 +24,7 @@
 #if DEBUG
 #define SET_PRIORITIES              FALSE       ///< Disable if you want to use gdb to debug...
 #else
-#define SET_PRIORITIES              TRUE        ///< Disable if you want to use gdb to debug...
+#define SET_PRIORITIES              REDIS_SET_LISTENER_PRIORITIES        ///< Whether to actually set listener priorities
 #endif
 
 #define XPRIO_MIN                   (sched_get_priority_min(SCHED_RR))
@@ -466,7 +466,7 @@ int redisxPing(Redis *redis, const char *message) {
  * @sa redisxSelectDB()
  * @sa redisxLockEnabled()
  */
-int redisxSelectClientDBAsync(RedisClient *cl, int idx, boolean confirm) {
+static int redisxSelectClientDBAsync(RedisClient *cl, int idx, boolean confirm) {
   static const char *funcName = "redisxSelectClientDBAsync()";
 
   char sval[20];
@@ -648,26 +648,6 @@ int redisxCheckDestroyRESP(RESP *resp, char expectedType, int expectedSize) {
   return status;
 }
 
-/**
- * Silently consumes a reply from the specified Redis channel.
- *
- * \param cl    Pointer to a Redis channel.
- *
- * \return      X_SUCCESS if a response was successfully consumed, or
- *              REDIS_NULL if a valid response could not be obtained.
- *
- */
-int redisxIgnoreReplyAsync(RedisClient *cl) {
-  static const char *funcName = "redisxIgnoreReplyAsync()";
-  RESP *resp;
-
-  if(cl == NULL) return redisxError(funcName, X_NULL);
-
-  resp = redisxReadReplyAsync(cl);
-  if(resp == NULL) return redisxError(funcName, REDIS_NULL);
-  else redisxDestroyRESP(resp);
-  return X_SUCCESS;
-}
 
 /**
  * Prints a descriptive error message to stderr, and returns the error code.

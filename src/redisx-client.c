@@ -617,6 +617,27 @@ RESP *redisxRequest(Redis *redis, const char *command, const char *arg1, const c
 }
 
 /**
+ * Silently consumes a reply from the specified Redis channel.
+ *
+ * \param cl    Pointer to a Redis channel.
+ *
+ * \return      X_SUCCESS if a response was successfully consumed, or
+ *              REDIS_NULL if a valid response could not be obtained.
+ *
+ */
+int redisxIgnoreReplyAsync(RedisClient *cl) {
+  static const char *funcName = "redisxIgnoreReplyAsync()";
+  RESP *resp;
+
+  if(cl == NULL) return redisxError(funcName, X_NULL);
+
+  resp = redisxReadReplyAsync(cl);
+  if(resp == NULL) return redisxError(funcName, REDIS_NULL);
+  else redisxDestroyRESP(resp);
+  return X_SUCCESS;
+}
+
+/**
  * Reads a response from Redis and returns it.
  *
  * \param cl    Pointer to a Redis channel

@@ -58,13 +58,13 @@ clean:
 .PHONY: distclean
 distclean: clean
 	rm -f Doxyfile.local $(LIB)/libredisx.so* $(LIB)/libredisx.a
-	
+
 
 # ----------------------------------------------------------------------------
 # The nitty-gritty stuff below
 # ----------------------------------------------------------------------------
 
-SOURCES = $(SRC)/redisx.c $(SRC)/redisx-net.c $(SRC)/redisx-hooks.c $(SRC)/redisx-io.c $(SRC)/redisx-tab.c $(SRC)/redisx-sub.c
+SOURCES = $(SRC)/redisx.c $(SRC)/redisx-net.c $(SRC)/redisx-hooks.c $(SRC)/redisx-client.c $(SRC)/redisx-tab.c $(SRC)/redisx-sub.c
 
 # Generate a list of object (obj/*.o) files from the input sources
 OBJECTS := $(subst $(SRC),$(OBJ),$(SOURCES))
