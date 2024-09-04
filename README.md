@@ -38,8 +38,8 @@ A simple, light-weight C/C++ Redis client.
 
 __RedisX__ is a light-weight [Redis](https://redis.io) client for C/C++. As such, it should also work with Redis forks 
 / clones like [Dragonfly](https://dragonfly.io) or [Valkey](https://valkey.io). It supports both interactive and 
-pipelined Redis queries, managing and processing subscriptions. It also supports atomic execution blocks and LUA 
-scripts loading. It can be used with one or more distinct Redis servers simultaneously.
+pipelined Redis queries, managing and processing subscriptions, atomic execution blocks, and LUA scripts loading. It 
+can be used with multiple Redis servers simultaneously also.
 
 While there are other C/C++ Redis clients available, this one is C90 compatible, and hence can be used on older 
 platforms also. It is also small and fast, but still capable and versatile.
@@ -48,12 +48,6 @@ Rather than providing high-level support for every possible Redis command (which
 the pace new commands are being introduced all the time), it provides a basic framework for synchronous and 
 asynchronous queries, with some higher-level functions for managing key/value storage types (including hash tables), 
 and PUB/SUB. Future releases may add further higher-level functionality based on demand for such features.
-
-The library maintains up to three separate connections (channels) for each separate Redis server instance used: (1) an 
-interactive client for sequential round-trip transactions, (2) a pipeline client for bulk queries and asynchronous 
-background processing, and (3) a subscription client for PUB/SUB requests and notifications. The interactive client is 
-always connected, the pipeline client is connected only if explicitly requested at the time of establishing the server 
-connection, while the subscription client is connected only as needed.
 
 The __RedisX__ library was created, and is maintained, by Attila Kovács at the Center for Astrophysics \| Harvard 
 &amp; Smithsonian, and it is available through the [Smithsonian/redisx](https://github.com/Smithsonian/redisx) 
@@ -97,7 +91,7 @@ prior to invoking `make`. The following build variables can be configured:
  
  - `CFLAGS`: Flags to pass onto the C compiler (default: `-Os -Wall`). Note, `-Iinclude` will be added automatically.
    
- - `LDFLAGS`: Linker flags (default is `-lm`).
+ - `LDFLAGS`: Linker flags (default is `-lm`). Note, `-lxchange` will be added automatically.
 
  - `CHECKEXTRA`: Extra options to pass to `cppcheck` for the `make check` target
  
@@ -116,6 +110,12 @@ desired `make` target(s). (You can use `make help` to get a summary of the avail
  - [Connecting](#connecting)
  - [Disconnecting](#disconnecting)
  - [Connection hooks](#connection-hooks)
+
+The library maintains up to three separate connections (channels) for each separate Redis server instance used: (1) an 
+interactive client for sequential round-trip transactions, (2) a pipeline client for bulk queries and asynchronous 
+background processing, and (3) a subscription client for PUB/SUB requests and notifications. The interactive client is 
+always connected, the pipeline client is connected only if explicitly requested at the time of establishing the server 
+connection, while the subscription client is connected only as needed.
 
 <a name="initializing"></a>
 ### Initializing

@@ -480,10 +480,6 @@ void redisxEndSubscription(Redis *redis) {
 }
 
 static void rNotifyConsumers(Redis *redis, char *pattern, char *channel, char *msg, int length) {
-#if REDISX_LISTENER_YIELD_COUNT > 0
-  static int count;
-#endif
-
   MessageConsumer *c;
   RedisPrivate *p;
   RedisSubscriberCall *f = NULL;
@@ -519,11 +515,6 @@ static void rNotifyConsumers(Redis *redis, char *pattern, char *channel, char *m
     for(i=0; i<n; i++) f[i](pattern, channel, msg, length);
     free(f);
   }
-
-#if REDISX_LISTENER_YIELD_COUNT > 0
-  // Allow the waiting processes to take control...
-  if(++count % REDISX_LISTENER_YIELD_COUNT == 0) sched_yield();
-#endif
 }
 
 /// \cond PRIVATE

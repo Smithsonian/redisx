@@ -31,7 +31,7 @@
 #define XPRIO_MAX                   (sched_get_priority_max(SCHED_RR))
 #define XPRIO_RANGE                 (XPRIO_MAX - XPRIO_MIN)
 
-#define REDISX_LISTENER_PRIORITY           (XPRIO_MIN + (int) (REDISX_LISTENER_REL_PRIORITY * XPRIO_RANGE))
+#define REDISX_LISTENER_PRIORITY    (XPRIO_MIN + (int) (REDISX_LISTENER_REL_PRIORITY * XPRIO_RANGE))
 
 typedef struct ServerLink {
   Redis *redis;

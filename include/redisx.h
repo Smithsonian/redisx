@@ -37,7 +37,7 @@
 #ifndef REDISX_LISTENER_REL_PRIORITY
 /// [0.0:1.0] Listener priority as fraction of available range
 /// You may want to set it quite high to ensure that the receive buffer is promptly cleared.
-#  define REDISX_LISTENER_REL_PRIORITY       (0.9)
+#  define REDISX_LISTENER_REL_PRIORITY       (0.5)
 #endif
 
 // Various exposed constants ----------------------------------------------------->
@@ -199,7 +199,7 @@ typedef struct Redis {
  *                 be binary a '\0' termination should no be assumed. Instead, the
  *                 length of the message is specified explicitly.
  */
-typedef void (*RedisSubscriberCall)(const char *pattern, const char *channel, const char *msg, int length);
+typedef void (*RedisSubscriberCall)(const char *pattern, const char *channel, const char *msg, long length);
 
 
 /**

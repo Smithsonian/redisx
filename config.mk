@@ -29,18 +29,21 @@ CFLAGS ?= -Os -Wall
 # Add include/ directory
 CFLAGS += -I$(INC)
 
+# Extra warnings (not supported on all compilers)
+#CFLAGS += -Wextra
+
 # Link against math libs (for e.g. isnan())
 LDFLAGS ?= -lm
 
 # Compile and link against a specific xchange library (if defined)
 ifdef XCHANGE
   CFLAGS += -I$(XCHANGE)/include
-  LDFLAGS += -L$(XCHANGE)/lib -lxchange
+  LDFLAGS = -L$(XCHANGE)/lib
   LD_LIBRARY_PATH = $(XCHANGE)/lib:$(LD_LIBRARY_PATH)
 endif
 
-# Extra warnings (not supported on all compilers)
-#CFLAGS += -Wextra
+# Always link against the xchange lib.
+LDFLAGS += -lxchange
 
 # cppcheck options for 'check' target
 CHECKOPTS ?= --enable=performance,warning,portability,style --language=c \
