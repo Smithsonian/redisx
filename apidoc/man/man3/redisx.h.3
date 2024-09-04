@@ -30,13 +30,9 @@ include/redisx.h
 
 .in +1c
 .ti -1c
-.RI "#define \fBREDIS_CHANNELS\fP"
-.br
-.RI "The number of channels a \fBRedis\fP instance has\&. "
-.ti -1c
 .RI "#define \fBREDIS_CMDBUF_SIZE\fP   8192"
 .br
-.RI "(bytes) Size of many internal arrays, and the max\&. send size\&. At least ~16 bytes\&.\&.\&. "
+.RI "(bytes) Size of many internal arrays, and the max\&. send chunk size\&. At least ~16 bytes\&.\&.\&. "
 .ti -1c
 .RI "#define \fBREDIS_ERROR\fP"
 .br
@@ -56,15 +52,15 @@ include/redisx.h
 .ti -1c
 .RI "#define \fBREDIS_RCV_CHUNK_SIZE\fP   8192"
 .br
-.RI "(bytes) \fBRedis\fP receive buffer size\&. "
+.RI "(bytes) \fBRedis\fP receive buffer size (at most that much is read from the socket in a single call)\&. "
 .ti -1c
 .RI "#define \fBREDIS_TCP_BUF\fP   0"
 .br
-.RI "(bytes), <= 0 to use system default\&. "
+.RI "(bytes) Default TCP buffer size (send/recv) for \fBRedis\fP clients\&. Values <= 0 will use system default\&. "
 .ti -1c
 .RI "#define \fBREDIS_TCP_PORT\fP   6379"
 .br
-.RI "TCP/IP port on which \fBRedis\fP server listens to clients\&. "
+.RI "Default TCP/IP port on which \fBRedis\fP server listens to clients\&. "
 .ti -1c
 .RI "#define \fBREDIS_UNEXPECTED_ARRAY_SIZE\fP"
 .br
@@ -73,6 +69,10 @@ include/redisx.h
 .RI "#define \fBREDIS_UNEXPECTED_RESP\fP"
 .br
 .RI "Got a \fBRedis\fP response of a different type than expected\&. "
+.ti -1c
+.RI "#define \fBREDISX_CHANNELS\fP"
+.br
+.RI "The number of channels a \fBRedis\fP instance has\&. "
 .ti -1c
 .RI "#define \fBREDISX_LISTENER_REL_PRIORITY\fP   (0\&.5)"
 .br
@@ -92,6 +92,10 @@ include/redisx.h
 .RI "#define \fBREDISX_RELEASE_STRING\fP   '\-devel'"
 .br
 .RI "Additional release information in version, e\&.g\&. '-1', or '-rc1'\&. "
+.ti -1c
+.RI "#define \fBREDISX_SET_LISTENER_PRIORITY\fP   \fBFALSE\fP"
+.br
+.RI "Whether to explicitly set listener thread priorities\&. "
 .ti -1c
 .RI "#define \fBREDISX_VERSION_STRING\fP"
 .br
@@ -279,19 +283,13 @@ include/redisx.h
 .RI "\fBRESP\fP * \fBredisxRequest\fP (\fBRedis\fP *redis, const char *command, const char *arg1, const char *arg2, const char *arg3, int *status)"
 .br
 .ti -1c
-.RI "int \fBredisxResetClient\fP (\fBRedisClient\fP *cl)"
-.br
-.ti -1c
 .RI "char ** \fBredisxScanKeys\fP (\fBRedis\fP *redis, const char *pattern, int *n, int *status)"
 .br
 .ti -1c
 .RI "\fBRedisEntry\fP * \fBredisxScanTable\fP (\fBRedis\fP *redis, const char *table, const char *pattern, int *n, int *status)"
 .br
 .ti -1c
-.RI "int \fBredisxSelectDB\fP (\fBRedisClient\fP *cl, int idx)"
-.br
-.ti -1c
-.RI "int \fBredisxSelectDBAsync\fP (\fBRedisClient\fP *cl, int idx, \fBboolean\fP confirm)"
+.RI "int \fBredisxSelectDB\fP (\fBRedis\fP *redis, int idx)"
 .br
 .ti -1c
 .RI "int \fBredisxSendArrayRequestAsync\fP (\fBRedisClient\fP *cl, char *args[], int length[], int n)"
@@ -300,7 +298,7 @@ include/redisx.h
 .RI "int \fBredisxSendRequestAsync\fP (\fBRedisClient\fP *cl, const char *command, const char *arg1, const char *arg2, const char *arg3)"
 .br
 .ti -1c
-.RI "void \fBredisxSetPassword\fP (\fBRedis\fP *redis, const char *passwd)"
+.RI "int \fBredisxSetPassword\fP (\fBRedis\fP *redis, const char *passwd)"
 .br
 .ti -1c
 .RI "int \fBredisxSetPipelineConsumer\fP (\fBRedis\fP *redis, void(*f)(\fBRESP\fP *))"
@@ -316,6 +314,9 @@ include/redisx.h
 .br
 .ti -1c
 .RI "int \fBredisxSetTransmitErrorHandler\fP (\fBRedis\fP *redis, \fBRedisErrorHandler\fP f)"
+.br
+.ti -1c
+.RI "int \fBredisxSetUser\fP (\fBRedis\fP *redis, const char *username)"
 .br
 .ti -1c
 .RI "int \fBredisxSetValue\fP (\fBRedis\fP *redis, const char *table, const char *key, const char *value, \fBboolean\fP isPipelined)"
@@ -359,7 +360,7 @@ May 4, 2018
 Attila Kovacs
 .RE
 .PP
-RedisX public definition and prototypes\&. 
+RedisX public constant, data types and function prototypes\&. 
 .SH "Macro Definition Documentation"
 .PP 
 .SS "#define REDISX_LISTENER_REL_PRIORITY   (0\&.5)"
@@ -647,7 +648,13 @@ X_SUCCESS (0) if successfully connected to the REDIS server\&. X_NO_INIT if libr
 .PP
 \fBredisxSetPort()\fP 
 .PP
+\fBredisxSetUser()\fP 
+.PP
+\fBredisxSetPassword()\fP 
+.PP
 \fBredisxSetTcpBuf()\fP 
+.PP
+\fBredisxSelectDB()\fP 
 .PP
 \fBredisxDisconnect()\fP 
 .RE
@@ -665,7 +672,7 @@ Destroys a \fBRedis\fP intance, disconnecting any clients that may be connected,
 .PP
 
 .PP
-References \fBREDIS_CHANNELS\fP, \fBredisxDisconnect()\fP, and \fBredisxIsConnected()\fP\&.
+References \fBREDISX_CHANNELS\fP, \fBredisxDisconnect()\fP, and \fBredisxIsConnected()\fP\&.
 .SS "void redisxDestroyEntries (\fBRedisEntry\fP * entries, int count)"
 Destroy a \fBRedisEntry\fP array, such as returned e\&.g\&. by \fBredisxScanTable()\fP
 .PP
@@ -812,7 +819,7 @@ Pointer to the matching \fBRedis\fP client, or NULL if the channel argument is i
 .PP
 
 .PP
-References \fBREDIS_CHANNELS\fP\&.
+References \fBREDISX_CHANNELS\fP\&.
 .SS "char ** redisxGetKeys (\fBRedis\fP * redis, const char * table, int * n)"
 Returns all the key names stored in a given hash table
 .PP
@@ -992,7 +999,7 @@ X_SUCCESS or X_FAILURE if the IP address is invalid\&. X_NULL if the IP address 
 .PP
 
 .PP
-References \fBFALSE\fP, \fBRedis::id\fP, \fBRedis::interactive\fP, \fBINTERACTIVE_CHANNEL\fP, \fBRedis::pipeline\fP, \fBPIPELINE_CHANNEL\fP, \fBREDIS_CHANNELS\fP, \fBREDIS_TCP_PORT\fP, \fBsimpleHostnameToIP()\fP, \fBRedis::subscription\fP, \fBSUBSCRIPTION_CHANNEL\fP, \fBTRUE\fP, and \fBxStringCopyOf()\fP\&.
+References \fBFALSE\fP, \fBRedis::id\fP, \fBRedis::interactive\fP, \fBINTERACTIVE_CHANNEL\fP, \fBRedis::pipeline\fP, \fBPIPELINE_CHANNEL\fP, \fBREDIS_TCP_PORT\fP, \fBREDISX_CHANNELS\fP, \fBsimpleHostnameToIP()\fP, \fBRedis::subscription\fP, \fBSUBSCRIPTION_CHANNEL\fP, \fBTRUE\fP, and \fBxStringCopyOf()\fP\&.
 .SS "\fBboolean\fP redisxIsConnected (\fBRedis\fP * redis)"
 Checks if a \fBRedis\fP instance is connected\&.
 .PP
@@ -1343,22 +1350,6 @@ A freshly allocated \fBRESP\fP array containing the \fBRedis\fP response, or NUL
 
 .PP
 References \fBredisxArrayRequest()\fP\&.
-.SS "int redisxResetClient (\fBRedisClient\fP * cl)"
-Sends a \fCRESET\fP request to the specified \fBRedis\fP client\&. The server will perform a reset as if the client disconnected and reconnected again\&.
-.PP
-\fBParameters\fP
-.RS 4
-\fIcl\fP The \fBRedis\fP client 
-.RE
-.PP
-\fBReturns\fP
-.RS 4
-X_SUCCESS (0) if successful, or else an error code (<0) from \fBredisx\&.h\fP / \fBxchange\&.h\fP\&. 
-.RE
-.PP
-
-.PP
-References \fBREDIS_UNEXPECTED_RESP\fP, \fBredisxCheckRESP()\fP, \fBredisxDestroyRESP()\fP, \fBredisxError()\fP, \fBredisxLockEnabled()\fP, \fBredisxReadReplyAsync()\fP, \fBredisxSendRequestAsync()\fP, \fBredisxUnlockClient()\fP, \fBRESP_SIMPLE_STRING\fP, \fBRESP::value\fP, \fBX_NULL\fP, and \fBX_SUCCESS\fP\&.
 .SS "char ** redisxScanKeys (\fBRedis\fP * redis, const char * pattern, int * n, int * status)"
 Returns an alphabetical list of the \fBRedis\fP keys using the \fBRedis\fP SCAN command\&. Because it uses the scan command, it is guaranteed to not hog the database for excessive periods, and hence it is preferable to redisxGetKeys(table=NULL)\&.
 .PP
@@ -1435,44 +1426,19 @@ A \fBRedisEntry\fP[] array or NULL\&.
 
 .PP
 References \fBRedisEntry::key\fP, \fBRedisEntry::length\fP, \fBRESP::n\fP, \fBredisxArrayRequest()\fP, \fBredisxCheckRESP()\fP, \fBredisxDestroyRESP()\fP, \fBredisxError()\fP, \fBredisxGetScanCount()\fP, \fBRESP_ARRAY\fP, \fBRESP_BULK_STRING\fP, \fBSCAN_INITIAL_STORE_CAPACITY\fP, \fBRESP::value\fP, \fBRedisEntry::value\fP, \fBX_NULL\fP, \fBX_SUCCESS\fP, \fBxdprintf\fP, \fBxStringCopyOf()\fP, and \fBxvprintf\fP\&.
-.SS "int redisxSelectDB (\fBRedisClient\fP * cl, int idx)"
-Siwtches to another database\&. See the \fBRedis\fP \fCSELECT\fP command\&.
+.SS "int redisxSelectDB (\fBRedis\fP * redis, int idx)"
+Switches to another database index on the \fBRedis\fP server\&. Note that you cannot change the database on an active PUB/SUB channel, hence the call will return X_INCOMPLETE if attempted\&. You should instead switch DB when there are no active subscriptions\&.
 .PP
 \fBParameters\fP
 .RS 4
-\fIcl\fP the redis client 
+\fIredis\fP Pointer to a \fBRedis\fP instance\&. 
 .br
 \fIidx\fP zero-based database index 
 .RE
 .PP
 \fBReturns\fP
 .RS 4
-X_SUCCESS (0) if successful, or else an error code (<0) from \fBredisx\&.h\fP / \fBxchange\&.h\fP\&.
-.RE
-.PP
-\fBSee also\fP
-.RS 4
-\fBredisxSelectDBAsync()\fP 
-.RE
-.PP
-
-.PP
-References \fBPIPELINE_CHANNEL\fP, \fBredisxError()\fP, \fBredisxLockEnabled()\fP, \fBredisxSelectDBAsync()\fP, \fBredisxUnlockClient()\fP, \fBX_NULL\fP, and \fBX_SUCCESS\fP\&.
-.SS "int redisxSelectDBAsync (\fBRedisClient\fP * cl, int idx, \fBboolean\fP confirm)"
-Siwtches to another database\&. This version should be called with an exclusive lock on the affected client\&.
-.PP
-\fBParameters\fP
-.RS 4
-\fIcl\fP the redis client 
-.br
-\fIidx\fP zero-based database index 
-.br
-\fIconfirm\fP Whether to wait for confirmation from \fBRedis\fP, and check the response\&. 
-.RE
-.PP
-\fBReturns\fP
-.RS 4
-X_SUCCESS (0) if successful, or else an error code (<0) from \fBredisx\&.h\fP / \fBxchange\&.h\fP\&.
+X_SUCCESS (0) if successful, or X_NULL if the redis argument is NULL, X_INCOMPLETE if there is an active subscription channel that cannot be switched or one of the channels could not confirm the switch, or else another error code (<0) from \fBredisx\&.h\fP / \fBxchange\&.h\fP\&.
 .RE
 .PP
 \fBSee also\fP
@@ -1484,7 +1450,7 @@ X_SUCCESS (0) if successful, or else an error code (<0) from \fBredisx\&.h\fP / 
 .PP
 
 .PP
-References \fBREDIS_UNEXPECTED_RESP\fP, \fBredisxCheckRESP()\fP, \fBredisxDestroyRESP()\fP, \fBredisxError()\fP, \fBredisxReadReplyAsync()\fP, \fBredisxSendRequestAsync()\fP, \fBredisxSkipReplyAsync()\fP, \fBRESP_SIMPLE_STRING\fP, \fBRESP::value\fP, \fBX_NULL\fP, and \fBX_SUCCESS\fP\&.
+References \fBPIPELINE_CHANNEL\fP, \fBREDIS_INVALID_CHANNEL\fP, \fBREDISX_CHANNELS\fP, \fBredisxAddConnectHook()\fP, \fBredisxError()\fP, \fBredisxGetClient()\fP, \fBredisxIsConnected()\fP, \fBredisxLockEnabled()\fP, \fBredisxRemoveConnectHook()\fP, \fBredisxUnlockClient()\fP, \fBSUBSCRIPTION_CHANNEL\fP, \fBX_INCOMPLETE\fP, \fBX_NULL\fP, and \fBX_SUCCESS\fP\&.
 .SS "int redisxSendArrayRequestAsync (\fBRedisClient\fP * cl, char * args[], int lengths[], int n)"
 Send a \fBRedis\fP request with an arbitrary number of arguments\&.
 .PP
@@ -1531,7 +1497,7 @@ Send a command (with up to 3 arguments) to the REDIS server\&. The caller must h
 
 .PP
 References \fBredisxSendArrayRequestAsync()\fP, \fBX_NAME_INVALID\fP, \fBX_NO_INIT\fP, and \fBX_NULL\fP\&.
-.SS "void redisxSetPassword (\fBRedis\fP * redis, const char * passwd)"
+.SS "int redisxSetPassword (\fBRedis\fP * redis, const char * passwd)"
 Sets the password to use for authenticating on the \fBRedis\fP server after connection\&. See the AUTH \fBRedis\fP command for more explanation\&. Naturally, you need to call this prior to connecting your \fBRedis\fP instance to have the desired effect\&.
 .PP
 \fBParameters\fP
@@ -1541,9 +1507,19 @@ Sets the password to use for authenticating on the \fBRedis\fP server after conn
 \fIpasswd\fP the password to use for authenticating on the server, or NULL to clear a previously configured password\&. 
 .RE
 .PP
+\fBReturns\fP
+.RS 4
+X_SUCCESS (0) if successful, X_NULL if the redis argument is NULL, or X_ALREADY_OPEN if called after \fBRedis\fP was already connected\&.
+.RE
+.PP
+\fBSee also\fP
+.RS 4
+\fBredisxSetUser()\fP 
+.RE
+.PP
 
 .PP
-References \fBxStringCopyOf()\fP\&.
+References \fBredisxError()\fP, \fBredisxIsConnected()\fP, \fBX_ALREADY_OPEN\fP, \fBX_NULL\fP, \fBX_SUCCESS\fP, and \fBxStringCopyOf()\fP\&.
 .SS "int redisxSetPipelineConsumer (\fBRedis\fP * redis, void(*)(\fBRESP\fP *) f)"
 Sets the function processing valid pipeline responses\&.
 .PP
@@ -1629,6 +1605,29 @@ X_SUCCESS if the handler was successfully configured, or X_NULL if the \fBRedis\
 
 .PP
 References \fBX_NULL\fP, and \fBX_SUCCESS\fP\&.
+.SS "int redisxSetUser (\fBRedis\fP * redis, const char * username)"
+Sets the user name to use for authenticating on the \fBRedis\fP server after connection\&. See the \fCAUTH\fP \fBRedis\fP command for more explanation\&. Naturally, you need to call this prior to connecting your \fBRedis\fP instance to have the desired effect\&.
+.PP
+\fBParameters\fP
+.RS 4
+\fIredis\fP Pointer to the \fBRedis\fP instance for which to set credentials 
+.br
+\fIusername\fP the password to use for authenticating on the server, or NULL to clear a previously configured password\&. 
+.RE
+.PP
+\fBReturns\fP
+.RS 4
+X_SUCCESS (0) if successful, X_NULL if the redis argument is NULL, or X_ALREADY_OPEN if called after \fBRedis\fP was already connected\&.
+.RE
+.PP
+\fBSee also\fP
+.RS 4
+\fBredisxSetPassword()\fP 
+.RE
+.PP
+
+.PP
+References \fBredisxError()\fP, \fBredisxIsConnected()\fP, \fBX_ALREADY_OPEN\fP, \fBX_NULL\fP, \fBX_SUCCESS\fP, and \fBxStringCopyOf()\fP\&.
 .SS "int redisxSetValue (\fBRedis\fP * redis, const char * table, const char * key, const char * value, \fBboolean\fP isPipelined)"
 Sets a global or hashtable value on \fBRedis\fP\&.
 .PP

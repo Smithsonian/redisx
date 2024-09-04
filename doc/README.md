@@ -136,6 +136,19 @@ you application:
    redisxSetTcpBuf(65536);
 ```
 
+Optionally you can select the database index to use now (and also later, after connecting), if not the default (index 
+0):
+
+```c
+  Redis *redis = ...
+  
+  // Select the database index 2
+  redisxSelectDB(redis); 
+```
+
+(Note that you can switch the database index any time, with the caveat that it's not possible to change it for the 
+subscription client when there are active subscriptions.)
+
 <a name="connecting"></a>
 ### Connecting
 

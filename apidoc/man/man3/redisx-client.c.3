@@ -1,0 +1,328 @@
+.TH "src/redisx-client.c" 3 "Version v0.9" "RedisX" \" -*- nroff -*-
+.ad l
+.nh
+.SH NAME
+src/redisx-client.c
+.SH SYNOPSIS
+.br
+.PP
+.SS "Macros"
+
+.in +1c
+.ti -1c
+.RI "#define \fBREDIS_SIMPLE_STRING_SIZE\fP   256"
+.br
+.RI "(bytes) Only store up to this many characters from \fBRedis\fP confirms and errors\&. "
+.ti -1c
+.RI "#define \fBREDIS_TIMEOUT_SECONDS\fP   3"
+.br
+.RI "(seconds) Abort with an error if cannot send before this timeout (<=0 for not timeout) "
+.in -1c
+.SS "Functions"
+
+.in +1c
+.ti -1c
+.RI "int \fBredisxAbortBlockAsync\fP (\fBRedisClient\fP *cl)"
+.br
+.ti -1c
+.RI "\fBRESP\fP * \fBredisxArrayRequest\fP (\fBRedis\fP *redis, char *args[], int lengths[], int n, int *status)"
+.br
+.ti -1c
+.RI "\fBRESP\fP * \fBredisxExecBlockAsync\fP (\fBRedisClient\fP *cl)"
+.br
+.ti -1c
+.RI "int \fBredisxIgnoreReplyAsync\fP (\fBRedisClient\fP *cl)"
+.br
+.ti -1c
+.RI "\fBRESP\fP * \fBredisxReadReplyAsync\fP (\fBRedisClient\fP *cl)"
+.br
+.ti -1c
+.RI "\fBRESP\fP * \fBredisxRequest\fP (\fBRedis\fP *redis, const char *command, const char *arg1, const char *arg2, const char *arg3, int *status)"
+.br
+.ti -1c
+.RI "int \fBredisxSendArrayRequestAsync\fP (\fBRedisClient\fP *cl, char *args[], int lengths[], int n)"
+.br
+.ti -1c
+.RI "int \fBredisxSendRequestAsync\fP (\fBRedisClient\fP *cl, const char *command, const char *arg1, const char *arg2, const char *arg3)"
+.br
+.ti -1c
+.RI "int \fBredisxSkipReplyAsync\fP (\fBRedisClient\fP *cl)"
+.br
+.ti -1c
+.RI "int \fBredisxStartBlockAsync\fP (\fBRedisClient\fP *cl)"
+.br
+.in -1c
+.SH "Detailed Description"
+.PP 
+
+.PP
+\fBDate\fP
+.RS 4
+Created on Aug 26, 2024 
+.RE
+.PP
+\fBAuthor\fP
+.RS 4
+Attila Kovacs
+.RE
+.PP
+Basic I/O (send/receive) functions for the RedisX library\&. 
+.SH "Function Documentation"
+.PP 
+.SS "int redisxAbortBlockAsync (\fBRedisClient\fP * cl)"
+Abort an atomic transaction block\&. It sends \fCDISCARD\fP\&.
+.PP
+\fBParameters\fP
+.RS 4
+\fIcl\fP Pointer to a \fBRedis\fP client
+.RE
+.PP
+\fBReturns\fP
+.RS 4
+X_SUCCESS (0) if successful or else an error code from send() (see errno\&.h)\&.
+.RE
+.PP
+\fBSee also\fP
+.RS 4
+\fBredisxStartBlockAsync()\fP 
+.RE
+.PP
+
+.PP
+References \fBredisxError()\fP, \fBredisxIgnoreReplyAsync()\fP, \fBTRUE\fP, \fBX_NULL\fP, and \fBX_SUCCESS\fP\&.
+.SS "\fBRESP\fP * redisxArrayRequest (\fBRedis\fP * redis, char * args[], int lengths[], int n, int * status)"
+Returns the result of the most generic type of \fBRedis\fP request with any number of arguments\&. This is not the highest throughput mode (that would be sending asynchronous pipeline request, and then asynchronously collecting the results such as with \fBredisxSendArrayRequestAsync()\fP / \fBredisxReadReplyAsync()\fP, because it requires separate network roundtrips for each and every request\&. But, it is simple and perfectly good method when one needs to retrieve only a few (<1000) variables per second\&.\&.\&.
+.PP
+\fBParameters\fP
+.RS 4
+\fIredis\fP Pointer to a \fBRedis\fP instance\&. 
+.br
+\fIargs\fP An array of strings to send to \fBRedis\fP, corresponding to a single query\&. 
+.br
+\fIlengths\fP Array indicating the number of bytes to send from each string argument\&. Zero values can be used to determine the string length automatically using strlen(), and the length argument itself may be NULL to determine the lengths of all string arguments automatically\&. 
+.br
+\fIn\fP Number of string arguments\&. 
+.br
+\fIstatus\fP Pointer to the return error status, which is either 
+.PP
+.nf
+                 X_SUCCESS       on success\&.
+                 X_NO_INIT       if the Redis client librarywas not initialized via initRedis\&.
+                 X_NULL          if the argument is NULL or n<1\&.
+                 X_NO_SERVICE    if not connected to Redis\&.
+                 X_FAILURE       If there was a socket level error\&.
+
+.fi
+.PP
+.RE
+.PP
+\fBReturns\fP
+.RS 4
+A freshly allocated \fBRESP\fP array containing the \fBRedis\fP response, or NULL if no valid response could be obtained\&.
+.RE
+.PP
+\fBSee also\fP
+.RS 4
+\fBredisxRequest()\fP 
+.PP
+\fBredisxSendArrayRequestAsync()\fP 
+.PP
+\fBredisxReadReplyAsync()\fP 
+.RE
+.PP
+
+.PP
+References \fBRedis::interactive\fP, \fBredisxError()\fP, \fBredisxLockEnabled()\fP, \fBredisxReadReplyAsync()\fP, \fBredisxSendArrayRequestAsync()\fP, \fBredisxUnlockClient()\fP, \fBX_NULL\fP, \fBX_SUCCESS\fP, and \fBxvprintf\fP\&.
+.SS "\fBRESP\fP * redisxExecBlockAsync (\fBRedisClient\fP * cl)"
+Finish and execute an atomic transaction block\&. It sends \fCEXEC\fP, skips through all \fCOK\fP and \fCQUEUED\fP acknowledgements, and returns the reply to the transaction block itself\&.
+.PP
+\fBParameters\fP
+.RS 4
+\fIcl\fP Pointer to a \fBRedis\fP client
+.RE
+.PP
+\fBReturns\fP
+.RS 4
+The array \fBRESP\fP returned by EXEC, or NULL if there was an error\&.
+.RE
+.PP
+\fBSee also\fP
+.RS 4
+\fBredisxStartBlockAsync()\fP 
+.PP
+\fBredisxAbortBlockAsync()\fP 
+.RE
+.PP
+
+.PP
+References \fBREDIS_NULL\fP, \fBredisxDestroyRESP()\fP, \fBredisxError()\fP, \fBredisxReadReplyAsync()\fP, \fBredisxSkipReplyAsync()\fP, \fBRESP_ARRAY\fP, \fBRESP_ERROR\fP, \fBTRUE\fP, \fBRESP::type\fP, and \fBX_NULL\fP\&.
+.SS "int redisxIgnoreReplyAsync (\fBRedisClient\fP * cl)"
+Silently consumes a reply from the specified \fBRedis\fP channel\&.
+.PP
+\fBParameters\fP
+.RS 4
+\fIcl\fP Pointer to a \fBRedis\fP channel\&.
+.RE
+.PP
+\fBReturns\fP
+.RS 4
+X_SUCCESS if a response was successfully consumed, or REDIS_NULL if a valid response could not be obtained\&. 
+.RE
+.PP
+
+.PP
+References \fBREDIS_NULL\fP, \fBredisxDestroyRESP()\fP, \fBredisxError()\fP, \fBredisxReadReplyAsync()\fP, \fBX_NULL\fP, and \fBX_SUCCESS\fP\&.
+.SS "\fBRESP\fP * redisxReadReplyAsync (\fBRedisClient\fP * cl)"
+Reads a response from \fBRedis\fP and returns it\&.
+.PP
+\fBParameters\fP
+.RS 4
+\fIcl\fP Pointer to a \fBRedis\fP channel
+.RE
+.PP
+\fBReturns\fP
+.RS 4
+The \fBRESP\fP structure for the reponse received from \fBRedis\fP, or NULL if an error was encountered (errno will be set to describe the error, which may either be an errno produced by recv() or EBADMSG if the message was corrupted and/or unparseable\&. 
+.RE
+.PP
+
+.PP
+References \fBFALSE\fP, \fBRESP::n\fP, \fBREDIS_INCOMPLETE_TRANSFER\fP, \fBREDIS_SIMPLE_STRING_SIZE\fP, \fBREDIS_UNEXPECTED_RESP\fP, \fBredisxDestroyRESP()\fP, \fBredisxError()\fP, \fBredisxReadReplyAsync()\fP, \fBRESP_ARRAY\fP, \fBRESP_BULK_STRING\fP, \fBRESP_ERROR\fP, \fBRESP_INT\fP, \fBRESP_PONG\fP, \fBRESP_SIMPLE_STRING\fP, \fBRESP::type\fP, \fBRESP::value\fP, \fBX_FAILURE\fP, \fBX_PARSE_ERROR\fP, \fBX_SUCCESS\fP, and \fBxdprintf\fP\&.
+.SS "\fBRESP\fP * redisxRequest (\fBRedis\fP * redis, const char * command, const char * arg1, const char * arg2, const char * arg3, int * status)"
+Returns the result of a \fBRedis\fP command with up to 3 regularly terminated string arguments\&. This is not the highest throughput mode (that would be sending asynchronous pipeline request, and then asynchronously collecting the results such as with \fBredisxSendRequestAsync()\fP / \fBredisxReadReplyAsync()\fP, because it requires separate network roundtrips for each and every request\&. But, it is simple and perfectly good method when one needs to retrieve only a few (<1000) variables per second\&.\&.\&.
+.PP
+To make \fBRedis\fP calls with binary (non-string) data, you can use \fBredisxArrayRequest()\fP instead, where you can set the number of bytes for each argument explicitly\&.
+.PP
+\fBParameters\fP
+.RS 4
+\fIredis\fP Pointer to a \fBRedis\fP instance\&. 
+.br
+\fIcommand\fP \fBRedis\fP command, e\&.g\&. 'HGET' 
+.br
+\fIarg1\fP First terminated string argument or NULL\&. 
+.br
+\fIarg2\fP Second terminated string argument or NULL\&. 
+.br
+\fIarg3\fP Third terminated string argument or NULL\&. 
+.br
+\fIstatus\fP Pointer to the return error status, which is either X_SUCCESS on success or else the error code set by \fBredisxArrayRequest()\fP\&.
+.RE
+.PP
+\fBReturns\fP
+.RS 4
+A freshly allocated \fBRESP\fP array containing the \fBRedis\fP response, or NULL if no valid response could be obtained\&.
+.RE
+.PP
+\fBSee also\fP
+.RS 4
+\fBredisxArrayRequest()\fP 
+.PP
+\fBredisxSendRequestAsync()\fP 
+.PP
+\fBredisxReadReplyAsync()\fP 
+.RE
+.PP
+
+.PP
+References \fBredisxArrayRequest()\fP\&.
+.SS "int redisxSendArrayRequestAsync (\fBRedisClient\fP * cl, char * args[], int lengths[], int n)"
+Send a \fBRedis\fP request with an arbitrary number of arguments\&.
+.PP
+\fBParameters\fP
+.RS 4
+\fIcl\fP Pointer to the \fBRedis\fP client\&. 
+.br
+\fIargs\fP The array of string arguments to send\&. 
+.br
+\fIlengths\fP Array indicating the number of bytes to send from each string argument\&. Zero or negative values can be used to determine the string length automatically using strlen(), and the length argument itself may be NULL to determine the lengths of all string arguments automatically\&. 
+.br
+\fIn\fP The number of arguments to send\&.
+.RE
+.PP
+\fBReturns\fP
+.RS 4
+0 on success or an error code on failure, is either X_NO_SERVICE (if not connected to the REDIS server on the requested channel) or the errno set by send()\&. 
+.RE
+.PP
+
+.PP
+References \fBFALSE\fP, \fBREDIS_CMDBUF_SIZE\fP, \fBredisxError()\fP, \fBTRUE\fP, \fBX_NULL\fP, and \fBX_SUCCESS\fP\&.
+.SS "int redisxSendRequestAsync (\fBRedisClient\fP * cl, const char * command, const char * arg1, const char * arg2, const char * arg3)"
+Send a command (with up to 3 arguments) to the REDIS server\&. The caller must have an exclusive lock on the client for this version\&. The arguments supplied will be used up to the first non-NULL value\&.
+.PP
+\fBParameters\fP
+.RS 4
+\fIcl\fP Pointer to the \fBRedis\fP client instance\&. 
+.br
+\fIcommand\fP REDIS command string\&. 
+.br
+\fIarg1\fP Optional first string argument or NULL\&. 
+.br
+\fIarg2\fP Optional second string argument or NULL\&. 
+.br
+\fIarg3\fP Optional third string argument or NULL\&.
+.RE
+.PP
+\fBReturns\fP
+.RS 4
+0 on success or an error code on failure, is either X_NO_SERVICE (if not connected to the REDIS server on the requested channel) or the errno set by send()\&. 
+.RE
+.PP
+
+.PP
+References \fBredisxSendArrayRequestAsync()\fP, \fBX_NAME_INVALID\fP, \fBX_NO_INIT\fP, and \fBX_NULL\fP\&.
+.SS "int redisxSkipReplyAsync (\fBRedisClient\fP * cl)"
+Instructs \fBRedis\fP to skip sending a reply for the next command\&.
+.PP
+Sends \fCCLIENT REPLY SKIP\fP
+.PP
+\fBParameters\fP
+.RS 4
+\fIcl\fP Pointer to the \fBRedis\fP client to use\&.
+.RE
+.PP
+\fBReturns\fP
+.RS 4
+X_SUCCESS (0) on success or an error code on failure, is either X_NO_SERVICE (if not connected to the REDIS server on the requested channel) or the errno set by send()\&. 
+.PP
+.nf
+X_NULL      if the client is NULL\&.
+
+.fi
+.PP
+ 
+.RE
+.PP
+
+.PP
+References \fBredisxError()\fP, \fBTRUE\fP, \fBX_NULL\fP, and \fBX_SUCCESS\fP\&.
+.SS "int redisxStartBlockAsync (\fBRedisClient\fP * cl)"
+Starts an atomic \fBRedis\fP transaction block, by sending \fCMULTI\fP on the specified client connection\&. \fBRedis\fP transaction blocks behave just like scripts (in fact they are effectively improptu scripts themselves)\&. As such the rules of \fBRedis\fP scripting apply, such as you cannot call LUA from within a transaction block (which is a real pity\&.\&.\&.)
+.PP
+Once you start a transaction block you may ignore all acknowledgedments such as \fCOK\fP and \fCQUEUED\fP responses that \fBRedis\fP sends back\&. These will be 'processed' in bulk by redisEndBlockAsync(), at the end of the transaction block\&.
+.PP
+\fBParameters\fP
+.RS 4
+\fIcl\fP Pointer to a \fBRedis\fP client\&.
+.RE
+.PP
+\fBReturns\fP
+.RS 4
+X_SUCCESS (0) if successful, or X_NULL if the \fBRedis\fP client is NULL
+.RE
+.PP
+or else the error set by send()\&.
+.PP
+\fBSee also\fP
+.RS 4
+\fBredisxExecBlockAsync()\fP 
+.PP
+\fBredisxAbortBlockAsync()\fP 
+.RE
+.PP
+
+.PP
+References \fBredisxError()\fP, \fBTRUE\fP, \fBX_NULL\fP, and \fBX_SUCCESS\fP\&.
+.SH "Author"
+.PP 
+Generated automatically by Doxygen for RedisX from the source code\&.

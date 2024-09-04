@@ -32,9 +32,6 @@ src/redisx.c \- A \fBRedis\fP client library that compiles on older and newer pl
 .RI "int \fBredisxGetTime\fP (\fBRedis\fP *redis, struct timespec *t)"
 .br
 .ti -1c
-.RI "int \fBredisxIgnoreReplyAsync\fP (\fBRedisClient\fP *cl)"
-.br
-.ti -1c
 .RI "\fBRedis\fP * \fBredisxInit\fP (const char *server)"
 .br
 .ti -1c
@@ -50,19 +47,19 @@ src/redisx.c \- A \fBRedis\fP client library that compiles on older and newer pl
 .RI "int \fBredisxResetClient\fP (\fBRedisClient\fP *cl)"
 .br
 .ti -1c
-.RI "int \fBredisxSelectDB\fP (\fBRedisClient\fP *cl, int idx)"
+.RI "int \fBredisxSelectDB\fP (\fBRedis\fP *redis, int idx)"
 .br
 .ti -1c
-.RI "int \fBredisxSelectDBAsync\fP (\fBRedisClient\fP *cl, int idx, \fBboolean\fP confirm)"
-.br
-.ti -1c
-.RI "void \fBredisxSetPassword\fP (\fBRedis\fP *redis, const char *passwd)"
+.RI "int \fBredisxSetPassword\fP (\fBRedis\fP *redis, const char *passwd)"
 .br
 .ti -1c
 .RI "int \fBredisxSetPipelineConsumer\fP (\fBRedis\fP *redis, void(*f)(\fBRESP\fP *))"
 .br
 .ti -1c
 .RI "int \fBredisxSetTransmitErrorHandler\fP (\fBRedis\fP *redis, \fBRedisErrorHandler\fP f)"
+.br
+.ti -1c
+.RI "int \fBredisxSetUser\fP (\fBRedis\fP *redis, const char *username)"
 .br
 .ti -1c
 .RI "void \fBredisxSetVerbose\fP (\fBboolean\fP value)"
@@ -142,7 +139,7 @@ Destroys a \fBRedis\fP intance, disconnecting any clients that may be connected,
 .PP
 
 .PP
-References \fBREDIS_CHANNELS\fP, \fBredisxDisconnect()\fP, and \fBredisxIsConnected()\fP\&.
+References \fBREDISX_CHANNELS\fP, \fBredisxDisconnect()\fP, and \fBredisxIsConnected()\fP\&.
 .SS "void redisxDestroyRESP (\fBRESP\fP * resp)"
 Frees up the resources used by a \fBRESP\fP structure that was dynamically allocated\&. The call will segfault if the same \fBRESP\fP is destroyed twice or if the argument is a static allocation\&.
 .PP
@@ -206,22 +203,6 @@ X_SUCCESS (0) if successful, or X_NULL if either argument is NULL, or X_PARSE_ER
 
 .PP
 References \fBredisxCheckDestroyRESP()\fP, \fBredisxCheckRESP()\fP, \fBredisxDestroyRESP()\fP, \fBredisxError()\fP, \fBredisxRequest()\fP, \fBRESP_ARRAY\fP, \fBRESP_BULK_STRING\fP, \fBRESP::value\fP, \fBX_NULL\fP, \fBX_PARSE_ERROR\fP, and \fBX_SUCCESS\fP\&.
-.SS "int redisxIgnoreReplyAsync (\fBRedisClient\fP * cl)"
-Silently consumes a reply from the specified \fBRedis\fP channel\&.
-.PP
-\fBParameters\fP
-.RS 4
-\fIcl\fP Pointer to a \fBRedis\fP channel\&.
-.RE
-.PP
-\fBReturns\fP
-.RS 4
-X_SUCCESS if a response was successfully consumed, or REDIS_NULL if a valid response could not be obtained\&. 
-.RE
-.PP
-
-.PP
-References \fBREDIS_NULL\fP, \fBredisxDestroyRESP()\fP, \fBredisxError()\fP, \fBredisxReadReplyAsync()\fP, \fBX_NULL\fP, and \fBX_SUCCESS\fP\&.
 .SS "\fBRedis\fP * redisxInit (const char * server)"
 Initializes the \fBRedis\fP client library, and sets the hostname or IP address for the \fBRedis\fP server\&.
 .PP
@@ -237,7 +218,7 @@ X_SUCCESS or X_FAILURE if the IP address is invalid\&. X_NULL if the IP address 
 .PP
 
 .PP
-References \fBFALSE\fP, \fBRedis::id\fP, \fBRedis::interactive\fP, \fBINTERACTIVE_CHANNEL\fP, \fBRedis::pipeline\fP, \fBPIPELINE_CHANNEL\fP, \fBREDIS_CHANNELS\fP, \fBREDIS_TCP_PORT\fP, \fBsimpleHostnameToIP()\fP, \fBRedis::subscription\fP, \fBSUBSCRIPTION_CHANNEL\fP, \fBTRUE\fP, and \fBxStringCopyOf()\fP\&.
+References \fBFALSE\fP, \fBRedis::id\fP, \fBRedis::interactive\fP, \fBINTERACTIVE_CHANNEL\fP, \fBRedis::pipeline\fP, \fBPIPELINE_CHANNEL\fP, \fBREDIS_TCP_PORT\fP, \fBREDISX_CHANNELS\fP, \fBsimpleHostnameToIP()\fP, \fBRedis::subscription\fP, \fBSUBSCRIPTION_CHANNEL\fP, \fBTRUE\fP, and \fBxStringCopyOf()\fP\&.
 .SS "\fBboolean\fP redisxIsVerbose ()"
 Checks id verbose reporting is enabled\&.
 .PP
@@ -303,44 +284,19 @@ X_SUCCESS (0) if successful, or else an error code (<0) from \fBredisx\&.h\fP / 
 
 .PP
 References \fBREDIS_UNEXPECTED_RESP\fP, \fBredisxCheckRESP()\fP, \fBredisxDestroyRESP()\fP, \fBredisxError()\fP, \fBredisxLockEnabled()\fP, \fBredisxReadReplyAsync()\fP, \fBredisxSendRequestAsync()\fP, \fBredisxUnlockClient()\fP, \fBRESP_SIMPLE_STRING\fP, \fBRESP::value\fP, \fBX_NULL\fP, and \fBX_SUCCESS\fP\&.
-.SS "int redisxSelectDB (\fBRedisClient\fP * cl, int idx)"
-Siwtches to another database\&. See the \fBRedis\fP \fCSELECT\fP command\&.
+.SS "int redisxSelectDB (\fBRedis\fP * redis, int idx)"
+Switches to another database index on the \fBRedis\fP server\&. Note that you cannot change the database on an active PUB/SUB channel, hence the call will return X_INCOMPLETE if attempted\&. You should instead switch DB when there are no active subscriptions\&.
 .PP
 \fBParameters\fP
 .RS 4
-\fIcl\fP the redis client 
+\fIredis\fP Pointer to a \fBRedis\fP instance\&. 
 .br
 \fIidx\fP zero-based database index 
 .RE
 .PP
 \fBReturns\fP
 .RS 4
-X_SUCCESS (0) if successful, or else an error code (<0) from \fBredisx\&.h\fP / \fBxchange\&.h\fP\&.
-.RE
-.PP
-\fBSee also\fP
-.RS 4
-\fBredisxSelectDBAsync()\fP 
-.RE
-.PP
-
-.PP
-References \fBPIPELINE_CHANNEL\fP, \fBredisxError()\fP, \fBredisxLockEnabled()\fP, \fBredisxSelectDBAsync()\fP, \fBredisxUnlockClient()\fP, \fBX_NULL\fP, and \fBX_SUCCESS\fP\&.
-.SS "int redisxSelectDBAsync (\fBRedisClient\fP * cl, int idx, \fBboolean\fP confirm)"
-Siwtches to another database\&. This version should be called with an exclusive lock on the affected client\&.
-.PP
-\fBParameters\fP
-.RS 4
-\fIcl\fP the redis client 
-.br
-\fIidx\fP zero-based database index 
-.br
-\fIconfirm\fP Whether to wait for confirmation from \fBRedis\fP, and check the response\&. 
-.RE
-.PP
-\fBReturns\fP
-.RS 4
-X_SUCCESS (0) if successful, or else an error code (<0) from \fBredisx\&.h\fP / \fBxchange\&.h\fP\&.
+X_SUCCESS (0) if successful, or X_NULL if the redis argument is NULL, X_INCOMPLETE if there is an active subscription channel that cannot be switched or one of the channels could not confirm the switch, or else another error code (<0) from \fBredisx\&.h\fP / \fBxchange\&.h\fP\&.
 .RE
 .PP
 \fBSee also\fP
@@ -352,8 +308,8 @@ X_SUCCESS (0) if successful, or else an error code (<0) from \fBredisx\&.h\fP / 
 .PP
 
 .PP
-References \fBREDIS_UNEXPECTED_RESP\fP, \fBredisxCheckRESP()\fP, \fBredisxDestroyRESP()\fP, \fBredisxError()\fP, \fBredisxReadReplyAsync()\fP, \fBredisxSendRequestAsync()\fP, \fBredisxSkipReplyAsync()\fP, \fBRESP_SIMPLE_STRING\fP, \fBRESP::value\fP, \fBX_NULL\fP, and \fBX_SUCCESS\fP\&.
-.SS "void redisxSetPassword (\fBRedis\fP * redis, const char * passwd)"
+References \fBPIPELINE_CHANNEL\fP, \fBREDIS_INVALID_CHANNEL\fP, \fBREDISX_CHANNELS\fP, \fBredisxAddConnectHook()\fP, \fBredisxError()\fP, \fBredisxGetClient()\fP, \fBredisxIsConnected()\fP, \fBredisxLockEnabled()\fP, \fBredisxRemoveConnectHook()\fP, \fBredisxUnlockClient()\fP, \fBSUBSCRIPTION_CHANNEL\fP, \fBX_INCOMPLETE\fP, \fBX_NULL\fP, and \fBX_SUCCESS\fP\&.
+.SS "int redisxSetPassword (\fBRedis\fP * redis, const char * passwd)"
 Sets the password to use for authenticating on the \fBRedis\fP server after connection\&. See the AUTH \fBRedis\fP command for more explanation\&. Naturally, you need to call this prior to connecting your \fBRedis\fP instance to have the desired effect\&.
 .PP
 \fBParameters\fP
@@ -363,9 +319,19 @@ Sets the password to use for authenticating on the \fBRedis\fP server after conn
 \fIpasswd\fP the password to use for authenticating on the server, or NULL to clear a previously configured password\&. 
 .RE
 .PP
+\fBReturns\fP
+.RS 4
+X_SUCCESS (0) if successful, X_NULL if the redis argument is NULL, or X_ALREADY_OPEN if called after \fBRedis\fP was already connected\&.
+.RE
+.PP
+\fBSee also\fP
+.RS 4
+\fBredisxSetUser()\fP 
+.RE
+.PP
 
 .PP
-References \fBxStringCopyOf()\fP\&.
+References \fBredisxError()\fP, \fBredisxIsConnected()\fP, \fBX_ALREADY_OPEN\fP, \fBX_NULL\fP, \fBX_SUCCESS\fP, and \fBxStringCopyOf()\fP\&.
 .SS "int redisxSetPipelineConsumer (\fBRedis\fP * redis, void(*)(\fBRESP\fP *) f)"
 Sets the function processing valid pipeline responses\&.
 .PP
@@ -402,6 +368,29 @@ X_SUCCESS if the handler was successfully configured, or X_NULL if the \fBRedis\
 
 .PP
 References \fBX_NULL\fP, and \fBX_SUCCESS\fP\&.
+.SS "int redisxSetUser (\fBRedis\fP * redis, const char * username)"
+Sets the user name to use for authenticating on the \fBRedis\fP server after connection\&. See the \fCAUTH\fP \fBRedis\fP command for more explanation\&. Naturally, you need to call this prior to connecting your \fBRedis\fP instance to have the desired effect\&.
+.PP
+\fBParameters\fP
+.RS 4
+\fIredis\fP Pointer to the \fBRedis\fP instance for which to set credentials 
+.br
+\fIusername\fP the password to use for authenticating on the server, or NULL to clear a previously configured password\&. 
+.RE
+.PP
+\fBReturns\fP
+.RS 4
+X_SUCCESS (0) if successful, X_NULL if the redis argument is NULL, or X_ALREADY_OPEN if called after \fBRedis\fP was already connected\&.
+.RE
+.PP
+\fBSee also\fP
+.RS 4
+\fBredisxSetPassword()\fP 
+.RE
+.PP
+
+.PP
+References \fBredisxError()\fP, \fBredisxIsConnected()\fP, \fBX_ALREADY_OPEN\fP, \fBX_NULL\fP, \fBX_SUCCESS\fP, and \fBxStringCopyOf()\fP\&.
 .SS "void redisxSetVerbose (\fBboolean\fP value)"
 Enable or disable verbose reporting of all \fBRedis\fP operations (and possibly some details of them)\&. Reporting is done on the standard output (stdout)\&. It may be useful when debugging programs that use the redisx interface\&. Verbose reporting is DISABLED by default\&.
 .PP

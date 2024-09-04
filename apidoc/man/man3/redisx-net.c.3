@@ -93,7 +93,13 @@ X_SUCCESS (0) if successfully connected to the REDIS server\&. X_NO_INIT if libr
 .PP
 \fBredisxSetPort()\fP 
 .PP
+\fBredisxSetUser()\fP 
+.PP
+\fBredisxSetPassword()\fP 
+.PP
 \fBredisxSetTcpBuf()\fP 
+.PP
+\fBredisxSelectDB()\fP 
 .PP
 \fBredisxDisconnect()\fP 
 .RE
@@ -127,7 +133,7 @@ Pointer to the matching \fBRedis\fP client, or NULL if the channel argument is i
 .PP
 
 .PP
-References \fBREDIS_CHANNELS\fP\&.
+References \fBREDISX_CHANNELS\fP\&.
 .SS "int redisxGetTcpBuf ()"
 Returns the current TCP/IP buffer size (send and receive) to be used for future client connections\&.
 .PP
@@ -311,7 +317,7 @@ Shuts down the \fBRedis\fP connection immediately\&. It does not obtain excluive
 .PP
 
 .PP
-References \fBREDIS_CHANNELS\fP\&.
+References \fBREDISX_CHANNELS\fP\&.
 .SS "int simpleHostnameToIP (const char * hostName, char * ip)"
 Gets an IP address string for a given host name\&. If more than one IP address is associated with a host name, the first one is returned\&.
 .PP
