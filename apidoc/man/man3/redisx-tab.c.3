@@ -368,7 +368,7 @@ X_SUCCESS if the variable was succesfully set, or:
 .PP
 
 .PP
-References \fBFALSE\fP, \fBRedis::interactive\fP, \fBRedis::pipeline\fP, \fBredisxCheckRESP()\fP, \fBredisxDestroyRESP()\fP, \fBredisxError()\fP, \fBredisxLockEnabled()\fP, \fBredisxReadReplyAsync()\fP, \fBredisxSetValueAsync()\fP, \fBredisxSkipReplyAsync()\fP, \fBredisxUnlockClient()\fP, \fBRESP_INT\fP, \fBX_NULL\fP, and \fBX_SUCCESS\fP\&.
+References \fBFALSE\fP, \fBRedis::interactive\fP, \fBRedis::pipeline\fP, \fBredisxError()\fP, \fBredisxLockEnabled()\fP, \fBredisxSetValueAsync()\fP, \fBredisxUnlockClient()\fP, \fBX_NULL\fP, and \fBX_SUCCESS\fP\&.
 .SS "int redisxSetValueAsync (\fBRedisClient\fP * cl, const char * table, const char * key, const char * value, \fBboolean\fP confirm)"
 Sends a request for setting a table value, using the \fBRedis\fP 'SET' or 'HSET' command\&.
 .PP
@@ -392,7 +392,7 @@ X_SUCCESS (0) if successful, or X_NULL if the client or value is NULL X_NAME_INV
 .PP
 or an error returned by \fBredisxSendRequestAsync()\fP\&. 
 .PP
-References \fBredisxError()\fP, \fBredisxSendRequestAsync()\fP, \fBredisxSkipReplyAsync()\fP, \fBX_NAME_INVALID\fP, \fBX_NULL\fP, \fBX_SUCCESS\fP, and \fBxvprintf\fP\&.
+References \fBredisxCheckRESP()\fP, \fBredisxDestroyRESP()\fP, \fBredisxError()\fP, \fBredisxReadReplyAsync()\fP, \fBredisxSendRequestAsync()\fP, \fBredisxSkipReplyAsync()\fP, \fBRESP_INT\fP, \fBX_NAME_INVALID\fP, \fBX_NULL\fP, \fBX_SUCCESS\fP, and \fBxvprintf\fP\&.
 .SH "Author"
 .PP 
 Generated automatically by Doxygen for RedisX from the source code\&.

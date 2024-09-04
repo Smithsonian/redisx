@@ -74,7 +74,7 @@ include/redisx.h
 .br
 .RI "Got a \fBRedis\fP response of a different type than expected\&. "
 .ti -1c
-.RI "#define \fBREDISX_LISTENER_REL_PRIORITY\fP   (0\&.9)"
+.RI "#define \fBREDISX_LISTENER_REL_PRIORITY\fP   (0\&.5)"
 .br
 .ti -1c
 .RI "#define \fBREDISX_MAJOR_VERSION\fP   0"
@@ -127,7 +127,7 @@ include/redisx.h
 .RI "typedef void(* \fBRedisErrorHandler\fP) (\fBRedis\fP *redis, enum \fBredisx_channel\fP channel, const char *op)"
 .br
 .ti -1c
-.RI "typedef void(* \fBRedisSubscriberCall\fP) (const char *pattern, const char *channel, const char *msg, int length)"
+.RI "typedef void(* \fBRedisSubscriberCall\fP) (const char *pattern, const char *channel, const char *msg, long length)"
 .br
 .in -1c
 .SS "Enumerations"
@@ -252,6 +252,9 @@ include/redisx.h
 .RI "int \fBredisxNotify\fP (\fBRedis\fP *redis, const char *channel, const char *message)"
 .br
 .ti -1c
+.RI "int \fBredisxPing\fP (\fBRedis\fP *redis, const char *message)"
+.br
+.ti -1c
 .RI "int \fBredisxPublish\fP (\fBRedis\fP *redis, const char *channel, const char *message, int length)"
 .br
 .ti -1c
@@ -276,10 +279,19 @@ include/redisx.h
 .RI "\fBRESP\fP * \fBredisxRequest\fP (\fBRedis\fP *redis, const char *command, const char *arg1, const char *arg2, const char *arg3, int *status)"
 .br
 .ti -1c
+.RI "int \fBredisxResetClient\fP (\fBRedisClient\fP *cl)"
+.br
+.ti -1c
 .RI "char ** \fBredisxScanKeys\fP (\fBRedis\fP *redis, const char *pattern, int *n, int *status)"
 .br
 .ti -1c
 .RI "\fBRedisEntry\fP * \fBredisxScanTable\fP (\fBRedis\fP *redis, const char *table, const char *pattern, int *n, int *status)"
+.br
+.ti -1c
+.RI "int \fBredisxSelectDB\fP (\fBRedisClient\fP *cl, int idx)"
+.br
+.ti -1c
+.RI "int \fBredisxSelectDBAsync\fP (\fBRedisClient\fP *cl, int idx, \fBboolean\fP confirm)"
 .br
 .ti -1c
 .RI "int \fBredisxSendArrayRequestAsync\fP (\fBRedisClient\fP *cl, char *args[], int length[], int n)"
@@ -350,7 +362,7 @@ Attila Kovacs
 RedisX public definition and prototypes\&. 
 .SH "Macro Definition Documentation"
 .PP 
-.SS "#define REDISX_LISTENER_REL_PRIORITY   (0\&.9)"
+.SS "#define REDISX_LISTENER_REL_PRIORITY   (0\&.5)"
 [0\&.0:1\&.0] Listener priority as fraction of available range You may want to set it quite high to ensure that the receive buffer is promptly cleared\&. 
 .SS "#define REDISX_VERSION_STRING"
 The version string for this library 
@@ -369,7 +381,7 @@ User-specified callback function for handling RedisX errors\&.
 .RE
 .PP
 
-.SS "typedef void(* RedisSubscriberCall) (const char *pattern, const char *channel, const char *msg, int length)"
+.SS "typedef void(* RedisSubscriberCall) (const char *pattern, const char *channel, const char *msg, long length)"
 A type of function that handles \fBRedis\fP PUB/SUB messages\&. These functions should follow a set of basic rules:
 .PP
 .PD 0
@@ -1038,7 +1050,14 @@ Get exclusive write access to the specified REDIS channel\&.
 .PP
 \fBReturns\fP
 .RS 4
-X_SUCCESS if the exclusive lock for the channel was successfully obtained X_FAILURE if pthread_mutex_lock() returned an error X_NULL if the client is NULL\&. 
+X_SUCCESS if the exclusive lock for the channel was successfully obtained X_FAILURE if pthread_mutex_lock() returned an error X_NULL if the client is NULL\&.
+.RE
+.PP
+\fBSee also\fP
+.RS 4
+\fBredisxLockEnabled()\fP 
+.PP
+\fBredisxUnlockClient()\fP 
 .RE
 .PP
 
@@ -1054,7 +1073,14 @@ Lock a channel, but only if it has been enabled for communication\&.
 .PP
 \fBReturns\fP
 .RS 4
-X_SUCCESS (0) if an excusive lock to the channel has been granted\&. X_FAILURE if pthread_mutex_lock() returned an error X_NULL if the client is NULL REDIS_INVALID_CHANNEL if the channel is enabled/connected\&. 
+X_SUCCESS (0) if an excusive lock to the channel has been granted\&. X_FAILURE if pthread_mutex_lock() returned an error X_NULL if the client is NULL REDIS_INVALID_CHANNEL if the channel is enabled/connected\&.
+.RE
+.PP
+\fBSee also\fP
+.RS 4
+\fBredisxLockClient()\fP 
+.PP
+\fBredisxUnlockClient()\fP 
 .RE
 .PP
 
@@ -1113,6 +1139,24 @@ X_SUCCESS if the message was successfullt sent\&. X_NO_INIT if the \fBRedis\fP l
 
 .PP
 References \fBredisxPublish()\fP\&.
+.SS "int redisxPing (\fBRedis\fP * redis, const char * message)"
+Pings the \fBRedis\fP server (see the \fBRedis\fP \fCPING\fP command), and check the response\&.
+.PP
+\fBParameters\fP
+.RS 4
+\fIredis\fP Pointer to a \fBRedis\fP instance\&. 
+.br
+\fImessage\fP Optional message , or NULL for \fCPING\fP without an argument\&. 
+.RE
+.PP
+\fBReturns\fP
+.RS 4
+X_SUCCESS (0) if successful, or else an error code (<0) from \fBredisx\&.h\fP / \fBxchange\&.h\fP\&. 
+.RE
+.PP
+
+.PP
+References \fBREDIS_UNEXPECTED_RESP\fP, \fBredisxCheckRESP()\fP, \fBredisxDestroyRESP()\fP, \fBredisxError()\fP, \fBredisxRequest()\fP, \fBRESP_BULK_STRING\fP, \fBRESP_SIMPLE_STRING\fP, \fBRESP::value\fP, \fBX_NULL\fP, and \fBX_SUCCESS\fP\&.
 .SS "int redisxPublish (\fBRedis\fP * redis, const char * channel, const char * data, int length)"
 Sends a generic \fBRedis\fP PUB/SUB message on the specified channel\&. \fBRedis\fP must be connected before attempting to send messages\&. It will send the message over the pipeline client if it is avaiable, or else over the interactive client\&.
 .PP
@@ -1299,6 +1343,22 @@ A freshly allocated \fBRESP\fP array containing the \fBRedis\fP response, or NUL
 
 .PP
 References \fBredisxArrayRequest()\fP\&.
+.SS "int redisxResetClient (\fBRedisClient\fP * cl)"
+Sends a \fCRESET\fP request to the specified \fBRedis\fP client\&. The server will perform a reset as if the client disconnected and reconnected again\&.
+.PP
+\fBParameters\fP
+.RS 4
+\fIcl\fP The \fBRedis\fP client 
+.RE
+.PP
+\fBReturns\fP
+.RS 4
+X_SUCCESS (0) if successful, or else an error code (<0) from \fBredisx\&.h\fP / \fBxchange\&.h\fP\&. 
+.RE
+.PP
+
+.PP
+References \fBREDIS_UNEXPECTED_RESP\fP, \fBredisxCheckRESP()\fP, \fBredisxDestroyRESP()\fP, \fBredisxError()\fP, \fBredisxLockEnabled()\fP, \fBredisxReadReplyAsync()\fP, \fBredisxSendRequestAsync()\fP, \fBredisxUnlockClient()\fP, \fBRESP_SIMPLE_STRING\fP, \fBRESP::value\fP, \fBX_NULL\fP, and \fBX_SUCCESS\fP\&.
 .SS "char ** redisxScanKeys (\fBRedis\fP * redis, const char * pattern, int * n, int * status)"
 Returns an alphabetical list of the \fBRedis\fP keys using the \fBRedis\fP SCAN command\&. Because it uses the scan command, it is guaranteed to not hog the database for excessive periods, and hence it is preferable to redisxGetKeys(table=NULL)\&.
 .PP
@@ -1375,6 +1435,56 @@ A \fBRedisEntry\fP[] array or NULL\&.
 
 .PP
 References \fBRedisEntry::key\fP, \fBRedisEntry::length\fP, \fBRESP::n\fP, \fBredisxArrayRequest()\fP, \fBredisxCheckRESP()\fP, \fBredisxDestroyRESP()\fP, \fBredisxError()\fP, \fBredisxGetScanCount()\fP, \fBRESP_ARRAY\fP, \fBRESP_BULK_STRING\fP, \fBSCAN_INITIAL_STORE_CAPACITY\fP, \fBRESP::value\fP, \fBRedisEntry::value\fP, \fBX_NULL\fP, \fBX_SUCCESS\fP, \fBxdprintf\fP, \fBxStringCopyOf()\fP, and \fBxvprintf\fP\&.
+.SS "int redisxSelectDB (\fBRedisClient\fP * cl, int idx)"
+Siwtches to another database\&. See the \fBRedis\fP \fCSELECT\fP command\&.
+.PP
+\fBParameters\fP
+.RS 4
+\fIcl\fP the redis client 
+.br
+\fIidx\fP zero-based database index 
+.RE
+.PP
+\fBReturns\fP
+.RS 4
+X_SUCCESS (0) if successful, or else an error code (<0) from \fBredisx\&.h\fP / \fBxchange\&.h\fP\&.
+.RE
+.PP
+\fBSee also\fP
+.RS 4
+\fBredisxSelectDBAsync()\fP 
+.RE
+.PP
+
+.PP
+References \fBPIPELINE_CHANNEL\fP, \fBredisxError()\fP, \fBredisxLockEnabled()\fP, \fBredisxSelectDBAsync()\fP, \fBredisxUnlockClient()\fP, \fBX_NULL\fP, and \fBX_SUCCESS\fP\&.
+.SS "int redisxSelectDBAsync (\fBRedisClient\fP * cl, int idx, \fBboolean\fP confirm)"
+Siwtches to another database\&. This version should be called with an exclusive lock on the affected client\&.
+.PP
+\fBParameters\fP
+.RS 4
+\fIcl\fP the redis client 
+.br
+\fIidx\fP zero-based database index 
+.br
+\fIconfirm\fP Whether to wait for confirmation from \fBRedis\fP, and check the response\&. 
+.RE
+.PP
+\fBReturns\fP
+.RS 4
+X_SUCCESS (0) if successful, or else an error code (<0) from \fBredisx\&.h\fP / \fBxchange\&.h\fP\&.
+.RE
+.PP
+\fBSee also\fP
+.RS 4
+\fBredisxSelectDB()\fP 
+.PP
+\fBredisxLockEnabled()\fP 
+.RE
+.PP
+
+.PP
+References \fBREDIS_UNEXPECTED_RESP\fP, \fBredisxCheckRESP()\fP, \fBredisxDestroyRESP()\fP, \fBredisxError()\fP, \fBredisxReadReplyAsync()\fP, \fBredisxSendRequestAsync()\fP, \fBredisxSkipReplyAsync()\fP, \fBRESP_SIMPLE_STRING\fP, \fBRESP::value\fP, \fBX_NULL\fP, and \fBX_SUCCESS\fP\&.
 .SS "int redisxSendArrayRequestAsync (\fBRedisClient\fP * cl, char * args[], int lengths[], int n)"
 Send a \fBRedis\fP request with an arbitrary number of arguments\&.
 .PP
@@ -1398,9 +1508,7 @@ Send a \fBRedis\fP request with an arbitrary number of arguments\&.
 .PP
 References \fBFALSE\fP, \fBREDIS_CMDBUF_SIZE\fP, \fBredisxError()\fP, \fBTRUE\fP, \fBX_NULL\fP, and \fBX_SUCCESS\fP\&.
 .SS "int redisxSendRequestAsync (\fBRedisClient\fP * cl, const char * command, const char * arg1, const char * arg2, const char * arg3)"
-Send a command (with up to 3 arguments) to the REDIS server\&. The arguments supplied will be used up to the first non-NULL value\&. E\&.g\&. to send the command 'HLEN acc3' on the regular REDIS command connection (INTERACTIVE_CHANNEL), you would call:
-.PP
-sendRequest(INTERACTIVE_CHANNEL, 'HLEN', 'acc3', NULL, NULL);
+Send a command (with up to 3 arguments) to the REDIS server\&. The caller must have an exclusive lock on the client for this version\&. The arguments supplied will be used up to the first non-NULL value\&.
 .PP
 \fBParameters\fP
 .RS 4
@@ -1555,7 +1663,7 @@ X_SUCCESS if the variable was succesfully set, or:
 .PP
 
 .PP
-References \fBFALSE\fP, \fBRedis::interactive\fP, \fBRedis::pipeline\fP, \fBredisxCheckRESP()\fP, \fBredisxDestroyRESP()\fP, \fBredisxError()\fP, \fBredisxLockEnabled()\fP, \fBredisxReadReplyAsync()\fP, \fBredisxSetValueAsync()\fP, \fBredisxSkipReplyAsync()\fP, \fBredisxUnlockClient()\fP, \fBRESP_INT\fP, \fBX_NULL\fP, and \fBX_SUCCESS\fP\&.
+References \fBFALSE\fP, \fBRedis::interactive\fP, \fBRedis::pipeline\fP, \fBredisxError()\fP, \fBredisxLockEnabled()\fP, \fBredisxSetValueAsync()\fP, \fBredisxUnlockClient()\fP, \fBX_NULL\fP, and \fBX_SUCCESS\fP\&.
 .SS "int redisxSetValueAsync (\fBRedisClient\fP * cl, const char * table, const char * key, const char * value, \fBboolean\fP confirm)"
 Sends a request for setting a table value, using the \fBRedis\fP 'SET' or 'HSET' command\&.
 .PP
@@ -1579,7 +1687,7 @@ X_SUCCESS (0) if successful, or X_NULL if the client or value is NULL X_NAME_INV
 .PP
 or an error returned by \fBredisxSendRequestAsync()\fP\&. 
 .PP
-References \fBredisxError()\fP, \fBredisxSendRequestAsync()\fP, \fBredisxSkipReplyAsync()\fP, \fBX_NAME_INVALID\fP, \fBX_NULL\fP, \fBX_SUCCESS\fP, and \fBxvprintf\fP\&.
+References \fBredisxCheckRESP()\fP, \fBredisxDestroyRESP()\fP, \fBredisxError()\fP, \fBredisxReadReplyAsync()\fP, \fBredisxSendRequestAsync()\fP, \fBredisxSkipReplyAsync()\fP, \fBRESP_INT\fP, \fBX_NAME_INVALID\fP, \fBX_NULL\fP, \fBX_SUCCESS\fP, and \fBxvprintf\fP\&.
 .SS "void redisxSetVerbose (\fBboolean\fP value)"
 Enable or disable verbose reporting of all \fBRedis\fP operations (and possibly some details of them)\&. Reporting is done on the standard output (stdout)\&. It may be useful when debugging programs that use the redisx interface\&. Verbose reporting is DISABLED by default\&.
 .PP
@@ -1684,7 +1792,14 @@ Relinquish exclusive write access to the specified REDIS channel
 .PP
 \fBReturns\fP
 .RS 4
-X_SUCCESS if the exclusive lock for the channel was successfully obtained X_FAILURE if pthread_mutex_lock() returned an error X_NULL if the client is NULL 
+X_SUCCESS if the exclusive lock for the channel was successfully obtained X_FAILURE if pthread_mutex_lock() returned an error X_NULL if the client is NULL
+.RE
+.PP
+\fBSee also\fP
+.RS 4
+\fBredisxLockClient()\fP 
+.PP
+\fBredisxLockEnabled()\fP 
 .RE
 .PP
 

@@ -44,6 +44,18 @@ src/redisx.c \- A \fBRedis\fP client library that compiles on older and newer pl
 .RI "int \fBredisxLoadScript\fP (\fBRedis\fP *redis, const char *script, char **sha1)"
 .br
 .ti -1c
+.RI "int \fBredisxPing\fP (\fBRedis\fP *redis, const char *message)"
+.br
+.ti -1c
+.RI "int \fBredisxResetClient\fP (\fBRedisClient\fP *cl)"
+.br
+.ti -1c
+.RI "int \fBredisxSelectDB\fP (\fBRedisClient\fP *cl, int idx)"
+.br
+.ti -1c
+.RI "int \fBredisxSelectDBAsync\fP (\fBRedisClient\fP *cl, int idx, \fBboolean\fP confirm)"
+.br
+.ti -1c
 .RI "void \fBredisxSetPassword\fP (\fBRedis\fP *redis, const char *passwd)"
 .br
 .ti -1c
@@ -257,6 +269,90 @@ X_SUCCESS (0) if the script has been successfully loaded into \fBRedis\fP, or X_
 ot an error returned by \fBredisxRequest()\fP\&. 
 .PP
 References \fBredisxCheckDestroyRESP()\fP, \fBredisxDestroyRESP()\fP, \fBredisxError()\fP, \fBredisxRequest()\fP, \fBRESP_BULK_STRING\fP, \fBRESP::value\fP, \fBX_NAME_INVALID\fP, \fBX_NULL\fP, and \fBX_SUCCESS\fP\&.
+.SS "int redisxPing (\fBRedis\fP * redis, const char * message)"
+Pings the \fBRedis\fP server (see the \fBRedis\fP \fCPING\fP command), and check the response\&.
+.PP
+\fBParameters\fP
+.RS 4
+\fIredis\fP Pointer to a \fBRedis\fP instance\&. 
+.br
+\fImessage\fP Optional message , or NULL for \fCPING\fP without an argument\&. 
+.RE
+.PP
+\fBReturns\fP
+.RS 4
+X_SUCCESS (0) if successful, or else an error code (<0) from \fBredisx\&.h\fP / \fBxchange\&.h\fP\&. 
+.RE
+.PP
+
+.PP
+References \fBREDIS_UNEXPECTED_RESP\fP, \fBredisxCheckRESP()\fP, \fBredisxDestroyRESP()\fP, \fBredisxError()\fP, \fBredisxRequest()\fP, \fBRESP_BULK_STRING\fP, \fBRESP_SIMPLE_STRING\fP, \fBRESP::value\fP, \fBX_NULL\fP, and \fBX_SUCCESS\fP\&.
+.SS "int redisxResetClient (\fBRedisClient\fP * cl)"
+Sends a \fCRESET\fP request to the specified \fBRedis\fP client\&. The server will perform a reset as if the client disconnected and reconnected again\&.
+.PP
+\fBParameters\fP
+.RS 4
+\fIcl\fP The \fBRedis\fP client 
+.RE
+.PP
+\fBReturns\fP
+.RS 4
+X_SUCCESS (0) if successful, or else an error code (<0) from \fBredisx\&.h\fP / \fBxchange\&.h\fP\&. 
+.RE
+.PP
+
+.PP
+References \fBREDIS_UNEXPECTED_RESP\fP, \fBredisxCheckRESP()\fP, \fBredisxDestroyRESP()\fP, \fBredisxError()\fP, \fBredisxLockEnabled()\fP, \fBredisxReadReplyAsync()\fP, \fBredisxSendRequestAsync()\fP, \fBredisxUnlockClient()\fP, \fBRESP_SIMPLE_STRING\fP, \fBRESP::value\fP, \fBX_NULL\fP, and \fBX_SUCCESS\fP\&.
+.SS "int redisxSelectDB (\fBRedisClient\fP * cl, int idx)"
+Siwtches to another database\&. See the \fBRedis\fP \fCSELECT\fP command\&.
+.PP
+\fBParameters\fP
+.RS 4
+\fIcl\fP the redis client 
+.br
+\fIidx\fP zero-based database index 
+.RE
+.PP
+\fBReturns\fP
+.RS 4
+X_SUCCESS (0) if successful, or else an error code (<0) from \fBredisx\&.h\fP / \fBxchange\&.h\fP\&.
+.RE
+.PP
+\fBSee also\fP
+.RS 4
+\fBredisxSelectDBAsync()\fP 
+.RE
+.PP
+
+.PP
+References \fBPIPELINE_CHANNEL\fP, \fBredisxError()\fP, \fBredisxLockEnabled()\fP, \fBredisxSelectDBAsync()\fP, \fBredisxUnlockClient()\fP, \fBX_NULL\fP, and \fBX_SUCCESS\fP\&.
+.SS "int redisxSelectDBAsync (\fBRedisClient\fP * cl, int idx, \fBboolean\fP confirm)"
+Siwtches to another database\&. This version should be called with an exclusive lock on the affected client\&.
+.PP
+\fBParameters\fP
+.RS 4
+\fIcl\fP the redis client 
+.br
+\fIidx\fP zero-based database index 
+.br
+\fIconfirm\fP Whether to wait for confirmation from \fBRedis\fP, and check the response\&. 
+.RE
+.PP
+\fBReturns\fP
+.RS 4
+X_SUCCESS (0) if successful, or else an error code (<0) from \fBredisx\&.h\fP / \fBxchange\&.h\fP\&.
+.RE
+.PP
+\fBSee also\fP
+.RS 4
+\fBredisxSelectDB()\fP 
+.PP
+\fBredisxLockEnabled()\fP 
+.RE
+.PP
+
+.PP
+References \fBREDIS_UNEXPECTED_RESP\fP, \fBredisxCheckRESP()\fP, \fBredisxDestroyRESP()\fP, \fBredisxError()\fP, \fBredisxReadReplyAsync()\fP, \fBredisxSendRequestAsync()\fP, \fBredisxSkipReplyAsync()\fP, \fBRESP_SIMPLE_STRING\fP, \fBRESP::value\fP, \fBX_NULL\fP, and \fBX_SUCCESS\fP\&.
 .SS "void redisxSetPassword (\fBRedis\fP * redis, const char * passwd)"
 Sets the password to use for authenticating on the \fBRedis\fP server after connection\&. See the AUTH \fBRedis\fP command for more explanation\&. Naturally, you need to call this prior to connecting your \fBRedis\fP instance to have the desired effect\&.
 .PP

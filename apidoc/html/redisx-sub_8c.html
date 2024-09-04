@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=11"/>
 <meta charset="utf-8"/>
 <meta name="description" content="A light-weight Redis client library for C/C++"/>
-<meta name="keywords" content="redis client, C, C++, library"/>
+<meta name="keywords" content="Redis client library, C, C++, C90, software library, open source"/>
 <meta name="author" content="Attila Kovacs"/>
 <meta name="copyright" content="(C)2024 Attila Kovacs" />
 <meta name="robots" content="index,follow"/>
@@ -120,7 +120,7 @@ $(document).ready(function(){initNavTree('redisx-sub_8c.html',''); initResizable
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="func-members" name="func-members"></a>
 Functions</h2></td></tr>
-<tr class="memitem:a8a31ecaa0f83150366b72aa9b47755f0" id="r_a8a31ecaa0f83150366b72aa9b47755f0"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="redisx-sub_8c.html#a8a31ecaa0f83150366b72aa9b47755f0">redisxAddSubscriber</a> (<a class="el" href="structRedis.html">Redis</a> *redis, const char *channelStem, <a class="el" href="redisx_8h.html#a6492aad2ae8290c9b27f8cabfbbc2fbe">RedisSubscriberCall</a> f)</td></tr>
+<tr class="memitem:a8a31ecaa0f83150366b72aa9b47755f0" id="r_a8a31ecaa0f83150366b72aa9b47755f0"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="redisx-sub_8c.html#a8a31ecaa0f83150366b72aa9b47755f0">redisxAddSubscriber</a> (<a class="el" href="structRedis.html">Redis</a> *redis, const char *channelStem, <a class="el" href="redisx_8h.html#aeb7d6976a06d6b51780b1c9d3f927ef8">RedisSubscriberCall</a> f)</td></tr>
 <tr class="separator:a8a31ecaa0f83150366b72aa9b47755f0"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:af70948d6e1b0e3b8f4fde82d0ce27094" id="r_af70948d6e1b0e3b8f4fde82d0ce27094"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="redisx-sub_8c.html#af70948d6e1b0e3b8f4fde82d0ce27094">redisxClearSubscribers</a> (<a class="el" href="structRedis.html">Redis</a> *redis)</td></tr>
 <tr class="separator:af70948d6e1b0e3b8f4fde82d0ce27094"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -132,7 +132,7 @@ Functions</h2></td></tr>
 <tr class="separator:a3ae6a78cececda6a1a495eebefbd57e9"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a89b6c2128548882616c081553ea2436c" id="r_a89b6c2128548882616c081553ea2436c"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="redisx-sub_8c.html#a89b6c2128548882616c081553ea2436c">redisxPublishAsync</a> (<a class="el" href="structRedis.html">Redis</a> *redis, const char *channel, const char *data, int length)</td></tr>
 <tr class="separator:a89b6c2128548882616c081553ea2436c"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aeda3fce11d0f9a11428ca405d1e45b69" id="r_aeda3fce11d0f9a11428ca405d1e45b69"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="redisx-sub_8c.html#aeda3fce11d0f9a11428ca405d1e45b69">redisxRemoveSubscribers</a> (<a class="el" href="structRedis.html">Redis</a> *redis, <a class="el" href="redisx_8h.html#a6492aad2ae8290c9b27f8cabfbbc2fbe">RedisSubscriberCall</a> f)</td></tr>
+<tr class="memitem:aeda3fce11d0f9a11428ca405d1e45b69" id="r_aeda3fce11d0f9a11428ca405d1e45b69"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="redisx-sub_8c.html#aeda3fce11d0f9a11428ca405d1e45b69">redisxRemoveSubscribers</a> (<a class="el" href="structRedis.html">Redis</a> *redis, <a class="el" href="redisx_8h.html#aeb7d6976a06d6b51780b1c9d3f927ef8">RedisSubscriberCall</a> f)</td></tr>
 <tr class="separator:aeda3fce11d0f9a11428ca405d1e45b69"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a0aa27b4fce0d0986cae75dfe7fa12f19" id="r_a0aa27b4fce0d0986cae75dfe7fa12f19"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="redisx-sub_8c.html#a0aa27b4fce0d0986cae75dfe7fa12f19">redisxSubscribe</a> (<a class="el" href="structRedis.html">Redis</a> *redis, const char *pattern)</td></tr>
 <tr class="separator:a0aa27b4fce0d0986cae75dfe7fa12f19"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -165,7 +165,7 @@ Functions</h2></td></tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype"><a class="el" href="redisx_8h.html#a6492aad2ae8290c9b27f8cabfbbc2fbe">RedisSubscriberCall</a>&#160;</td>
+          <td class="paramtype"><a class="el" href="redisx_8h.html#aeb7d6976a06d6b51780b1c9d3f927ef8">RedisSubscriberCall</a>&#160;</td>
           <td class="paramname"><em>f</em>&#160;</td>
         </tr>
         <tr>
@@ -427,7 +427,7 @@ Functions</h2></td></tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype"><a class="el" href="redisx_8h.html#a6492aad2ae8290c9b27f8cabfbbc2fbe">RedisSubscriberCall</a>&#160;</td>
+          <td class="paramtype"><a class="el" href="redisx_8h.html#aeb7d6976a06d6b51780b1c9d3f927ef8">RedisSubscriberCall</a>&#160;</td>
           <td class="paramname"><em>f</em>&#160;</td>
         </tr>
         <tr>

@@ -229,9 +229,7 @@ Send a \fBRedis\fP request with an arbitrary number of arguments\&.
 .PP
 References \fBFALSE\fP, \fBREDIS_CMDBUF_SIZE\fP, \fBredisxError()\fP, \fBTRUE\fP, \fBX_NULL\fP, and \fBX_SUCCESS\fP\&.
 .SS "int redisxSendRequestAsync (\fBRedisClient\fP * cl, const char * command, const char * arg1, const char * arg2, const char * arg3)"
-Send a command (with up to 3 arguments) to the REDIS server\&. The arguments supplied will be used up to the first non-NULL value\&. E\&.g\&. to send the command 'HLEN acc3' on the regular REDIS command connection (INTERACTIVE_CHANNEL), you would call:
-.PP
-sendRequest(INTERACTIVE_CHANNEL, 'HLEN', 'acc3', NULL, NULL);
+Send a command (with up to 3 arguments) to the REDIS server\&. The caller must have an exclusive lock on the client for this version\&. The arguments supplied will be used up to the first non-NULL value\&.
 .PP
 \fBParameters\fP
 .RS 4

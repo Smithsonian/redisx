@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=11"/>
 <meta charset="utf-8"/>
 <meta name="description" content="A light-weight Redis client library for C/C++"/>
-<meta name="keywords" content="redis client, C, C++, library"/>
+<meta name="keywords" content="Redis client library, C, C++, C90, software library, open source"/>
 <meta name="author" content="Attila Kovacs"/>
 <meta name="copyright" content="(C)2024 Attila Kovacs" />
 <meta name="robots" content="index,follow"/>
@@ -363,7 +363,10 @@ Functions</h2></td></tr>
   </table>
   </dd>
 </dl>
-<dl class="section return"><dt>Returns</dt><dd>X_SUCCESS if the exclusive lock for the channel was successfully obtained X_FAILURE if pthread_mutex_lock() returned an error X_NULL if the client is NULL. </dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>X_SUCCESS if the exclusive lock for the channel was successfully obtained X_FAILURE if pthread_mutex_lock() returned an error X_NULL if the client is NULL.</dd></dl>
+<dl class="section see"><dt>See also</dt><dd><a class="el" href="redisx-net_8c.html#ac6c9928f425b6b1d97d721cbddc3cf28">redisxLockEnabled()</a> </dd>
+<dd>
+<a class="el" href="redisx-net_8c.html#a87efe53c80fcff3fcf189362cbc602f7">redisxUnlockClient()</a> </dd></dl>
 
 <p class="reference">References <a class="el" href="redisx_8c.html#ae722b046fa70a55db725341ef8ee56dc">redisxError()</a>, <a class="elRef" href="../../xchange/apidoc/html/xchange_8h.html#a1d4a0c99f979fd0ecf0e9dcb7191a8d7">X_FAILURE</a>, <a class="elRef" href="../../xchange/apidoc/html/xchange_8h.html#aadbbe3ae01369cbddf4d57d430b33133">X_NULL</a>, and <a class="elRef" href="../../xchange/apidoc/html/xchange_8h.html#a7b2679c964ea5f2160380ed55654b873">X_SUCCESS</a>.</p>
 
@@ -391,7 +394,10 @@ Functions</h2></td></tr>
   </table>
   </dd>
 </dl>
-<dl class="section return"><dt>Returns</dt><dd>X_SUCCESS (0) if an excusive lock to the channel has been granted. X_FAILURE if pthread_mutex_lock() returned an error X_NULL if the client is NULL REDIS_INVALID_CHANNEL if the channel is enabled/connected. </dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>X_SUCCESS (0) if an excusive lock to the channel has been granted. X_FAILURE if pthread_mutex_lock() returned an error X_NULL if the client is NULL REDIS_INVALID_CHANNEL if the channel is enabled/connected.</dd></dl>
+<dl class="section see"><dt>See also</dt><dd><a class="el" href="redisx-net_8c.html#ac9c69fbcaa2a2fbe95af72d91a7b7e6c">redisxLockClient()</a> </dd>
+<dd>
+<a class="el" href="redisx-net_8c.html#a87efe53c80fcff3fcf189362cbc602f7">redisxUnlockClient()</a> </dd></dl>
 
 <p class="reference">References <a class="el" href="redisx_8h.html#a8827c9e06650c47f2cfd96496af5487e">REDIS_INVALID_CHANNEL</a>, <a class="el" href="redisx_8c.html#ae722b046fa70a55db725341ef8ee56dc">redisxError()</a>, <a class="el" href="redisx-net_8c.html#ac9c69fbcaa2a2fbe95af72d91a7b7e6c">redisxLockClient()</a>, <a class="el" href="redisx-net_8c.html#a87efe53c80fcff3fcf189362cbc602f7">redisxUnlockClient()</a>, and <a class="elRef" href="../../xchange/apidoc/html/xchange_8h.html#a7b2679c964ea5f2160380ed55654b873">X_SUCCESS</a>.</p>
 
@@ -525,7 +531,10 @@ Functions</h2></td></tr>
   </table>
   </dd>
 </dl>
-<dl class="section return"><dt>Returns</dt><dd>X_SUCCESS if the exclusive lock for the channel was successfully obtained X_FAILURE if pthread_mutex_lock() returned an error X_NULL if the client is NULL </dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>X_SUCCESS if the exclusive lock for the channel was successfully obtained X_FAILURE if pthread_mutex_lock() returned an error X_NULL if the client is NULL</dd></dl>
+<dl class="section see"><dt>See also</dt><dd><a class="el" href="redisx-net_8c.html#ac9c69fbcaa2a2fbe95af72d91a7b7e6c">redisxLockClient()</a> </dd>
+<dd>
+<a class="el" href="redisx-net_8c.html#ac6c9928f425b6b1d97d721cbddc3cf28">redisxLockEnabled()</a> </dd></dl>
 
 <p class="reference">References <a class="el" href="redisx_8c.html#ae722b046fa70a55db725341ef8ee56dc">redisxError()</a>, <a class="elRef" href="../../xchange/apidoc/html/xchange_8h.html#a1d4a0c99f979fd0ecf0e9dcb7191a8d7">X_FAILURE</a>, <a class="elRef" href="../../xchange/apidoc/html/xchange_8h.html#aadbbe3ae01369cbddf4d57d430b33133">X_NULL</a>, and <a class="elRef" href="../../xchange/apidoc/html/xchange_8h.html#a7b2679c964ea5f2160380ed55654b873">X_SUCCESS</a>.</p>
 

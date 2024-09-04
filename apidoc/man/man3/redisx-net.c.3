@@ -179,7 +179,14 @@ Get exclusive write access to the specified REDIS channel\&.
 .PP
 \fBReturns\fP
 .RS 4
-X_SUCCESS if the exclusive lock for the channel was successfully obtained X_FAILURE if pthread_mutex_lock() returned an error X_NULL if the client is NULL\&. 
+X_SUCCESS if the exclusive lock for the channel was successfully obtained X_FAILURE if pthread_mutex_lock() returned an error X_NULL if the client is NULL\&.
+.RE
+.PP
+\fBSee also\fP
+.RS 4
+\fBredisxLockEnabled()\fP 
+.PP
+\fBredisxUnlockClient()\fP 
 .RE
 .PP
 
@@ -195,7 +202,14 @@ Lock a channel, but only if it has been enabled for communication\&.
 .PP
 \fBReturns\fP
 .RS 4
-X_SUCCESS (0) if an excusive lock to the channel has been granted\&. X_FAILURE if pthread_mutex_lock() returned an error X_NULL if the client is NULL REDIS_INVALID_CHANNEL if the channel is enabled/connected\&. 
+X_SUCCESS (0) if an excusive lock to the channel has been granted\&. X_FAILURE if pthread_mutex_lock() returned an error X_NULL if the client is NULL REDIS_INVALID_CHANNEL if the channel is enabled/connected\&.
+.RE
+.PP
+\fBSee also\fP
+.RS 4
+\fBredisxLockClient()\fP 
+.PP
+\fBredisxUnlockClient()\fP 
 .RE
 .PP
 
@@ -258,7 +272,14 @@ Relinquish exclusive write access to the specified REDIS channel
 .PP
 \fBReturns\fP
 .RS 4
-X_SUCCESS if the exclusive lock for the channel was successfully obtained X_FAILURE if pthread_mutex_lock() returned an error X_NULL if the client is NULL 
+X_SUCCESS if the exclusive lock for the channel was successfully obtained X_FAILURE if pthread_mutex_lock() returned an error X_NULL if the client is NULL
+.RE
+.PP
+\fBSee also\fP
+.RS 4
+\fBredisxLockClient()\fP 
+.PP
+\fBredisxLockEnabled()\fP 
 .RE
 .PP
 

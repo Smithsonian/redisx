@@ -180,8 +180,8 @@
       <type>void(*</type>
       <name>RedisSubscriberCall</name>
       <anchorfile>redisx_8h.html</anchorfile>
-      <anchor>a6492aad2ae8290c9b27f8cabfbbc2fbe</anchor>
-      <arglist>)(const char *pattern, const char *channel, const char *msg, int length)</arglist>
+      <anchor>aeb7d6976a06d6b51780b1c9d3f927ef8</anchor>
+      <arglist>)(const char *pattern, const char *channel, const char *msg, long length)</arglist>
     </member>
     <member kind="enumeration">
       <type></type>
@@ -469,6 +469,13 @@
     </member>
     <member kind="function">
       <type>int</type>
+      <name>redisxPing</name>
+      <anchorfile>redisx_8h.html</anchorfile>
+      <anchor>afd19b1137e80ed26065d9e6e7039c8fe</anchor>
+      <arglist>(Redis *redis, const char *message)</arglist>
+    </member>
+    <member kind="function">
+      <type>int</type>
       <name>redisxPublish</name>
       <anchorfile>redisx_8h.html</anchorfile>
       <anchor>a06262603a9a3153fb29d81628fee6a8e</anchor>
@@ -524,6 +531,13 @@
       <arglist>(Redis *redis, const char *command, const char *arg1, const char *arg2, const char *arg3, int *status)</arglist>
     </member>
     <member kind="function">
+      <type>int</type>
+      <name>redisxResetClient</name>
+      <anchorfile>redisx_8h.html</anchorfile>
+      <anchor>a05f0f4d0a2f3d8fb5e385541be6624a2</anchor>
+      <arglist>(RedisClient *cl)</arglist>
+    </member>
+    <member kind="function">
       <type>char **</type>
       <name>redisxScanKeys</name>
       <anchorfile>redisx_8h.html</anchorfile>
@@ -536,6 +550,20 @@
       <anchorfile>redisx_8h.html</anchorfile>
       <anchor>a47d28fd9f2f35f0af5abd67a1ae7b987</anchor>
       <arglist>(Redis *redis, const char *table, const char *pattern, int *n, int *status)</arglist>
+    </member>
+    <member kind="function">
+      <type>int</type>
+      <name>redisxSelectDB</name>
+      <anchorfile>redisx_8h.html</anchorfile>
+      <anchor>a13d3ff6c46e7f437a6e1f47565d41729</anchor>
+      <arglist>(RedisClient *cl, int idx)</arglist>
+    </member>
+    <member kind="function">
+      <type>int</type>
+      <name>redisxSelectDBAsync</name>
+      <anchorfile>redisx_8h.html</anchorfile>
+      <anchor>a8c680e778a6f702586e70b8ed22c9f60</anchor>
+      <arglist>(RedisClient *cl, int idx, boolean confirm)</arglist>
     </member>
     <member kind="function">
       <type>int</type>
@@ -1140,6 +1168,34 @@
       <anchorfile>redisx_8c.html</anchorfile>
       <anchor>ae8930592b8f927a154508669132bebab</anchor>
       <arglist>(Redis *redis, const char *script, char **sha1)</arglist>
+    </member>
+    <member kind="function">
+      <type>int</type>
+      <name>redisxPing</name>
+      <anchorfile>redisx_8c.html</anchorfile>
+      <anchor>afd19b1137e80ed26065d9e6e7039c8fe</anchor>
+      <arglist>(Redis *redis, const char *message)</arglist>
+    </member>
+    <member kind="function">
+      <type>int</type>
+      <name>redisxResetClient</name>
+      <anchorfile>redisx_8c.html</anchorfile>
+      <anchor>a05f0f4d0a2f3d8fb5e385541be6624a2</anchor>
+      <arglist>(RedisClient *cl)</arglist>
+    </member>
+    <member kind="function">
+      <type>int</type>
+      <name>redisxSelectDB</name>
+      <anchorfile>redisx_8c.html</anchorfile>
+      <anchor>a13d3ff6c46e7f437a6e1f47565d41729</anchor>
+      <arglist>(RedisClient *cl, int idx)</arglist>
+    </member>
+    <member kind="function">
+      <type>int</type>
+      <name>redisxSelectDBAsync</name>
+      <anchorfile>redisx_8c.html</anchorfile>
+      <anchor>a8c680e778a6f702586e70b8ed22c9f60</anchor>
+      <arglist>(RedisClient *cl, int idx, boolean confirm)</arglist>
     </member>
     <member kind="function">
       <type>void</type>
