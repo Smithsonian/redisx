@@ -4,7 +4,7 @@
  * \date May 4, 2018
  * \author Attila Kovacs
  *
- *   RedisX public definition and prototypes.
+ *   RedisX public constant, data types and function prototypes.
  */
 
 #ifndef REDISX_H_
@@ -17,11 +17,13 @@
 
 // Configuration constants ------------------------------------------------------->
 #ifndef REDIS_TCP_PORT
-#  define REDIS_TCP_PORT                  6379    ///< TCP/IP port on which Redis server listens to clients.
+/// Default TCP/IP port on which Redis server listens to clients.
+#  define REDIS_TCP_PORT                  6379
 #endif
 
 #ifndef REDIS_TCP_BUF
-#  define REDIS_TCP_BUF                   0       ///< (bytes), <= 0 to use system default.
+/// (bytes) Default TCP buffer size (send/recv) for Redis clients. Values &lt;= 0 will use system default.
+#  define REDIS_TCP_BUF                   0
 #endif
 
 #ifndef REDIS_CMDBUF_SIZE
@@ -30,12 +32,13 @@
 #endif
 
 #ifndef REDIS_RCV_CHUNK_SIZE
-/// (bytes) Redis receive buffer size.
+/// (bytes) Redis receive buffer size (at most that much is read from the socket in a single call).
 #  define REDIS_RCV_CHUNK_SIZE            8192
 #endif
 
 #ifndef REDISX_SET_LISTENER_PRIORITY
-#  define REDISX_SET_LISTENER_PRIORITY    FALSE   ///< Whether to explicitly set listener thread priorities
+/// Whether to explicitly set listener thread priorities
+#  define REDISX_SET_LISTENER_PRIORITY    FALSE
 #endif
 
 #ifndef REDISX_LISTENER_REL_PRIORITY
