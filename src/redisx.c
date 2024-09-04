@@ -335,8 +335,6 @@ int redisxLoadScript(Redis *redis, const char *script, char **sha1) {
   return X_SUCCESS;
 }
 
-
-
 /**
  * Returns the current time on the Redis server instance.
  *
