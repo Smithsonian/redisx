@@ -682,8 +682,7 @@ than ignoring the replies with `redisxIgnoreReplyAsync()` you might call `redisx
 time and network bandwidth!):
 
 ```c
- ...
- // We don't want to receive a response to our command... 
+ // We don't want to receive a response to our next command... 
  int status = redisxSkipReplyAsync(cl);
  
  if (status == X_SUCCESS) {
