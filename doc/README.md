@@ -809,7 +809,7 @@ server is restarted.
 Functions, introduced in Redis 7, offer another evolutionary step over the LUA scripting described above. Unlike 
 scripts, functions are persistent and they can be called by name rather than a cryptic SHA1 sum. Otherwise, they offer
 more or less the same functionality as scripts. __RedisX__ does not currently have a built-in high-level support
-for managing and calling user-defined functions, but it is a feature that may be added in the not too distant future.
+for managing and calling user-defined functions, but it is a feature that may be added in the not-too-distant future.
 Stay tuned.
 
 
