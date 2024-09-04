@@ -58,6 +58,7 @@ typedef struct {
   uint32_t addr;                ///< The 32-bit inet address
   int port;                     ///< port number (usually 6379)
   int dbIndex;                  ///< the zero-based database index
+  char *username;               ///< REdis user name (if any)
   char *password;               ///< Redis password (if any)
 
   RedisClient *clients;

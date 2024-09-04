@@ -96,22 +96,55 @@ boolean redisxIsVerbose() {
 }
 
 /**
+ * Sets the user name to use for authenticating on the Redis server after connection. See the
+ * `AUTH` Redis command for more explanation. Naturally, you need to call this prior to connecting
+ * your Redis instance to have the desired effect.
+ *
+ * @param redis     Pointer to the Redis instance for which to set credentials
+ * @param username  the password to use for authenticating on the server, or NULL to clear a
+ *                  previously configured password.
+ * @return          X_SUCCESS (0) if successful, X_NULL if the redis argument is NULL, or
+ *                  X_ALREADY_OPEN if called after Redis was already connected.
+ *
+ * @sa redisxSetPassword()
+ */
+int redisxSetUser(Redis *redis, const char *username) {
+  RedisPrivate *p;
+
+  if(!redis) return X_NULL;
+  if(redisxIsConnected(redis)) return redisxError("redisxSetUser()", X_ALREADY_OPEN);
+
+  p = (RedisPrivate *) redis->priv;
+  if(p->username) free(p->username);
+  p->username = xStringCopyOf(username);
+
+  return X_SUCCESS;
+}
+
+/**
  * Sets the password to use for authenticating on the Redis server after connection. See the AUTH
  * Redis command for more explanation. Naturally, you need to call this prior to connecting
  * your Redis instance to have the desired effect.
  *
- * @param redis   Pointer to the Redis instance for which to set credentials
- * @param passwd  the password to use for authenticating on the server, or NULL to clear a
- *                previously configured password.
+ * @param redis     Pointer to the Redis instance for which to set credentials
+ * @param passwd    the password to use for authenticating on the server, or NULL to clear a
+ *                  previously configured password.
+ * @return          X_SUCCESS (0) if successful, X_NULL if the redis argument is NULL, or
+ *                  X_ALREADY_OPEN if called after Redis was already connected.
+ *
+ * @sa redisxSetUser()
  */
-void redisxSetPassword(Redis *redis, const char *passwd) {
+int redisxSetPassword(Redis *redis, const char *passwd) {
   RedisPrivate *p;
 
-  if(!redis) return;
+  if(!redis) return X_NULL;
+   if(redisxIsConnected(redis)) return redisxError("redisxSetPassword()", X_ALREADY_OPEN);
 
   p = (RedisPrivate *) redis->priv;
   if(p->password) free(p->password);
   p->password = xStringCopyOf(passwd);
+
+  return X_SUCCESS;
 }
 
 /**
@@ -463,7 +496,7 @@ int redisxSelectClientDBAsync(RedisClient *cl, int idx, boolean confirm) {
 
 static void rAffirmDB(Redis *redis) {
   const RedisPrivate *p = (RedisPrivate *) redis->priv;
-  redisxSelectDB(redis, p->dbIndex, TRUE);
+  redisxSelectDB(redis, p->dbIndex);
 }
 
 /**
@@ -473,7 +506,6 @@ static void rAffirmDB(Redis *redis) {
  *
  * @param redis       Pointer to a Redis instance.
  * @param idx         zero-based database index
- * @param confirm     Whether to wait for confirmation from Redis, and check the response.
  * @return            X_SUCCESS (0) if successful, or
  *                    X_NULL if the redis argument is NULL,
  *                    X_INCOMPLETE if there is an active subscription channel that cannot be switched or
@@ -483,7 +515,7 @@ static void rAffirmDB(Redis *redis) {
  * @sa redisxSelectDB()
  * @sa redisxLockEnabled()
  */
-int redisxSelectDB(Redis *redis, int idx, boolean confirm) {
+int redisxSelectDB(Redis *redis, int idx) {
   RedisPrivate *p;
   enum redisx_channel c;
   int status = X_SUCCESS;
@@ -511,7 +543,7 @@ int redisxSelectDB(Redis *redis, int idx, boolean confirm) {
       continue;
     }
 
-    s = redisxSelectClientDBAsync(cl, idx, confirm && c != PIPELINE_CHANNEL);
+    s = redisxSelectClientDBAsync(cl, idx, c != PIPELINE_CHANNEL);
     redisxUnlockClient(cl);
 
     if(s) status = X_INCOMPLETE;

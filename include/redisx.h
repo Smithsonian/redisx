@@ -220,7 +220,9 @@ void redisxSetTcpBuf(int size);
 int redisxGetTcpBuf();
 
 void redisxSetPort(Redis *redis, int port);
-void redisxSetPassword(Redis *redis, const char *passwd);
+int redisxSetUser(Redis *redis, const char *username);
+int redisxSetPassword(Redis *redis, const char *passwd);
+int redisxSelectDB(Redis *redis, int idx);
 
 int redisxSetTransmitErrorHandler(Redis *redis, RedisErrorHandler f);
 
@@ -235,7 +237,6 @@ boolean redisxIsConnected(Redis *redis);
 boolean redisxHasPipeline(Redis *redis);
 
 RedisClient *redisxGetClient(Redis *redis, enum redisx_channel channel);
-int redisxSelectDB(Redis *redis, int idx, boolean confirm);
 
 void redisxAddConnectHook(Redis *redis, void (*setupCall)(Redis *));
 void redisxRemoveConnectHook(Redis *redis, void (*setupCall)(Redis *));

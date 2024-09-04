@@ -130,7 +130,7 @@ static int rAuthAsync(RedisClient *cl) {
   const RedisPrivate *p = (RedisPrivate *) cp->redis->priv;
   RESP *reply;
 
-  int status = redisxSendRequestAsync(cl, "AUTH", p->password, NULL, NULL);
+  int status = p->username ? redisxSendRequestAsync(cl, "AUTH", p->username, p->password, NULL) : redisxSendRequestAsync(cl, "AUTH", p->password, NULL, NULL);
   if(status) return redisxError("rAuthAsync()", status);
 
   reply = redisxReadReplyAsync(cl);
@@ -582,7 +582,10 @@ void redisxSetPort(Redis *redis, int port) {
  *
  * \sa redisxInit()
  * \sa redisxSetPort()
+ * \sa redisxSetUser()
+ * \sa redisxSetPassword()
  * \sa redisxSetTcpBuf()
+ * \sa redisxSelectDB()
  * \sa redisxDisconnect()
  */
 int redisxConnect(Redis *redis, boolean usePipeline) {
