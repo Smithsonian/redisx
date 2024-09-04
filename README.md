@@ -767,6 +767,7 @@ Some obvious ways the library could evolve and grow in the not too distant futur
  - Support for the [RESP3](https://github.com/antirez/RESP3/blob/master/spec.md) standard and Redis `HELLO`.
  - Support for Redis sentinel, high-availability server configurations.
  - TLS support (perhaps...)
+ - Add functions for `CLIENT TRACKING` / `CLIENT CACHING` support. 
  - Add more high-level redis commands, e.g. for lists, streams, etc.
  - Improved debug capabilities (e.g. with built-in error traces)
  - Improved error handling (e.g. by consistently setting `errno` beyond just the __RedisX__ error status).

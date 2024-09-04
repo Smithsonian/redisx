@@ -85,7 +85,7 @@ static int rConnectSubscriptionClientAsync(Redis *redis) {
  * @sa redisxNotify()
  */
 int redisxPublishAsync(Redis *redis, const char *channel, const char *data, int length) {
-  const char *funcName = "redisSEndInteractiveNotifyAsync()";
+  static const char *funcName = "redisPublishAsync()";
 
   char *args[3];
   int status, L[3] = {0};
@@ -133,7 +133,7 @@ int redisxPublishAsync(Redis *redis, const char *channel, const char *data, int 
  * @sa redisxSubscribe()
  */
 int redisxPublish(Redis *redis, const char *channel, const char *data, int length) {
-  const char *funcName = "redisxNotifyBin()";
+  static const char *funcName = "redisxPublish()";
 
   int status = 0;
 
@@ -255,7 +255,7 @@ void redisxAddSubscriber(Redis *redis, const char *channelStem, RedisSubscriberC
 // cppcheck-suppress constParameter
 // cppcheck-suppress constParameterPointer
 int redisxRemoveSubscribers(Redis *redis, RedisSubscriberCall f) {
-  const char *funcName = "redisxRemoveSubscribers()";
+  static const char *funcName = "redisxRemoveSubscribers()";
 
   RedisPrivate *p;
   MessageConsumer *c, *last = NULL;
@@ -365,7 +365,7 @@ static int rIsGlobPattern(const char *str) {
  * @sa redisxPublishAsync()
  */
 int redisxSubscribe(Redis *redis, const char *pattern) {
-  const char *funcName = "redisxSubscribe()";
+  static const char *funcName = "redisxSubscribe()";
 
   const ClientPrivate *cp;
   int status = 0;
@@ -414,7 +414,7 @@ int redisxSubscribe(Redis *redis, const char *pattern) {
  * @sa redisxRemoveSubscribers()
  */
 int redisxUnsubscribe(Redis *redis, const char *pattern) {
-  const char *funcName = "redisxUnsubscribe()";
+  static const char *funcName = "redisxUnsubscribe()";
 
   int status;
 

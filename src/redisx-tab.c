@@ -42,7 +42,7 @@
  * @sa redisxDEstroyEntries()
  */
 RedisEntry *redisxGetTable(Redis *redis, const char *table, int *n) {
-  const char *funcName = "redisxGetAll()";
+  static const char *funcName = "redisxGetTable()";
   RedisEntry *entries = NULL;
   RESP *reply;
 
@@ -122,11 +122,10 @@ RedisEntry *redisxGetTable(Redis *redis, const char *table, int *n) {
  *
  */
 int redisxSetValue(Redis *redis, const char *table, const char *key, const char *value, boolean isPipelined) {
-  const char *funcName = "setRedisValue()";
+  static const char *funcName = "redisxSetValue()";
 
   int status = X_SUCCESS;
   RedisClient *cl;
-  RESP *reply = NULL;
 
   if(redis == NULL) return redisxError(funcName, X_NULL);
 
@@ -142,23 +141,10 @@ int redisxSetValue(Redis *redis, const char *table, const char *key, const char 
     if(status) return redisxError(funcName, status);
   }
 
-  if(isPipelined) status = redisxSkipReplyAsync(cl);
-  if(!status) {
-    status = redisxSetValueAsync(cl, table, key, value, !isPipelined);
-    if(!isPipelined) if(!status) reply = redisxReadReplyAsync(cl);
-  }
-
+  status = redisxSetValueAsync(cl, table, key, value, !isPipelined);
   redisxUnlockClient(cl);
 
-  if(status) return redisxError(funcName, status);
-
-  if(!isPipelined) {
-    status = redisxCheckRESP(reply, RESP_INT, 0);
-    redisxDestroyRESP(reply);
-    if(status) return redisxError(funcName, status);
-  }
-
-  return X_SUCCESS;
+  return status;
 }
 
 /**
@@ -177,7 +163,7 @@ int redisxSetValue(Redis *redis, const char *table, const char *key, const char 
  *                  or an error returned by redisxSendRequestAsync().
  */
 int redisxSetValueAsync(RedisClient *cl, const char *table, const char *key, const char *value, boolean confirm) {
-  const char *funcName = "redisxSendValueAsync()";
+  static const char *funcName = "redisxSetValueAsync()";
   int status;
 
   if(cl == NULL) return redisxError(funcName, X_NULL);
@@ -196,6 +182,13 @@ int redisxSetValueAsync(RedisClient *cl, const char *table, const char *key, con
   if(status) return redisxError(funcName, status);
 
   xvprintf("Redis-X> set %s = %s on %s\n", key, value, table);
+
+  if(confirm) {
+    RESP *reply = redisxReadReplyAsync(cl);
+    status = redisxCheckRESP(reply, RESP_INT, 0);
+    redisxDestroyRESP(reply);
+    if(status) return redisxError(funcName, status);
+  }
 
   return X_SUCCESS;
 }
@@ -219,7 +212,7 @@ int redisxSetValueAsync(RedisClient *cl, const char *table, const char *key, con
  *                  response could be obtained.
  */
 RESP *redisxGetValue(Redis *redis, const char *table, const char *key, int *status) {
-  const char *funcName = "redisxGetValue()";
+  static const char *funcName = "redisxGetValue()";
 
   RESP *reply;
 
@@ -253,7 +246,7 @@ RESP *redisxGetValue(Redis *redis, const char *table, const char *key, int *stat
  *
  */
 int redisxMultiSet(Redis *redis, const char *table, const RedisEntry *entries, int n, boolean isPipelined) {
-  const char *funcName = "redisSetAll()";
+  static const char *funcName = "redisxMultiSet()";
   int i, *L, N, status;
   char **req;
 
@@ -334,7 +327,7 @@ int redisxMultiSet(Redis *redis, const char *table, const RedisEntry *entries, i
  * @sa redisxDestroyKeys()
  */
 char **redisxGetKeys(Redis *redis, const char *table, int *n) {
-  const char *funcName = "redisxGetKeys()";
+  static const char *funcName = "redisxGetKeys()";
   RESP *reply;
   char **names = NULL;
 
@@ -446,7 +439,7 @@ static int compare_strings(const void *a, const void *b) {
  * @sa redisxDestroyKeys()
  */
 char **redisxScanKeys(Redis *redis, const char *pattern, int *n, int *status) {
-  const char *funcName = "redisxScanKeys()";
+  static const char *funcName = "redisxScanKeys()";
 
   RESP *reply = NULL;
   char *cmd[6] = {NULL};
@@ -609,7 +602,7 @@ static int compare_entries(const void *a, const void *b) {
  * @sa redisxDestroyEntries()
  */
 RedisEntry *redisxScanTable(Redis *redis, const char *table, const char *pattern, int *n, int *status) {
-  const char *funcName = "redisxScanKeys()";
+  static const char *funcName = "redisxScanTable()";
 
   RESP *reply = NULL;
   RedisEntry *entries = NULL;

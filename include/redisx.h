@@ -229,10 +229,14 @@ void redisxDestroy(Redis *redis);
 int redisxConnect(Redis *redis, boolean usePipeline);
 void redisxDisconnect(Redis *redis);
 int redisxReconnect(Redis *redis, boolean usePipeline);
+int redisxPing(Redis *redis, const char *message);
+
 boolean redisxIsConnected(Redis *redis);
 boolean redisxHasPipeline(Redis *redis);
 
 RedisClient *redisxGetClient(Redis *redis, enum redisx_channel channel);
+int redisxSelectDB(RedisClient *cl, int idx);
+int redisxResetClient(RedisClient *cl);
 
 void redisxAddConnectHook(Redis *redis, void (*setupCall)(Redis *));
 void redisxRemoveConnectHook(Redis *redis, void (*setupCall)(Redis *));
@@ -291,6 +295,7 @@ RESP *redisxReadReplyAsync(RedisClient *cl);
 int redisxIgnoreReplyAsync(RedisClient *cl);
 int redisxSkipReplyAsync(RedisClient *cl);
 int redisxPublishAsync(Redis *redis, const char *channel, const char *data, int length);
+int redisxSelectDBAsync(RedisClient *cl, int idx, boolean confirm);
 
 // Error generation with stderr message...
 int redisxError(const char *func, int errorCode);

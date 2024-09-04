@@ -96,7 +96,7 @@ static int rReadChunkAsync(ClientPrivate *cp) {
  *                 Values < 0 indicate an error.
  */
 static int rReadToken(ClientPrivate *cp, char *buf, int length) {
-  const char *funcName = "rReadToken()";
+  static const char *funcName = "rReadToken()";
   int foundTerms = 0, L;
 
   length--; // leave room for termination in incomplete tokens...
@@ -176,7 +176,7 @@ static int rReadToken(ClientPrivate *cp, char *buf, int length) {
  * \return     Number of bytes successfully read (>=0), or else X_NO_SERVICE.
  */
 static int rReadBytes(ClientPrivate *cp, char *buf, int length) {
-  const char *funcName = "rReadBytes()";
+  static const char *funcName = "rReadBytes()";
   int L;
 
   pthread_mutex_lock(&cp->readLock);
@@ -275,7 +275,7 @@ int rSendBytesAsync(ClientPrivate *cp, const char *buf, int length, boolean isLa
  *                          X_NULL      if the client is NULL.
  */
 int redisxSkipReplyAsync(RedisClient *cl) {
-  const char *funcName = "redisSkipReplyAsync()";
+  static const char *funcName = "redisSkipReplyAsync()";
   static char cmd[] = "*3\r\n$6\r\nCLIENT\r\n$5\r\nREPLY\r\n$4\r\nSKIP\r\n";
 
   int status;
@@ -310,7 +310,7 @@ int redisxSkipReplyAsync(RedisClient *cl) {
  *
  */
 int redisxStartBlockAsync(RedisClient *cl) {
-  const char *funcName = "redisxStartBlockAsync()";
+  static const char *funcName = "redisxStartBlockAsync()";
   static char cmd[] = "*1\r\n$5\r\nMULTI\r\n";
 
   int status;
@@ -334,7 +334,7 @@ int redisxStartBlockAsync(RedisClient *cl) {
  *
  */
 int redisxAbortBlockAsync(RedisClient *cl) {
-  const char *funcName = "redisxAbortBlockAsync()";
+  static const char *funcName = "redisxAbortBlockAsync()";
   static char cmd[] = "*1\r\n$7\r\nDISCARD\r\n";
 
   int status;
@@ -363,7 +363,7 @@ int redisxAbortBlockAsync(RedisClient *cl) {
  *
  */
 RESP *redisxExecBlockAsync(RedisClient *cl) {
-  const char *funcName = "redisxExecBlockAsync()";
+  static const char *funcName = "redisxExecBlockAsync()";
   static char cmd[] = "*1\r\n$4\r\nEXEC\r\n";
 
   int status;
@@ -403,11 +403,9 @@ RESP *redisxExecBlockAsync(RedisClient *cl) {
 }
 
 /**
- * Send a command (with up to 3 arguments) to the REDIS server. The arguments supplied
- * will be used up to the first non-NULL value. E.g. to send the command 'HLEN acc3'
- * on the regular REDIS command connection (INTERACTIVE_CHANNEL), you would call:
- *
- *   sendRequest(INTERACTIVE_CHANNEL, "HLEN", "acc3", NULL, NULL);
+ * Send a command (with up to 3 arguments) to the REDIS server. The caller must have an
+ * exclusive lock on the client for this version. The arguments supplied will be used up
+ * to the first non-NULL value.
  *
  * \param cl            Pointer to the Redis client instance.
  * \param command       REDIS command string.
@@ -548,7 +546,7 @@ int redisxSendArrayRequestAsync(RedisClient *cl, char *args[], int lengths[], in
  * @sa redisxReadReplyAsync()
  */
 RESP *redisxArrayRequest(Redis *redis, char *args[], int lengths[], int n, int *status) {
-  const char *funcName = "getRedisValue()";
+  static const char *funcName = "redisxArrayRequest()";
   RESP *reply = NULL;
   RedisClient *cl;
 
@@ -628,7 +626,7 @@ RESP *redisxRequest(Redis *redis, const char *command, const char *arg1, const c
  *              or EBADMSG if the message was corrupted and/or unparseable.
  */
 RESP *redisxReadReplyAsync(RedisClient *cl) {
-  const char *funcName = "redisxReadReplyAsync()";
+  static const char *funcName = "redisxReadReplyAsync()";
 
   ClientPrivate *cp;
   RESP *resp = NULL;
@@ -768,5 +766,6 @@ RESP *redisxReadReplyAsync(RedisClient *cl) {
 
   return resp;
 }
+
 
 

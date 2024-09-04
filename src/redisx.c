@@ -346,7 +346,7 @@ int redisxLoadScript(Redis *redis, const char *script, char **sha1) {
  *                  if could not parse the response, or another error returned by redisxCheckRESP().
  */
 int redisxGetTime(Redis *redis, struct timespec *t) {
-  const char *funcName = "redisxGetTime()";
+  static const char *funcName = "redisxGetTime()";
 
   RESP *reply, **components;
   int status = X_SUCCESS;
@@ -394,6 +394,132 @@ int redisxGetTime(Redis *redis, struct timespec *t) {
   redisxDestroyRESP(reply);
 
   return status;
+}
+
+/**
+ * Pings the Redis server (see the Redis `PING` command), and check the response.
+ *
+ * @param redis     Pointer to a Redis instance.
+ * @param message   Optional message , or NULL for `PING` without an argument.
+ * @return          X_SUCCESS (0) if successful, or else an error code (&lt;0) from redisx.h / xchange.h.
+ *
+ */
+int redisxPing(Redis *redis, const char *message) {
+  static const char *funcName = "redisxPing()";
+  int status = X_SUCCESS;
+
+  RESP *reply = redisxRequest(redis, "PING", message, NULL, NULL, &status);
+
+  if(!reply) return redisxError(funcName, X_NULL);
+  if(!status) {
+    status = redisxCheckRESP(reply, message ? RESP_BULK_STRING : RESP_SIMPLE_STRING, 0);
+    if(!status) if(strcmp(message ? message : "PONG", (char *)reply->value) != 0) status = REDIS_UNEXPECTED_RESP;
+  }
+
+  redisxDestroyRESP(reply);
+  if(status) return redisxError(funcName, status);
+
+  return X_SUCCESS;
+}
+
+/**
+ * Siwtches to another database. This version should be called with an exclusive lock on the affected
+ * client.
+ *
+ * @param cl          the redis client
+ * @param idx         zero-based database index
+ * @param confirm     Whether to wait for confirmation from Redis, and check the response.
+ * @return            X_SUCCESS (0) if successful, or else an error code (&lt;0) from redisx.h / xchange.h.
+ *
+ * @sa redisxSelectDB()
+ * @sa redisxLockEnabled()
+ */
+int redisxSelectDBAsync(RedisClient *cl, int idx, boolean confirm) {
+  static const char *funcName = "redisxSelectDBAsync()";
+
+  char sval[20];
+  int status;
+
+  if(cl == NULL) return redisxError(funcName, X_NULL);
+
+  if(!confirm) {
+    status = redisxSkipReplyAsync(cl);
+    if(status) return redisxError(funcName, status);
+  }
+
+  sprintf(sval, "%d", idx);
+  status = redisxSendRequestAsync(cl, "SELECT", sval, NULL, NULL);
+  if(status) return redisxError(funcName, status);
+
+  if(confirm) {
+    RESP *reply = redisxReadReplyAsync(cl);
+    status = redisxCheckRESP(reply, RESP_SIMPLE_STRING, 0);
+    if(!status) if(strcmp("OK", (char *) reply->value) != 0) status = REDIS_UNEXPECTED_RESP;
+    redisxDestroyRESP(reply);
+    if(status) return redisxError(funcName, status);
+  }
+
+  return X_SUCCESS;
+}
+
+/**
+ * Siwtches to another database. See the Redis `SELECT` command.
+ *
+ * @param cl          the redis client
+ * @param idx         zero-based database index
+ * @return            X_SUCCESS (0) if successful, or else an error code (&lt;0) from redisx.h / xchange.h.
+ *
+ * @sa redisxSelectDBAsync()
+ */
+int redisxSelectDB(RedisClient *cl, int idx) {
+  static const char *funcName = "redisxSelectDB()";
+
+  const ClientPrivate *cp;
+  int status = X_SUCCESS;
+
+  if(cl == NULL) return redisxError(funcName, X_NULL);
+
+  cp = (ClientPrivate *) cl->priv;
+
+  status = redisxLockEnabled(cl);
+  if(status) return redisxError(funcName, status);
+
+  status = redisxSelectDBAsync(cl, idx, cp->idx == PIPELINE_CHANNEL);
+  redisxUnlockClient(cl);
+
+  return status;
+}
+
+/**
+ * Sends a `RESET` request to the specified Redis client. The server will perform a reset as if the
+ * client disconnected and reconnected again.
+ *
+ * @param cl    The Redis client
+ * @return      X_SUCCESS (0) if successful, or else an error code (&lt;0) from redisx.h / xchange.h.
+ */
+int redisxResetClient(RedisClient *cl) {
+  static const char *funcName = "redisxResetClient()";
+
+  int status = X_SUCCESS;
+
+  if(cl == NULL) return redisxError(funcName, X_NULL);
+
+  status = redisxLockEnabled(cl);
+  if(status) return redisxError(funcName, status);
+
+  status = redisxSendRequestAsync(cl, "RESET", NULL, NULL, NULL);
+  if(!status) {
+    RESP *reply = redisxReadReplyAsync(cl);
+    status = redisxCheckRESP(reply, RESP_SIMPLE_STRING, 0);
+    if(!status) if(strcmp("RESET", (char *) reply->value) != 0) status = REDIS_UNEXPECTED_RESP;
+    redisxDestroyRESP(reply);
+  }
+
+  redisxUnlockClient(cl);
+
+  if(status) return redisxError(funcName, status);
+
+  return X_SUCCESS;
 }
 
 /**
@@ -469,7 +595,7 @@ int redisxCheckDestroyRESP(RESP *resp, char expectedType, int expectedSize) {
  *
  */
 int redisxIgnoreReplyAsync(RedisClient *cl) {
-  const char *funcName = "redisxIgnoreReplyAsync()";
+  static const char *funcName = "redisxIgnoreReplyAsync()";
   RESP *resp;
 
   if(cl == NULL) return redisxError(funcName, X_NULL);

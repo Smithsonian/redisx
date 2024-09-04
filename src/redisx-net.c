@@ -587,9 +587,10 @@ void redisxSetPort(Redis *redis, int port) {
  * \sa redisxDisconnect()
  */
 int redisxConnect(Redis *redis, boolean usePipeline) {
+  static const char *funcName = "redisxConnect()";
   int status;
 
-  if(redis == NULL) return redisxError("redisxConnect()", X_NULL);
+  if(redis == NULL) return redisxError(funcName, X_NULL);
 
   rConfigLock(redis);
 
@@ -597,7 +598,7 @@ int redisxConnect(Redis *redis, boolean usePipeline) {
 
   rConfigUnlock(redis);
 
-  if(status) return redisxError("redisxConnect()", status);
+  if(status) return redisxError(funcName, status);
 
   return X_SUCCESS;
 }
@@ -661,9 +662,12 @@ RedisClient *redisxGetClient(Redis *redis, enum redisx_channel channel) {
  * \return          X_SUCCESS           if the exclusive lock for the channel was successfully obtained
  *                  X_FAILURE           if pthread_mutex_lock() returned an error
  *                  X_NULL              if the client is NULL.
+ *
+ * @sa redisxLockEnabled()
+ * @sa redisxUnlockClient()
  */
 int redisxLockClient(RedisClient *cl) {
-  const char *funcName = "redisLockChannel()";
+  static const char *funcName = "redisLockClient()";
   ClientPrivate *cp;
   int status;
 
@@ -688,9 +692,12 @@ int redisxLockClient(RedisClient *cl) {
  *               X_FAILURE              if pthread_mutex_lock() returned an error
  *               X_NULL                 if the client is NULL
  *               REDIS_INVALID_CHANNEL  if the channel is enabled/connected.
+ *
+ * @sa redisxLockClient()
+ * @sa redisxUnlockClient()
  */
 int redisxLockEnabled(RedisClient *cl) {
-  const char *funcName = "redisxLockEnabled()";
+  static const char *funcName = "redisxLockEnabled()";
   const ClientPrivate *cp;
   int status = redisxLockClient(cl);
   if(status) return redisxError(funcName, status);
@@ -712,9 +719,12 @@ int redisxLockEnabled(RedisClient *cl) {
  * \return          X_SUCCESS           if the exclusive lock for the channel was successfully obtained
  *                  X_FAILURE           if pthread_mutex_lock() returned an error
  *                  X_NULL              if the client is NULL
+ *
+ * @sa redisxLockClient()
+ * @sa redisxLockEnabled()
  */
 int redisxUnlockClient(RedisClient *cl) {
-  const char *funcName = "redisxUnlockClient()";
+  static const char *funcName = "redisxUnlockClient()";
   ClientPrivate *cp;
   int status;
 
