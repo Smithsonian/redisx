@@ -10,28 +10,22 @@ src/redisx-net.c
 
 .in +1c
 .ti -1c
+.RI "void * \fBRedisPipelineListener\fP (void *pRedis)"
+.br
+.ti -1c
 .RI "int \fBredisxConnect\fP (\fBRedis\fP *redis, \fBboolean\fP usePipeline)"
+.br
+.ti -1c
+.RI "void \fBredisxDestroy\fP (\fBRedis\fP *redis)"
 .br
 .ti -1c
 .RI "void \fBredisxDisconnect\fP (\fBRedis\fP *redis)"
 .br
 .ti -1c
-.RI "\fBRedisClient\fP * \fBredisxGetClient\fP (\fBRedis\fP *redis, enum \fBredisx_channel\fP channel)"
-.br
-.ti -1c
-.RI "int \fBredisxGetTcpBuf\fP ()"
-.br
-.ti -1c
-.RI "\fBboolean\fP \fBredisxHasPipeline\fP (\fBRedis\fP *redis)"
+.RI "\fBRedis\fP * \fBredisxInit\fP (const char *server)"
 .br
 .ti -1c
 .RI "\fBboolean\fP \fBredisxIsConnected\fP (\fBRedis\fP *redis)"
-.br
-.ti -1c
-.RI "int \fBredisxLockClient\fP (\fBRedisClient\fP *cl)"
-.br
-.ti -1c
-.RI "int \fBredisxLockEnabled\fP (\fBRedisClient\fP *cl)"
 .br
 .ti -1c
 .RI "int \fBredisxReconnect\fP (\fBRedis\fP *redis, \fBboolean\fP usePipeline)"
@@ -41,18 +35,6 @@ src/redisx-net.c
 .br
 .ti -1c
 .RI "void \fBredisxSetTcpBuf\fP (int size)"
-.br
-.ti -1c
-.RI "int \fBredisxUnlockClient\fP (\fBRedisClient\fP *cl)"
-.br
-.ti -1c
-.RI "\fBboolean\fP \fBrIsLowLatency\fP (const ClientPrivate *cp)"
-.br
-.ti -1c
-.RI "void \fBrShutdownLinkAsync\fP (\fBRedis\fP *redis)"
-.br
-.ti -1c
-.RI "int \fBsimpleHostnameToIP\fP (const char *hostName, char *ip)"
 .br
 .in -1c
 .SH "Detailed Description"
@@ -72,6 +54,22 @@ Attila Kovacs
 Network layer management functions for the RedisX library\&. 
 .SH "Function Documentation"
 .PP 
+.SS "void * RedisPipelineListener (void * pRedis)"
+The listener function that processes pipelined responses in the background\&. It is started when \fBRedis\fP is connected with the pipeline enabled\&.
+.PP
+\fBParameters\fP
+.RS 4
+\fIpRedis\fP Pointer to a \fBRedis\fP instance\&.
+.RE
+.PP
+\fBReturns\fP
+.RS 4
+Always NULL\&. 
+.RE
+.PP
+
+.PP
+References \fBFALSE\fP, \fBRESP::n\fP, \fBRedis::pipeline\fP, \fBredisxDestroyRESP()\fP, \fBredisxError()\fP, \fBredisxReadReplyAsync()\fP, \fBRESP_SIMPLE_STRING\fP, \fBRESP::type\fP, \fBX_NULL\fP, and \fBxvprintf\fP\&.
 .SS "int redisxConnect (\fBRedis\fP * redis, \fBboolean\fP usePipeline)"
 Connects to a REDIS server\&.
 .PP
@@ -107,6 +105,17 @@ X_SUCCESS (0) if successfully connected to the REDIS server\&. X_NO_INIT if libr
 
 .PP
 References \fBredisxError()\fP, \fBX_NULL\fP, and \fBX_SUCCESS\fP\&.
+.SS "void redisxDestroy (\fBRedis\fP * redis)"
+Destroys a \fBRedis\fP intance, disconnecting any clients that may be connected, and freeing all resources used by that \fBRedis\fP instance\&.
+.PP
+\fBParameters\fP
+.RS 4
+\fIredis\fP Pointer to a \fBRedis\fP instance\&. 
+.RE
+.PP
+
+.PP
+References \fBREDISX_CHANNELS\fP, \fBredisxDisconnect()\fP, and \fBredisxIsConnected()\fP\&.
 .SS "void redisxDisconnect (\fBRedis\fP * redis)"
 Disconnect all clients from the REDIS server\&.
 .PP
@@ -116,49 +125,22 @@ Disconnect all clients from the REDIS server\&.
 .RE
 .PP
 
-.SS "\fBRedisClient\fP * redisxGetClient (\fBRedis\fP * redis, enum \fBredisx_channel\fP channel)"
-Returns the redis client for a given connection type in a \fBRedis\fP instance\&.
+.SS "\fBRedis\fP * redisxInit (const char * server)"
+Initializes the \fBRedis\fP client library, and sets the hostname or IP address for the \fBRedis\fP server\&.
 .PP
 \fBParameters\fP
 .RS 4
-\fIredis\fP Pointer to a \fBRedis\fP instance\&. 
-.br
-\fIchannel\fP INTERACTIVE_CHANNEL, PIPELINE_CHANNEL, or SUBSCRIPTION_CHANNEL
+\fIserver\fP Server host name or numeric IP address, e\&.g\&. '127\&.0\&.0\&.1'
 .RE
 .PP
 \fBReturns\fP
 .RS 4
-Pointer to the matching \fBRedis\fP client, or NULL if the channel argument is invalid\&. 
+X_SUCCESS or X_FAILURE if the IP address is invalid\&. X_NULL if the IP address is NULL\&. 
 .RE
 .PP
 
 .PP
-References \fBREDISX_CHANNELS\fP\&.
-.SS "int redisxGetTcpBuf ()"
-Returns the current TCP/IP buffer size (send and receive) to be used for future client connections\&.
-.PP
-\fBReturns\fP
-.RS 4
-(bytes) future TCP/IP buffer size, 0 if system default\&. 
-.RE
-.PP
-
-.SS "\fBboolean\fP redisxHasPipeline (\fBRedis\fP * redis)"
-Checks if a \fBRedis\fP instance has the pipeline connection enabled\&.
-.PP
-\fBParameters\fP
-.RS 4
-\fIredis\fP Pointer to a \fBRedis\fP instance\&.
-.RE
-.PP
-\fBReturns\fP
-.RS 4
-TRUE (1) if the pipeline client is enabled on the \fBRedis\fP intance, or FALSE (0) otherwise\&. 
-.RE
-.PP
-
-.PP
-References \fBFALSE\fP, and \fBRedis::pipeline\fP\&.
+References \fBFALSE\fP, \fBRedis::id\fP, \fBRedis::interactive\fP, \fBINTERACTIVE_CHANNEL\fP, \fBRedis::pipeline\fP, \fBPIPELINE_CHANNEL\fP, \fBREDIS_TCP_PORT\fP, \fBREDISX_CHANNELS\fP, \fBRedis::subscription\fP, \fBSUBSCRIPTION_CHANNEL\fP, \fBTRUE\fP, and \fBxStringCopyOf()\fP\&.
 .SS "\fBboolean\fP redisxIsConnected (\fBRedis\fP * redis)"
 Checks if a \fBRedis\fP instance is connected\&.
 .PP
@@ -175,52 +157,6 @@ TRUE (1) if the \fBRedis\fP instance is connected, or FALSE (0) otherwise\&.
 
 .PP
 References \fBFALSE\fP, and \fBRedis::interactive\fP\&.
-.SS "int redisxLockClient (\fBRedisClient\fP * cl)"
-Get exclusive write access to the specified REDIS channel\&.
-.PP
-\fBParameters\fP
-.RS 4
-\fIcl\fP Pointer to the \fBRedis\fP client instance\&.
-.RE
-.PP
-\fBReturns\fP
-.RS 4
-X_SUCCESS if the exclusive lock for the channel was successfully obtained X_FAILURE if pthread_mutex_lock() returned an error X_NULL if the client is NULL\&.
-.RE
-.PP
-\fBSee also\fP
-.RS 4
-\fBredisxLockEnabled()\fP 
-.PP
-\fBredisxUnlockClient()\fP 
-.RE
-.PP
-
-.PP
-References \fBredisxError()\fP, \fBX_FAILURE\fP, \fBX_NULL\fP, and \fBX_SUCCESS\fP\&.
-.SS "int redisxLockEnabled (\fBRedisClient\fP * cl)"
-Lock a channel, but only if it has been enabled for communication\&.
-.PP
-\fBParameters\fP
-.RS 4
-\fIcl\fP Pointer to the \fBRedis\fP client instance
-.RE
-.PP
-\fBReturns\fP
-.RS 4
-X_SUCCESS (0) if an excusive lock to the channel has been granted\&. X_FAILURE if pthread_mutex_lock() returned an error X_NULL if the client is NULL REDIS_INVALID_CHANNEL if the channel is enabled/connected\&.
-.RE
-.PP
-\fBSee also\fP
-.RS 4
-\fBredisxLockClient()\fP 
-.PP
-\fBredisxUnlockClient()\fP 
-.RE
-.PP
-
-.PP
-References \fBREDIS_INVALID_CHANNEL\fP, \fBredisxError()\fP, \fBredisxLockClient()\fP, \fBredisxUnlockClient()\fP, and \fBX_SUCCESS\fP\&.
 .SS "int redisxReconnect (\fBRedis\fP * redis, \fBboolean\fP usePipeline)"
 Disconnects from \fBRedis\fP, and then connects again\&.\&.\&.
 .PP
@@ -268,74 +204,6 @@ Set the size of the TCP/IP buffers (send and receive) for future client connecti
 
 .PP
 References \fBxvprintf\fP\&.
-.SS "int redisxUnlockClient (\fBRedisClient\fP * cl)"
-Relinquish exclusive write access to the specified REDIS channel
-.PP
-\fBParameters\fP
-.RS 4
-\fIcl\fP Pointer to the \fBRedis\fP client instance
-.RE
-.PP
-\fBReturns\fP
-.RS 4
-X_SUCCESS if the exclusive lock for the channel was successfully obtained X_FAILURE if pthread_mutex_lock() returned an error X_NULL if the client is NULL
-.RE
-.PP
-\fBSee also\fP
-.RS 4
-\fBredisxLockClient()\fP 
-.PP
-\fBredisxLockEnabled()\fP 
-.RE
-.PP
-
-.PP
-References \fBredisxError()\fP, \fBX_FAILURE\fP, \fBX_NULL\fP, and \fBX_SUCCESS\fP\&.
-.SS "\fBboolean\fP rIsLowLatency (const ClientPrivate * cp)"
-Checks if a client was configured with a low-latency socket connection\&.
-.PP
-\fBParameters\fP
-.RS 4
-\fIcp\fP Pointer to the private data of a \fBRedis\fP client\&.
-.RE
-.PP
-\fBReturns\fP
-.RS 4
-TRUE (1) if the client is low latency, or else FALSE (0)\&. 
-.RE
-.PP
-
-.PP
-References \fBFALSE\fP, and \fBPIPELINE_CHANNEL\fP\&.
-.SS "void rShutdownLinkAsync (\fBRedis\fP * redis)"
-Shuts down the \fBRedis\fP connection immediately\&. It does not obtain excluive locks to either configuration settings or to open channels\&. As such it should only be called to clean up an otherwise terminated program\&.
-.PP
-\fBParameters\fP
-.RS 4
-\fIredis\fP Pointer to the \fBRedis\fP intance to shut down\&. 
-.RE
-.PP
-
-.PP
-References \fBREDISX_CHANNELS\fP\&.
-.SS "int simpleHostnameToIP (const char * hostName, char * ip)"
-Gets an IP address string for a given host name\&. If more than one IP address is associated with a host name, the first one is returned\&.
-.PP
-\fBParameters\fP
-.RS 4
-\fIhostName\fP The host name, e\&.g\&. 'localhost' 
-.br
-\fIip\fP Pointer to the string buffer to which to write the corresponding IP\&.
-.RE
-.PP
-\fBReturns\fP
-.RS 4
-X_SUCESSS if the name was successfully matched to an IP address\&. X_NAME_INVALID if the no host is known by the specified name\&. X_NULL if hostName is NULL or if it is not associated to any valid IP address\&. 
-.RE
-.PP
-
-.PP
-References \fBX_NAME_INVALID\fP, \fBX_NULL\fP, and \fBX_SUCCESS\fP\&.
 .SH "Author"
 .PP 
 Generated automatically by Doxygen for RedisX from the source code\&.

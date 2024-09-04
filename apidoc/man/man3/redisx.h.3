@@ -217,9 +217,6 @@ include/redisx.h
 .RI "\fBRedisEntry\fP * \fBredisxGetTable\fP (\fBRedis\fP *redis, const char *table, int *n)"
 .br
 .ti -1c
-.RI "int \fBredisxGetTcpBuf\fP ()"
-.br
-.ti -1c
 .RI "int \fBredisxGetTime\fP (\fBRedis\fP *redis, struct timespec *t)"
 .br
 .ti -1c
@@ -341,9 +338,6 @@ include/redisx.h
 .br
 .ti -1c
 .RI "int \fBredisxUnsubscribe\fP (\fBRedis\fP *redis, const char *channel)"
-.br
-.ti -1c
-.RI "int \fBsimpleHostnameToIP\fP (const char *hostName, char *ip)"
 .br
 .in -1c
 .SH "Detailed Description"
@@ -901,15 +895,6 @@ redisxDEstroyEntries()
 
 .PP
 References \fBRedisEntry::key\fP, \fBRedisEntry::length\fP, \fBRESP::n\fP, \fBredisxCheckDestroyRESP()\fP, \fBredisxDestroyRESP()\fP, \fBredisxError()\fP, \fBredisxRequest()\fP, \fBRESP_ARRAY\fP, \fBRESP::value\fP, \fBRedisEntry::value\fP, \fBX_GROUP_INVALID\fP, and \fBX_NO_INIT\fP\&.
-.SS "int redisxGetTcpBuf ()"
-Returns the current TCP/IP buffer size (send and receive) to be used for future client connections\&.
-.PP
-\fBReturns\fP
-.RS 4
-(bytes) future TCP/IP buffer size, 0 if system default\&. 
-.RE
-.PP
-
 .SS "int redisxGetTime (\fBRedis\fP * redis, struct timespec * t)"
 Returns the current time on the \fBRedis\fP server instance\&.
 .PP
@@ -999,7 +984,7 @@ X_SUCCESS or X_FAILURE if the IP address is invalid\&. X_NULL if the IP address 
 .PP
 
 .PP
-References \fBFALSE\fP, \fBRedis::id\fP, \fBRedis::interactive\fP, \fBINTERACTIVE_CHANNEL\fP, \fBRedis::pipeline\fP, \fBPIPELINE_CHANNEL\fP, \fBREDIS_TCP_PORT\fP, \fBREDISX_CHANNELS\fP, \fBsimpleHostnameToIP()\fP, \fBRedis::subscription\fP, \fBSUBSCRIPTION_CHANNEL\fP, \fBTRUE\fP, and \fBxStringCopyOf()\fP\&.
+References \fBFALSE\fP, \fBRedis::id\fP, \fBRedis::interactive\fP, \fBINTERACTIVE_CHANNEL\fP, \fBRedis::pipeline\fP, \fBPIPELINE_CHANNEL\fP, \fBREDIS_TCP_PORT\fP, \fBREDISX_CHANNELS\fP, \fBRedis::subscription\fP, \fBSUBSCRIPTION_CHANNEL\fP, \fBTRUE\fP, and \fBxStringCopyOf()\fP\&.
 .SS "\fBboolean\fP redisxIsConnected (\fBRedis\fP * redis)"
 Checks if a \fBRedis\fP instance is connected\&.
 .PP
@@ -1831,24 +1816,6 @@ redisxEndSubscribe()
 
 .PP
 References \fBredisxError()\fP, \fBredisxLockEnabled()\fP, \fBredisxSendRequestAsync()\fP, \fBredisxUnlockClient()\fP, \fBRedis::subscription\fP, \fBX_NULL\fP, and \fBX_SUCCESS\fP\&.
-.SS "int simpleHostnameToIP (const char * hostName, char * ip)"
-Gets an IP address string for a given host name\&. If more than one IP address is associated with a host name, the first one is returned\&.
-.PP
-\fBParameters\fP
-.RS 4
-\fIhostName\fP The host name, e\&.g\&. 'localhost' 
-.br
-\fIip\fP Pointer to the string buffer to which to write the corresponding IP\&.
-.RE
-.PP
-\fBReturns\fP
-.RS 4
-X_SUCESSS if the name was successfully matched to an IP address\&. X_NAME_INVALID if the no host is known by the specified name\&. X_NULL if hostName is NULL or if it is not associated to any valid IP address\&. 
-.RE
-.PP
-
-.PP
-References \fBX_NAME_INVALID\fP, \fBX_NULL\fP, and \fBX_SUCCESS\fP\&.
 .SH "Author"
 .PP 
 Generated automatically by Doxygen for RedisX from the source code\&.

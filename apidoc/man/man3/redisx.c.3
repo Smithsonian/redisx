@@ -11,13 +11,13 @@ src/redisx.c \- A \fBRedis\fP client library that compiles on older and newer pl
 
 .in +1c
 .ti -1c
+.RI "\fBRESP\fP * \fBredisxArrayRequest\fP (\fBRedis\fP *redis, char *args[], int lengths[], int n, int *status)"
+.br
+.ti -1c
 .RI "int \fBredisxCheckDestroyRESP\fP (\fBRESP\fP *resp, char expectedType, int expectedSize)"
 .br
 .ti -1c
 .RI "int \fBredisxCheckRESP\fP (const \fBRESP\fP *resp, char expectedType, int expectedSize)"
-.br
-.ti -1c
-.RI "void \fBredisxDestroy\fP (\fBRedis\fP *redis)"
 .br
 .ti -1c
 .RI "void \fBredisxDestroyRESP\fP (\fBRESP\fP *resp)"
@@ -32,7 +32,7 @@ src/redisx.c \- A \fBRedis\fP client library that compiles on older and newer pl
 .RI "int \fBredisxGetTime\fP (\fBRedis\fP *redis, struct timespec *t)"
 .br
 .ti -1c
-.RI "\fBRedis\fP * \fBredisxInit\fP (const char *server)"
+.RI "\fBboolean\fP \fBredisxHasPipeline\fP (\fBRedis\fP *redis)"
 .br
 .ti -1c
 .RI "\fBboolean\fP \fBredisxIsVerbose\fP ()"
@@ -42,6 +42,9 @@ src/redisx.c \- A \fBRedis\fP client library that compiles on older and newer pl
 .br
 .ti -1c
 .RI "int \fBredisxPing\fP (\fBRedis\fP *redis, const char *message)"
+.br
+.ti -1c
+.RI "\fBRESP\fP * \fBredisxRequest\fP (\fBRedis\fP *redis, const char *command, const char *arg1, const char *arg2, const char *arg3, int *status)"
 .br
 .ti -1c
 .RI "int \fBredisxResetClient\fP (\fBRedisClient\fP *cl)"
@@ -84,6 +87,49 @@ Attila Kovacs
 
 .SH "Function Documentation"
 .PP 
+.SS "\fBRESP\fP * redisxArrayRequest (\fBRedis\fP * redis, char * args[], int lengths[], int n, int * status)"
+Returns the result of the most generic type of \fBRedis\fP request with any number of arguments\&. This is not the highest throughput mode (that would be sending asynchronous pipeline request, and then asynchronously collecting the results such as with \fBredisxSendArrayRequestAsync()\fP / \fBredisxReadReplyAsync()\fP, because it requires separate network roundtrips for each and every request\&. But, it is simple and perfectly good method when one needs to retrieve only a few (<1000) variables per second\&.\&.\&.
+.PP
+\fBParameters\fP
+.RS 4
+\fIredis\fP Pointer to a \fBRedis\fP instance\&. 
+.br
+\fIargs\fP An array of strings to send to \fBRedis\fP, corresponding to a single query\&. 
+.br
+\fIlengths\fP Array indicating the number of bytes to send from each string argument\&. Zero values can be used to determine the string length automatically using strlen(), and the length argument itself may be NULL to determine the lengths of all string arguments automatically\&. 
+.br
+\fIn\fP Number of string arguments\&. 
+.br
+\fIstatus\fP Pointer to the return error status, which is either 
+.PP
+.nf
+                 X_SUCCESS       on success\&.
+                 X_NO_INIT       if the Redis client librarywas not initialized via initRedis\&.
+                 X_NULL          if the argument is NULL or n<1\&.
+                 X_NO_SERVICE    if not connected to Redis\&.
+                 X_FAILURE       If there was a socket level error\&.
+
+.fi
+.PP
+.RE
+.PP
+\fBReturns\fP
+.RS 4
+A freshly allocated \fBRESP\fP array containing the \fBRedis\fP response, or NULL if no valid response could be obtained\&.
+.RE
+.PP
+\fBSee also\fP
+.RS 4
+\fBredisxRequest()\fP 
+.PP
+\fBredisxSendArrayRequestAsync()\fP 
+.PP
+\fBredisxReadReplyAsync()\fP 
+.RE
+.PP
+
+.PP
+References \fBRedis::interactive\fP, \fBredisxError()\fP, \fBredisxLockEnabled()\fP, \fBredisxReadReplyAsync()\fP, \fBredisxSendArrayRequestAsync()\fP, \fBredisxUnlockClient()\fP, \fBX_NULL\fP, \fBX_SUCCESS\fP, and \fBxvprintf\fP\&.
 .SS "int redisxCheckDestroyRESP (\fBRESP\fP * resp, char expectedType, int expectedSize)"
 Like \fBredisxCheckRESP()\fP, but it also destroys the \fBRESP\fP in case of an error\&.
 .PP
@@ -129,17 +175,6 @@ X_SUCCESS (0) if the \fBRESP\fP passes the tests, or X_PARSE_ERROR if the \fBRES
 or the error returned in resp->n\&. 
 .PP
 References \fBRESP::n\fP, \fBREDIS_NULL\fP, \fBREDIS_UNEXPECTED_ARRAY_SIZE\fP, \fBREDIS_UNEXPECTED_RESP\fP, \fBRESP_INT\fP, \fBRESP::type\fP, \fBRESP::value\fP, \fBX_PARSE_ERROR\fP, and \fBX_SUCCESS\fP\&.
-.SS "void redisxDestroy (\fBRedis\fP * redis)"
-Destroys a \fBRedis\fP intance, disconnecting any clients that may be connected, and freeing all resources used by that \fBRedis\fP instance\&.
-.PP
-\fBParameters\fP
-.RS 4
-\fIredis\fP Pointer to a \fBRedis\fP instance\&. 
-.RE
-.PP
-
-.PP
-References \fBREDISX_CHANNELS\fP, \fBredisxDisconnect()\fP, and \fBredisxIsConnected()\fP\&.
 .SS "void redisxDestroyRESP (\fBRESP\fP * resp)"
 Frees up the resources used by a \fBRESP\fP structure that was dynamically allocated\&. The call will segfault if the same \fBRESP\fP is destroyed twice or if the argument is a static allocation\&.
 .PP
@@ -203,22 +238,22 @@ X_SUCCESS (0) if successful, or X_NULL if either argument is NULL, or X_PARSE_ER
 
 .PP
 References \fBredisxCheckDestroyRESP()\fP, \fBredisxCheckRESP()\fP, \fBredisxDestroyRESP()\fP, \fBredisxError()\fP, \fBredisxRequest()\fP, \fBRESP_ARRAY\fP, \fBRESP_BULK_STRING\fP, \fBRESP::value\fP, \fBX_NULL\fP, \fBX_PARSE_ERROR\fP, and \fBX_SUCCESS\fP\&.
-.SS "\fBRedis\fP * redisxInit (const char * server)"
-Initializes the \fBRedis\fP client library, and sets the hostname or IP address for the \fBRedis\fP server\&.
+.SS "\fBboolean\fP redisxHasPipeline (\fBRedis\fP * redis)"
+Checks if a \fBRedis\fP instance has the pipeline connection enabled\&.
 .PP
 \fBParameters\fP
 .RS 4
-\fIserver\fP Server host name or numeric IP address, e\&.g\&. '127\&.0\&.0\&.1'
+\fIredis\fP Pointer to a \fBRedis\fP instance\&.
 .RE
 .PP
 \fBReturns\fP
 .RS 4
-X_SUCCESS or X_FAILURE if the IP address is invalid\&. X_NULL if the IP address is NULL\&. 
+TRUE (1) if the pipeline client is enabled on the \fBRedis\fP intance, or FALSE (0) otherwise\&. 
 .RE
 .PP
 
 .PP
-References \fBFALSE\fP, \fBRedis::id\fP, \fBRedis::interactive\fP, \fBINTERACTIVE_CHANNEL\fP, \fBRedis::pipeline\fP, \fBPIPELINE_CHANNEL\fP, \fBREDIS_TCP_PORT\fP, \fBREDISX_CHANNELS\fP, \fBsimpleHostnameToIP()\fP, \fBRedis::subscription\fP, \fBSUBSCRIPTION_CHANNEL\fP, \fBTRUE\fP, and \fBxStringCopyOf()\fP\&.
+References \fBFALSE\fP, and \fBRedis::pipeline\fP\&.
 .SS "\fBboolean\fP redisxIsVerbose ()"
 Checks id verbose reporting is enabled\&.
 .PP
@@ -268,6 +303,43 @@ X_SUCCESS (0) if successful, or else an error code (<0) from \fBredisx\&.h\fP / 
 
 .PP
 References \fBREDIS_UNEXPECTED_RESP\fP, \fBredisxCheckRESP()\fP, \fBredisxDestroyRESP()\fP, \fBredisxError()\fP, \fBredisxRequest()\fP, \fBRESP_BULK_STRING\fP, \fBRESP_SIMPLE_STRING\fP, \fBRESP::value\fP, \fBX_NULL\fP, and \fBX_SUCCESS\fP\&.
+.SS "\fBRESP\fP * redisxRequest (\fBRedis\fP * redis, const char * command, const char * arg1, const char * arg2, const char * arg3, int * status)"
+Returns the result of a \fBRedis\fP command with up to 3 regularly terminated string arguments\&. This is not the highest throughput mode (that would be sending asynchronous pipeline request, and then asynchronously collecting the results such as with \fBredisxSendRequestAsync()\fP / \fBredisxReadReplyAsync()\fP, because it requires separate network roundtrips for each and every request\&. But, it is simple and perfectly good method when one needs to retrieve only a few (<1000) variables per second\&.\&.\&.
+.PP
+To make \fBRedis\fP calls with binary (non-string) data, you can use \fBredisxArrayRequest()\fP instead, where you can set the number of bytes for each argument explicitly\&.
+.PP
+\fBParameters\fP
+.RS 4
+\fIredis\fP Pointer to a \fBRedis\fP instance\&. 
+.br
+\fIcommand\fP \fBRedis\fP command, e\&.g\&. 'HGET' 
+.br
+\fIarg1\fP First terminated string argument or NULL\&. 
+.br
+\fIarg2\fP Second terminated string argument or NULL\&. 
+.br
+\fIarg3\fP Third terminated string argument or NULL\&. 
+.br
+\fIstatus\fP Pointer to the return error status, which is either X_SUCCESS on success or else the error code set by \fBredisxArrayRequest()\fP\&.
+.RE
+.PP
+\fBReturns\fP
+.RS 4
+A freshly allocated \fBRESP\fP array containing the \fBRedis\fP response, or NULL if no valid response could be obtained\&.
+.RE
+.PP
+\fBSee also\fP
+.RS 4
+\fBredisxArrayRequest()\fP 
+.PP
+\fBredisxSendRequestAsync()\fP 
+.PP
+\fBredisxReadReplyAsync()\fP 
+.RE
+.PP
+
+.PP
+References \fBredisxArrayRequest()\fP\&.
 .SS "int redisxResetClient (\fBRedisClient\fP * cl)"
 Sends a \fCRESET\fP request to the specified \fBRedis\fP client\&. The server will perform a reset as if the client disconnected and reconnected again\&.
 .PP

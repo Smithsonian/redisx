@@ -385,13 +385,6 @@
     </member>
     <member kind="function">
       <type>int</type>
-      <name>redisxGetTcpBuf</name>
-      <anchorfile>redisx_8h.html</anchorfile>
-      <anchor>a110a875c8146f58265408712154fe8bd</anchor>
-      <arglist>()</arglist>
-    </member>
-    <member kind="function">
-      <type>int</type>
       <name>redisxGetTime</name>
       <anchorfile>redisx_8h.html</anchorfile>
       <anchor>a5dbdb6bef9c8ac3a4a8e901abe505d30</anchor>
@@ -677,13 +670,6 @@
       <anchor>af64c112d9c395f1e08af52acd6f5c3ec</anchor>
       <arglist>(Redis *redis, const char *channel)</arglist>
     </member>
-    <member kind="function">
-      <type>int</type>
-      <name>simpleHostnameToIP</name>
-      <anchorfile>redisx_8h.html</anchorfile>
-      <anchor>a2705bdad7ed2d968ecced5cd7c379bad</anchor>
-      <arglist>(const char *hostName, char *ip)</arglist>
-    </member>
   </compound>
   <compound kind="file">
     <name>redisx-client.c</name>
@@ -712,17 +698,17 @@
     </member>
     <member kind="function">
       <type>RESP *</type>
-      <name>redisxArrayRequest</name>
-      <anchorfile>redisx-client_8c.html</anchorfile>
-      <anchor>a13ae33bc25ee03621b23541236ef5f82</anchor>
-      <arglist>(Redis *redis, char *args[], int lengths[], int n, int *status)</arglist>
-    </member>
-    <member kind="function">
-      <type>RESP *</type>
       <name>redisxExecBlockAsync</name>
       <anchorfile>redisx-client_8c.html</anchorfile>
       <anchor>a6fed65f9413569c771d5165a0194477a</anchor>
       <arglist>(RedisClient *cl)</arglist>
+    </member>
+    <member kind="function">
+      <type>RedisClient *</type>
+      <name>redisxGetClient</name>
+      <anchorfile>redisx-client_8c.html</anchorfile>
+      <anchor>a14907be8fba6a13505a352673cea5895</anchor>
+      <arglist>(Redis *redis, enum redisx_channel channel)</arglist>
     </member>
     <member kind="function">
       <type>int</type>
@@ -732,18 +718,25 @@
       <arglist>(RedisClient *cl)</arglist>
     </member>
     <member kind="function">
+      <type>int</type>
+      <name>redisxLockClient</name>
+      <anchorfile>redisx-client_8c.html</anchorfile>
+      <anchor>ac9c69fbcaa2a2fbe95af72d91a7b7e6c</anchor>
+      <arglist>(RedisClient *cl)</arglist>
+    </member>
+    <member kind="function">
+      <type>int</type>
+      <name>redisxLockEnabled</name>
+      <anchorfile>redisx-client_8c.html</anchorfile>
+      <anchor>ac6c9928f425b6b1d97d721cbddc3cf28</anchor>
+      <arglist>(RedisClient *cl)</arglist>
+    </member>
+    <member kind="function">
       <type>RESP *</type>
       <name>redisxReadReplyAsync</name>
       <anchorfile>redisx-client_8c.html</anchorfile>
       <anchor>abc855133c2af4f5d929a05292aa634d1</anchor>
       <arglist>(RedisClient *cl)</arglist>
-    </member>
-    <member kind="function">
-      <type>RESP *</type>
-      <name>redisxRequest</name>
-      <anchorfile>redisx-client_8c.html</anchorfile>
-      <anchor>a09092bd97eead5c5fa73fa0d9241018c</anchor>
-      <arglist>(Redis *redis, const char *command, const char *arg1, const char *arg2, const char *arg3, int *status)</arglist>
     </member>
     <member kind="function">
       <type>int</type>
@@ -771,6 +764,13 @@
       <name>redisxStartBlockAsync</name>
       <anchorfile>redisx-client_8c.html</anchorfile>
       <anchor>a3e49508e4e4fcc283832226fd1bffd85</anchor>
+      <arglist>(RedisClient *cl)</arglist>
+    </member>
+    <member kind="function">
+      <type>int</type>
+      <name>redisxUnlockClient</name>
+      <anchorfile>redisx-client_8c.html</anchorfile>
+      <anchor>a87efe53c80fcff3fcf189362cbc602f7</anchor>
       <arglist>(RedisClient *cl)</arglist>
     </member>
   </compound>
@@ -826,11 +826,25 @@
     <path>src/</path>
     <filename>redisx-net_8c.html</filename>
     <member kind="function">
+      <type>void *</type>
+      <name>RedisPipelineListener</name>
+      <anchorfile>redisx-net_8c.html</anchorfile>
+      <anchor>a124e24b5cfba8172ed3f548b8056deb2</anchor>
+      <arglist>(void *pRedis)</arglist>
+    </member>
+    <member kind="function">
       <type>int</type>
       <name>redisxConnect</name>
       <anchorfile>redisx-net_8c.html</anchorfile>
       <anchor>ad71822356ffd40ed4b1c71d065f48809</anchor>
       <arglist>(Redis *redis, boolean usePipeline)</arglist>
+    </member>
+    <member kind="function">
+      <type>void</type>
+      <name>redisxDestroy</name>
+      <anchorfile>redisx-net_8c.html</anchorfile>
+      <anchor>ac54dd4c46d8615db4da02702c18f062b</anchor>
+      <arglist>(Redis *redis)</arglist>
     </member>
     <member kind="function">
       <type>void</type>
@@ -840,25 +854,11 @@
       <arglist>(Redis *redis)</arglist>
     </member>
     <member kind="function">
-      <type>RedisClient *</type>
-      <name>redisxGetClient</name>
+      <type>Redis *</type>
+      <name>redisxInit</name>
       <anchorfile>redisx-net_8c.html</anchorfile>
-      <anchor>a14907be8fba6a13505a352673cea5895</anchor>
-      <arglist>(Redis *redis, enum redisx_channel channel)</arglist>
-    </member>
-    <member kind="function">
-      <type>int</type>
-      <name>redisxGetTcpBuf</name>
-      <anchorfile>redisx-net_8c.html</anchorfile>
-      <anchor>a110a875c8146f58265408712154fe8bd</anchor>
-      <arglist>()</arglist>
-    </member>
-    <member kind="function">
-      <type>boolean</type>
-      <name>redisxHasPipeline</name>
-      <anchorfile>redisx-net_8c.html</anchorfile>
-      <anchor>a481678923a653e5227f7dab5a1fd272d</anchor>
-      <arglist>(Redis *redis)</arglist>
+      <anchor>a5c78c2189a76a077231016564a0cecd5</anchor>
+      <arglist>(const char *server)</arglist>
     </member>
     <member kind="function">
       <type>boolean</type>
@@ -866,20 +866,6 @@
       <anchorfile>redisx-net_8c.html</anchorfile>
       <anchor>a94326ebfa5868579c8448cdbb941b3da</anchor>
       <arglist>(Redis *redis)</arglist>
-    </member>
-    <member kind="function">
-      <type>int</type>
-      <name>redisxLockClient</name>
-      <anchorfile>redisx-net_8c.html</anchorfile>
-      <anchor>ac9c69fbcaa2a2fbe95af72d91a7b7e6c</anchor>
-      <arglist>(RedisClient *cl)</arglist>
-    </member>
-    <member kind="function">
-      <type>int</type>
-      <name>redisxLockEnabled</name>
-      <anchorfile>redisx-net_8c.html</anchorfile>
-      <anchor>ac6c9928f425b6b1d97d721cbddc3cf28</anchor>
-      <arglist>(RedisClient *cl)</arglist>
     </member>
     <member kind="function">
       <type>int</type>
@@ -901,34 +887,6 @@
       <anchorfile>redisx-net_8c.html</anchorfile>
       <anchor>a83fce113d042490e77efdc574e64d76f</anchor>
       <arglist>(int size)</arglist>
-    </member>
-    <member kind="function">
-      <type>int</type>
-      <name>redisxUnlockClient</name>
-      <anchorfile>redisx-net_8c.html</anchorfile>
-      <anchor>a87efe53c80fcff3fcf189362cbc602f7</anchor>
-      <arglist>(RedisClient *cl)</arglist>
-    </member>
-    <member kind="function">
-      <type>boolean</type>
-      <name>rIsLowLatency</name>
-      <anchorfile>redisx-net_8c.html</anchorfile>
-      <anchor>a9e887a583f0ec739e30a1c75bd86c574</anchor>
-      <arglist>(const ClientPrivate *cp)</arglist>
-    </member>
-    <member kind="function">
-      <type>void</type>
-      <name>rShutdownLinkAsync</name>
-      <anchorfile>redisx-net_8c.html</anchorfile>
-      <anchor>a1a7b80e39495fa41259619bd7e4f063b</anchor>
-      <arglist>(Redis *redis)</arglist>
-    </member>
-    <member kind="function">
-      <type>int</type>
-      <name>simpleHostnameToIP</name>
-      <anchorfile>redisx-net_8c.html</anchorfile>
-      <anchor>a2705bdad7ed2d968ecced5cd7c379bad</anchor>
-      <arglist>(const char *hostName, char *ip)</arglist>
     </member>
   </compound>
   <compound kind="file">
@@ -1100,6 +1058,13 @@
     <path>src/</path>
     <filename>redisx_8c.html</filename>
     <member kind="function">
+      <type>RESP *</type>
+      <name>redisxArrayRequest</name>
+      <anchorfile>redisx_8c.html</anchorfile>
+      <anchor>a13ae33bc25ee03621b23541236ef5f82</anchor>
+      <arglist>(Redis *redis, char *args[], int lengths[], int n, int *status)</arglist>
+    </member>
+    <member kind="function">
       <type>int</type>
       <name>redisxCheckDestroyRESP</name>
       <anchorfile>redisx_8c.html</anchorfile>
@@ -1112,13 +1077,6 @@
       <anchorfile>redisx_8c.html</anchorfile>
       <anchor>a2d3ffb89129ab04483e3966835a5ff71</anchor>
       <arglist>(const RESP *resp, char expectedType, int expectedSize)</arglist>
-    </member>
-    <member kind="function">
-      <type>void</type>
-      <name>redisxDestroy</name>
-      <anchorfile>redisx_8c.html</anchorfile>
-      <anchor>ac54dd4c46d8615db4da02702c18f062b</anchor>
-      <arglist>(Redis *redis)</arglist>
     </member>
     <member kind="function">
       <type>void</type>
@@ -1149,11 +1107,11 @@
       <arglist>(Redis *redis, struct timespec *t)</arglist>
     </member>
     <member kind="function">
-      <type>Redis *</type>
-      <name>redisxInit</name>
+      <type>boolean</type>
+      <name>redisxHasPipeline</name>
       <anchorfile>redisx_8c.html</anchorfile>
-      <anchor>a5c78c2189a76a077231016564a0cecd5</anchor>
-      <arglist>(const char *server)</arglist>
+      <anchor>a481678923a653e5227f7dab5a1fd272d</anchor>
+      <arglist>(Redis *redis)</arglist>
     </member>
     <member kind="function">
       <type>boolean</type>
@@ -1175,6 +1133,13 @@
       <anchorfile>redisx_8c.html</anchorfile>
       <anchor>afd19b1137e80ed26065d9e6e7039c8fe</anchor>
       <arglist>(Redis *redis, const char *message)</arglist>
+    </member>
+    <member kind="function">
+      <type>RESP *</type>
+      <name>redisxRequest</name>
+      <anchorfile>redisx_8c.html</anchorfile>
+      <anchor>a09092bd97eead5c5fa73fa0d9241018c</anchor>
+      <arglist>(Redis *redis, const char *command, const char *arg1, const char *arg2, const char *arg3, int *status)</arglist>
     </member>
     <member kind="function">
       <type>int</type>
@@ -1335,9 +1300,11 @@
     <docanchor file="index.html">publish-subscribe-support</docanchor>
     <docanchor file="index.html">broadcasting-messages</docanchor>
     <docanchor file="index.html">subscriptions</docanchor>
+    <docanchor file="index.html">advanced-queries</docanchor>
     <docanchor file="index.html">atomic-transaction-blocks-and-lua-scripts</docanchor>
     <docanchor file="index.html">execution-blocks</docanchor>
     <docanchor file="index.html">lua-script-loading-and-execution</docanchor>
+    <docanchor file="index.html">custom-functions</docanchor>
     <docanchor file="index.html">error-handling</docanchor>
     <docanchor file="index.html">debug-support</docanchor>
     <docanchor file="index.html">future-plans</docanchor>

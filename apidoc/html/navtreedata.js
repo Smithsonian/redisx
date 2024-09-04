@@ -49,13 +49,15 @@ var NAVTREE =
         [ "Broadcasting messages", "index.html#autotoc_md26", null ],
         [ "Subscriptions", "index.html#autotoc_md27", null ]
       ] ],
-      [ "Atomic execution blocks and LUA scripts", "index.html#autotoc_md29", [
-        [ "Execution blocks", "index.html#autotoc_md30", null ],
-        [ "LUA script loading and execution", "index.html#autotoc_md31", null ]
+      [ "Advanced queries", "index.html#autotoc_md29", null ],
+      [ "Atomic execution blocks and LUA scripts", "index.html#autotoc_md31", [
+        [ "Execution blocks", "index.html#autotoc_md32", null ],
+        [ "LUA script loading and execution", "index.html#autotoc_md33", null ],
+        [ "Custom functions", "index.html#autotoc_md34", null ]
       ] ],
-      [ "Error handling", "index.html#autotoc_md33", null ],
-      [ "Debug support", "index.html#autotoc_md35", null ],
-      [ "Future plans", "index.html#autotoc_md37", null ],
+      [ "Error handling", "index.html#autotoc_md36", null ],
+      [ "Debug support", "index.html#autotoc_md38", null ],
+      [ "Future plans", "index.html#autotoc_md40", null ],
       [ "[Unreleased]", "../../xchange/apidoc/html/md_CHANGELOG.html#autotoc_md1", null ]
     ] ],
     [ "Contributing to RedisX", "../../xchange/apidoc/html/md_CONTRIBUTING.html", null ],

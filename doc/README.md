@@ -10,6 +10,7 @@ A simple, light-weight C/C++ Redis client.
  - [Managing Redis server connections](#managing-redis-server-connections)
  - [Simple Redis queries](#simple-redis-queries)
  - [Publish/subscribe (PUB/SUB) support](#publish-subscribe-support)
+ - [Advanced queries](#advanced-queries)
  - [Atomic execution blocks and LUA scripts](#atomic-transaction-blocks-and-lua-scripts)
  - [Error handling](#error-handling)
  - [Debug support](#debug-support)
@@ -620,22 +621,105 @@ appropriate (provided no other subscription needs it) via `redisxRemoveSubscribe
 
 -----------------------------------------------------------------------------
 
+<a name="advanced-queries"></a>
+## Advanced queries
+
+Sometimes you might want to micro manage how requests are sent and responses to them are receieved. __RedisX__ 
+provides a set of asynchronous client functions that do that. These functions should be called with the specific 
+client's mutex locked, to ensure that other threads do not interfere with your sequence of requests and responses. 
+E.g.:
+
+```c
+  RedisClient *cl = redisxGetClient(...);
+  
+  // Obtain an exclusive lock on the client
+  int status = redisxLockEnabled(cl);
+  if (status != X_SUCCESS) {
+    // Abort: the client is probably not connected
+    return;
+  }
+  
+  // Now send commands, and receive responses as you like using the redisx...Async() calls
+  ...
+  
+  // When done, release the lock
+  redisxUnlockClient(cl);
+```
+
+While you have the exclusive lock you may send any number of requests, e.g. via `redisxSendRequestAsync()` and/or 
+`redixSendArrayRequestAsync()`. Then collect replies either with `redisxReadReplyAsync()` or else 
+`redisxIgnoreReplyAsync()`. For example, the basic anatomy of sending a single request and then receiving a response, 
+while we have exclusive access to the client, might look something like this:
+
+```c
+  ...
+  // Send a command to Redis
+  int status = redisxSendRequestAsync(cl, ...);
+  
+  if(status == X_SUCCESS) {
+    // Read the response
+    RESP *reply = redisxReadReplyAsync(cl);
+    
+    // check and process the response
+    if(redisxCheckRESP(reply, ...) != X_SUCCESS) {
+      // Ooops, not the reply what we expected...
+      ...
+    } 
+    else {
+      // Process the response
+      ...
+    }
+    
+    // Destroy the reply
+    redisxDestroyRESP(reply);
+  }
+  ...
+```
+   
+In some cases you may be OK with just firing off Redis commands, without necessarily caring about responses. Rather 
+than ignoring the replies with `redisxIgnoreReplyAsync()` you might call `redisxSkiReplyAsync()` instead __before__
+`redisxSendRequestAsync()` to instruct Redis to not even bother about sending a response to your request (it saves 
+time and network bandwidth!):
+
+```c
+ ...
+ // We don't want to receive a response to our command... 
+ int status = redisxSkipReplyAsync(cl);
+ 
+ if (status == X_SUCCESS) {
+   // Now send the request...
+   status = redisxSendRequest(cl, ...);
+ }
+ 
+ if (status != X_SUCCESS) {
+    // Ooops, the request did not go through...
+    ...
+ }
+```
+
+Of course you can build up arbitrarily complex set of queries and deal with a set of responses in different ways. Do 
+what works best for your application.
+
+-----------------------------------------------------------------------------
+
 <a name="atomic-transaction-blocks-and-lua-scripts"></a>
 ## Atomic execution blocks and LUA scripts
 
  - [Execution blocks](#execution-blocks)
  - [LUA script loading and execution](#lua-script-loading-and-execution)
+ - [Custom functions](#custom-functions)
 
-Sometimes you want to ececute a series of Redis command atomically, such that nothing else may alter the database 
+Sometimes you may want to execute a series of Redis command atomically, such that nothing else may alter the database 
 while the set of commands execute, so they may return a coherent state. For example, you want to set or query a 
-collection of related variables so they change together and are reported together. You have two choices. (1) you
-can execute the Redis commands in an execution block, or else (2) load a LUA script onto the Redis server and call 
-it with some parameters (possibly many times over).
+collection of related variables so they change together and are reported together. You have two choices. (1) you can 
+execute the Redis commands in an execution block, or else (2) load a LUA script onto the Redis server and call it with 
+some parameters (possibly many times over).
 
 <a name="execution-blocks"></a>
 ### Execution blocks
 
-Execution blocks offer a fairly simple way of bunching 
+Execution blocks offer a fairly simple way of bunching together a set of Redis commands that need to be executed 
+atomically. Such an execution block in RedisX may look something like:
 
 ```c
   Redis *redis = ...;
@@ -671,7 +755,9 @@ Execution blocks offer a fairly simple way of bunching
 ```
 
 If at any point things don't go according to plan in the middle of the block, you can call `redisAbortBlockAsync()` to
-abort and discard all prior commands submitted in the execution block already.
+abort and discard all prior commands submitted in the execution block already. It is important to remembet that every
+time you call `redisxStartBlockAsync()`, you must call either `redisxExecBlockAsync()` to execute it or else 
+`redisxAbortBlockAsync() to discard it. Failure to do so, will effectively end you up with a hung Redis client.
 
 <a name="lua-script-loading-and-execution"></a>
 ### LUA script loading and execution
@@ -718,14 +804,24 @@ One thing to keep in mind about LUA scripts is that they are not persistent. The
 server is restarted.
 
 
+<a name="custom-functions"></a>
+### Custom functions
+
+Functions, introduced in Redis 7, offer another evolutionary step over the LUA scripting described above. Unlike 
+scripts, functions are persistent and they can be called by name rather than a cryptic SHA1 sum. Otherwise, they offer
+more or less the same functionality as scripts. __RedisX__ does not currently have a built-in high-level support
+for managing and calling user-defined functions, but it is a feature that may be added in the not too distant future.
+Stay tuned.
+
+
 -----------------------------------------------------------------------------
 
 <a name="error-handling"></a>
 ## Error handling
 
-Error handling of RedisX is an extension of that of __xchange__, with further error codes defined in `redisx.h`. 
-The RedisX functions that return an error status (either directly, or into the integer designated by a pointer 
-argument), can be inspected by `redisxErrorDescription()`, e.g.:
+The principal error handling of RedisX is an extension of that of __xchange__, with further error codes defined in 
+`redisx.h`. The RedisX functions that return an error status (either directly, or into the integer designated by a 
+pointer argument), can be inspected by `redisxErrorDescription()`, e.g.:
 
 ```c
   Redis *redis ...
@@ -737,6 +833,25 @@ argument), can be inspected by `redisxErrorDescription()`, e.g.:
   }
 ```
  
+In addition you can define your own handler function to deal with transmission (send/receive) errors, by defining
+your own `RedisErrorHandler` function, such as:
+
+```c
+  void my_error_handler(Redis *redis, enum redisx_channel channel, const char *op) {
+    fprintf(stderr, "ERROR! %s: Redis at %s, channel %d\n", op, redis->id, channel);
+  }
+```
+
+Then activate it as:
+
+```c
+  Redis *redis = ...
+  
+  redisSetTransmitErrorHandler(redis, my_error_handler);
+```
+
+After that, every time there is an error with sending or receiving packets over the network to any of the Redis
+clients used, your handler will report it the way you want it.
 
 -----------------------------------------------------------------------------
 
@@ -763,7 +878,8 @@ Some obvious ways the library could evolve and grow in the not too distant futur
  - Support for the [RESP3](https://github.com/antirez/RESP3/blob/master/spec.md) standard and Redis `HELLO`.
  - Support for Redis sentinel, high-availability server configurations.
  - TLS support (perhaps...)
- - Add functions for `CLIENT TRACKING` / `CLIENT CACHING` support. 
+ - Ass high-level support for managing and calling custom Redis functions.
+ - Add support for `CLIENT TRACKING` / `CLIENT CACHING`. 
  - Add more high-level redis commands, e.g. for lists, streams, etc.
  - Improved debug capabilities (e.g. with built-in error traces)
  - Improved error handling (e.g. by consistently setting `errno` beyond just the __RedisX__ error status).

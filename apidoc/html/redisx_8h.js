@@ -59,7 +59,6 @@ var redisx_8h =
     [ "redisxGetKeys", "redisx_8h.html#aaa45af252b10e19c647d2cd5b51d7c05", null ],
     [ "redisxGetScanCount", "redisx_8h.html#af3167ceaaedaf0a005da22e28521440e", null ],
     [ "redisxGetTable", "redisx_8h.html#af4290857fc98baac7edd15edb6d0bcac", null ],
-    [ "redisxGetTcpBuf", "redisx_8h.html#a110a875c8146f58265408712154fe8bd", null ],
     [ "redisxGetTime", "redisx_8h.html#a5dbdb6bef9c8ac3a4a8e901abe505d30", null ],
     [ "redisxGetValue", "redisx_8h.html#a01bf1f5d830d1af19456ab78457a54ab", null ],
     [ "redisxHasPipeline", "redisx_8h.html#a481678923a653e5227f7dab5a1fd272d", null ],
@@ -100,6 +99,5 @@ var redisx_8h =
     [ "redisxStartBlockAsync", "redisx_8h.html#a3e49508e4e4fcc283832226fd1bffd85", null ],
     [ "redisxSubscribe", "redisx_8h.html#a789f711733a55601cd71a2c0f61ec2db", null ],
     [ "redisxUnlockClient", "redisx_8h.html#a87efe53c80fcff3fcf189362cbc602f7", null ],
-    [ "redisxUnsubscribe", "redisx_8h.html#af64c112d9c395f1e08af52acd6f5c3ec", null ],
-    [ "simpleHostnameToIP", "redisx_8h.html#a2705bdad7ed2d968ecced5cd7c379bad", null ]
+    [ "redisxUnsubscribe", "redisx_8h.html#af64c112d9c395f1e08af52acd6f5c3ec", null ]
 ];

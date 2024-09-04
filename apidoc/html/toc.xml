@@ -21,13 +21,15 @@
       <topic label="Broadcasting messages" href="index.html#autotoc_md26"/>
       <topic label="Subscriptions" href="index.html#autotoc_md27"/>
     </topic>
-    <topic label="Atomic execution blocks and LUA scripts" href="index.html#autotoc_md29">
-      <topic label="Execution blocks" href="index.html#autotoc_md30"/>
-      <topic label="LUA script loading and execution" href="index.html#autotoc_md31"/>
+    <topic label="Advanced queries" href="index.html#autotoc_md29"/>
+    <topic label="Atomic execution blocks and LUA scripts" href="index.html#autotoc_md31">
+      <topic label="Execution blocks" href="index.html#autotoc_md32"/>
+      <topic label="LUA script loading and execution" href="index.html#autotoc_md33"/>
+      <topic label="Custom functions" href="index.html#autotoc_md34"/>
     </topic>
-    <topic label="Error handling" href="index.html#autotoc_md33"/>
-    <topic label="Debug support" href="index.html#autotoc_md35"/>
-    <topic label="Future plans" href="index.html#autotoc_md37"/>
+    <topic label="Error handling" href="index.html#autotoc_md36"/>
+    <topic label="Debug support" href="index.html#autotoc_md38"/>
+    <topic label="Future plans" href="index.html#autotoc_md40"/>
   </topic>
   <topic label="Changelog" href="md_CHANGELOG.html">
     <topic label="[Unreleased]" href="md_CHANGELOG.html#autotoc_md1"/>
@@ -135,7 +137,6 @@
           <topic label="redisxGetKeys" href="redisx_8h.html#aaa45af252b10e19c647d2cd5b51d7c05"/>
           <topic label="redisxGetScanCount" href="redisx_8h.html#af3167ceaaedaf0a005da22e28521440e"/>
           <topic label="redisxGetTable" href="redisx_8h.html#af4290857fc98baac7edd15edb6d0bcac"/>
-          <topic label="redisxGetTcpBuf" href="redisx_8h.html#a110a875c8146f58265408712154fe8bd"/>
           <topic label="redisxGetTime" href="redisx_8h.html#a5dbdb6bef9c8ac3a4a8e901abe505d30"/>
           <topic label="redisxGetValue" href="redisx_8h.html#a01bf1f5d830d1af19456ab78457a54ab"/>
           <topic label="redisxHasPipeline" href="redisx_8h.html#a481678923a653e5227f7dab5a1fd272d"/>
@@ -177,7 +178,6 @@
           <topic label="redisxSubscribe" href="redisx_8h.html#a789f711733a55601cd71a2c0f61ec2db"/>
           <topic label="redisxUnlockClient" href="redisx_8h.html#a87efe53c80fcff3fcf189362cbc602f7"/>
           <topic label="redisxUnsubscribe" href="redisx_8h.html#af64c112d9c395f1e08af52acd6f5c3ec"/>
-          <topic label="simpleHostnameToIP" href="redisx_8h.html#a2705bdad7ed2d968ecced5cd7c379bad"/>
         </topic>
       </topic>
       <topic label="src" href="dir_68267d1309a1af8e8297ef4c3efbcdba.html">
@@ -185,15 +185,17 @@
           <topic label="REDIS_SIMPLE_STRING_SIZE" href="redisx-client_8c.html#ac5021fd53b8fb32c06455b174e849751"/>
           <topic label="REDIS_TIMEOUT_SECONDS" href="redisx-client_8c.html#a537f665e7813cee70bc73b5751a50946"/>
           <topic label="redisxAbortBlockAsync" href="redisx-client_8c.html#ab98b0e71d2d0941920e3097a66eae7b8"/>
-          <topic label="redisxArrayRequest" href="redisx-client_8c.html#a13ae33bc25ee03621b23541236ef5f82"/>
           <topic label="redisxExecBlockAsync" href="redisx-client_8c.html#a6fed65f9413569c771d5165a0194477a"/>
+          <topic label="redisxGetClient" href="redisx-client_8c.html#a14907be8fba6a13505a352673cea5895"/>
           <topic label="redisxIgnoreReplyAsync" href="redisx-client_8c.html#ac0f30d62044638a2ead07583ad723fdf"/>
+          <topic label="redisxLockClient" href="redisx-client_8c.html#ac9c69fbcaa2a2fbe95af72d91a7b7e6c"/>
+          <topic label="redisxLockEnabled" href="redisx-client_8c.html#ac6c9928f425b6b1d97d721cbddc3cf28"/>
           <topic label="redisxReadReplyAsync" href="redisx-client_8c.html#abc855133c2af4f5d929a05292aa634d1"/>
-          <topic label="redisxRequest" href="redisx-client_8c.html#a09092bd97eead5c5fa73fa0d9241018c"/>
           <topic label="redisxSendArrayRequestAsync" href="redisx-client_8c.html#a899f4f8853add789db4bd4de106fd6d8"/>
           <topic label="redisxSendRequestAsync" href="redisx-client_8c.html#afc7b28288c07baf0b3c8fdc9d8ddf263"/>
           <topic label="redisxSkipReplyAsync" href="redisx-client_8c.html#a44c5d0bd24f5a4f2f131218f14c9c599"/>
           <topic label="redisxStartBlockAsync" href="redisx-client_8c.html#a3e49508e4e4fcc283832226fd1bffd85"/>
+          <topic label="redisxUnlockClient" href="redisx-client_8c.html#a87efe53c80fcff3fcf189362cbc602f7"/>
         </topic>
         <topic label="redisx-hooks.c" href="redisx-hooks_8c.html">
           <topic label="redisxAddConnectHook" href="redisx-hooks_8c.html#aaa5c67708e8081814fdae646f6179842"/>
@@ -204,21 +206,15 @@
           <topic label="redisxRemoveDisconnectHook" href="redisx-hooks_8c.html#a1cbb19408f67f3a1997bb7c0793b2380"/>
         </topic>
         <topic label="redisx-net.c" href="redisx-net_8c.html">
+          <topic label="RedisPipelineListener" href="redisx-net_8c.html#a124e24b5cfba8172ed3f548b8056deb2"/>
           <topic label="redisxConnect" href="redisx-net_8c.html#ad71822356ffd40ed4b1c71d065f48809"/>
+          <topic label="redisxDestroy" href="redisx-net_8c.html#ac54dd4c46d8615db4da02702c18f062b"/>
           <topic label="redisxDisconnect" href="redisx-net_8c.html#acae5ab8af4db1c4ab13c4069aa744a44"/>
-          <topic label="redisxGetClient" href="redisx-net_8c.html#a14907be8fba6a13505a352673cea5895"/>
-          <topic label="redisxGetTcpBuf" href="redisx-net_8c.html#a110a875c8146f58265408712154fe8bd"/>
-          <topic label="redisxHasPipeline" href="redisx-net_8c.html#a481678923a653e5227f7dab5a1fd272d"/>
+          <topic label="redisxInit" href="redisx-net_8c.html#a5c78c2189a76a077231016564a0cecd5"/>
           <topic label="redisxIsConnected" href="redisx-net_8c.html#a94326ebfa5868579c8448cdbb941b3da"/>
-          <topic label="redisxLockClient" href="redisx-net_8c.html#ac9c69fbcaa2a2fbe95af72d91a7b7e6c"/>
-          <topic label="redisxLockEnabled" href="redisx-net_8c.html#ac6c9928f425b6b1d97d721cbddc3cf28"/>
           <topic label="redisxReconnect" href="redisx-net_8c.html#a55a2efad7c8d8f840f4144a217f58965"/>
           <topic label="redisxSetPort" href="redisx-net_8c.html#a7e632b56ced17fe2103f325f2aea53a3"/>
           <topic label="redisxSetTcpBuf" href="redisx-net_8c.html#a83fce113d042490e77efdc574e64d76f"/>
-          <topic label="redisxUnlockClient" href="redisx-net_8c.html#a87efe53c80fcff3fcf189362cbc602f7"/>
-          <topic label="rIsLowLatency" href="redisx-net_8c.html#a9e887a583f0ec739e30a1c75bd86c574"/>
-          <topic label="rShutdownLinkAsync" href="redisx-net_8c.html#a1a7b80e39495fa41259619bd7e4f063b"/>
-          <topic label="simpleHostnameToIP" href="redisx-net_8c.html#a2705bdad7ed2d968ecced5cd7c379bad"/>
         </topic>
         <topic label="redisx-sub.c" href="redisx-sub_8c.html">
           <topic label="redisxAddSubscriber" href="redisx-sub_8c.html#a8a31ecaa0f83150366b72aa9b47755f0"/>
@@ -247,17 +243,18 @@
           <topic label="redisxSetValueAsync" href="redisx-tab_8c.html#a9e784632598b0c418a3ae3a87aa09fe4"/>
         </topic>
         <topic label="redisx.c" href="redisx_8c.html">
+          <topic label="redisxArrayRequest" href="redisx_8c.html#a13ae33bc25ee03621b23541236ef5f82"/>
           <topic label="redisxCheckDestroyRESP" href="redisx_8c.html#a67b8bd13975dd286600f20dc80bdb462"/>
           <topic label="redisxCheckRESP" href="redisx_8c.html#a2d3ffb89129ab04483e3966835a5ff71"/>
-          <topic label="redisxDestroy" href="redisx_8c.html#ac54dd4c46d8615db4da02702c18f062b"/>
           <topic label="redisxDestroyRESP" href="redisx_8c.html#aa4e23a7454f7055711915ec430599011"/>
           <topic label="redisxError" href="redisx_8c.html#ae722b046fa70a55db725341ef8ee56dc"/>
           <topic label="redisxErrorDescription" href="redisx_8c.html#a38f3de77ad5a48d37b302bce2e3cd25b"/>
           <topic label="redisxGetTime" href="redisx_8c.html#a5dbdb6bef9c8ac3a4a8e901abe505d30"/>
-          <topic label="redisxInit" href="redisx_8c.html#a5c78c2189a76a077231016564a0cecd5"/>
+          <topic label="redisxHasPipeline" href="redisx_8c.html#a481678923a653e5227f7dab5a1fd272d"/>
           <topic label="redisxIsVerbose" href="redisx_8c.html#a484532a0b208bbd9c7a6cb9663361696"/>
           <topic label="redisxLoadScript" href="redisx_8c.html#ae8930592b8f927a154508669132bebab"/>
           <topic label="redisxPing" href="redisx_8c.html#afd19b1137e80ed26065d9e6e7039c8fe"/>
+          <topic label="redisxRequest" href="redisx_8c.html#a09092bd97eead5c5fa73fa0d9241018c"/>
           <topic label="redisxResetClient" href="redisx_8c.html#a05f0f4d0a2f3d8fb5e385541be6624a2"/>
           <topic label="redisxSelectDB" href="redisx_8c.html#aec99fb8b19d6751038bf9c4c6d04f8d0"/>
           <topic label="redisxSetPassword" href="redisx_8c.html#a0e9eda38aa6f084ac151cbebe2886c2f"/>
