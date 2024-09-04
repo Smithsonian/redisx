@@ -33,14 +33,6 @@
 
 #define REDISX_LISTENER_PRIORITY    (XPRIO_MIN + (int) (REDISX_LISTENER_REL_PRIORITY * XPRIO_RANGE))
 
-typedef struct ServerLink {
-  Redis *redis;
-  struct ServerLink *next;
-} ServerLink;
-
-static ServerLink *serverList;
-static pthread_mutex_t serverLock = PTHREAD_MUTEX_INITIALIZER;
-
 /// \endcond
 
 /// \cond PRIVATE
@@ -172,152 +164,6 @@ int redisxSetTransmitErrorHandler(Redis *redis, RedisErrorHandler f) {
   rConfigUnlock(redis);
 
   return X_SUCCESS;
-}
-
-/**
- * Shuts down Redis immediately, including all running Redis instances. It does not obtain
- * excluive locks to server list, configuration settings, or to open channels. As such
- * it should only be called to clean up an otherwise terminated program, e.g.
- * with atexit().
- *
- */
-static void rShutdownAsync() {
-  ServerLink *l;
-
-  // NOTE: Don't use any locks, as they may deadlock when trying to shut down...
-
-  l = serverList;
-
-  while(l != NULL) {
-    ServerLink *next = l->next;
-    rShutdownLinkAsync(l->redis);
-    free(l);
-    l = next;
-  }
-
-  serverList = NULL;
-}
-
-/**
- *  Initializes the Redis client library, and sets the hostname or IP address for the Redis server.
- *
- *  \param server       Server host name or numeric IP address, e.g. "127.0.0.1"
- *
- *  \return             X_SUCCESS or
- *                      X_FAILURE       if the IP address is invalid.
- *                      X_NULL          if the IP address is NULL.
- */
-Redis *redisxInit(const char *server) {
-  static int isInitialized = FALSE;
-
-  Redis *redis;
-  RedisPrivate *p;
-  ServerLink *l;
-  int i;
-  char ipAddress[IP_ADDRESS_LENGTH];
-
-  if(server == NULL) return NULL;
-
-  if(simpleHostnameToIP(server, ipAddress) < 0) return NULL;
-
-  if(!isInitialized) {
-    // Initialize the thread attributes once only to avoid segfaulting...
-    atexit(rShutdownAsync);
-    isInitialized = TRUE;
-  }
-
-  p = (RedisPrivate *) calloc(1, sizeof(RedisPrivate));
-  pthread_mutex_init(&p->configLock, NULL);
-  pthread_mutex_init(&p->subscriberLock, NULL);
-  p->clients = (RedisClient *) calloc(3, sizeof(RedisClient));
-
-  // Initialize the store access mutexes for each client channel.
-  for(i=REDISX_CHANNELS; --i >= 0; ) rInitClient(&p->clients[i], i);
-
-  redis = (Redis *) calloc(1, sizeof(Redis));
-  redis->priv = p;
-  redis->interactive = &p->clients[INTERACTIVE_CHANNEL];
-  redis->pipeline = &p->clients[PIPELINE_CHANNEL];
-  redis->subscription = &p->clients[SUBSCRIPTION_CHANNEL];
-  redis->id = xStringCopyOf(ipAddress);
-
-  for(i=REDISX_CHANNELS; --i >= 0; ) {
-    ClientPrivate *cp = (ClientPrivate *) p->clients[i].priv;
-    cp->redis = redis;
-  }
-
-  p->addr = inet_addr((char *) ipAddress);
-  p->port = REDIS_TCP_PORT;
-
-  l = (ServerLink *) calloc(1, sizeof(ServerLink));
-  l->redis = redis;
-
-  pthread_mutex_lock(&serverLock);
-  l->next = serverList;
-  serverList = l;
-  pthread_mutex_unlock(&serverLock);
-
-  return redis;
-}
-
-/**
- * Removes a Redis instance from the list of tracked instances. This is ormally called only
- * by redisxDestroy()
- *
- * @param redis      Pointer to a Redis instance.
- */
-static void rUnregisterServer(const Redis *redis) {
-  ServerLink *s, *last = NULL;
-
-  pthread_mutex_lock(&serverLock);
-
-  // remove this server from the open servers...
-  for(s = serverList; s != NULL; ) {
-    ServerLink *next = s->next;
-    if(s->redis == redis) {
-      if(last) last->next = s->next;
-      else serverList = s->next;
-      free(s);
-      break;
-    }
-    last = s;
-    s = next;
-  }
-
-  pthread_mutex_unlock(&serverLock);
-}
-
-/**
- * Destroys a Redis intance, disconnecting any clients that may be connected, and freeing all resources
- * used by that Redis instance.
- *
- * \param redis         Pointer to a Redis instance.
- *
- */
-void redisxDestroy(Redis *redis) {
-  int i;
-  RedisPrivate *p;
-
-
-  if(redis == NULL) return;
-
-  p = (RedisPrivate *) redis->priv;
-
-  if(redisxIsConnected(redis)) redisxDisconnect(redis);
-
-  for(i=REDISX_CHANNELS; --i >= 0; ) {
-    ClientPrivate *cp = (ClientPrivate *) p->clients[i].priv;
-    pthread_mutex_destroy(&cp->readLock);
-    pthread_mutex_destroy(&cp->writeLock);
-    pthread_mutex_destroy(&cp->pendingLock);
-    if(cp != NULL) free(cp);
-  }
-  free(p->clients);
-  free(p);
-
-  rUnregisterServer(redis);
-
-  free(redis);
 }
 
 /**
@@ -670,6 +516,21 @@ int redisxError(const char *func, int errorCode) {
 }
 
 /**
+ * Checks if a Redis instance has the pipeline connection enabled.
+ *
+ * \param redis         Pointer to a Redis instance.
+ *
+ * \return      TRUE (1) if the pipeline client is enabled on the Redis intance, or FALSE (0) otherwise.
+ */
+boolean redisxHasPipeline(Redis *redis) {
+  const ClientPrivate *pp;
+
+  if(redis == NULL) return FALSE;
+  pp = (ClientPrivate *) redis->pipeline->priv;
+  return pp->isEnabled;
+}
+
+/**
  * Sets the function processing valid pipeline responses.
  *
  * \param redis             Pointer to a Redis instance.
@@ -691,158 +552,12 @@ int redisxSetPipelineConsumer(Redis *redis, void (*f)(RESP *)) {
   return X_SUCCESS;
 }
 
-/**
- * The listener function that processes pipelined responses in the background. It is started when Redis
- * is connected with the pipeline enabled.
- *
- * \param pRedis        Pointer to a Redis instance.
- *
- * \return              Always NULL.
- *
- */
-static void *RedisPipelineListener(void *pRedis) {
-  static int counter, lastError;
-
-  Redis *redis = (Redis *) pRedis;
-  RedisPrivate *p;
-  RedisClient *cl;
-  ClientPrivate *cp;
-  RESP *reply = NULL;
-  void (*consume)(RESP *response);
-
-  pthread_detach(pthread_self());
-
-  xvprintf("Redis-X> Started processing pipelined responses...\n");
-
-  if(redis == NULL) {
-    redisxError("RedisPipelineListener", X_NULL);
-    return NULL;
-  }
-
-  p = (RedisPrivate *) redis->priv;
-  cl = redis->pipeline;
-  cp = (ClientPrivate *) cl->priv;
-
-  while(cp->isEnabled && p->isPipelineListenerEnabled && pthread_equal(p->pipelineListenerTID, pthread_self())) {
-    // Discard the response from the prior iteration
-    if(reply) redisxDestroyRESP(reply);
-
-    // Get a new response...
-    reply = redisxReadReplyAsync(cl);
-
-    counter++;
-
-    // If client was disabled while waiting for response, then break out.
-    if(!cp->isEnabled) {
-      pthread_mutex_lock(&cp->pendingLock);
-      if(cp->pendingRequests > 0) xvprintf("WARNING! pipeline disabled with %d requests in queue.\n", cp->pendingRequests);
-      pthread_mutex_unlock(&cp->pendingLock);
-      break;
-    }
-
-    if(reply == NULL) {
-      fprintf(stderr, "WARNING! Redis-X: pipeline null response.\n");
-      continue;
-    }
-
-    if(reply->n < 0) {
-      if(reply->n != lastError) fprintf(stderr, "ERROR! Redis-X: pipeline parse error: %d.\n", reply->n);
-      lastError = reply->n;
-      continue;
-    }
-
-    // Skip confirms...
-    if(reply->type == RESP_SIMPLE_STRING) continue;
-
-    consume = p->pipelineConsumerFunc;
-    if(consume) consume(reply);
-
-#if REDISX_LISTENER_YIELD_COUNT > 0
-    // Allow the waiting processes to take control...
-    if(counter % REDISX_LISTENER_YIELD_COUNT == 0) sched_yield();
-#endif
-
-  } // <-- End of listener loop...
-
-  xvprintf("Redis-X> Stopped processing pipeline responses (%d processed)...\n", counter);
-
-  rConfigLock(redis);
-  // If we are the current listener thread, then mark the listener as disabled.
-  if(pthread_equal(p->pipelineListenerTID, pthread_self())) p->isPipelineListenerEnabled = FALSE;
-  rConfigUnlock(redis);
-
-  if(reply != NULL) redisxDestroyRESP(reply);
-
-  return NULL;
-}
 
 /// \cond PRIVATE
 
-/**
- * Starts the PUB/SUB listener thread with the specified thread attributes.
- *
- * \param redis     Pointer to the Redis instance.
- * \param attr      The thread attributes to set for the PUB/SUB listener thread.
- *
- * \return          0 if successful, or -1 if pthread_create() failed.
- *
- */
-int rStartSubscriptionListenerAsync(Redis *redis) {
-  RedisPrivate *p = (RedisPrivate *) redis->priv;
 
-#if SET_PRIORITIES
-  struct sched_param param;
-#endif
 
-  p->isSubscriptionListenerEnabled = TRUE;
 
-  if (pthread_create(&p->subscriptionListenerTID, NULL, RedisSubscriptionListener, redis) == -1) {
-    perror("ERROR! Redis-X : pthread_create SubscriptionListener");
-    p->isSubscriptionListenerEnabled = FALSE;
-    return -1;
-  }
-
-#if SET_PRIORITIES
-  param.sched_priority = REDISX_LISTENER_PRIORITY;
-  pthread_attr_setschedparam(&threadConfig, &param);
-  pthread_setschedparam(p->subscriptionListenerTID, SCHED_RR, &param);
-#endif
-
-  return 0;
-}
-
-/**
- * Starts the pipeline listener thread with the specified thread attributes.
- *
- * \param redis     Pointer to the Redis instance.
- * \param attr      The thread attributes to set for the pipeline listener thread.
- *
- * \return          0 if successful, or -1 if pthread_create() failed.
- *
- */
-int rStartPipelineListenerAsync(Redis *redis) {
-  RedisPrivate *p = (RedisPrivate *) redis->priv;
-
-#if SET_PRIORITIES
-  struct sched_param param;
-#endif
-
-  p->isPipelineListenerEnabled = TRUE;
-
-  if (pthread_create(&p->pipelineListenerTID, NULL, RedisPipelineListener, redis) == -1) {
-    perror("ERROR! Redis-X : pthread_create PipelineListener");
-    p->isPipelineListenerEnabled = FALSE;
-    return -1;
-  }
-
-#if SET_PRIORITIES
-  param.sched_priority = REDISX_LISTENER_PRIORITY;
-  pthread_attr_setschedparam(&threadConfig, &param);
-  pthread_setschedparam(p->pipelineListenerTID, SCHED_RR, &param);
-#endif
-
-  return 0;
-}
 
 /// \endcond
 

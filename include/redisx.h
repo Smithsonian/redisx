@@ -218,20 +218,16 @@ typedef void (*RedisSubscriberCall)(const char *pattern, const char *channel, co
  */
 typedef void (*RedisErrorHandler)(Redis *redis, enum redisx_channel channel, const char *op);
 
-int simpleHostnameToIP(const char *hostName, char *ip);
-
 void redisxSetVerbose(boolean value);
 boolean redisxIsVerbose();
 
 void redisxSetTcpBuf(int size);
-int redisxGetTcpBuf();
+int redisxSetTransmitErrorHandler(Redis *redis, RedisErrorHandler f);
 
 void redisxSetPort(Redis *redis, int port);
 int redisxSetUser(Redis *redis, const char *username);
 int redisxSetPassword(Redis *redis, const char *passwd);
 int redisxSelectDB(Redis *redis, int idx);
-
-int redisxSetTransmitErrorHandler(Redis *redis, RedisErrorHandler f);
 
 Redis *redisxInit(const char *server);
 void redisxDestroy(Redis *redis);

@@ -217,7 +217,7 @@ static int rReadBytes(ClientPrivate *cp, char *buf, int length) {
  * \return              0 if the data was successfully sent, otherwise the errno set by send().
  *
  */
-int rSendBytesAsync(ClientPrivate *cp, const char *buf, int length, boolean isLast) {
+static int rSendBytesAsync(ClientPrivate *cp, const char *buf, int length, boolean isLast) {
 #if SEND_YIELD_COUNT > 0
   static int count;   // Total bytes sent;
 #endif
@@ -260,6 +260,108 @@ int rSendBytesAsync(ClientPrivate *cp, const char *buf, int length, boolean isLa
 }
 
 /// \endcond
+
+/**
+ * Returns the redis client for a given connection type in a Redis instance.
+ *
+ * \param redis         Pointer to a Redis instance.
+ * \param channel       INTERACTIVE_CHANNEL, PIPELINE_CHANNEL, or SUBSCRIPTION_CHANNEL
+ *
+ * \return      Pointer to the matching Redis client, or NULL if the channel argument is invalid.
+ *
+ */
+RedisClient *redisxGetClient(Redis *redis, enum redisx_channel channel) {
+  RedisPrivate *p;
+
+  if(redis == NULL) return NULL;
+
+  p = (RedisPrivate *) redis->priv;
+  if(channel < 0 || channel >= REDISX_CHANNELS) return NULL;
+  return &p->clients[channel];
+}
+
+/**
+ * Get exclusive write access to the specified REDIS channel.
+ *
+ * \param cl        Pointer to the Redis client instance.
+ *
+ * \return          X_SUCCESS           if the exclusive lock for the channel was successfully obtained
+ *                  X_FAILURE           if pthread_mutex_lock() returned an error
+ *                  X_NULL              if the client is NULL.
+ *
+ * @sa redisxLockEnabled()
+ * @sa redisxUnlockClient()
+ */
+int redisxLockClient(RedisClient *cl) {
+  static const char *funcName = "redisLockClient()";
+  ClientPrivate *cp;
+  int status;
+
+  if(cl == NULL) return redisxError(funcName, X_NULL);
+  cp = (ClientPrivate *) cl->priv;
+
+  status = pthread_mutex_lock(&cp->writeLock);
+  if(status) {
+    fprintf(stderr, "WARNING! Redis-X : %s failed with code: %d.\n", funcName, status);
+    return redisxError(funcName, X_FAILURE);
+  }
+
+  return X_SUCCESS;
+}
+
+/**
+ * Lock a channel, but only if it has been enabled for communication.
+ *
+ * \param cl     Pointer to the Redis client instance
+ *
+ * \return       X_SUCCESS (0)          if an excusive lock to the channel has been granted.
+ *               X_FAILURE              if pthread_mutex_lock() returned an error
+ *               X_NULL                 if the client is NULL
+ *               REDIS_INVALID_CHANNEL  if the channel is enabled/connected.
+ *
+ * @sa redisxLockClient()
+ * @sa redisxUnlockClient()
+ */
+int redisxLockEnabled(RedisClient *cl) {
+  static const char *funcName = "redisxLockEnabled()";
+  const ClientPrivate *cp;
+  int status = redisxLockClient(cl);
+  if(status) return redisxError(funcName, status);
+
+  cp = (ClientPrivate *) cl->priv;
+  if(!cp->isEnabled) {
+    redisxUnlockClient(cl);
+    return redisxError(funcName, REDIS_INVALID_CHANNEL);
+  }
+
+  return X_SUCCESS;
+}
+
+/**
+ * Relinquish exclusive write access to the specified REDIS channel
+ *
+ * \param cl        Pointer to the Redis client instance
+ *
+ * \return          X_SUCCESS           if the exclusive lock for the channel was successfully obtained
+ *                  X_FAILURE           if pthread_mutex_lock() returned an error
+ *                  X_NULL              if the client is NULL
+ *
+ * @sa redisxLockClient()
+ * @sa redisxLockEnabled()
+ */
+int redisxUnlockClient(RedisClient *cl) {
+  static const char *funcName = "redisxUnlockClient()";
+  ClientPrivate *cp;
+  int status;
+
+  if(cl == NULL) return redisxError(funcName, X_NULL);
+  cp = (ClientPrivate *) cl->priv;
+
+  status = pthread_mutex_unlock(&cp->writeLock);
+  if(status) fprintf(stderr, "WARNING! Redis-X : %s failed with code: %d.\n", funcName, status);
+
+  return status ? redisxError(funcName, X_FAILURE) : X_SUCCESS;
+}
 
 /**
  * Instructs Redis to skip sending a reply for the next command.
@@ -787,6 +889,3 @@ RESP *redisxReadReplyAsync(RedisClient *cl) {
 
   return resp;
 }
-
-
-

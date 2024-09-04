@@ -15,6 +15,8 @@
 
 #include "redisx-priv.h"
 
+static int rStartSubscriptionListenerAsync(Redis *redis);
+
 /**
  * Waits to get exlusive access to Redis scubscriber calls.
  *
@@ -638,3 +640,36 @@ void *RedisSubscriptionListener(void *pRedis) {
 }
 
 /// \endcond
+
+/**
+ * Starts the PUB/SUB listener thread with the specified thread attributes.
+ *
+ * \param redis     Pointer to the Redis instance.
+ * \param attr      The thread attributes to set for the PUB/SUB listener thread.
+ *
+ * \return          0 if successful, or -1 if pthread_create() failed.
+ *
+ */
+static int rStartSubscriptionListenerAsync(Redis *redis) {
+  RedisPrivate *p = (RedisPrivate *) redis->priv;
+
+#if SET_PRIORITIES
+  struct sched_param param;
+#endif
+
+  p->isSubscriptionListenerEnabled = TRUE;
+
+  if (pthread_create(&p->subscriptionListenerTID, NULL, RedisSubscriptionListener, redis) == -1) {
+    perror("ERROR! Redis-X : pthread_create SubscriptionListener");
+    p->isSubscriptionListenerEnabled = FALSE;
+    return -1;
+  }
+
+#if SET_PRIORITIES
+  param.sched_priority = REDISX_LISTENER_PRIORITY;
+  pthread_attr_setschedparam(&threadConfig, &param);
+  pthread_setschedparam(p->subscriptionListenerTID, SCHED_RR, &param);
+#endif
+
+  return 0;
+}

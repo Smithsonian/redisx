@@ -26,28 +26,61 @@
 
 #include "redisx-priv.h"
 
-/// \cond PRIVATE
+static int rStartPipelineListenerAsync(Redis *redis);
 
+/// \cond PRIVATE
+///
 // SHUT_RD is not defined on LynxOS for some reason, even though it should be...
 #ifndef SHUT_RD
 #  define SHUT_RD 0
 #endif
 
+typedef struct ServerLink {
+  Redis *redis;
+  struct ServerLink *next;
+} ServerLink;
+
 /// \endcond
+
+static ServerLink *serverList;
+static pthread_mutex_t serverLock = PTHREAD_MUTEX_INITIALIZER;
 
 static int tcpBufSize = REDIS_TCP_BUF;
 
+
 /**
- * Checks if a client was configured with a low-latency socket connection.
+ * Gets an IP address string for a given host name. If more than one IP address is associated with a host name, the first one
+ * is returned.
  *
- * \param cp        Pointer to the private data of a Redis client.
+ * \param hostName      The host name, e.g. "localhost"
+ * \param ip            Pointer to the string buffer to which to write the corresponding IP.
  *
- * \return          TRUE (1) if the client is low latency, or else FALSE (0).
- *
+ * \return              X_SUCESSS       if the name was successfully matched to an IP address.
+ *                      X_NAME_INVALID  if the no host is known by the specified name.
+ *                      X_NULL          if hostName is NULL or if it is not associated to any valid IP address.
  */
-boolean rIsLowLatency(const ClientPrivate *cp) {
-  if(cp == NULL) return FALSE;
-  return cp->idx != PIPELINE_CHANNEL;
+static int hostnameToIP(const char *hostName, char *ip) {
+  struct hostent *h;
+  struct in_addr **addresses;
+  int i;
+
+  *ip = '\0';
+  if(hostName == NULL) return X_NULL;
+
+  if ((h = gethostbyname((char *) hostName)) == NULL) {
+    fprintf(stderr, "ERROR! Host lookup failed for: %s.\n", hostName);
+    return X_NAME_INVALID;
+  }
+
+  addresses = (struct in_addr **) h->h_addr_list;
+
+  for(i = 0; addresses[i] != NULL; i++) {
+    //Return the first one;
+    strcpy(ip, inet_ntoa(*addresses[i]));
+    return X_SUCCESS;
+  }
+
+  return X_NULL;
 }
 
 /**
@@ -360,7 +393,7 @@ int redisxReconnect(Redis *redis, boolean usePipeline) {
  *
  * @param redis   Pointer to the Redis intance to shut down.
  */
-void rShutdownLinkAsync(Redis *redis) {
+static void rShutdownLinkAsync(Redis *redis) {
   RedisPrivate *p = (RedisPrivate *) redis->priv;
   int i;
 
@@ -368,7 +401,57 @@ void rShutdownLinkAsync(Redis *redis) {
   for(i=0; i<REDISX_CHANNELS; i++) rDisconnectClientAsync(&p->clients[i]);
 }
 
-/// \cond PRIVATE
+
+/**
+ * Shuts down Redis immediately, including all running Redis instances. It does not obtain
+ * excluive locks to server list, configuration settings, or to open channels. As such
+ * it should only be called to clean up an otherwise terminated program, e.g.
+ * with atexit().
+ *
+ */
+static void rShutdownAsync() {
+  ServerLink *l;
+
+  // NOTE: Don't use any locks, as they may deadlock when trying to shut down...
+
+  l = serverList;
+
+  while(l != NULL) {
+    ServerLink *next = l->next;
+    rShutdownLinkAsync(l->redis);
+    free(l);
+    l = next;
+  }
+
+  serverList = NULL;
+}
+
+/**
+ * Removes a Redis instance from the list of tracked instances. This is ormally called only
+ * by redisxDestroy()
+ *
+ * @param redis      Pointer to a Redis instance.
+ */
+static void rUnregisterServer(const Redis *redis) {
+  ServerLink *s, *last = NULL;
+
+  pthread_mutex_lock(&serverLock);
+
+  // remove this server from the open servers...
+  for(s = serverList; s != NULL; ) {
+    ServerLink *next = s->next;
+    if(s->redis == redis) {
+      if(last) last->next = s->next;
+      else serverList = s->next;
+      free(s);
+      break;
+    }
+    last = s;
+    s = next;
+  }
+
+  pthread_mutex_unlock(&serverLock);
+}
 
 /**
  * Initializes a redis client structure for the specified communication channel
@@ -376,7 +459,7 @@ void rShutdownLinkAsync(Redis *redis) {
  * @param cl
  * @param idx
  */
-void rInitClient(RedisClient *cl, enum redisx_channel idx) {
+static void rInitClient(RedisClient *cl, enum redisx_channel idx) {
   ClientPrivate *cp;
 
   cl->priv = calloc(1, sizeof(ClientPrivate));
@@ -386,6 +469,21 @@ void rInitClient(RedisClient *cl, enum redisx_channel idx) {
   pthread_mutex_init(&cp->writeLock, NULL);
   pthread_mutex_init(&cp->pendingLock, NULL);
   rResetClientAsync(cl);
+}
+
+/// \cond PRIVATE
+
+/**
+ * Checks if a client was configured with a low-latency socket connection.
+ *
+ * \param cp        Pointer to the private data of a Redis client.
+ *
+ * \return          TRUE (1) if the client is low latency, or else FALSE (0).
+ *
+ */
+boolean rIsLowLatency(const ClientPrivate *cp) {
+  if(cp == NULL) return FALSE;
+  return cp->idx != PIPELINE_CHANNEL;
 }
 
 /**
@@ -491,6 +589,100 @@ int rConnectClient(Redis *redis, enum redisx_channel channel) {
 /// \endcond
 
 /**
+ *  Initializes the Redis client library, and sets the hostname or IP address for the Redis server.
+ *
+ *  \param server       Server host name or numeric IP address, e.g. "127.0.0.1"
+ *
+ *  \return             X_SUCCESS or
+ *                      X_FAILURE       if the IP address is invalid.
+ *                      X_NULL          if the IP address is NULL.
+ */
+Redis *redisxInit(const char *server) {
+  static int isInitialized = FALSE;
+
+  Redis *redis;
+  RedisPrivate *p;
+  ServerLink *l;
+  int i;
+  char ipAddress[IP_ADDRESS_LENGTH];
+
+  if(server == NULL) return NULL;
+
+  if(hostnameToIP(server, ipAddress) < 0) return NULL;
+
+  if(!isInitialized) {
+    // Initialize the thread attributes once only to avoid segfaulting...
+    atexit(rShutdownAsync);
+    isInitialized = TRUE;
+  }
+
+  p = (RedisPrivate *) calloc(1, sizeof(RedisPrivate));
+  pthread_mutex_init(&p->configLock, NULL);
+  pthread_mutex_init(&p->subscriberLock, NULL);
+  p->clients = (RedisClient *) calloc(3, sizeof(RedisClient));
+
+  // Initialize the store access mutexes for each client channel.
+  for(i=REDISX_CHANNELS; --i >= 0; ) rInitClient(&p->clients[i], i);
+
+  redis = (Redis *) calloc(1, sizeof(Redis));
+  redis->priv = p;
+  redis->interactive = &p->clients[INTERACTIVE_CHANNEL];
+  redis->pipeline = &p->clients[PIPELINE_CHANNEL];
+  redis->subscription = &p->clients[SUBSCRIPTION_CHANNEL];
+  redis->id = xStringCopyOf(ipAddress);
+
+  for(i=REDISX_CHANNELS; --i >= 0; ) {
+    ClientPrivate *cp = (ClientPrivate *) p->clients[i].priv;
+    cp->redis = redis;
+  }
+
+  p->addr = inet_addr((char *) ipAddress);
+  p->port = REDIS_TCP_PORT;
+
+  l = (ServerLink *) calloc(1, sizeof(ServerLink));
+  l->redis = redis;
+
+  pthread_mutex_lock(&serverLock);
+  l->next = serverList;
+  serverList = l;
+  pthread_mutex_unlock(&serverLock);
+
+  return redis;
+}
+
+/**
+ * Destroys a Redis intance, disconnecting any clients that may be connected, and freeing all resources
+ * used by that Redis instance.
+ *
+ * \param redis         Pointer to a Redis instance.
+ *
+ */
+void redisxDestroy(Redis *redis) {
+  int i;
+  RedisPrivate *p;
+
+  if(redis == NULL) return;
+
+  p = (RedisPrivate *) redis->priv;
+
+  if(redisxIsConnected(redis)) redisxDisconnect(redis);
+
+  for(i=REDISX_CHANNELS; --i >= 0; ) {
+    ClientPrivate *cp = (ClientPrivate *) p->clients[i].priv;
+    pthread_mutex_destroy(&cp->readLock);
+    pthread_mutex_destroy(&cp->writeLock);
+    pthread_mutex_destroy(&cp->pendingLock);
+    if(cp != NULL) free(cp);
+  }
+  free(p->clients);
+  free(p);
+
+  rUnregisterServer(redis);
+
+  free(redis);
+}
+
+/**
  * Set the size of the TCP/IP buffers (send and receive) for future client connections.
  *
  * @param size      (bytes) requested buffer size, or <= 0 to use default value
@@ -499,52 +691,6 @@ void redisxSetTcpBuf(int size) {
   xvprintf("Redis-X> Setting TCP buffer to %d\n.", size);
   tcpBufSize = size;
 }
-
-/**
- * Returns the current TCP/IP buffer size (send and receive) to be used for future client connections.
- *
- * @return      (bytes) future TCP/IP buffer size, 0 if system default.
- */
-int redisxGetTcpBuf() {
-  return tcpBufSize > 0 ? tcpBufSize : 0;
-}
-
-/**
- * Gets an IP address string for a given host name. If more than one IP address is associated with a host name, the first one
- * is returned.
- *
- * \param hostName      The host name, e.g. "localhost"
- * \param ip            Pointer to the string buffer to which to write the corresponding IP.
- *
- * \return              X_SUCESSS       if the name was successfully matched to an IP address.
- *                      X_NAME_INVALID  if the no host is known by the specified name.
- *                      X_NULL          if hostName is NULL or if it is not associated to any valid IP address.
- */
-int simpleHostnameToIP(const char *hostName, char *ip) {
-  struct hostent *h;
-  struct in_addr **addresses;
-  int i;
-
-  *ip = '\0';
-  if(hostName == NULL) return X_NULL;
-
-  if ((h = gethostbyname((char *) hostName)) == NULL) {
-    fprintf(stderr, "ERROR! Host lookup failed for: %s.\n", hostName);
-    return X_NAME_INVALID;
-  }
-
-  addresses = (struct in_addr **) h->h_addr_list;
-
-  for(i = 0; addresses[i] != NULL; i++) {
-    //Return the first one;
-    strcpy(ip, inet_ntoa(*addresses[i]));
-    return X_SUCCESS;
-  }
-
-  return X_NULL;
-}
-
-
 
 /**
  * Sets a non-standard TCP port number to use for the Redis server, prior to calling
@@ -623,119 +769,119 @@ boolean redisxIsConnected(Redis *redis) {
 }
 
 /**
- * Checks if a Redis instance has the pipeline connection enabled.
+ * The listener function that processes pipelined responses in the background. It is started when Redis
+ * is connected with the pipeline enabled.
  *
- * \param redis         Pointer to a Redis instance.
+ * \param pRedis        Pointer to a Redis instance.
  *
- * \return      TRUE (1) if the pipeline client is enabled on the Redis intance, or FALSE (0) otherwise.
- */
-boolean redisxHasPipeline(Redis *redis) {
-  const ClientPrivate *pp;
-
-  if(redis == NULL) return FALSE;
-  pp = (ClientPrivate *) redis->pipeline->priv;
-  return pp->isEnabled;
-}
-
-/**
- * Returns the redis client for a given connection type in a Redis instance.
- *
- * \param redis         Pointer to a Redis instance.
- * \param channel       INTERACTIVE_CHANNEL, PIPELINE_CHANNEL, or SUBSCRIPTION_CHANNEL
- *
- * \return      Pointer to the matching Redis client, or NULL if the channel argument is invalid.
+ * \return              Always NULL.
  *
  */
-RedisClient *redisxGetClient(Redis *redis, enum redisx_channel channel) {
+void *RedisPipelineListener(void *pRedis) {
+  static int counter, lastError;
+
+  Redis *redis = (Redis *) pRedis;
   RedisPrivate *p;
+  RedisClient *cl;
+  ClientPrivate *cp;
+  RESP *reply = NULL;
+  void (*consume)(RESP *response);
 
-  if(redis == NULL) return NULL;
+  pthread_detach(pthread_self());
+
+  xvprintf("Redis-X> Started processing pipelined responses...\n");
+
+  if(redis == NULL) {
+    redisxError("RedisPipelineListener", X_NULL);
+    return NULL;
+  }
 
   p = (RedisPrivate *) redis->priv;
-  if(channel < 0 || channel >= REDISX_CHANNELS) return NULL;
-  return &p->clients[channel];
+  cl = redis->pipeline;
+  cp = (ClientPrivate *) cl->priv;
+
+  while(cp->isEnabled && p->isPipelineListenerEnabled && pthread_equal(p->pipelineListenerTID, pthread_self())) {
+    // Discard the response from the prior iteration
+    if(reply) redisxDestroyRESP(reply);
+
+    // Get a new response...
+    reply = redisxReadReplyAsync(cl);
+
+    counter++;
+
+    // If client was disabled while waiting for response, then break out.
+    if(!cp->isEnabled) {
+      pthread_mutex_lock(&cp->pendingLock);
+      if(cp->pendingRequests > 0) xvprintf("WARNING! pipeline disabled with %d requests in queue.\n", cp->pendingRequests);
+      pthread_mutex_unlock(&cp->pendingLock);
+      break;
+    }
+
+    if(reply == NULL) {
+      fprintf(stderr, "WARNING! Redis-X: pipeline null response.\n");
+      continue;
+    }
+
+    if(reply->n < 0) {
+      if(reply->n != lastError) fprintf(stderr, "ERROR! Redis-X: pipeline parse error: %d.\n", reply->n);
+      lastError = reply->n;
+      continue;
+    }
+
+    // Skip confirms...
+    if(reply->type == RESP_SIMPLE_STRING) continue;
+
+    consume = p->pipelineConsumerFunc;
+    if(consume) consume(reply);
+
+#if REDISX_LISTENER_YIELD_COUNT > 0
+    // Allow the waiting processes to take control...
+    if(counter % REDISX_LISTENER_YIELD_COUNT == 0) sched_yield();
+#endif
+
+  } // <-- End of listener loop...
+
+  xvprintf("Redis-X> Stopped processing pipeline responses (%d processed)...\n", counter);
+
+  rConfigLock(redis);
+  // If we are the current listener thread, then mark the listener as disabled.
+  if(pthread_equal(p->pipelineListenerTID, pthread_self())) p->isPipelineListenerEnabled = FALSE;
+  rConfigUnlock(redis);
+
+  if(reply != NULL) redisxDestroyRESP(reply);
+
+  return NULL;
 }
 
 /**
- * Get exclusive write access to the specified REDIS channel.
+ * Starts the pipeline listener thread with the specified thread attributes.
  *
- * \param cl        Pointer to the Redis client instance.
+ * \param redis     Pointer to the Redis instance.
+ * \param attr      The thread attributes to set for the pipeline listener thread.
  *
- * \return          X_SUCCESS           if the exclusive lock for the channel was successfully obtained
- *                  X_FAILURE           if pthread_mutex_lock() returned an error
- *                  X_NULL              if the client is NULL.
+ * \return          0 if successful, or -1 if pthread_create() failed.
  *
- * @sa redisxLockEnabled()
- * @sa redisxUnlockClient()
  */
-int redisxLockClient(RedisClient *cl) {
-  static const char *funcName = "redisLockClient()";
-  ClientPrivate *cp;
-  int status;
+static int rStartPipelineListenerAsync(Redis *redis) {
+  RedisPrivate *p = (RedisPrivate *) redis->priv;
 
-  if(cl == NULL) return redisxError(funcName, X_NULL);
-  cp = (ClientPrivate *) cl->priv;
+#if SET_PRIORITIES
+  struct sched_param param;
+#endif
 
-  status = pthread_mutex_lock(&cp->writeLock);
-  if(status) {
-    fprintf(stderr, "WARNING! Redis-X : %s failed with code: %d.\n", funcName, status);
-    return redisxError(funcName, X_FAILURE);
+  p->isPipelineListenerEnabled = TRUE;
+
+  if (pthread_create(&p->pipelineListenerTID, NULL, RedisPipelineListener, redis) == -1) {
+    perror("ERROR! Redis-X : pthread_create PipelineListener");
+    p->isPipelineListenerEnabled = FALSE;
+    return -1;
   }
 
-  return X_SUCCESS;
+#if SET_PRIORITIES
+  param.sched_priority = REDISX_LISTENER_PRIORITY;
+  pthread_attr_setschedparam(&threadConfig, &param);
+  pthread_setschedparam(p->pipelineListenerTID, SCHED_RR, &param);
+#endif
+
+  return 0;
 }
-
-/**
- * Lock a channel, but only if it has been enabled for communication.
- *
- * \param cl     Pointer to the Redis client instance
- *
- * \return       X_SUCCESS (0)          if an excusive lock to the channel has been granted.
- *               X_FAILURE              if pthread_mutex_lock() returned an error
- *               X_NULL                 if the client is NULL
- *               REDIS_INVALID_CHANNEL  if the channel is enabled/connected.
- *
- * @sa redisxLockClient()
- * @sa redisxUnlockClient()
- */
-int redisxLockEnabled(RedisClient *cl) {
-  static const char *funcName = "redisxLockEnabled()";
-  const ClientPrivate *cp;
-  int status = redisxLockClient(cl);
-  if(status) return redisxError(funcName, status);
-
-  cp = (ClientPrivate *) cl->priv;
-  if(!cp->isEnabled) {
-    redisxUnlockClient(cl);
-    return redisxError(funcName, REDIS_INVALID_CHANNEL);
-  }
-
-  return X_SUCCESS;
-}
-
-/**
- * Relinquish exclusive write access to the specified REDIS channel
- *
- * \param cl        Pointer to the Redis client instance
- *
- * \return          X_SUCCESS           if the exclusive lock for the channel was successfully obtained
- *                  X_FAILURE           if pthread_mutex_lock() returned an error
- *                  X_NULL              if the client is NULL
- *
- * @sa redisxLockClient()
- * @sa redisxLockEnabled()
- */
-int redisxUnlockClient(RedisClient *cl) {
-  static const char *funcName = "redisxUnlockClient()";
-  ClientPrivate *cp;
-  int status;
-
-  if(cl == NULL) return redisxError(funcName, X_NULL);
-  cp = (ClientPrivate *) cl->priv;
-
-  status = pthread_mutex_unlock(&cp->writeLock);
-  if(status) fprintf(stderr, "WARNING! Redis-X : %s failed with code: %d.\n", funcName, status);
-
-  return status ? redisxError(funcName, X_FAILURE) : X_SUCCESS;
-}
-

@@ -86,16 +86,9 @@ typedef struct {
 // in redisx-sub.c ------------------------>
 void rConfigLock(Redis *redis);
 void rConfigUnlock(Redis *redis);
-int rStartPipelineListenerAsync(Redis *redis);
-int rStartSubscriptionListenerAsync(Redis *redis);
-
-// in redisx-sub.c ------------------------>
-void *RedisSubscriptionListener(void *pRedis);
 
 // in redisx-net.c ------------------------>
-void rInitClient(RedisClient *cl, enum redisx_channel channel);
 int rConnectClient(Redis *redis, enum redisx_channel channel);
-void rShutdownLinkAsync(Redis *redis);
 void rCloseClient(RedisClient *cl);
 boolean rIsLowLatency(const ClientPrivate *cp);
 
