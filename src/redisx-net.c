@@ -295,7 +295,6 @@ static void rDisconnectAsync(Redis *redis) {
   p->isPipelineListenerEnabled = FALSE;
 
   // Gracefully end subscriptions and close subscription client
-  rEndSubscriptionAsync(redis);
   rCloseClient(redis->pipeline);
   rCloseClient(redis->interactive);
 
@@ -366,7 +365,7 @@ void rShutdownLinkAsync(Redis *redis) {
   int i;
 
   // NOTE: Don't use client locks, as they may deadlock when trying to shut down...
-  for(i=0; i<REDIS_CHANNELS; i++) rDisconnectClientAsync(&p->clients[i]);
+  for(i=0; i<REDISX_CHANNELS; i++) rDisconnectClientAsync(&p->clients[i]);
 }
 
 /// \cond PRIVATE
@@ -650,7 +649,7 @@ RedisClient *redisxGetClient(Redis *redis, enum redisx_channel channel) {
   if(redis == NULL) return NULL;
 
   p = (RedisPrivate *) redis->priv;
-  if(channel < 0 || channel >= REDIS_CHANNELS) return NULL;
+  if(channel < 0 || channel >= REDISX_CHANNELS) return NULL;
   return &p->clients[channel];
 }
 

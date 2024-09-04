@@ -105,7 +105,7 @@ enum redisx_channel {
   SUBSCRIPTION_CHANNEL       ///< \hideinitializer Redis channel number for PUB/SUB messages
 };
 
-#define  REDIS_CHANNELS     (SUBSCRIPTION_CHANNEL + 1)  ///< \hideinitializer The number of channels a Redis instance has.
+#define REDISX_CHANNELS     (SUBSCRIPTION_CHANNEL + 1)  ///< \hideinitializer The number of channels a Redis instance has.
 
 
 /**
@@ -235,8 +235,7 @@ boolean redisxIsConnected(Redis *redis);
 boolean redisxHasPipeline(Redis *redis);
 
 RedisClient *redisxGetClient(Redis *redis, enum redisx_channel channel);
-int redisxSelectDB(RedisClient *cl, int idx);
-int redisxResetClient(RedisClient *cl);
+int redisxSelectDB(Redis *redis, int idx, boolean confirm);
 
 void redisxAddConnectHook(Redis *redis, void (*setupCall)(Redis *));
 void redisxRemoveConnectHook(Redis *redis, void (*setupCall)(Redis *));
@@ -295,7 +294,6 @@ RESP *redisxReadReplyAsync(RedisClient *cl);
 int redisxIgnoreReplyAsync(RedisClient *cl);
 int redisxSkipReplyAsync(RedisClient *cl);
 int redisxPublishAsync(Redis *redis, const char *channel, const char *data, int length);
-int redisxSelectDBAsync(RedisClient *cl, int idx, boolean confirm);
 
 // Error generation with stderr message...
 int redisxError(const char *func, int errorCode);

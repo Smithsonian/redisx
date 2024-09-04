@@ -57,6 +57,7 @@ typedef struct {
 typedef struct {
   uint32_t addr;                ///< The 32-bit inet address
   int port;                     ///< port number (usually 6379)
+  int dbIndex;                  ///< the zero-based database index
   char *password;               ///< Redis password (if any)
 
   RedisClient *clients;
@@ -83,7 +84,6 @@ typedef struct {
 } RedisPrivate;
 
 
-
 // in redisx-sub.c ------------------------>
 void rConfigLock(Redis *redis);
 void rConfigUnlock(Redis *redis);
@@ -92,7 +92,6 @@ int rStartSubscriptionListenerAsync(Redis *redis);
 
 // in redisx-sub.c ------------------------>
 void *RedisSubscriptionListener(void *pRedis);
-void rEndSubscriptionAsync(Redis *redis);
 
 // in redisx-net.c ------------------------>
 void rInitClient(RedisClient *cl, enum redisx_channel channel);

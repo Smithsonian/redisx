@@ -49,6 +49,7 @@ static pthread_attr_t threadConfig;
 
 /// \cond PRIVATE
 
+
 /**
  * Waits to get exlusive access to configuring the properties of a Redis instance.
  *
@@ -203,7 +204,7 @@ Redis *redisxInit(const char *server) {
   p->clients = (RedisClient *) calloc(3, sizeof(RedisClient));
 
   // Initialize the store access mutexes for each client channel.
-  for(i=REDIS_CHANNELS; --i >= 0; ) rInitClient(&p->clients[i], i);
+  for(i=REDISX_CHANNELS; --i >= 0; ) rInitClient(&p->clients[i], i);
 
   redis = (Redis *) calloc(1, sizeof(Redis));
   redis->priv = p;
@@ -212,7 +213,7 @@ Redis *redisxInit(const char *server) {
   redis->subscription = &p->clients[SUBSCRIPTION_CHANNEL];
   redis->id = xStringCopyOf(ipAddress);
 
-  for(i=REDIS_CHANNELS; --i >= 0; ) {
+  for(i=REDISX_CHANNELS; --i >= 0; ) {
     ClientPrivate *cp = (ClientPrivate *) p->clients[i].priv;
     cp->redis = redis;
   }
@@ -276,7 +277,7 @@ void redisxDestroy(Redis *redis) {
 
   if(redisxIsConnected(redis)) redisxDisconnect(redis);
 
-  for(i=REDIS_CHANNELS; --i >= 0; ) {
+  for(i=REDISX_CHANNELS; --i >= 0; ) {
     ClientPrivate *cp = (ClientPrivate *) p->clients[i].priv;
     pthread_mutex_destroy(&cp->readLock);
     pthread_mutex_destroy(&cp->writeLock);
@@ -432,8 +433,8 @@ int redisxPing(Redis *redis, const char *message) {
  * @sa redisxSelectDB()
  * @sa redisxLockEnabled()
  */
-int redisxSelectDBAsync(RedisClient *cl, int idx, boolean confirm) {
-  static const char *funcName = "redisxSelectDBAsync()";
+int redisxSelectClientDBAsync(RedisClient *cl, int idx, boolean confirm) {
+  static const char *funcName = "redisxSelectClientDBAsync()";
 
   char sval[20];
   int status;
@@ -460,33 +461,66 @@ int redisxSelectDBAsync(RedisClient *cl, int idx, boolean confirm) {
   return X_SUCCESS;
 }
 
+static void rAffirmDB(Redis *redis) {
+  const RedisPrivate *p = (RedisPrivate *) redis->priv;
+  redisxSelectDB(redis, p->dbIndex, TRUE);
+}
+
 /**
- * Siwtches to another database. See the Redis `SELECT` command.
+ * Switches to another database index on the Redis server. Note that you cannot change the database on an active
+ * PUB/SUB channel, hence the call will return X_INCOMPLETE if attempted. You should instead switch DB when there
+ * are no active subscriptions.
  *
- * @param cl          the redis client
+ * @param redis       Pointer to a Redis instance.
  * @param idx         zero-based database index
- * @return            X_SUCCESS (0) if successful, or else an error code (&lt;0) from redisx.h / xchange.h.
+ * @param confirm     Whether to wait for confirmation from Redis, and check the response.
+ * @return            X_SUCCESS (0) if successful, or
+ *                    X_NULL if the redis argument is NULL,
+ *                    X_NO_INIT if the redis instance is not connected,
+ *                    X_INCOMPLETE if there is an active subscription channel that cannot be switched or
+ *                    one of the channels could not confirm the switch, or
+ *                    else another error code (&lt;0) from redisx.h / xchange.h.
  *
- * @sa redisxSelectDBAsync()
+ * @sa redisxSelectDB()
+ * @sa redisxLockEnabled()
  */
-int redisxSelectDB(RedisClient *cl, int idx) {
+int redisxSelectDB(Redis *redis, int idx, boolean confirm) {
   static const char *funcName = "redisxSelectDB()";
 
-  const ClientPrivate *cp;
+  RedisPrivate *p;
+  enum redisx_channel c;
   int status = X_SUCCESS;
 
-  if(cl == NULL) return redisxError(funcName, X_NULL);
+  if(!redis) return redisxError(funcName, X_NULL);
+  if(!redisxIsConnected(redis)) return redisxError(funcName, X_NO_INIT);
 
-  cp = (ClientPrivate *) cl->priv;
+  p = (RedisPrivate *) redis->priv;
 
-  status = redisxLockEnabled(cl);
-  if(status) return redisxError(funcName, status);
+  if(p->dbIndex == idx) return X_SUCCESS;
 
-  status = redisxSelectDBAsync(cl, idx, cp->idx == PIPELINE_CHANNEL);
-  redisxUnlockClient(cl);
+  redisxAddConnectHook(redis, rAffirmDB);
+  p->dbIndex = idx;
+
+  for(c = 0; c < REDISX_CHANNELS; c++) {
+    RedisClient *cl = redisxGetClient(redis, c);
+    int s = redisxLockEnabled(cl);
+
+    // We can't switch unconnected clients or the existing subscription client
+    if(s == REDIS_INVALID_CHANNEL || c == SUBSCRIPTION_CHANNEL) {
+      if(!s) status = X_INCOMPLETE;
+      redisxUnlockClient(cl);
+      continue;
+    }
+
+    s = redisxSelectClientDBAsync(cl, idx, confirm && c != PIPELINE_CHANNEL);
+    redisxUnlockClient(cl);
+
+    if(s) status = X_INCOMPLETE;
+  }
 
   return status;
 }
+
 
 /**
  * Sends a `RESET` request to the specified Redis client. The server will perform a reset as if the
