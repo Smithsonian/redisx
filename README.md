@@ -466,7 +466,7 @@ Setting values is straightforward also:
   Redis *redis = ...;
   
   // Set the "property" field in the "system:subsystem" hash table to -2.5
-  // using the interactive client connection. 
+  // using the interactive client connection, without requiring confirmation. 
   int status = redisxSetValue(redis, "system:subsystem", "property", "-2.5", FALSE);
   if (status != X_SUCCESS) {
     // Oops something went wrong.

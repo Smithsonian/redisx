@@ -108,9 +108,7 @@ RedisEntry *redisxGetTable(Redis *redis, const char *table, int *n) {
  * \param table         Hash table identifier or NULL if setting a global value.
  * \param key           Redis field name (i.e. variable name).
  * \param value         A proper 0-terminated string value to store.
- * \param isPipelined   If TRUE the call will be sent on the pipeline channel and no response
- *                      will be requested. Otherwise, the request will be sent on the interactive
- *                      channel, and checked for confirmation.
+ * \param confirm       Whether we should get a confirmation from the server (requires a round-trip).
  *
  * \return      X_SUCCESS if the variable was succesfully set, or:
  *
@@ -121,28 +119,24 @@ RedisEntry *redisxGetTable(Redis *redis, const char *table, int *n) {
  *                  X_FAILURE
  *
  */
-int redisxSetValue(Redis *redis, const char *table, const char *key, const char *value, boolean isPipelined) {
+int redisxSetValue(Redis *redis, const char *table, const char *key, const char *value, boolean confirm) {
   static const char *funcName = "redisxSetValue()";
 
   int status = X_SUCCESS;
-  RedisClient *cl;
 
   if(redis == NULL) return redisxError(funcName, X_NULL);
 
-  if(isPipelined) {
-    cl = redis->pipeline;
-    if(redisxLockConnected(cl) != X_SUCCESS) isPipelined = FALSE;
+  status = redisxLockConnected(redis->interactive);
+  if(status) return redisxError(funcName, status);
+
+  status = redisxSetValueAsync(redis->interactive, table, key, value, confirm);
+  if(status == X_SUCCESS && confirm) {
+    RESP *reply = redisxReadReplyAsync(redis->interactive);
+    status = redisxCheckRESP(reply, RESP_INT, -1);
+    redisxDestroyRESP(reply);
   }
 
-  // Not pipelined or pipeline is not available...
-  if(!isPipelined) {
-    cl = redis->interactive;
-    status = redisxLockConnected(cl);
-    if(status) return redisxError(funcName, status);
-  }
-
-  status = redisxSetValueAsync(cl, table, key, value, !isPipelined);
-  redisxUnlockClient(cl);
+  redisxUnlockClient(redis->interactive);
 
   return status;
 }
@@ -283,25 +277,26 @@ char *redisxGetStringValue(Redis *redis, const char *table, const char *key, int
 }
 
 /**
- * Sets multiple key/value pairs in a given hash table.
+ * Sets multiple key/value pairs in a given hash table. This function should be called with exclusive
+ * access to the client.
  *
- * \param redis         Pointer to a Redis instance.
+ * \param cl            A Redis client to which we have exclusive access.
  * \param table         Hashtable from which to retrieve a value or NULL if to use the global table.
  * \param entries       Pointer to an array of key/value pairs.
  * \param n             Number of entries.
- * \param isPipelined   If TRUE the call will be sent on the pipeline channel and no response
- *                      will be requested. Otherwise, the request will be sent on the interactive
- *                      channel, and checked for confirmation.
+ * \param confirm       Whether we should get a confirmation from the server (requires a round-trip).
  *
  * \return              X_SUCCESS (0) on success or an error code.
  *
+ * @sa redisxMultiSet()
+ * @sa redisxLockClient()
  */
-int redisxMultiSet(Redis *redis, const char *table, const RedisEntry *entries, int n, boolean isPipelined) {
-  static const char *funcName = "redisxMultiSet()";
-  int i, *L, N, status;
+int redisxMultiSetAsync(RedisClient *cl, const char *table, const RedisEntry *entries, int n, boolean confirm) {
+  static const char *funcName = "redisxMultiSetAsync()";
+  int i, *L, N, status = X_SUCCESS;
   char **req;
 
-  if(redis == NULL) return X_NO_INIT;
+  if(cl == NULL) return X_NULL;
   if(table == NULL) return X_GROUP_INVALID;
   if(entries == NULL) return X_NULL;
   if(n < 1) return X_SIZE_INVALID;
@@ -331,34 +326,52 @@ int redisxMultiSet(Redis *redis, const char *table, const RedisEntry *entries, i
     L[m+1] = entries[n].length;
   }
 
-  isPipelined &= redisxHasPipeline(redis);
+  if(!confirm) status = redisxSkipReplyAsync(cl);
+  if(!status) status = redisxSendArrayRequestAsync(cl, req, L, N);
 
-  if(isPipelined) {
-    status = redisxLockConnected(redis->pipeline);
-    if(!status) {
-      status = redisxSkipReplyAsync(redis->pipeline);
-      if(!status) status = redisxSendArrayRequestAsync(redis->pipeline, req, L, N);
-      redisxUnlockClient(redis->pipeline);
-    }
+  free(req);
+  free(L);
 
-    free(req);
-    free(L);
-  }
+  if(status) return redisxError(funcName, status);
 
-  else {
-    RESP *reply;
+  return X_SUCCESS;
+}
 
-    reply = redisxArrayRequest(redis, req, L, N, &status);
-    free(req);
-    free(L);
+/**
+ * Sets multiple key/value pairs in a given hash table.
+ *
+ * \param redis         Pointer to a Redis instance.
+ * \param table         Hashtable from which to retrieve a value or NULL if to use the global table.
+ * \param entries       Pointer to an array of key/value pairs.
+ * \param n             Number of entries.
+ * \param confirm       Whether we should get a confirmation from the server (requires a round-trip).
+ *
+ * \return              X_SUCCESS (0) on success or an error code.
+ *
+ */
+int redisxMultiSet(Redis *redis, const char *table, const RedisEntry *entries, int n, boolean confirm) {
+  static const char *funcName = "redisxMultiSet()";
+  int status;
 
-    if(!status) status = redisxCheckDestroyRESP(reply, RESP_SIMPLE_STRING, 0);
+  if(redis == NULL) return X_NO_INIT;
+  if(table == NULL) return X_GROUP_INVALID;
+  if(entries == NULL) return X_NULL;
+  if(n < 1) return X_SIZE_INVALID;
+
+  status = redisxLockConnected(redis->interactive);
+  if(status) return redisxError(funcName, status);
+
+  status = redisxMultiSetAsync(redis->interactive, table, entries, n, confirm);
+  if(status == X_SUCCESS && confirm) {
+    RESP *reply = redisxReadReplyAsync(redis->interactive);
+    status = redisxCheckRESP(reply, RESP_SIMPLE_STRING, 0);
     if(!status) if(strcmp(reply->value, "OK")) status = REDIS_ERROR;
-
     redisxDestroyRESP(reply);
   }
 
-  return status ? redisxError(funcName, status) : X_SUCCESS;
+  if(status) return redisxError(funcName, status);
+
+  return X_SUCCESS;
 }
 
 /**
