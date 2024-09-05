@@ -61,6 +61,7 @@ Some related links:
 
  - [API documentation](https://smithsonian.github.io/redisx/apidoc/html/files.html)
  - [Project page](https://smithsonian.github.io/redisx) on github.io
+ - [xchange](https://smithsonian.github.io/redisx) library dependency
 
 
 -----------------------------------------------------------------------------
@@ -76,8 +77,8 @@ RedisX.
 <a name="building-redisx"></a>
 ## Building RedisX
 
-The RedisX library can be built either as a shared (`libredisx.so[.1]`) and as a static (`libredisx.a`) library, 
-depending on what suites your needs best.
+The __RedisX__ library can be built either as a shared (`libredisx.so[.1]`) and as a static (`libredisx.a`) library, 
+depending on what suits your needs best.
 
 You can configure the build, either by editing `config.mk` or else by defining the relevant environment variables 
 prior to invoking `make`. The following build variables can be configured:
@@ -94,10 +95,14 @@ prior to invoking `make`. The following build variables can be configured:
    
  - `LDFLAGS`: Linker flags (default is `-lm`). Note, `-lxchange` will be added automatically.
 
+ - `BUILD_MODE`: You can set it to `debug` to enable debugging features: it will initialize the global `xDebug` 
+   variable to `TRUE`) and add `-g` to `CFLAGS`.
+
  - `CHECKEXTRA`: Extra options to pass to `cppcheck` for the `make check` target
  
-After configuring, you can simply run `make`, which will build the `shared` (`lib/libxchange.so[.1]`) and `static` 
-(`lib/libxchange.a`) libraries, local HTML documentation (provided `doxygen` is available), and performs static
+ 
+After configuring, you can simply run `make`, which will build the `shared` (`lib/libredisx.so[.1]`) and `static` 
+(`lib/libredisx.a`) libraries, local HTML documentation (provided `doxygen` is available), and performs static
 analysis via the `check` target. Or, you may build just the components you are interested in, by specifying the
 desired `make` target(s). (You can use `make help` to get a summary of the available `make` targets). 
 

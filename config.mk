@@ -65,7 +65,7 @@ CHECKOPTS += --template='{file}({line}): {severity} ({id}): {message}' --inline-
 
 # Compiler and linker options etc.
 ifeq ($(BUILD_MODE),debug)
-	CFLAGS += -g
+	CFLAGS += -g -DDEBUG
 endif
 
 # Search for files in the designated locations
