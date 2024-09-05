@@ -279,8 +279,8 @@ RESP data type</h3>
 <div class="line">   ...</div>
 <div class="line">   <a class="code hl_function" href="redisx_8c.html#aa4e23a7454f7055711915ec430599011">redisxDestroyRESP</a>(r);</div>
 <div class="line">}</div>
-<div class="ttc" id="aredisx_8c_html_a67b8bd13975dd286600f20dc80bdb462"><div class="ttname"><a href="redisx_8c.html#a67b8bd13975dd286600f20dc80bdb462">redisxCheckDestroyRESP</a></div><div class="ttdeci">int redisxCheckDestroyRESP(RESP *resp, char expectedType, int expectedSize)</div><div class="ttdef"><b>Definition</b> redisx.c:486</div></div>
-<div class="ttc" id="aredisx_8c_html_aa4e23a7454f7055711915ec430599011"><div class="ttname"><a href="redisx_8c.html#aa4e23a7454f7055711915ec430599011">redisxDestroyRESP</a></div><div class="ttdeci">void redisxDestroyRESP(RESP *resp)</div><div class="ttdef"><b>Definition</b> redisx.c:436</div></div>
+<div class="ttc" id="aredisx_8c_html_a67b8bd13975dd286600f20dc80bdb462"><div class="ttname"><a href="redisx_8c.html#a67b8bd13975dd286600f20dc80bdb462">redisxCheckDestroyRESP</a></div><div class="ttdeci">int redisxCheckDestroyRESP(RESP *resp, char expectedType, int expectedSize)</div><div class="ttdef"><b>Definition</b> redisx.c:410</div></div>
+<div class="ttc" id="aredisx_8c_html_aa4e23a7454f7055711915ec430599011"><div class="ttname"><a href="redisx_8c.html#aa4e23a7454f7055711915ec430599011">redisxDestroyRESP</a></div><div class="ttdeci">void redisxDestroyRESP(RESP *resp)</div><div class="ttdef"><b>Definition</b> redisx.c:360</div></div>
 <div class="ttc" id="aredisx_8h_html_ae140df45d32af33e2334fb677213e887"><div class="ttname"><a href="redisx_8h.html#ae140df45d32af33e2334fb677213e887">RESP_ARRAY</a></div><div class="ttdeci">#define RESP_ARRAY</div><div class="ttdoc">RESP array type.</div><div class="ttdef"><b>Definition</b> redisx.h:88</div></div>
 <div class="ttc" id="astructRESP_html"><div class="ttname"><a href="structRESP.html">RESP</a></div><div class="ttdoc">Structure that represents a Redis response (RESP format).</div><div class="ttdef"><b>Definition</b> redisx.h:123</div></div>
 </div><!-- fragment --><p>Before destroying a <a class="el" href="structRESP.html" title="Structure that represents a Redis response (RESP format).">RESP</a> structure, the caller may want to de-reference values within it if they are to be used as is (without making copies), e.g.:</p>
@@ -320,7 +320,7 @@ Interactive transactions</h3>
 <div class="line">  ...</div>
 <div class="line">}</div>
 <div class="line">...</div>
-<div class="ttc" id="aredisx_8c_html_a09092bd97eead5c5fa73fa0d9241018c"><div class="ttname"><a href="redisx_8c.html#a09092bd97eead5c5fa73fa0d9241018c">redisxRequest</a></div><div class="ttdeci">RESP * redisxRequest(Redis *redis, const char *command, const char *arg1, const char *arg2, const char *arg3, int *status)</div><div class="ttdef"><b>Definition</b> redisx.c:581</div></div>
+<div class="ttc" id="aredisx_8c_html_a09092bd97eead5c5fa73fa0d9241018c"><div class="ttname"><a href="redisx_8c.html#a09092bd97eead5c5fa73fa0d9241018c">redisxRequest</a></div><div class="ttdeci">RESP * redisxRequest(Redis *redis, const char *command, const char *arg1, const char *arg2, const char *arg3, int *status)</div><div class="ttdef"><b>Definition</b> redisx.c:505</div></div>
 </div><!-- fragment --><p>The <code><a class="el" href="redisx_8c.html#a09092bd97eead5c5fa73fa0d9241018c">redisxRequest()</a></code> sends a command with up to three arguments. If the command takes fewer than 3 parameters, then the remaining ones must be set to <code>NULL</code>. This function thus offers a simple interface for running most basic sequential queries. In cases where 3 parameters are nut sufficient, you may use <code><a class="el" href="redisx_8c.html#a13ae33bc25ee03621b23541236ef5f82">redisxArrayRequest()</a></code> instead, e.g.:</p>
 <div class="fragment"><div class="line">...</div>
 <div class="line">char *args[] = { <span class="stringliteral">&quot;my_table&quot;</span>, <span class="stringliteral">&quot;my_key&quot;</span> };  <span class="comment">// parameters as an array...</span></div>
@@ -564,7 +564,7 @@ Advanced queries</h2>
 <div class="line">}</div>
 <div class="line">...</div>
 <div class="ttc" id="aredisx-client_8c_html_abc855133c2af4f5d929a05292aa634d1"><div class="ttname"><a href="redisx-client_8c.html#abc855133c2af4f5d929a05292aa634d1">redisxReadReplyAsync</a></div><div class="ttdeci">RESP * redisxReadReplyAsync(RedisClient *cl)</div><div class="ttdef"><b>Definition</b> redisx-client.c:674</div></div>
-<div class="ttc" id="aredisx_8c_html_a2d3ffb89129ab04483e3966835a5ff71"><div class="ttname"><a href="redisx_8c.html#a2d3ffb89129ab04483e3966835a5ff71">redisxCheckRESP</a></div><div class="ttdeci">int redisxCheckRESP(const RESP *resp, char expectedType, int expectedSize)</div><div class="ttdef"><b>Definition</b> redisx.c:463</div></div>
+<div class="ttc" id="aredisx_8c_html_a2d3ffb89129ab04483e3966835a5ff71"><div class="ttname"><a href="redisx_8c.html#a2d3ffb89129ab04483e3966835a5ff71">redisxCheckRESP</a></div><div class="ttdeci">int redisxCheckRESP(const RESP *resp, char expectedType, int expectedSize)</div><div class="ttdef"><b>Definition</b> redisx.c:387</div></div>
 </div><!-- fragment --><p>For the best performance, you may want to leave the processing of the replies until after you unlock the client. I.e., you only block other threads from accessing the clients while you send off the requests and collect the corresponding responses. Then you leave analyzing the responses at your leisure later, and outside of the mutexed section.</p>
 <p>In some cases you may be OK with just firing off some <a class="el" href="structRedis.html" title="Structure that represents a Redis database instance, with one or more RedisClient connections.">Redis</a> commands, without necessarily caring about responses. Rather than ignoring the replies with <code><a class="el" href="redisx-client_8c.html#ac0f30d62044638a2ead07583ad723fdf">redisxIgnoreReplyAsync()</a></code> you might call <code>redisxSkiReplyAsync()</code> instead <b>before</b> <code><a class="el" href="redisx-client_8c.html#afc7b28288c07baf0b3c8fdc9d8ddf263">redisxSendRequestAsync()</a></code> to instruct <a class="el" href="structRedis.html" title="Structure that represents a Redis database instance, with one or more RedisClient connections.">Redis</a> to not even bother about sending a response to your request (it saves time and network bandwidth!):</p>
 <div class="fragment"><div class="line"><span class="comment">// We don&#39;t want to receive a response to our next command... </span></div>
@@ -644,15 +644,18 @@ LUA script loading and execution</h3>
 <div class="line">}</div>
 </div><!-- fragment --><p><a class="el" href="structRedis.html" title="Structure that represents a Redis database instance, with one or more RedisClient connections.">Redis</a> will refer to the script by its SHA1 sum, so it's important keep a record of it. You'll call the script with its SHA1 sum, a set of redis keys the script may use, and a set of other parameters it might need.</p>
 <div class="fragment"><div class="line"><a class="code hl_struct" href="structRedis.html">Redis</a> *redis = ...</div>
-<div class="line">int status;</div>
 <div class="line"> </div>
-<div class="line"><span class="comment">// Execute the script, with one redis key argument (and no parameters)...</span></div>
-<div class="line"><a class="code hl_struct" href="structRESP.html">RESP</a> *r = <a class="code hl_function" href="redisx_8c.html#a09092bd97eead5c5fa73fa0d9241018c">redisxRequest</a>(<span class="stringliteral">&quot;EVALSHA&quot;</span>, scriptSHA1, <span class="stringliteral">&quot;1&quot;</span>, <span class="stringliteral">&quot;my-redis-key-argument&quot;</span>, &amp;status);</div>
+<div class="line">char *keyArgs[] = { <span class="stringliteral">&quot;my-redis-key-argument&quot;</span>, NULL }; <span class="comment">// NULL-terminated array of keyword arguments</span></div>
+<div class="line"><span class="keywordtype">char</span> *params[] = { <span class="stringliteral">&quot;some-string&quot;</span>, <span class="stringliteral">&quot;-1.11&quot;</span>, NULL };   <span class="comment">// NULL-terminated array of additional parameters</span></div>
+<div class="line"> </div>
+<div class="line"><span class="comment">// Execute the script, with the specified keyword arguments and parameters</span></div>
+<div class="line"><a class="code hl_struct" href="structRESP.html">RESP</a> *reply = <a class="code hl_function" href="redisx-script_8c.html#a36374ac4afaaca0a72be2fb95a909869">redisxRunScript</a>(redis, scriptSHA1, keyArgs, params);</div>
 <div class="line"> </div>
 <div class="line"><span class="comment">// Check status and inspect RESP</span></div>
 <div class="line">...</div>
-</div><!-- fragment --><p>Clearly, if you have additional <a class="el" href="structRedis.html" title="Structure that represents a Redis database instance, with one or more RedisClient connections.">Redis</a> key arguments and/or parameters to pass to the script, you'll have to use <code><a class="el" href="redisx_8c.html#a13ae33bc25ee03621b23541236ef5f82">redisxArrayRequest()</a></code>, instead.</p>
-<p>One thing to keep in mind about LUA scripts is that they are not persistent. They are lost each time the <a class="el" href="structRedis.html" title="Structure that represents a Redis database instance, with one or more RedisClient connections.">Redis</a> server is restarted.</p>
+<div class="ttc" id="aredisx-script_8c_html_a36374ac4afaaca0a72be2fb95a909869"><div class="ttname"><a href="redisx-script_8c.html#a36374ac4afaaca0a72be2fb95a909869">redisxRunScript</a></div><div class="ttdeci">RESP * redisxRunScript(Redis *redis, const char *sha1, const char **keys, const char **params)</div><div class="ttdef"><b>Definition</b> redisx-script.c:120</div></div>
+</div><!-- fragment --><p>Or, you can use <code><a class="el" href="redisx-script_8c.html#a711d6ba68a67ab814ddda0adc998a2ce">redisxRunScriptAsync()</a></code> instead to send the request to run the script, and then collect the response later, as appropriate.</p>
+<p>One thing to keep in mind about LUA scripts is that they are not fully persistent. They will be lost each time the <a class="el" href="structRedis.html" title="Structure that represents a Redis database instance, with one or more RedisClient connections.">Redis</a> server is restarted.</p>
 <p><a class="anchor" id="custom-functions"></a> </p>
 <h3><a class="anchor" id="autotoc_md34"></a>
 Custom functions</h3>

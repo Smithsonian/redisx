@@ -792,20 +792,22 @@ its SHA1 sum, a set of redis keys the script may use, and a set of other paramet
 
 ```c
   Redis *redis = ...
-  int status;
   
-  // Execute the script, with one redis key argument (and no parameters)...
-  RESP *r = redisxRequest("EVALSHA", scriptSHA1, "1", "my-redis-key-argument", &status);
+  char *keyArgs[] = { "my-redis-key-argument", NULL }; // NULL-terminated array of keyword arguments
+  char *params[] = { "some-string", "-1.11", NULL };   // NULL-terminated array of additional parameters
+  
+  // Execute the script, with the specified keyword arguments and parameters
+  RESP *reply = redisxRunScript(redis, scriptSHA1, keyArgs, params);
 
   // Check status and inspect RESP
   ...
 ```
 
-Clearly, if you have additional Redis key arguments and/or parameters to pass to the script, you'll have to use 
-`redisxArrayRequest()`, instead.
+Or, you can use `redisxRunScriptAsync()` instead to send the request to run the script, and then collect the 
+response later, as appropriate.
 
-One thing to keep in mind about LUA scripts is that they are not persistent. They are lost each time the Redis 
-server is restarted.
+One thing to keep in mind about LUA scripts is that they are not fully persistent. They will be lost each time the 
+Redis server is restarted.
 
 
 <a name="custom-functions"></a>

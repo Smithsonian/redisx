@@ -761,6 +761,13 @@
     </member>
     <member kind="function">
       <type>int</type>
+      <name>redisxResetClient</name>
+      <anchorfile>redisx-client_8c.html</anchorfile>
+      <anchor>a05f0f4d0a2f3d8fb5e385541be6624a2</anchor>
+      <arglist>(RedisClient *cl)</arglist>
+    </member>
+    <member kind="function">
+      <type>int</type>
       <name>redisxSendArrayRequestAsync</name>
       <anchorfile>redisx-client_8c.html</anchorfile>
       <anchor>a899f4f8853add789db4bd4de106fd6d8</anchor>
@@ -908,6 +915,32 @@
       <anchorfile>redisx-net_8c.html</anchorfile>
       <anchor>a83fce113d042490e77efdc574e64d76f</anchor>
       <arglist>(int size)</arglist>
+    </member>
+  </compound>
+  <compound kind="file">
+    <name>redisx-script.c</name>
+    <path>src/</path>
+    <filename>redisx-script_8c.html</filename>
+    <member kind="function">
+      <type>int</type>
+      <name>redisxLoadScript</name>
+      <anchorfile>redisx-script_8c.html</anchorfile>
+      <anchor>ae8930592b8f927a154508669132bebab</anchor>
+      <arglist>(Redis *redis, const char *script, char **sha1)</arglist>
+    </member>
+    <member kind="function">
+      <type>RESP *</type>
+      <name>redisxRunScript</name>
+      <anchorfile>redisx-script_8c.html</anchorfile>
+      <anchor>a36374ac4afaaca0a72be2fb95a909869</anchor>
+      <arglist>(Redis *redis, const char *sha1, const char **keys, const char **params)</arglist>
+    </member>
+    <member kind="function">
+      <type>int</type>
+      <name>redisxRunScriptAsync</name>
+      <anchorfile>redisx-script_8c.html</anchorfile>
+      <anchor>a711d6ba68a67ab814ddda0adc998a2ce</anchor>
+      <arglist>(RedisClient *cl, const char *sha1, const char **keys, const char **params)</arglist>
     </member>
   </compound>
   <compound kind="file">
@@ -1150,13 +1183,6 @@
     </member>
     <member kind="function">
       <type>int</type>
-      <name>redisxLoadScript</name>
-      <anchorfile>redisx_8c.html</anchorfile>
-      <anchor>ae8930592b8f927a154508669132bebab</anchor>
-      <arglist>(Redis *redis, const char *script, char **sha1)</arglist>
-    </member>
-    <member kind="function">
-      <type>int</type>
       <name>redisxPing</name>
       <anchorfile>redisx_8c.html</anchorfile>
       <anchor>afd19b1137e80ed26065d9e6e7039c8fe</anchor>
@@ -1168,13 +1194,6 @@
       <anchorfile>redisx_8c.html</anchorfile>
       <anchor>a09092bd97eead5c5fa73fa0d9241018c</anchor>
       <arglist>(Redis *redis, const char *command, const char *arg1, const char *arg2, const char *arg3, int *status)</arglist>
-    </member>
-    <member kind="function">
-      <type>int</type>
-      <name>redisxResetClient</name>
-      <anchorfile>redisx_8c.html</anchorfile>
-      <anchor>a05f0f4d0a2f3d8fb5e385541be6624a2</anchor>
-      <arglist>(RedisClient *cl)</arglist>
     </member>
     <member kind="function">
       <type>int</type>

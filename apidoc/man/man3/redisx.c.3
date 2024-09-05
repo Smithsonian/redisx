@@ -38,16 +38,10 @@ src/redisx.c \- A \fBRedis\fP client library that compiles on older and newer pl
 .RI "\fBboolean\fP \fBredisxIsVerbose\fP ()"
 .br
 .ti -1c
-.RI "int \fBredisxLoadScript\fP (\fBRedis\fP *redis, const char *script, char **sha1)"
-.br
-.ti -1c
 .RI "int \fBredisxPing\fP (\fBRedis\fP *redis, const char *message)"
 .br
 .ti -1c
 .RI "\fBRESP\fP * \fBredisxRequest\fP (\fBRedis\fP *redis, const char *command, const char *arg1, const char *arg2, const char *arg3, int *status)"
-.br
-.ti -1c
-.RI "int \fBredisxResetClient\fP (\fBRedisClient\fP *cl)"
 .br
 .ti -1c
 .RI "int \fBredisxSelectDB\fP (\fBRedis\fP *redis, int idx)"
@@ -265,26 +259,6 @@ TRUE if verbose reporting is enabled, otherwise FALSE\&.
 
 .PP
 References \fBxIsVerbose()\fP\&.
-.SS "int redisxLoadScript (\fBRedis\fP * redis, const char * script, char ** sha1)"
-Loads a LUA script into \fBRedis\fP, returning it's SHA1 hash to use as it's call ID\&.
-.PP
-\fBParameters\fP
-.RS 4
-\fIredis\fP Pointer to a \fBRedis\fP instance\&. 
-.br
-\fIscript\fP String containing the full LUA script\&. 
-.br
-\fIsha1\fP Buffer into which SHA1 key returned by \fBRedis\fP to use as call ID\&. (It must be at least 41 bytes, and will be string terminated)\&. By default it will return an empty string\&.
-.RE
-.PP
-\fBReturns\fP
-.RS 4
-X_SUCCESS (0) if the script has been successfully loaded into \fBRedis\fP, or X_NULL if the \fBRedis\fP instance is NULL X_NAME_INVALID if the script is NULL or empty\&. REDIS_UNEXPECTED_RESP if received a \fBRedis\fP reponse of the wrong type,
-.RE
-.PP
-ot an error returned by \fBredisxRequest()\fP\&. 
-.PP
-References \fBredisxCheckDestroyRESP()\fP, \fBredisxDestroyRESP()\fP, \fBredisxError()\fP, \fBredisxRequest()\fP, \fBRESP_BULK_STRING\fP, \fBRESP::value\fP, \fBX_NAME_INVALID\fP, \fBX_NULL\fP, and \fBX_SUCCESS\fP\&.
 .SS "int redisxPing (\fBRedis\fP * redis, const char * message)"
 Pings the \fBRedis\fP server (see the \fBRedis\fP \fCPING\fP command), and check the response\&.
 .PP
@@ -340,22 +314,6 @@ A freshly allocated \fBRESP\fP array containing the \fBRedis\fP response, or NUL
 
 .PP
 References \fBredisxArrayRequest()\fP\&.
-.SS "int redisxResetClient (\fBRedisClient\fP * cl)"
-Sends a \fCRESET\fP request to the specified \fBRedis\fP client\&. The server will perform a reset as if the client disconnected and reconnected again\&.
-.PP
-\fBParameters\fP
-.RS 4
-\fIcl\fP The \fBRedis\fP client 
-.RE
-.PP
-\fBReturns\fP
-.RS 4
-X_SUCCESS (0) if successful, or else an error code (<0) from \fBredisx\&.h\fP / \fBxchange\&.h\fP\&. 
-.RE
-.PP
-
-.PP
-References \fBREDIS_UNEXPECTED_RESP\fP, \fBredisxCheckRESP()\fP, \fBredisxDestroyRESP()\fP, \fBredisxError()\fP, \fBredisxLockConnected()\fP, \fBredisxReadReplyAsync()\fP, \fBredisxSendRequestAsync()\fP, \fBredisxUnlockClient()\fP, \fBRESP_SIMPLE_STRING\fP, \fBRESP::value\fP, \fBX_NULL\fP, and \fBX_SUCCESS\fP\&.
 .SS "int redisxSelectDB (\fBRedis\fP * redis, int idx)"
 Switches to another database index on the \fBRedis\fP server\&. Note that you cannot change the database on an active PUB/SUB channel, hence the call will return X_INCOMPLETE if attempted\&. You should instead switch DB when there are no active subscriptions\&.
 .PP

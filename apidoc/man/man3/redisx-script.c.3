@@ -1,0 +1,121 @@
+.TH "src/redisx-script.c" 3 "Version v0.9" "RedisX" \" -*- nroff -*-
+.ad l
+.nh
+.SH NAME
+src/redisx-script.c
+.SH SYNOPSIS
+.br
+.PP
+.SS "Functions"
+
+.in +1c
+.ti -1c
+.RI "int \fBredisxLoadScript\fP (\fBRedis\fP *redis, const char *script, char **sha1)"
+.br
+.ti -1c
+.RI "\fBRESP\fP * \fBredisxRunScript\fP (\fBRedis\fP *redis, const char *sha1, const char **keys, const char **params)"
+.br
+.ti -1c
+.RI "int \fBredisxRunScriptAsync\fP (\fBRedisClient\fP *cl, const char *sha1, const char **keys, const char **params)"
+.br
+.in -1c
+.SH "Detailed Description"
+.PP 
+
+.PP
+\fBDate\fP
+.RS 4
+Created on Sep 5, 2024 
+.RE
+.PP
+\fBAuthor\fP
+.RS 4
+Attila Kovacs 
+.RE
+.PP
+
+.SH "Function Documentation"
+.PP 
+.SS "int redisxLoadScript (\fBRedis\fP * redis, const char * script, char ** sha1)"
+Loads a LUA script into \fBRedis\fP, returning it's SHA1 hash to use as it's call ID\&.
+.PP
+\fBParameters\fP
+.RS 4
+\fIredis\fP Pointer to a \fBRedis\fP instance\&. 
+.br
+\fIscript\fP String containing the full LUA script\&. 
+.br
+\fIsha1\fP Buffer into which SHA1 key returned by \fBRedis\fP to use as call ID\&. (It must be at least 41 bytes, and will be string terminated)\&. By default it will return an empty string\&.
+.RE
+.PP
+\fBReturns\fP
+.RS 4
+X_SUCCESS (0) if the script has been successfully loaded into \fBRedis\fP, or X_NULL if the \fBRedis\fP instance is NULL X_NAME_INVALID if the script is NULL or empty\&. REDIS_UNEXPECTED_RESP if received a \fBRedis\fP reponse of the wrong type,
+.RE
+.PP
+ot an error returned by \fBredisxRequest()\fP\&. 
+.PP
+References \fBredisxCheckDestroyRESP()\fP, \fBredisxDestroyRESP()\fP, \fBredisxError()\fP, \fBredisxRequest()\fP, \fBRESP_BULK_STRING\fP, \fBRESP::value\fP, \fBX_NAME_INVALID\fP, \fBX_NULL\fP, and \fBX_SUCCESS\fP\&.
+.SS "\fBRESP\fP * redisxRunScript (\fBRedis\fP * redis, const char * sha1, const char ** keys, const char ** params)"
+Runs a LUA script that has been loaded into the \fBRedis\fP database, returning the response received, or NULL if there was an error\&.
+.PP
+\fBParameters\fP
+.RS 4
+\fIredis\fP The \fBRedis\fP instance 
+.br
+\fIsha1\fP The SHA1 sum of the script that was previously loaded into the \fBRedis\fP DB\&. 
+.br
+\fIkeys\fP A NULL-terminated array of \fBRedis\fP keywords, or NULL if the script does not take any keyword argument\&. 
+.br
+\fIparams\fP A NULL-terminated array of additional parameters to pass onto the script, or NULL if the script does not take any parameters\&. 
+.RE
+.PP
+\fBReturns\fP
+.RS 4
+The response received from the script or the EVALSHA request, or NULL if there was an error\&.
+.RE
+.PP
+\fBSee also\fP
+.RS 4
+\fBredisxRunScriptAsync()\fP 
+.PP
+\fBredisxLoadScript()\fP 
+.RE
+.PP
+
+.PP
+References \fBRedis::interactive\fP, \fBredisxLockConnected()\fP, \fBredisxReadReplyAsync()\fP, \fBredisxRunScriptAsync()\fP, \fBredisxUnlockClient()\fP, and \fBX_SUCCESS\fP\&.
+.SS "int redisxRunScriptAsync (\fBRedisClient\fP * cl, const char * sha1, const char ** keys, const char ** params)"
+Send a request to runs a LUA script that has been loaded into the \fBRedis\fP database\&. This function should be called with the connected client's mutex locked\&. The call returns as soon as the request has been sent, without waiting for a response to come back\&.
+.PP
+\fBParameters\fP
+.RS 4
+\fIcl\fP The \fBRedis\fP client channel on which to send the request to run the script 
+.br
+\fIsha1\fP The SHA1 sum of the script that was previously loaded into the \fBRedis\fP DB\&. 
+.br
+\fIkeys\fP A NULL-terminated array of \fBRedis\fP keywords, or NULL if the script does not take any keyword argument\&. 
+.br
+\fIparams\fP A NULL-terminated array of additional parameters to pass onto the script, or NULL if the script does not take any parameters\&. 
+.RE
+.PP
+\fBReturns\fP
+.RS 4
+X_SUCCESS (0) if successful or else X_NULL if the \fCredis\fP or \fCsha1\fP parameters are NULL, or else an error code from \fBredisxSendArrayRequestAsync()\fP\&.
+.RE
+.PP
+\fBSee also\fP
+.RS 4
+\fBredisxRunScript()\fP 
+.PP
+\fBredisxLoadScript()\fP 
+.PP
+\fBredisxLockConnected()\fP 
+.RE
+.PP
+
+.PP
+References \fBredisxError()\fP, \fBredisxSendArrayRequestAsync()\fP, and \fBX_NULL\fP\&.
+.SH "Author"
+.PP 
+Generated automatically by Doxygen for RedisX from the source code\&.
