@@ -30,10 +30,6 @@ include/redisx.h
 
 .in +1c
 .ti -1c
-.RI "#define \fBREDIS_CMDBUF_SIZE\fP   8192"
-.br
-.RI "(bytes) Size of many internal arrays, and the max\&. send chunk size\&. At least ~16 bytes\&.\&.\&. "
-.ti -1c
 .RI "#define \fBREDIS_ERROR\fP"
 .br
 .RI "\fBRedis\fP returned an error\&. "
@@ -44,23 +40,11 @@ include/redisx.h
 .ti -1c
 .RI "#define \fBREDIS_INVALID_CHANNEL\fP"
 .br
-.RI "There is no such channel in the \fBRedis\fP intance\&. "
+.RI "There is no such channel in the \fBRedis\fP instance\&. "
 .ti -1c
 .RI "#define \fBREDIS_NULL\fP"
 .br
 .RI "\fBRedis\fP returned NULL\&. "
-.ti -1c
-.RI "#define \fBREDIS_RCV_CHUNK_SIZE\fP   8192"
-.br
-.RI "(bytes) \fBRedis\fP receive buffer size (at most that much is read from the socket in a single call)\&. "
-.ti -1c
-.RI "#define \fBREDIS_TCP_BUF\fP   0"
-.br
-.RI "(bytes) Default TCP buffer size (send/recv) for \fBRedis\fP clients\&. Values <= 0 will use system default\&. "
-.ti -1c
-.RI "#define \fBREDIS_TCP_PORT\fP   6379"
-.br
-.RI "Default TCP/IP port on which \fBRedis\fP server listens to clients\&. "
 .ti -1c
 .RI "#define \fBREDIS_UNEXPECTED_ARRAY_SIZE\fP"
 .br
@@ -73,6 +57,10 @@ include/redisx.h
 .RI "#define \fBREDISX_CHANNELS\fP"
 .br
 .RI "The number of channels a \fBRedis\fP instance has\&. "
+.ti -1c
+.RI "#define \fBREDISX_CMDBUF_SIZE\fP   8192"
+.br
+.RI "(bytes) Size of many internal arrays, and the max\&. send chunk size\&. At least ~16 bytes\&.\&.\&. "
 .ti -1c
 .RI "#define \fBREDISX_LISTENER_REL_PRIORITY\fP   (0\&.5)"
 .br
@@ -89,6 +77,10 @@ include/redisx.h
 .br
 .RI "Integer sub version of the release\&. "
 .ti -1c
+.RI "#define \fBREDISX_RCVBUF_SIZE\fP   8192"
+.br
+.RI "(bytes) \fBRedis\fP receive buffer size (at most that much is read from the socket in a single call)\&. "
+.ti -1c
 .RI "#define \fBREDISX_RELEASE_STRING\fP   '\-devel'"
 .br
 .RI "Additional release information in version, e\&.g\&. '-1', or '-rc1'\&. "
@@ -96,6 +88,14 @@ include/redisx.h
 .RI "#define \fBREDISX_SET_LISTENER_PRIORITY\fP   \fBFALSE\fP"
 .br
 .RI "Whether to explicitly set listener thread priorities\&. "
+.ti -1c
+.RI "#define \fBREDISX_TCP_BUF_SIZE\fP   0"
+.br
+.RI "(bytes) Default TCP buffer size (send/recv) for \fBRedis\fP clients\&. Values <= 0 will use system default\&. "
+.ti -1c
+.RI "#define \fBREDISX_TCP_PORT\fP   6379"
+.br
+.RI "Default TCP/IP port on which \fBRedis\fP server listens to clients\&. "
 .ti -1c
 .RI "#define \fBREDISX_VERSION_STRING\fP"
 .br
@@ -1051,7 +1051,7 @@ X_SUCCESS or X_FAILURE if the IP address is invalid\&. X_NULL if the IP address 
 .PP
 
 .PP
-References \fBFALSE\fP, \fBRedis::id\fP, \fBRedis::interactive\fP, \fBRedis::pipeline\fP, \fBREDIS_TCP_PORT\fP, \fBREDISX_CHANNELS\fP, \fBREDISX_INTERACTIVE_CHANNEL\fP, \fBREDISX_PIPELINE_CHANNEL\fP, \fBREDISX_SUBSCRIPTION_CHANNEL\fP, \fBRedis::subscription\fP, \fBTRUE\fP, and \fBxStringCopyOf()\fP\&.
+References \fBFALSE\fP, \fBRedis::id\fP, \fBRedis::interactive\fP, \fBRedis::pipeline\fP, \fBREDISX_CHANNELS\fP, \fBREDISX_INTERACTIVE_CHANNEL\fP, \fBREDISX_PIPELINE_CHANNEL\fP, \fBREDISX_SUBSCRIPTION_CHANNEL\fP, \fBREDISX_TCP_PORT\fP, \fBRedis::subscription\fP, \fBTRUE\fP, and \fBxStringCopyOf()\fP\&.
 .SS "\fBboolean\fP redisxIsConnected (\fBRedis\fP * redis)"
 Checks if a \fBRedis\fP instance is connected\&.
 .PP
@@ -1526,7 +1526,7 @@ Send a \fBRedis\fP request with an arbitrary number of arguments\&.
 .PP
 
 .PP
-References \fBFALSE\fP, \fBREDIS_CMDBUF_SIZE\fP, \fBredisxError()\fP, \fBTRUE\fP, \fBX_NULL\fP, and \fBX_SUCCESS\fP\&.
+References \fBFALSE\fP, \fBREDISX_CMDBUF_SIZE\fP, \fBredisxError()\fP, \fBTRUE\fP, \fBX_NULL\fP, and \fBX_SUCCESS\fP\&.
 .SS "int redisxSendRequestAsync (\fBRedisClient\fP * cl, const char * command, const char * arg1, const char * arg2, const char * arg3)"
 Send a command (with up to 3 arguments) to the REDIS server\&. The caller must have an exclusive lock on the client for this version\&. The arguments supplied will be used up to the first non-NULL value\&.
 .PP

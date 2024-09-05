@@ -80,7 +80,7 @@ prior to invoking `make`. The following build variables can be configured:
  - `LDFLAGS`: Linker flags (default is `-lm`). Note, `-lxchange` will be added automatically.
 
  - `BUILD_MODE`: You can set it to `debug` to enable debugging features: it will initialize the global `xDebug` 
-   variable to `TRUE`) and add `-g` to `CFLAGS`.
+   variable to `TRUE` and add `-g` to `CFLAGS`.
 
  - `CHECKEXTRA`: Extra options to pass to `cppcheck` for the `make check` target
  
@@ -732,7 +732,7 @@ atomically. Such an execution block in RedisX may look something like:
   RESP *result;
   
   // Obtain a lock on the client on which to execute the block.
-  // e.g. the INTERACTIVE_CHANNEL
+  // e.g. the interactive client channel.
   RedisClient *cl = redisxGetLockedConnectedClient(redis, REDISX_INTERACTIVE_CHANNEL);
   if (cl == NULL) {
     // Abort: we don't have exclusive access to the client

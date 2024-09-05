@@ -163,7 +163,7 @@ Building RedisX</h2>
 <li><code>CPPFLAGS</code>: C pre-processor flags, such as externally defined compiler constants.</li>
 <li><code>CFLAGS</code>: Flags to pass onto the C compiler (default: <code>-Os -Wall</code>). Note, <code>-Iinclude</code> will be added automatically.</li>
 <li><code>LDFLAGS</code>: Linker flags (default is <code>-lm</code>). Note, <code>-lxchange</code> will be added automatically.</li>
-<li><code>BUILD_MODE</code>: You can set it to <code>debug</code> to enable debugging features: it will initialize the global <code>xDebug</code> variable to <code>TRUE</code>) and add <code>-g</code> to <code>CFLAGS</code>.</li>
+<li><code>BUILD_MODE</code>: You can set it to <code>debug</code> to enable debugging features: it will initialize the global <code>xDebug</code> variable to <code>TRUE</code> and add <code>-g</code> to <code>CFLAGS</code>.</li>
 <li><code>CHECKEXTRA</code>: Extra options to pass to <code>cppcheck</code> for the <code>make check</code> target</li>
 </ul>
 <p>After configuring, you can simply run <code>make</code>, which will build the <code>shared</code> (<code>lib/libredisx.so[.1]</code>) and <code>static</code> (<code>lib/libredisx.a</code>) libraries, local HTML documentation (provided <code>doxygen</code> is available), and performs static analysis via the <code>check</code> target. Or, you may build just the components you are interested in, by specifying the desired <code>make</code> target(s). (You can use <code>make help</code> to get a summary of the available <code>make</code> targets).</p>
@@ -599,7 +599,7 @@ Execution blocks</h3>
 <div class="line"><a class="code hl_struct" href="structRESP.html">RESP</a> *result;</div>
 <div class="line"> </div>
 <div class="line"><span class="comment">// Obtain a lock on the client on which to execute the block.</span></div>
-<div class="line"><span class="comment">// e.g. the INTERACTIVE_CHANNEL</span></div>
+<div class="line"><span class="comment">// e.g. the interactive client channel.</span></div>
 <div class="line"><a class="code hl_struct" href="structRedisClient.html">RedisClient</a> *cl = <a class="code hl_function" href="redisx-client_8c.html#a19d2fb18f2f939edfdc412d064741f9f">redisxGetLockedConnectedClient</a>(redis, <a class="code hl_enumvalue" href="redisx_8h.html#a5349b7340813fbd1e32d04ed650bc3d9a65b4f2926885665960480d008ab2a456">REDISX_INTERACTIVE_CHANNEL</a>);</div>
 <div class="line"><span class="keywordflow">if</span> (cl == NULL) {</div>
 <div class="line">  <span class="comment">// Abort: we don&#39;t have exclusive access to the client</span></div>

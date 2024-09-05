@@ -139,10 +139,6 @@ Data Structures</h2></td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="define-members" name="define-members"></a>
 Macros</h2></td></tr>
-<tr class="memitem:a4467906a00d48a757ba494a7e48d87f0" id="r_a4467906a00d48a757ba494a7e48d87f0"><td class="memItemLeft" align="right" valign="top"><a id="a4467906a00d48a757ba494a7e48d87f0" name="a4467906a00d48a757ba494a7e48d87f0"></a>
-#define&#160;</td><td class="memItemRight" valign="bottom"><b>REDIS_CMDBUF_SIZE</b>&#160;&#160;&#160;8192</td></tr>
-<tr class="memdesc:a4467906a00d48a757ba494a7e48d87f0"><td class="mdescLeft">&#160;</td><td class="mdescRight">(bytes) Size of many internal arrays, and the max. send chunk size. At least ~16 bytes... <br /></td></tr>
-<tr class="separator:a4467906a00d48a757ba494a7e48d87f0"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aad063b5d1f8eaeadc0c70f8568113034" id="r_aad063b5d1f8eaeadc0c70f8568113034"><td class="memItemLeft" align="right" valign="top"><a id="aad063b5d1f8eaeadc0c70f8568113034" name="aad063b5d1f8eaeadc0c70f8568113034"></a>
 #define&#160;</td><td class="memItemRight" valign="bottom"><b>REDIS_ERROR</b></td></tr>
 <tr class="memdesc:aad063b5d1f8eaeadc0c70f8568113034"><td class="mdescLeft">&#160;</td><td class="mdescRight"><a class="el" href="structRedis.html" title="Structure that represents a Redis database instance, with one or more RedisClient connections.">Redis</a> returned an error. <br /></td></tr>
@@ -153,24 +149,12 @@ Macros</h2></td></tr>
 <tr class="separator:a158f2b6af2421e42128d014e50896bb4"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a8827c9e06650c47f2cfd96496af5487e" id="r_a8827c9e06650c47f2cfd96496af5487e"><td class="memItemLeft" align="right" valign="top"><a id="a8827c9e06650c47f2cfd96496af5487e" name="a8827c9e06650c47f2cfd96496af5487e"></a>
 #define&#160;</td><td class="memItemRight" valign="bottom"><b>REDIS_INVALID_CHANNEL</b></td></tr>
-<tr class="memdesc:a8827c9e06650c47f2cfd96496af5487e"><td class="mdescLeft">&#160;</td><td class="mdescRight">There is no such channel in the <a class="el" href="structRedis.html" title="Structure that represents a Redis database instance, with one or more RedisClient connections.">Redis</a> intance. <br /></td></tr>
+<tr class="memdesc:a8827c9e06650c47f2cfd96496af5487e"><td class="mdescLeft">&#160;</td><td class="mdescRight">There is no such channel in the <a class="el" href="structRedis.html" title="Structure that represents a Redis database instance, with one or more RedisClient connections.">Redis</a> instance. <br /></td></tr>
 <tr class="separator:a8827c9e06650c47f2cfd96496af5487e"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a7e2f81e12d6982c6aa97b50a77fd98f5" id="r_a7e2f81e12d6982c6aa97b50a77fd98f5"><td class="memItemLeft" align="right" valign="top"><a id="a7e2f81e12d6982c6aa97b50a77fd98f5" name="a7e2f81e12d6982c6aa97b50a77fd98f5"></a>
 #define&#160;</td><td class="memItemRight" valign="bottom"><b>REDIS_NULL</b></td></tr>
 <tr class="memdesc:a7e2f81e12d6982c6aa97b50a77fd98f5"><td class="mdescLeft">&#160;</td><td class="mdescRight"><a class="el" href="structRedis.html" title="Structure that represents a Redis database instance, with one or more RedisClient connections.">Redis</a> returned NULL. <br /></td></tr>
 <tr class="separator:a7e2f81e12d6982c6aa97b50a77fd98f5"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aac8e20a457870295bd3ee21bd59c5782" id="r_aac8e20a457870295bd3ee21bd59c5782"><td class="memItemLeft" align="right" valign="top"><a id="aac8e20a457870295bd3ee21bd59c5782" name="aac8e20a457870295bd3ee21bd59c5782"></a>
-#define&#160;</td><td class="memItemRight" valign="bottom"><b>REDIS_RCV_CHUNK_SIZE</b>&#160;&#160;&#160;8192</td></tr>
-<tr class="memdesc:aac8e20a457870295bd3ee21bd59c5782"><td class="mdescLeft">&#160;</td><td class="mdescRight">(bytes) <a class="el" href="structRedis.html" title="Structure that represents a Redis database instance, with one or more RedisClient connections.">Redis</a> receive buffer size (at most that much is read from the socket in a single call). <br /></td></tr>
-<tr class="separator:aac8e20a457870295bd3ee21bd59c5782"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ac8135dad507d04869b8ac630e5cd3b98" id="r_ac8135dad507d04869b8ac630e5cd3b98"><td class="memItemLeft" align="right" valign="top"><a id="ac8135dad507d04869b8ac630e5cd3b98" name="ac8135dad507d04869b8ac630e5cd3b98"></a>
-#define&#160;</td><td class="memItemRight" valign="bottom"><b>REDIS_TCP_BUF</b>&#160;&#160;&#160;0</td></tr>
-<tr class="memdesc:ac8135dad507d04869b8ac630e5cd3b98"><td class="mdescLeft">&#160;</td><td class="mdescRight">(bytes) Default TCP buffer size (send/recv) for <a class="el" href="structRedis.html" title="Structure that represents a Redis database instance, with one or more RedisClient connections.">Redis</a> clients. Values &lt;= 0 will use system default. <br /></td></tr>
-<tr class="separator:ac8135dad507d04869b8ac630e5cd3b98"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a1219fdcd54e7126a762f294ea8b4e259" id="r_a1219fdcd54e7126a762f294ea8b4e259"><td class="memItemLeft" align="right" valign="top"><a id="a1219fdcd54e7126a762f294ea8b4e259" name="a1219fdcd54e7126a762f294ea8b4e259"></a>
-#define&#160;</td><td class="memItemRight" valign="bottom"><b>REDIS_TCP_PORT</b>&#160;&#160;&#160;6379</td></tr>
-<tr class="memdesc:a1219fdcd54e7126a762f294ea8b4e259"><td class="mdescLeft">&#160;</td><td class="mdescRight">Default TCP/IP port on which <a class="el" href="structRedis.html" title="Structure that represents a Redis database instance, with one or more RedisClient connections.">Redis</a> server listens to clients. <br /></td></tr>
-<tr class="separator:a1219fdcd54e7126a762f294ea8b4e259"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a447a38ce70634136b737274965aa5ecc" id="r_a447a38ce70634136b737274965aa5ecc"><td class="memItemLeft" align="right" valign="top"><a id="a447a38ce70634136b737274965aa5ecc" name="a447a38ce70634136b737274965aa5ecc"></a>
 #define&#160;</td><td class="memItemRight" valign="bottom"><b>REDIS_UNEXPECTED_ARRAY_SIZE</b></td></tr>
 <tr class="memdesc:a447a38ce70634136b737274965aa5ecc"><td class="mdescLeft">&#160;</td><td class="mdescRight">Got a <a class="el" href="structRedis.html" title="Structure that represents a Redis database instance, with one or more RedisClient connections.">Redis</a> response with different number of elements than expected. <br /></td></tr>
@@ -183,6 +167,10 @@ Macros</h2></td></tr>
 #define&#160;</td><td class="memItemRight" valign="bottom"><b>REDISX_CHANNELS</b></td></tr>
 <tr class="memdesc:aa748f96c61478c3fbef8074021dee901"><td class="mdescLeft">&#160;</td><td class="mdescRight">The number of channels a <a class="el" href="structRedis.html" title="Structure that represents a Redis database instance, with one or more RedisClient connections.">Redis</a> instance has. <br /></td></tr>
 <tr class="separator:aa748f96c61478c3fbef8074021dee901"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a7e2b05b584b2b1b7af9430657679fe65" id="r_a7e2b05b584b2b1b7af9430657679fe65"><td class="memItemLeft" align="right" valign="top"><a id="a7e2b05b584b2b1b7af9430657679fe65" name="a7e2b05b584b2b1b7af9430657679fe65"></a>
+#define&#160;</td><td class="memItemRight" valign="bottom"><b>REDISX_CMDBUF_SIZE</b>&#160;&#160;&#160;8192</td></tr>
+<tr class="memdesc:a7e2b05b584b2b1b7af9430657679fe65"><td class="mdescLeft">&#160;</td><td class="mdescRight">(bytes) Size of many internal arrays, and the max. send chunk size. At least ~16 bytes... <br /></td></tr>
+<tr class="separator:a7e2b05b584b2b1b7af9430657679fe65"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a43ec81454d96c773c6e6dd80dfbb180a" id="r_a43ec81454d96c773c6e6dd80dfbb180a"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="redisx_8h.html#a43ec81454d96c773c6e6dd80dfbb180a">REDISX_LISTENER_REL_PRIORITY</a>&#160;&#160;&#160;(0.5)</td></tr>
 <tr class="separator:a43ec81454d96c773c6e6dd80dfbb180a"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a05046fd4ff3dc951f29e2f62f2e2c816" id="r_a05046fd4ff3dc951f29e2f62f2e2c816"><td class="memItemLeft" align="right" valign="top"><a id="a05046fd4ff3dc951f29e2f62f2e2c816" name="a05046fd4ff3dc951f29e2f62f2e2c816"></a>
@@ -197,6 +185,10 @@ Macros</h2></td></tr>
 #define&#160;</td><td class="memItemRight" valign="bottom"><b>REDISX_PATCHLEVEL</b>&#160;&#160;&#160;0</td></tr>
 <tr class="memdesc:aa1c6cddd63b0cee67482cbda6986e8c6"><td class="mdescLeft">&#160;</td><td class="mdescRight">Integer sub version of the release. <br /></td></tr>
 <tr class="separator:aa1c6cddd63b0cee67482cbda6986e8c6"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a57e8fa49f964f2ce738eeb0d9c0c89bf" id="r_a57e8fa49f964f2ce738eeb0d9c0c89bf"><td class="memItemLeft" align="right" valign="top"><a id="a57e8fa49f964f2ce738eeb0d9c0c89bf" name="a57e8fa49f964f2ce738eeb0d9c0c89bf"></a>
+#define&#160;</td><td class="memItemRight" valign="bottom"><b>REDISX_RCVBUF_SIZE</b>&#160;&#160;&#160;8192</td></tr>
+<tr class="memdesc:a57e8fa49f964f2ce738eeb0d9c0c89bf"><td class="mdescLeft">&#160;</td><td class="mdescRight">(bytes) <a class="el" href="structRedis.html" title="Structure that represents a Redis database instance, with one or more RedisClient connections.">Redis</a> receive buffer size (at most that much is read from the socket in a single call). <br /></td></tr>
+<tr class="separator:a57e8fa49f964f2ce738eeb0d9c0c89bf"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a275d8232b3f701eaba97b6f57ef0f65e" id="r_a275d8232b3f701eaba97b6f57ef0f65e"><td class="memItemLeft" align="right" valign="top"><a id="a275d8232b3f701eaba97b6f57ef0f65e" name="a275d8232b3f701eaba97b6f57ef0f65e"></a>
 #define&#160;</td><td class="memItemRight" valign="bottom"><b>REDISX_RELEASE_STRING</b>&#160;&#160;&#160;&quot;-devel&quot;</td></tr>
 <tr class="memdesc:a275d8232b3f701eaba97b6f57ef0f65e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Additional release information in version, e.g. "-1", or "-rc1". <br /></td></tr>
@@ -205,6 +197,14 @@ Macros</h2></td></tr>
 #define&#160;</td><td class="memItemRight" valign="bottom"><b>REDISX_SET_LISTENER_PRIORITY</b>&#160;&#160;&#160;<a class="elRef" href="../../xchange/apidoc/html/xchange_8h.html#aa93f0eb578d23995850d61f7d61c55c1">FALSE</a></td></tr>
 <tr class="memdesc:adc3981d6b06cc87e563e77584765eb19"><td class="mdescLeft">&#160;</td><td class="mdescRight">Whether to explicitly set listener thread priorities. <br /></td></tr>
 <tr class="separator:adc3981d6b06cc87e563e77584765eb19"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a98778e47cc76371868212b00e48ac03d" id="r_a98778e47cc76371868212b00e48ac03d"><td class="memItemLeft" align="right" valign="top"><a id="a98778e47cc76371868212b00e48ac03d" name="a98778e47cc76371868212b00e48ac03d"></a>
+#define&#160;</td><td class="memItemRight" valign="bottom"><b>REDISX_TCP_BUF_SIZE</b>&#160;&#160;&#160;0</td></tr>
+<tr class="memdesc:a98778e47cc76371868212b00e48ac03d"><td class="mdescLeft">&#160;</td><td class="mdescRight">(bytes) Default TCP buffer size (send/recv) for <a class="el" href="structRedis.html" title="Structure that represents a Redis database instance, with one or more RedisClient connections.">Redis</a> clients. Values &lt;= 0 will use system default. <br /></td></tr>
+<tr class="separator:a98778e47cc76371868212b00e48ac03d"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aecec1b5bff8cfc6bd9407b848b09f20d" id="r_aecec1b5bff8cfc6bd9407b848b09f20d"><td class="memItemLeft" align="right" valign="top"><a id="aecec1b5bff8cfc6bd9407b848b09f20d" name="aecec1b5bff8cfc6bd9407b848b09f20d"></a>
+#define&#160;</td><td class="memItemRight" valign="bottom"><b>REDISX_TCP_PORT</b>&#160;&#160;&#160;6379</td></tr>
+<tr class="memdesc:aecec1b5bff8cfc6bd9407b848b09f20d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Default TCP/IP port on which <a class="el" href="structRedis.html" title="Structure that represents a Redis database instance, with one or more RedisClient connections.">Redis</a> server listens to clients. <br /></td></tr>
+<tr class="separator:aecec1b5bff8cfc6bd9407b848b09f20d"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a1f22a8f5e970a292c5539f8fcfe139e8" id="r_a1f22a8f5e970a292c5539f8fcfe139e8"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="redisx_8h.html#a1f22a8f5e970a292c5539f8fcfe139e8">REDISX_VERSION_STRING</a></td></tr>
 <tr class="separator:a1f22a8f5e970a292c5539f8fcfe139e8"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ae140df45d32af33e2334fb677213e887" id="r_ae140df45d32af33e2334fb677213e887"><td class="memItemLeft" align="right" valign="top"><a id="ae140df45d32af33e2334fb677213e887" name="ae140df45d32af33e2334fb677213e887"></a>
@@ -1685,7 +1685,7 @@ redisxDEstroyEntries() </dd></dl>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>X_SUCCESS or X_FAILURE if the IP address is invalid. X_NULL if the IP address is NULL. </dd></dl>
 
-<p class="reference">References <a class="elRef" href="../../xchange/apidoc/html/xchange_8h.html#aa93f0eb578d23995850d61f7d61c55c1">FALSE</a>, <a class="el" href="structRedis.html#aecb3b0d045ada529257a2fbf8f829599">Redis::id</a>, <a class="el" href="structRedis.html#af51011d99955d6f036a9f2c291577749">Redis::interactive</a>, <a class="el" href="structRedis.html#a59d367a240bf9c00366465d842402de8">Redis::pipeline</a>, <a class="el" href="redisx_8h.html#a1219fdcd54e7126a762f294ea8b4e259">REDIS_TCP_PORT</a>, <a class="el" href="redisx_8h.html#aa748f96c61478c3fbef8074021dee901">REDISX_CHANNELS</a>, <a class="el" href="redisx_8h.html#a5349b7340813fbd1e32d04ed650bc3d9a65b4f2926885665960480d008ab2a456">REDISX_INTERACTIVE_CHANNEL</a>, <a class="el" href="redisx_8h.html#a5349b7340813fbd1e32d04ed650bc3d9a7a240839c1e943706535b8d69a605f0c">REDISX_PIPELINE_CHANNEL</a>, <a class="el" href="redisx_8h.html#a5349b7340813fbd1e32d04ed650bc3d9afafc30afa687bc5c56c42b0e677f5981">REDISX_SUBSCRIPTION_CHANNEL</a>, <a class="el" href="structRedis.html#aa4878fb8cef61468ee8e7426a973a75c">Redis::subscription</a>, <a class="elRef" href="../../xchange/apidoc/html/xchange_8h.html#aa8cecfc5c5c054d2875c03e77b7be15d">TRUE</a>, and <a class="elRef" href="../../xchange/apidoc/html/xchange_8h.html#a01d730a1a98963816de2dd73e72957a5">xStringCopyOf()</a>.</p>
+<p class="reference">References <a class="elRef" href="../../xchange/apidoc/html/xchange_8h.html#aa93f0eb578d23995850d61f7d61c55c1">FALSE</a>, <a class="el" href="structRedis.html#aecb3b0d045ada529257a2fbf8f829599">Redis::id</a>, <a class="el" href="structRedis.html#af51011d99955d6f036a9f2c291577749">Redis::interactive</a>, <a class="el" href="structRedis.html#a59d367a240bf9c00366465d842402de8">Redis::pipeline</a>, <a class="el" href="redisx_8h.html#aa748f96c61478c3fbef8074021dee901">REDISX_CHANNELS</a>, <a class="el" href="redisx_8h.html#a5349b7340813fbd1e32d04ed650bc3d9a65b4f2926885665960480d008ab2a456">REDISX_INTERACTIVE_CHANNEL</a>, <a class="el" href="redisx_8h.html#a5349b7340813fbd1e32d04ed650bc3d9a7a240839c1e943706535b8d69a605f0c">REDISX_PIPELINE_CHANNEL</a>, <a class="el" href="redisx_8h.html#a5349b7340813fbd1e32d04ed650bc3d9afafc30afa687bc5c56c42b0e677f5981">REDISX_SUBSCRIPTION_CHANNEL</a>, <a class="el" href="redisx_8h.html#aecec1b5bff8cfc6bd9407b848b09f20d">REDISX_TCP_PORT</a>, <a class="el" href="structRedis.html#aa4878fb8cef61468ee8e7426a973a75c">Redis::subscription</a>, <a class="elRef" href="../../xchange/apidoc/html/xchange_8h.html#aa8cecfc5c5c054d2875c03e77b7be15d">TRUE</a>, and <a class="elRef" href="../../xchange/apidoc/html/xchange_8h.html#a01d730a1a98963816de2dd73e72957a5">xStringCopyOf()</a>.</p>
 
 </div>
 </div>
@@ -2595,7 +2595,7 @@ redisxUnsubscrive() </dd></dl>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>0 on success or an error code on failure, is either X_NO_SERVICE (if not connected to the REDIS server on the requested channel) or the errno set by send(). </dd></dl>
 
-<p class="reference">References <a class="elRef" href="../../xchange/apidoc/html/xchange_8h.html#aa93f0eb578d23995850d61f7d61c55c1">FALSE</a>, <a class="el" href="redisx_8h.html#a4467906a00d48a757ba494a7e48d87f0">REDIS_CMDBUF_SIZE</a>, <a class="el" href="redisx_8c.html#ae722b046fa70a55db725341ef8ee56dc">redisxError()</a>, <a class="elRef" href="../../xchange/apidoc/html/xchange_8h.html#aa8cecfc5c5c054d2875c03e77b7be15d">TRUE</a>, <a class="elRef" href="../../xchange/apidoc/html/xchange_8h.html#aadbbe3ae01369cbddf4d57d430b33133">X_NULL</a>, and <a class="elRef" href="../../xchange/apidoc/html/xchange_8h.html#a7b2679c964ea5f2160380ed55654b873">X_SUCCESS</a>.</p>
+<p class="reference">References <a class="elRef" href="../../xchange/apidoc/html/xchange_8h.html#aa93f0eb578d23995850d61f7d61c55c1">FALSE</a>, <a class="el" href="redisx_8h.html#a7e2b05b584b2b1b7af9430657679fe65">REDISX_CMDBUF_SIZE</a>, <a class="el" href="redisx_8c.html#ae722b046fa70a55db725341ef8ee56dc">redisxError()</a>, <a class="elRef" href="../../xchange/apidoc/html/xchange_8h.html#aa8cecfc5c5c054d2875c03e77b7be15d">TRUE</a>, <a class="elRef" href="../../xchange/apidoc/html/xchange_8h.html#aadbbe3ae01369cbddf4d57d430b33133">X_NULL</a>, and <a class="elRef" href="../../xchange/apidoc/html/xchange_8h.html#a7b2679c964ea5f2160380ed55654b873">X_SUCCESS</a>.</p>
 
 </div>
 </div>

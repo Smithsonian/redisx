@@ -82,23 +82,23 @@
             <topic label="type" href="structRESP.html#aff17911edc8208aa8ddb1c7c52c78389"/>
             <topic label="value" href="structRESP.html#a0f61d63b009d0880a89c843bd50d8d76"/>
           </topic>
-          <topic label="REDIS_CMDBUF_SIZE" href="redisx_8h.html#a4467906a00d48a757ba494a7e48d87f0"/>
           <topic label="REDIS_ERROR" href="redisx_8h.html#aad063b5d1f8eaeadc0c70f8568113034"/>
           <topic label="REDIS_INCOMPLETE_TRANSFER" href="redisx_8h.html#a158f2b6af2421e42128d014e50896bb4"/>
           <topic label="REDIS_INVALID_CHANNEL" href="redisx_8h.html#a8827c9e06650c47f2cfd96496af5487e"/>
           <topic label="REDIS_NULL" href="redisx_8h.html#a7e2f81e12d6982c6aa97b50a77fd98f5"/>
-          <topic label="REDIS_RCV_CHUNK_SIZE" href="redisx_8h.html#aac8e20a457870295bd3ee21bd59c5782"/>
-          <topic label="REDIS_TCP_BUF" href="redisx_8h.html#ac8135dad507d04869b8ac630e5cd3b98"/>
-          <topic label="REDIS_TCP_PORT" href="redisx_8h.html#a1219fdcd54e7126a762f294ea8b4e259"/>
           <topic label="REDIS_UNEXPECTED_ARRAY_SIZE" href="redisx_8h.html#a447a38ce70634136b737274965aa5ecc"/>
           <topic label="REDIS_UNEXPECTED_RESP" href="redisx_8h.html#a9d530bcfae7689b4275749b47a6d9b51"/>
           <topic label="REDISX_CHANNELS" href="redisx_8h.html#aa748f96c61478c3fbef8074021dee901"/>
+          <topic label="REDISX_CMDBUF_SIZE" href="redisx_8h.html#a7e2b05b584b2b1b7af9430657679fe65"/>
           <topic label="REDISX_LISTENER_REL_PRIORITY" href="redisx_8h.html#a43ec81454d96c773c6e6dd80dfbb180a"/>
           <topic label="REDISX_MAJOR_VERSION" href="redisx_8h.html#a05046fd4ff3dc951f29e2f62f2e2c816"/>
           <topic label="REDISX_MINOR_VERSION" href="redisx_8h.html#ab56c292120a99c1e841869b5c8d6dd5d"/>
           <topic label="REDISX_PATCHLEVEL" href="redisx_8h.html#aa1c6cddd63b0cee67482cbda6986e8c6"/>
+          <topic label="REDISX_RCVBUF_SIZE" href="redisx_8h.html#a57e8fa49f964f2ce738eeb0d9c0c89bf"/>
           <topic label="REDISX_RELEASE_STRING" href="redisx_8h.html#a275d8232b3f701eaba97b6f57ef0f65e"/>
           <topic label="REDISX_SET_LISTENER_PRIORITY" href="redisx_8h.html#adc3981d6b06cc87e563e77584765eb19"/>
+          <topic label="REDISX_TCP_BUF_SIZE" href="redisx_8h.html#a98778e47cc76371868212b00e48ac03d"/>
+          <topic label="REDISX_TCP_PORT" href="redisx_8h.html#aecec1b5bff8cfc6bd9407b848b09f20d"/>
           <topic label="REDISX_VERSION_STRING" href="redisx_8h.html#a1f22a8f5e970a292c5539f8fcfe139e8"/>
           <topic label="RESP_ARRAY" href="redisx_8h.html#ae140df45d32af33e2334fb677213e887"/>
           <topic label="RESP_BULK_STRING" href="redisx_8h.html#a980fc225ec0392474ff67e319a33f028"/>

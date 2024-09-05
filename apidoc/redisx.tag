@@ -10,13 +10,6 @@
     <class kind="struct">RESP</class>
     <member kind="define">
       <type>#define</type>
-      <name>REDIS_CMDBUF_SIZE</name>
-      <anchorfile>redisx_8h.html</anchorfile>
-      <anchor>a4467906a00d48a757ba494a7e48d87f0</anchor>
-      <arglist></arglist>
-    </member>
-    <member kind="define">
-      <type>#define</type>
       <name>REDIS_ERROR</name>
       <anchorfile>redisx_8h.html</anchorfile>
       <anchor>aad063b5d1f8eaeadc0c70f8568113034</anchor>
@@ -45,27 +38,6 @@
     </member>
     <member kind="define">
       <type>#define</type>
-      <name>REDIS_RCV_CHUNK_SIZE</name>
-      <anchorfile>redisx_8h.html</anchorfile>
-      <anchor>aac8e20a457870295bd3ee21bd59c5782</anchor>
-      <arglist></arglist>
-    </member>
-    <member kind="define">
-      <type>#define</type>
-      <name>REDIS_TCP_BUF</name>
-      <anchorfile>redisx_8h.html</anchorfile>
-      <anchor>ac8135dad507d04869b8ac630e5cd3b98</anchor>
-      <arglist></arglist>
-    </member>
-    <member kind="define">
-      <type>#define</type>
-      <name>REDIS_TCP_PORT</name>
-      <anchorfile>redisx_8h.html</anchorfile>
-      <anchor>a1219fdcd54e7126a762f294ea8b4e259</anchor>
-      <arglist></arglist>
-    </member>
-    <member kind="define">
-      <type>#define</type>
       <name>REDIS_UNEXPECTED_ARRAY_SIZE</name>
       <anchorfile>redisx_8h.html</anchorfile>
       <anchor>a447a38ce70634136b737274965aa5ecc</anchor>
@@ -83,6 +55,13 @@
       <name>REDISX_CHANNELS</name>
       <anchorfile>redisx_8h.html</anchorfile>
       <anchor>aa748f96c61478c3fbef8074021dee901</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="define">
+      <type>#define</type>
+      <name>REDISX_CMDBUF_SIZE</name>
+      <anchorfile>redisx_8h.html</anchorfile>
+      <anchor>a7e2b05b584b2b1b7af9430657679fe65</anchor>
       <arglist></arglist>
     </member>
     <member kind="define">
@@ -115,6 +94,13 @@
     </member>
     <member kind="define">
       <type>#define</type>
+      <name>REDISX_RCVBUF_SIZE</name>
+      <anchorfile>redisx_8h.html</anchorfile>
+      <anchor>a57e8fa49f964f2ce738eeb0d9c0c89bf</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="define">
+      <type>#define</type>
       <name>REDISX_RELEASE_STRING</name>
       <anchorfile>redisx_8h.html</anchorfile>
       <anchor>a275d8232b3f701eaba97b6f57ef0f65e</anchor>
@@ -125,6 +111,20 @@
       <name>REDISX_SET_LISTENER_PRIORITY</name>
       <anchorfile>redisx_8h.html</anchorfile>
       <anchor>adc3981d6b06cc87e563e77584765eb19</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="define">
+      <type>#define</type>
+      <name>REDISX_TCP_BUF_SIZE</name>
+      <anchorfile>redisx_8h.html</anchorfile>
+      <anchor>a98778e47cc76371868212b00e48ac03d</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="define">
+      <type>#define</type>
+      <name>REDISX_TCP_PORT</name>
+      <anchorfile>redisx_8h.html</anchorfile>
+      <anchor>aecec1b5bff8cfc6bd9407b848b09f20d</anchor>
       <arglist></arglist>
     </member>
     <member kind="define">
