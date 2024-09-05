@@ -5,6 +5,7 @@ var redisx_tab_8c =
     [ "redisxDestroyKeys", "redisx-tab_8c.html#a42d64f9b8b0399bf391a5aa3d8cbb9e0", null ],
     [ "redisxGetKeys", "redisx-tab_8c.html#aaa45af252b10e19c647d2cd5b51d7c05", null ],
     [ "redisxGetScanCount", "redisx-tab_8c.html#af3167ceaaedaf0a005da22e28521440e", null ],
+    [ "redisxGetStringValue", "redisx-tab_8c.html#afc875f142146282860b6a8a3ac2f0fc8", null ],
     [ "redisxGetTable", "redisx-tab_8c.html#af4290857fc98baac7edd15edb6d0bcac", null ],
     [ "redisxGetValue", "redisx-tab_8c.html#a01bf1f5d830d1af19456ab78457a54ab", null ],
     [ "redisxMultiSet", "redisx-tab_8c.html#ada49b9dad00af34819a8de323b59be16", null ],

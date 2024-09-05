@@ -214,6 +214,9 @@ include/redisx.h
 .RI "int \fBredisxGetScanCount\fP (\fBRedis\fP *redis)"
 .br
 .ti -1c
+.RI "char * \fBredisxGetStringValue\fP (\fBRedis\fP *redis, const char *table, const char *key, int *len)"
+.br
+.ti -1c
 .RI "\fBRedisEntry\fP * \fBredisxGetTable\fP (\fBRedis\fP *redis, const char *table, int *n)"
 .br
 .ti -1c
@@ -866,6 +869,35 @@ The current COUNT to use for SCAN-type commands or <0 to use default\&.
 .RE
 .PP
 
+.SS "char * redisxGetStringValue (\fBRedis\fP * redis, const char * table, const char * key, int * len)"
+Retrieve a variable from \fBRedis\fP as a string (or byte array), through the interactive connection\&. This is not the highest throughput mode (that would be sending asynchronous pipeline request, and then asynchronously collecting the results such as with \fBredisxSendRequestAsync()\fP / \fBredisxReadReplyAsync()\fP), because it requires separate network roundtrips for each and every request\&. But, it is simple and perfectly good method when one needs to retrieve only a few (<1000) variables per second\&.\&.\&.
+.PP
+The call is effectively implements a \fBRedis\fP GET (if the tale argument is NULL) or HGET call\&.
+.PP
+\fBParameters\fP
+.RS 4
+\fIredis\fP Pointer to a \fBRedis\fP instance\&. 
+.br
+\fItable\fP Hashtable from which to retrieve a value or NULL if to use the global table\&. 
+.br
+\fIkey\fP Field name (i\&.e\&. variable name)\&. 
+.br
+\fIlen\fP (optional) pointer in which to return the length (>=0) of the value or else an error code (<0) defined in \fBxchange\&.h\fP / \fBredisx\&.h\fP
+.RE
+.PP
+\fBReturns\fP
+.RS 4
+A freshly allocated \fBRESP\fP array containing the \fBRedis\fP response, or NULL if no valid response could be obtained\&.
+.RE
+.PP
+\fBSee also\fP
+.RS 4
+\fBredisxGetValue()\fP 
+.RE
+.PP
+
+.PP
+References \fBRESP::n\fP, \fBredisxCheckDestroyRESP()\fP, \fBredisxGetValue()\fP, \fBRESP_BULK_STRING\fP, \fBRESP::value\fP, \fBX_NULL\fP, and \fBX_SUCCESS\fP\&.
 .SS "\fBRedisEntry\fP * redisxGetTable (\fBRedis\fP * redis, const char * table, int * n)"
 Returns all the key/value pairs stored in a given hash table
 .PP
@@ -931,12 +963,17 @@ The call is effectively implements a \fBRedis\fP GET (if the tale argument is NU
 .PP
 \fBReturns\fP
 .RS 4
-A freshly allocated \fBRESP\fP array containing the \fBRedis\fP response, or NULL if no valid response could be obtained\&. 
+A freshly allocated \fBRESP\fP array containing the \fBRedis\fP response, or NULL if no valid response could be obtained\&.
+.RE
+.PP
+\fBSee also\fP
+.RS 4
+\fBredisxGetStringValue()\fP 
 .RE
 .PP
 
 .PP
-References \fBredisxError()\fP, \fBredisxRequest()\fP, and \fBX_NAME_INVALID\fP\&.
+References \fBredisxError()\fP, \fBredisxRequest()\fP, \fBX_NAME_INVALID\fP, and \fBX_NULL\fP\&.
 .SS "\fBboolean\fP redisxHasPipeline (\fBRedis\fP * redis)"
 Checks if a \fBRedis\fP instance has the pipeline connection enabled\&.
 .PP

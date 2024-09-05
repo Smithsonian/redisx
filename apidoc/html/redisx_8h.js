@@ -58,6 +58,7 @@ var redisx_8h =
     [ "redisxGetClient", "redisx_8h.html#a14907be8fba6a13505a352673cea5895", null ],
     [ "redisxGetKeys", "redisx_8h.html#aaa45af252b10e19c647d2cd5b51d7c05", null ],
     [ "redisxGetScanCount", "redisx_8h.html#af3167ceaaedaf0a005da22e28521440e", null ],
+    [ "redisxGetStringValue", "redisx_8h.html#afc875f142146282860b6a8a3ac2f0fc8", null ],
     [ "redisxGetTable", "redisx_8h.html#af4290857fc98baac7edd15edb6d0bcac", null ],
     [ "redisxGetTime", "redisx_8h.html#a5dbdb6bef9c8ac3a4a8e901abe505d30", null ],
     [ "redisxGetValue", "redisx_8h.html#a01bf1f5d830d1af19456ab78457a54ab", null ],

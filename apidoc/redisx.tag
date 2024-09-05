@@ -377,6 +377,13 @@
       <arglist>(Redis *redis)</arglist>
     </member>
     <member kind="function">
+      <type>char *</type>
+      <name>redisxGetStringValue</name>
+      <anchorfile>redisx_8h.html</anchorfile>
+      <anchor>afc875f142146282860b6a8a3ac2f0fc8</anchor>
+      <arglist>(Redis *redis, const char *table, const char *key, int *len)</arglist>
+    </member>
+    <member kind="function">
       <type>RedisEntry *</type>
       <name>redisxGetTable</name>
       <anchorfile>redisx_8h.html</anchorfile>
@@ -995,6 +1002,13 @@
       <anchorfile>redisx-tab_8c.html</anchorfile>
       <anchor>af3167ceaaedaf0a005da22e28521440e</anchor>
       <arglist>(Redis *redis)</arglist>
+    </member>
+    <member kind="function">
+      <type>char *</type>
+      <name>redisxGetStringValue</name>
+      <anchorfile>redisx-tab_8c.html</anchorfile>
+      <anchor>afc875f142146282860b6a8a3ac2f0fc8</anchor>
+      <arglist>(Redis *redis, const char *table, const char *key, int *len)</arglist>
     </member>
     <member kind="function">
       <type>RedisEntry *</type>

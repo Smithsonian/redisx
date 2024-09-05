@@ -136,6 +136,7 @@
           <topic label="redisxGetClient" href="redisx_8h.html#a14907be8fba6a13505a352673cea5895"/>
           <topic label="redisxGetKeys" href="redisx_8h.html#aaa45af252b10e19c647d2cd5b51d7c05"/>
           <topic label="redisxGetScanCount" href="redisx_8h.html#af3167ceaaedaf0a005da22e28521440e"/>
+          <topic label="redisxGetStringValue" href="redisx_8h.html#afc875f142146282860b6a8a3ac2f0fc8"/>
           <topic label="redisxGetTable" href="redisx_8h.html#af4290857fc98baac7edd15edb6d0bcac"/>
           <topic label="redisxGetTime" href="redisx_8h.html#a5dbdb6bef9c8ac3a4a8e901abe505d30"/>
           <topic label="redisxGetValue" href="redisx_8h.html#a01bf1f5d830d1af19456ab78457a54ab"/>
@@ -233,6 +234,7 @@
           <topic label="redisxDestroyKeys" href="redisx-tab_8c.html#a42d64f9b8b0399bf391a5aa3d8cbb9e0"/>
           <topic label="redisxGetKeys" href="redisx-tab_8c.html#aaa45af252b10e19c647d2cd5b51d7c05"/>
           <topic label="redisxGetScanCount" href="redisx-tab_8c.html#af3167ceaaedaf0a005da22e28521440e"/>
+          <topic label="redisxGetStringValue" href="redisx-tab_8c.html#afc875f142146282860b6a8a3ac2f0fc8"/>
           <topic label="redisxGetTable" href="redisx-tab_8c.html#af4290857fc98baac7edd15edb6d0bcac"/>
           <topic label="redisxGetValue" href="redisx-tab_8c.html#a01bf1f5d830d1af19456ab78457a54ab"/>
           <topic label="redisxMultiSet" href="redisx-tab_8c.html#ada49b9dad00af34819a8de323b59be16"/>

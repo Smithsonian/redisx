@@ -420,11 +420,11 @@ Retrieving individual keyed values is simple:
 
 ```c
   Redis *redis = ...;
-  int status;    // Variable in which we'll report error status. 
+  int len; // Variable in which we return the length of the value or an error code 
   
   // Get the "property" field from the "system:subsystem" hash table
-  RESP *resp = redisxGetValue(redis, "system:subsystem", "property", &status);
-  if (status != X_SUCCESS) {
+  char *value = redisxGetStringValue(redis, "system:subsystem", "property", &len);
+  if (len < 0) {
     // Oops something went wrong.
     ...
   }
@@ -440,12 +440,8 @@ The same goes for top-level keyed values, using `NULL` for the hash table name:
 
 ```c
   // Get value for top-level key (not stored in hash table!)
-  RESP *resp = redisxGetValue(redis, NULL, "my-key", &status);
+  char *value = redisxGetStringValue(redis, NULL, "my-key", &len);
 ```
-
-The reason the return value is a `RESP` pointer, rather than a string is twofold: (1) because it lets you process possible
-error responses from Redis also, and (2) because it lets you deal with unterminated string values, such as binary sequences
-of known length.
 
 In turn, setting values is also straightforward:
 

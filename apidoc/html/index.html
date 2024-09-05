@@ -401,11 +401,11 @@ Getting and setting keyed values</h3>
 <p>Key/value pairs are the bread and butter of <a class="el" href="structRedis.html" title="Structure that represents a Redis database instance, with one or more RedisClient connections.">Redis</a>. They come in two variaties: (1) there are top-level key-value pairs, and (2) there are key-value pairs organized into hash tables, where the table name is a top-level key, but the fields in the table are not. The RedisX library offers a unified approach for dealing with key/value pairs, whether they are top level or hash-tables. Simply, a table name <code>NULL</code> is used to refer to top-level keys.</p>
 <p>Retrieving individual keyed values is simple:</p>
 <div class="fragment"><div class="line"><a class="code hl_struct" href="structRedis.html">Redis</a> *redis = ...;</div>
-<div class="line"><span class="keywordtype">int</span> status;    <span class="comment">// Variable in which we&#39;ll report error status. </span></div>
+<div class="line"><span class="keywordtype">int</span> len; <span class="comment">// Variable in which we return the length of the value or an error code </span></div>
 <div class="line"> </div>
 <div class="line"><span class="comment">// Get the &quot;property&quot; field from the &quot;system:subsystem&quot; hash table</span></div>
-<div class="line"><a class="code hl_struct" href="structRESP.html">RESP</a> *resp = <a class="code hl_function" href="redisx-tab_8c.html#a01bf1f5d830d1af19456ab78457a54ab">redisxGetValue</a>(redis, <span class="stringliteral">&quot;system:subsystem&quot;</span>, <span class="stringliteral">&quot;property&quot;</span>, &amp;status);</div>
-<div class="line"><span class="keywordflow">if</span> (status != X_SUCCESS) {</div>
+<div class="line"><span class="keywordtype">char</span> *value = <a class="code hl_function" href="redisx-tab_8c.html#afc875f142146282860b6a8a3ac2f0fc8">redisxGetStringValue</a>(redis, <span class="stringliteral">&quot;system:subsystem&quot;</span>, <span class="stringliteral">&quot;property&quot;</span>, &amp;len);</div>
+<div class="line"><span class="keywordflow">if</span> (len &lt; 0) {</div>
 <div class="line">  <span class="comment">// Oops something went wrong.</span></div>
 <div class="line">  ...</div>
 <div class="line">}</div>
@@ -415,12 +415,11 @@ Getting and setting keyed values</h3>
 <div class="line"> </div>
 <div class="line"><span class="comment">// Destroy resp</span></div>
 <div class="line">redisxDestroyRESP(resp);</div>
-<div class="ttc" id="aredisx-tab_8c_html_a01bf1f5d830d1af19456ab78457a54ab"><div class="ttname"><a href="redisx-tab_8c.html#a01bf1f5d830d1af19456ab78457a54ab">redisxGetValue</a></div><div class="ttdeci">RESP * redisxGetValue(Redis *redis, const char *table, const char *key, int *status)</div><div class="ttdef"><b>Definition</b> redisx-tab.c:214</div></div>
+<div class="ttc" id="aredisx-tab_8c_html_afc875f142146282860b6a8a3ac2f0fc8"><div class="ttname"><a href="redisx-tab_8c.html#afc875f142146282860b6a8a3ac2f0fc8">redisxGetStringValue</a></div><div class="ttdeci">char * redisxGetStringValue(Redis *redis, const char *table, const char *key, int *len)</div><div class="ttdef"><b>Definition</b> redisx-tab.c:259</div></div>
 </div><!-- fragment --><p>The same goes for top-level keyed values, using <code>NULL</code> for the hash table name:</p>
 <div class="fragment"><div class="line"><span class="comment">// Get value for top-level key (not stored in hash table!)</span></div>
-<div class="line"><a class="code hl_struct" href="structRESP.html">RESP</a> *resp = <a class="code hl_function" href="redisx-tab_8c.html#a01bf1f5d830d1af19456ab78457a54ab">redisxGetValue</a>(redis, NULL, <span class="stringliteral">&quot;my-key&quot;</span>, &amp;status);</div>
-</div><!-- fragment --><p>The reason the return value is a <code><a class="el" href="structRESP.html" title="Structure that represents a Redis response (RESP format).">RESP</a></code> pointer, rather than a string is twofold: (1) because it lets you process possible error responses from <a class="el" href="structRedis.html" title="Structure that represents a Redis database instance, with one or more RedisClient connections.">Redis</a> also, and (2) because it lets you deal with unterminated string values, such as binary sequences of known length.</p>
-<p>In turn, setting values is also straightforward:</p>
+<div class="line"><span class="keywordtype">char</span> *value = <a class="code hl_function" href="redisx-tab_8c.html#afc875f142146282860b6a8a3ac2f0fc8">redisxGetStringValue</a>(redis, NULL, <span class="stringliteral">&quot;my-key&quot;</span>, &amp;len);</div>
+</div><!-- fragment --><p>In turn, setting values is also straightforward:</p>
 <div class="fragment"><div class="line"><a class="code hl_struct" href="structRedis.html">Redis</a> *redis = ...;</div>
 <div class="line"> </div>
 <div class="line"><span class="comment">// Set the &quot;property&quot; field in the &quot;system:subsystem&quot; hash table to -2.5</span></div>
@@ -458,7 +457,7 @@ Listing and Scanning</h3>
 <div class="line"> </div>
 <div class="line"><span class="comment">// Once done using the &#39;keys&#39; array, we should destroy it</span></div>
 <div class="line">redisxDestroyKeys(keys, nMatches);</div>
-<div class="ttc" id="aredisx-tab_8c_html_a67dd05115ae75dac9637ac04220d73b6"><div class="ttname"><a href="redisx-tab_8c.html#a67dd05115ae75dac9637ac04220d73b6">redisxScanKeys</a></div><div class="ttdeci">char ** redisxScanKeys(Redis *redis, const char *pattern, int *n, int *status)</div><div class="ttdef"><b>Definition</b> redisx-tab.c:441</div></div>
+<div class="ttc" id="aredisx-tab_8c_html_a67dd05115ae75dac9637ac04220d73b6"><div class="ttname"><a href="redisx-tab_8c.html#a67dd05115ae75dac9637ac04220d73b6">redisxScanKeys</a></div><div class="ttdeci">char ** redisxScanKeys(Redis *redis, const char *pattern, int *n, int *status)</div><div class="ttdef"><b>Definition</b> redisx-tab.c:489</div></div>
 </div><!-- fragment --><p>Similarly, to retrieve a set of keywords from a table, matching a glob pattern:</p>
 <div class="fragment"><div class="line">...</div>
 <div class="line"> </div>
@@ -475,7 +474,7 @@ Listing and Scanning</h3>
 <div class="line"> </div>
 <div class="line"><span class="comment">// Once done using the &#39;keys&#39; array, we should destroy it</span></div>
 <div class="line">redisxDEstroyEntries(entries, nMatches);</div>
-<div class="ttc" id="aredisx-tab_8c_html_a47d28fd9f2f35f0af5abd67a1ae7b987"><div class="ttname"><a href="redisx-tab_8c.html#a47d28fd9f2f35f0af5abd67a1ae7b987">redisxScanTable</a></div><div class="ttdeci">RedisEntry * redisxScanTable(Redis *redis, const char *table, const char *pattern, int *n, int *status)</div><div class="ttdef"><b>Definition</b> redisx-tab.c:604</div></div>
+<div class="ttc" id="aredisx-tab_8c_html_a47d28fd9f2f35f0af5abd67a1ae7b987"><div class="ttname"><a href="redisx-tab_8c.html#a47d28fd9f2f35f0af5abd67a1ae7b987">redisxScanTable</a></div><div class="ttdeci">RedisEntry * redisxScanTable(Redis *redis, const char *table, const char *pattern, int *n, int *status)</div><div class="ttdef"><b>Definition</b> redisx-tab.c:652</div></div>
 </div><!-- fragment --><p>Finally, you may use <code><a class="el" href="redisx-tab_8c.html#ad299cc621ad0dab54c6f7a7fd6770db9">redisxSetScanCount()</a></code> to tune just how many results should individial scan queries return. Please refer to the <a class="el" href="structRedis.html" title="Structure that represents a Redis database instance, with one or more RedisClient connections.">Redis</a> documentation on the behavior of the <code>SCAN</code> and <code>HSCAN</code> commands to learn more.</p>
 <hr  />
 <p><a class="anchor" id="publish-subscribe-support"></a> </p>
