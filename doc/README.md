@@ -121,13 +121,16 @@ The first step is to create a `Redis` object, with the server name or IP address
 ```
 
 Before connecting to the Redis server, you may configure optional settings, such as the TCP port number to use (if not
-the default 6379), and the database authentication password (if any):
+the default 6379), and the database authentication (if any):
 
 ```c
   Redis *redis = ...
   
   // (optional) configure a non-standard port number
   redisxSetPort(&redis, 7089);
+  
+  // (optional) Configure the database user (since Redis 6.0, using ACL)
+  redisxSetUser(&redis, "johndoe"); 
   
   // (optional) Configure the database password...
   redisxSetPassword(&redis, mySecretPasswordString);
@@ -142,7 +145,7 @@ you application:
    redisxSetTcpBuf(65536);
 ```
 
-Optionally you can select the database index to use now (and also later, after connecting), if not the default (index 
+Optionally you can select the database index to use now (or later, after connecting), if not the default (index 
 0):
 
 ```c
@@ -152,8 +155,9 @@ Optionally you can select the database index to use now (and also later, after c
   redisxSelectDB(redis); 
 ```
 
-(Note that you can switch the database index any time, with the caveat that it's not possible to change it for the 
-subscription client when there are active subscriptions.)
+Note, that you can switch the database index any time, with the caveat that it's not possible to change it for the 
+subscription client when there are active subscriptions.
+
 
 <a name="connecting"></a>
 ### Connecting

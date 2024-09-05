@@ -189,26 +189,30 @@ Initializing</h3>
 <div class="line">}</div>
 <div class="ttc" id="aredisx-net_8c_html_a5c78c2189a76a077231016564a0cecd5"><div class="ttname"><a href="redisx-net_8c.html#a5c78c2189a76a077231016564a0cecd5">redisxInit</a></div><div class="ttdeci">Redis * redisxInit(const char *server)</div><div class="ttdef"><b>Definition</b> redisx-net.c:600</div></div>
 <div class="ttc" id="astructRedis_html"><div class="ttname"><a href="structRedis.html">Redis</a></div><div class="ttdoc">Structure that represents a Redis database instance, with one or more RedisClient connections.</div><div class="ttdef"><b>Definition</b> redisx.h:159</div></div>
-</div><!-- fragment --><p>Before connecting to the <a class="el" href="structRedis.html" title="Structure that represents a Redis database instance, with one or more RedisClient connections.">Redis</a> server, you may configure optional settings, such as the TCP port number to use (if not the default 6379), and the database authentication password (if any):</p>
+</div><!-- fragment --><p>Before connecting to the <a class="el" href="structRedis.html" title="Structure that represents a Redis database instance, with one or more RedisClient connections.">Redis</a> server, you may configure optional settings, such as the TCP port number to use (if not the default 6379), and the database authentication (if any):</p>
 <div class="fragment"><div class="line"><a class="code hl_struct" href="structRedis.html">Redis</a> *redis = ...</div>
 <div class="line"> </div>
 <div class="line"><span class="comment">// (optional) configure a non-standard port number</span></div>
 <div class="line">redisxSetPort(&amp;redis, 7089);</div>
 <div class="line"> </div>
+<div class="line"><span class="comment">// (optional) Configure the database user (since Redis 6.0, using ACL)</span></div>
+<div class="line"><a class="code hl_function" href="redisx_8c.html#a3beff3a9e373a0f1de626a8e64da98cf">redisxSetUser</a>(&amp;redis, <span class="stringliteral">&quot;johndoe&quot;</span>); </div>
+<div class="line"> </div>
 <div class="line"><span class="comment">// (optional) Configure the database password...</span></div>
 <div class="line"><a class="code hl_function" href="redisx_8c.html#a0e9eda38aa6f084ac151cbebe2886c2f">redisxSetPassword</a>(&amp;redis, mySecretPasswordString);</div>
 <div class="ttc" id="aredisx_8c_html_a0e9eda38aa6f084ac151cbebe2886c2f"><div class="ttname"><a href="redisx_8c.html#a0e9eda38aa6f084ac151cbebe2886c2f">redisxSetPassword</a></div><div class="ttdeci">int redisxSetPassword(Redis *redis, const char *passwd)</div><div class="ttdef"><b>Definition</b> redisx.c:125</div></div>
+<div class="ttc" id="aredisx_8c_html_a3beff3a9e373a0f1de626a8e64da98cf"><div class="ttname"><a href="redisx_8c.html#a3beff3a9e373a0f1de626a8e64da98cf">redisxSetUser</a></div><div class="ttdeci">int redisxSetUser(Redis *redis, const char *username)</div><div class="ttdef"><b>Definition</b> redisx.c:99</div></div>
 </div><!-- fragment --><p>You might also tweak the send/receive buffer sizes to use for clients, if you find the socket defaults sub-optimal for you application:</p>
 <div class="fragment"><div class="line"><span class="comment">// (optional) Set the TCP send/rcv buffer sizes to use if not default values.</span></div>
 <div class="line"><span class="comment">//            This setting applies to all new connections after...</span></div>
 <div class="line"><a class="code hl_function" href="redisx-net_8c.html#a83fce113d042490e77efdc574e64d76f">redisxSetTcpBuf</a>(65536);</div>
 <div class="ttc" id="aredisx-net_8c_html_a83fce113d042490e77efdc574e64d76f"><div class="ttname"><a href="redisx-net_8c.html#a83fce113d042490e77efdc574e64d76f">redisxSetTcpBuf</a></div><div class="ttdeci">void redisxSetTcpBuf(int size)</div><div class="ttdef"><b>Definition</b> redisx-net.c:690</div></div>
-</div><!-- fragment --><p>Optionally you can select the database index to use now (and also later, after connecting), if not the default (index 0):</p>
+</div><!-- fragment --><p>Optionally you can select the database index to use now (or later, after connecting), if not the default (index 0):</p>
 <div class="fragment"><div class="line"><a class="code hl_struct" href="structRedis.html">Redis</a> *redis = ...</div>
 <div class="line"> </div>
 <div class="line"><span class="comment">// Select the database index 2</span></div>
 <div class="line">redisxSelectDB(redis); </div>
-</div><!-- fragment --><p>(Note that you can switch the database index any time, with the caveat that it's not possible to change it for the subscription client when there are active subscriptions.)</p>
+</div><!-- fragment --><p>Note, that you can switch the database index any time, with the caveat that it's not possible to change it for the subscription client when there are active subscriptions.</p>
 <p><a class="anchor" id="connecting"></a> </p>
 <h3><a class="anchor" id="autotoc_md12"></a>
 Connecting</h3>
