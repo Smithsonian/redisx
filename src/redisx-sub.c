@@ -141,7 +141,7 @@ int redisxPublish(Redis *redis, const char *channel, const char *data, int lengt
 
   if(redis == NULL) return redisxError(funcName, X_NULL);
 
-  status = redisxLockEnabled(redis->interactive);
+  status = redisxLockConnected(redis->interactive);
   if(status) return redisxError(funcName, status);
 
   // Now send the message
@@ -387,7 +387,7 @@ int redisxSubscribe(Redis *redis, const char *pattern) {
 
   if(status) return redisxError(funcName, status);
 
-  status = redisxLockEnabled(redis->subscription);
+  status = redisxLockConnected(redis->subscription);
   if(status) return redisxError(funcName, status);
 
   status = redisxSendRequestAsync(redis->subscription, rIsGlobPattern(pattern) ? "PSUBSCRIBE" : "SUBSCRIBE", pattern, NULL, NULL);
@@ -422,7 +422,7 @@ int redisxUnsubscribe(Redis *redis, const char *pattern) {
 
   if(redis == NULL) return redisxError(funcName, X_NULL);
 
-  status = redisxLockEnabled(redis->subscription);
+  status = redisxLockConnected(redis->subscription);
   if(status) return redisxError(funcName, status);
 
   if(pattern) {

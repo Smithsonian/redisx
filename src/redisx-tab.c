@@ -131,13 +131,13 @@ int redisxSetValue(Redis *redis, const char *table, const char *key, const char 
 
   if(isPipelined) {
     cl = redis->pipeline;
-    if(redisxLockEnabled(cl) != X_SUCCESS) isPipelined = FALSE;
+    if(redisxLockConnected(cl) != X_SUCCESS) isPipelined = FALSE;
   }
 
   // Not pipelined or pipeline is not available...
   if(!isPipelined) {
     cl = redis->interactive;
-    status = redisxLockEnabled(cl);
+    status = redisxLockConnected(cl);
     if(status) return redisxError(funcName, status);
   }
 
@@ -334,7 +334,7 @@ int redisxMultiSet(Redis *redis, const char *table, const RedisEntry *entries, i
   isPipelined &= redisxHasPipeline(redis);
 
   if(isPipelined) {
-    status = redisxLockEnabled(redis->pipeline);
+    status = redisxLockConnected(redis->pipeline);
     if(!status) {
       status = redisxSkipReplyAsync(redis->pipeline);
       if(!status) status = redisxSendArrayRequestAsync(redis->pipeline, req, L, N);

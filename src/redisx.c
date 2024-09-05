@@ -305,7 +305,7 @@ int redisxPing(Redis *redis, const char *message) {
  * @return            X_SUCCESS (0) if successful, or else an error code (&lt;0) from redisx.h / xchange.h.
  *
  * @sa redisxSelectDB()
- * @sa redisxLockEnabled()
+ * @sa redisxLockConnected()
  */
 static int redisxSelectClientDBAsync(RedisClient *cl, int idx, boolean confirm) {
   static const char *funcName = "redisxSelectClientDBAsync()";
@@ -354,7 +354,7 @@ static void rAffirmDB(Redis *redis) {
  *                    else another error code (&lt;0) from redisx.h / xchange.h.
  *
  * @sa redisxSelectDB()
- * @sa redisxLockEnabled()
+ * @sa redisxLockConnected()
  */
 int redisxSelectDB(Redis *redis, int idx) {
   RedisPrivate *p;
@@ -375,7 +375,7 @@ int redisxSelectDB(Redis *redis, int idx) {
 
   for(c = 0; c < REDISX_CHANNELS; c++) {
     RedisClient *cl = redisxGetClient(redis, c);
-    int s = redisxLockEnabled(cl);
+    int s = redisxLockConnected(cl);
 
     // We can't switch unconnected clients or the existing subscription client
     if(s == REDIS_INVALID_CHANNEL || c == REDISX_SUBSCRIPTION_CHANNEL) {
@@ -408,7 +408,7 @@ int redisxResetClient(RedisClient *cl) {
 
   if(cl == NULL) return redisxError(funcName, X_NULL);
 
-  status = redisxLockEnabled(cl);
+  status = redisxLockConnected(cl);
   if(status) return redisxError(funcName, status);
 
   status = redisxSendRequestAsync(cl, "RESET", NULL, NULL, NULL);
@@ -639,7 +639,7 @@ RESP *redisxArrayRequest(Redis *redis, char *args[], int lengths[], int n, int *
   xvprintf("Redis-X> request %s... [%d].\n", args[0], n);
 
   cl = redis->interactive;
-  *status = redisxLockEnabled(cl);
+  *status = redisxLockConnected(cl);
   if(*status) {
     redisxError(funcName, *status);
     return NULL;

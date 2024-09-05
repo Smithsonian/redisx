@@ -240,6 +240,7 @@ boolean redisxIsConnected(Redis *redis);
 boolean redisxHasPipeline(Redis *redis);
 
 RedisClient *redisxGetClient(Redis *redis, enum redisx_channel channel);
+RedisClient *redisxGetLockedConnectedClient(Redis *redis, enum redisx_channel channel);
 
 void redisxAddConnectHook(Redis *redis, void (*setupCall)(Redis *));
 void redisxRemoveConnectHook(Redis *redis, void (*setupCall)(Redis *));
@@ -288,7 +289,7 @@ void redisxDestroyRESP(RESP *resp);
 
 // Locks for async calls
 int redisxLockClient(RedisClient *cl);
-int redisxLockEnabled(RedisClient *cl);
+int redisxLockConnected(RedisClient *cl);
 int redisxUnlockClient(RedisClient *cl);
 
 // Asynchronous access routines (use within redisxLockClient()/ redisxUnlockClient() blocks)...

@@ -280,6 +280,29 @@ RedisClient *redisxGetClient(Redis *redis, enum redisx_channel channel) {
   return &p->clients[channel];
 }
 
+
+/**
+ * Returns the redis client for a given connection type in a Redis instance, with the exclusive access lock
+ * if the client is valid and is connected, or else NULL. It is effectively the combination of `redisxGetClient()`
+ * followed by `redisxLockConnected()`.
+ *
+ * @param redis     Pointer to a Redis instance.
+ * @param channel   REDISX_INTERACTIVE_CHANNEL, REDISX_PIPELINE_CHANNEL, or REDISX_SUBSCRIPTION_CHANNEL
+ * @return          The locked client, if it is enabled, or NULL if the redis argument is NULL, the channel is
+ *                  invalid, or the requested client is not currently connected.
+ *
+ * @sa redisxGetClient()
+ * @sa redisxUnlockClient()
+ * @sa redisxLockConnected()
+ */
+RedisClient *redisxGetLockedConnectedClient(Redis *redis, enum redisx_channel channel) {
+  RedisClient *cl = redisxGetClient(redis, channel);
+  if(!cl) return NULL;
+
+  if(redisxLockConnected(cl) != X_SUCCESS) return NULL;
+  return cl;
+}
+
 /**
  * Get exclusive write access to the specified REDIS channel.
  *
@@ -289,11 +312,11 @@ RedisClient *redisxGetClient(Redis *redis, enum redisx_channel channel) {
  *                  X_FAILURE           if pthread_mutex_lock() returned an error
  *                  X_NULL              if the client is NULL.
  *
- * @sa redisxLockEnabled()
+ * @sa redisxLockConnected()
  * @sa redisxUnlockClient()
  */
 int redisxLockClient(RedisClient *cl) {
-  static const char *funcName = "redisLockClient()";
+  static const char *funcName = "redisxLockClient()";
   ClientPrivate *cp;
   int status;
 
@@ -317,13 +340,14 @@ int redisxLockClient(RedisClient *cl) {
  * \return       X_SUCCESS (0)          if an excusive lock to the channel has been granted.
  *               X_FAILURE              if pthread_mutex_lock() returned an error
  *               X_NULL                 if the client is NULL
- *               REDIS_INVALID_CHANNEL  if the channel is enabled/connected.
+ *               REDIS_INVALID_CHANNEL  if the channel is not enabled/connected.
  *
  * @sa redisxLockClient()
  * @sa redisxUnlockClient()
+ * @sa redisxGetLockedConnectedClient()
  */
-int redisxLockEnabled(RedisClient *cl) {
-  static const char *funcName = "redisxLockEnabled()";
+int redisxLockConnected(RedisClient *cl) {
+  static const char *funcName = "redisxLockConnected()";
   const ClientPrivate *cp;
   int status = redisxLockClient(cl);
   if(status) return redisxError(funcName, status);
@@ -347,7 +371,7 @@ int redisxLockEnabled(RedisClient *cl) {
  *                  X_NULL              if the client is NULL
  *
  * @sa redisxLockClient()
- * @sa redisxLockEnabled()
+ * @sa redisxLockConnected()
  */
 int redisxUnlockClient(RedisClient *cl) {
   static const char *funcName = "redisxUnlockClient()";

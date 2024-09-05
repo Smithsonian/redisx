@@ -384,17 +384,13 @@ with the approrpiate mutex locked to prevent concurrency issues.
   // We'll use a dedicated pipeline connection for asynchronous requests
   // This way, interactive requests can still be sent independently on the interactive
   // channel independently, if need be.
-  RedisClient *pipe = redisxGetClient(redis, REDISX_PIPELINE_CHANNEL);
+  RedisClient *pipe = redisxGetLockedConnectedClient(redis, REDISX_PIPELINE_CHANNEL);
 
   // Check that the client is valid...
   if (pipe == NULL) {
      // Abort: we do not appear to have an active pipeline connection...
      return;
   }
-
-  // Get exclusive access to the pipeline channel, so no other thread may send
-  // other requests concurrently...
-  redisxLockEnabled(pipe);
 
   // -------------------------------------------------------------------------
   // Submit a whole bunch of asynchronous requests, e.g. from a loop...
@@ -582,7 +578,7 @@ byte sequence that is not 0-terminated). If zero is used, as in the example abov
 length of the 0-terminated string message using `strlen()`.
 
 Alternatively, you may use the `redisxPublishAsync()` instead if you want to publish on a subscription client to which
-you have already have exlusive access (e.g. after an appropriate `redisxLockEnabled()` call).
+you have already have exlusive access (e.g. after an appropriate `redisxLockConnected()` call).
 
 <a name="subscriptions"></a>
 ### Subscriptions
@@ -657,12 +653,10 @@ client's mutex locked, to ensure that other threads do not interfere with your s
 E.g.:
 
 ```c
-  RedisClient *cl = redisxGetClient(...);
-  
-  // Obtain an exclusive lock on the client
-  int status = redisxLockEnabled(cl);
-  if (status != X_SUCCESS) {
-    // Abort: the client is probably not connected
+  // Obtain the appropriate client with an exclusive lock on it.
+  RedisClient *cl = redisxGetLockedConnectedClient(...);
+  if (cl == NULL) {
+    // Abort: no such client is connected
     return;
   }
   
@@ -756,10 +750,8 @@ atomically. Such an execution block in RedisX may look something like:
   
   // Obtain a lock on the client on which to execute the block.
   // e.g. the INTERACTIVE_CHANNEL
-  RedisClient *cl = redisxGetClient(redis, REDISX_INTERACTIVE_CHANNEL);
-  
-  int status = redisxLockEnabled(cl);
-  if (status != X_SUCCESS) {
+  RedisClient *cl = redisxGetLockedConnectedClient(redis, REDISX_INTERACTIVE_CHANNEL);
+  if (cl == NULL) {
     // Abort: we don't have exclusive access to the client
     return;
   }
