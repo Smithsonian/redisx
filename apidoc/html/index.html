@@ -653,7 +653,7 @@ LUA script loading and execution</h3>
 <div class="line"> </div>
 <div class="line"><span class="comment">// Check and inspect the reply</span></div>
 <div class="line">...</div>
-<div class="ttc" id="aredisx-script_8c_html_a36374ac4afaaca0a72be2fb95a909869"><div class="ttname"><a href="redisx-script_8c.html#a36374ac4afaaca0a72be2fb95a909869">redisxRunScript</a></div><div class="ttdeci">RESP * redisxRunScript(Redis *redis, const char *sha1, const char **keys, const char **params)</div><div class="ttdef"><b>Definition</b> redisx-script.c:120</div></div>
+<div class="ttc" id="aredisx-script_8c_html_a36374ac4afaaca0a72be2fb95a909869"><div class="ttname"><a href="redisx-script_8c.html#a36374ac4afaaca0a72be2fb95a909869">redisxRunScript</a></div><div class="ttdeci">RESP * redisxRunScript(Redis *redis, const char *sha1, const char **keys, const char **params)</div><div class="ttdef"><b>Definition</b> redisx-script.c:122</div></div>
 </div><!-- fragment --><p>Or, you can use <code><a class="el" href="redisx-script_8c.html#a711d6ba68a67ab814ddda0adc998a2ce">redisxRunScriptAsync()</a></code> instead to send the request to run the script, and then collect the response later, as appropriate.</p>
 <p>One thing to keep in mind about LUA scripts is that they are not fully persistent. They will be lost each time the <a class="el" href="structRedis.html" title="Structure that represents a Redis database instance, with one or more RedisClient connections.">Redis</a> server is restarted.</p>
 <p><a class="anchor" id="custom-functions"></a> </p>
