@@ -253,6 +253,7 @@ RESP *redisxRequest(Redis *redis, const char *command, const char *arg1, const c
 RESP *redisxArrayRequest(Redis *redis, char *args[], int length[], int n, int *status);
 int redisxSetValue(Redis *redis, const char *table, const char *key, const char *value, boolean isPipelined);
 RESP *redisxGetValue(Redis*redis, const char *table, const char *key, int *status);
+char *redisxGetStringValue(Redis *redis, const char *table, const char *key, int *len);
 RedisEntry *redisxGetTable(Redis *redis, const char *table, int *n);
 RedisEntry *redisxScanTable(Redis *redis, const char *table, const char *pattern, int *n, int *status);
 int redisxMultiSet(Redis *redis, const char *table, const RedisEntry *entries, int n, boolean isPipelined);

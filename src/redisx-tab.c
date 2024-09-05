@@ -197,7 +197,7 @@ int redisxSetValueAsync(RedisClient *cl, const char *table, const char *key, con
  * Retrieve a variable from Redis, through the interactive connection. This is not the highest throughput mode
  * (that would be sending asynchronous pipeline request, and then asynchronously collecting the results such as
  * with redisxSendRequestAsync() / redisxReadReplyAsync()), because it requires separate network roundtrips for each
- * and every request. But, it is simple and perfectly good method when one needs to retrieve only a few (<1000)
+ * and every request. But, it is simple and perfectly good method when one needs to retrieve only a few (&lt;1000)
  * variables per second...
  *
  * The call is effectively implements a Redis GET (if the tale argument is NULL) or HGET call.
@@ -210,13 +210,18 @@ int redisxSetValueAsync(RedisClient *cl, const char *table, const char *key, con
  *
  * \return          A freshly allocated RESP array containing the Redis response, or NULL if no valid
  *                  response could be obtained.
+ *
+ * \sa redisxGetStringValue()
  */
 RESP *redisxGetValue(Redis *redis, const char *table, const char *key, int *status) {
   static const char *funcName = "redisxGetValue()";
 
   RESP *reply;
 
-  if(redis == NULL) return NULL;
+  if(redis == NULL) {
+    if(status) *status = X_NULL;
+    return NULL;
+  }
 
   if(key == NULL) {
     *status = redisxError(funcName, X_NAME_INVALID);
@@ -229,6 +234,52 @@ RESP *redisxGetValue(Redis *redis, const char *table, const char *key, int *stat
   if(*status) redisxError(funcName, *status);
 
   return reply;
+}
+
+/**
+ * Retrieve a variable from Redis as a string (or byte array), through the interactive connection. This is not the
+ * highest throughput mode (that would be sending asynchronous pipeline request, and then asynchronously collecting
+ * the results such as with redisxSendRequestAsync() / redisxReadReplyAsync()), because it requires separate network
+ * roundtrips for each and every request. But, it is simple and perfectly good method when one needs to retrieve only
+ * a few (&lt;1000) variables per second...
+ *
+ * The call is effectively implements a Redis GET (if the tale argument is NULL) or HGET call.
+ *
+ * \param[in]  redis     Pointer to a Redis instance.
+ * \param[in]  table     Hashtable from which to retrieve a value or NULL if to use the global table.
+ * \param[in]  key       Field name (i.e. variable name).
+ * \param[out] len       (optional) pointer in which to return the length (&gt;=0) of the value or else
+ *                       an error code (&lt;0) defined in xchange.h / redisx.h
+ *
+ * \return          A freshly allocated RESP array containing the Redis response, or NULL if no valid
+ *                  response could be obtained.
+ *
+ * \sa redisxGetValue()
+ */
+char *redisxGetStringValue(Redis *redis, const char *table, const char *key, int *len) {
+  RESP *reply;
+  char *str = NULL;
+  int status;
+
+  if(redis == NULL) {
+    if(len) *len = X_NULL;
+    return NULL;
+  }
+
+  reply = redisxGetValue(redis, table, key, len);
+
+  status = redisxCheckRESP(reply, RESP_BULK_STRING, 0);
+
+  if(status == X_SUCCESS) {
+    str = (char *) reply->value;
+    reply->value = NULL;
+    if(len) *len = reply->n;
+  }
+  else if(len) *len = status;
+
+  redisxDestroyRESP(reply);
+
+  return str;
 }
 
 /**
