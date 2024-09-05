@@ -74,7 +74,7 @@ static int rReadChunkAsync(ClientPrivate *cp) {
   if(sock < 0) return X_NO_INIT;
 
   cp->next = 0;
-  cp->available = recv(sock, cp->in, REDIS_RCV_CHUNK_SIZE, 0);
+  cp->available = recv(sock, cp->in, REDISX_RCVBUF_SIZE, 0);
   xdprintf(" ... read %d bytes from client %d socket.\n", cp->available, cp->idx);
   if(cp->available <= 0) {
     if(cp->available == 0) errno = ECONNRESET;        // 0 return is remote cleared connection. So set ECONNRESET...
@@ -580,7 +580,7 @@ int redisxSendRequestAsync(RedisClient *cl, const char *command, const char *arg
  */
 int redisxSendArrayRequestAsync(RedisClient *cl, char *args[], int lengths[], int n) {
   const char *funcName = "redisxSendArrayRequestAsync()";
-  char buf[REDIS_CMDBUF_SIZE];
+  char buf[REDISX_CMDBUF_SIZE];
   int status, i, L;
   ClientPrivate *cp;
 
@@ -601,7 +601,7 @@ int redisxSendArrayRequestAsync(RedisClient *cl, char *args[], int lengths[], in
     // length of next RESP the bulk string component including \r\n\0 termination.
     L1 = l + 3;
 
-    if((L + L1) > REDIS_CMDBUF_SIZE) {
+    if((L + L1) > REDISX_CMDBUF_SIZE) {
       // If buf cannot include the next argument, then flush the buffer...
       status = rSendBytesAsync(cp, buf, L, FALSE);
       if(status) return redisxError(funcName, status);
@@ -609,7 +609,7 @@ int redisxSendArrayRequestAsync(RedisClient *cl, char *args[], int lengths[], in
       L = 0;
 
       // If the next argument does not fit into the buffer, then send it piecemeal
-      if(L1 > REDIS_CMDBUF_SIZE) {
+      if(L1 > REDISX_CMDBUF_SIZE) {
         status = rSendBytesAsync(cp, args[i], l, FALSE);
         if(status) return redisxError(funcName, status);
 

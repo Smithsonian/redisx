@@ -16,24 +16,24 @@
 #include "xchange.h"
 
 // Configuration constants ------------------------------------------------------->
-#ifndef REDIS_TCP_PORT
+#ifndef REDISX_TCP_PORT
 /// Default TCP/IP port on which Redis server listens to clients.
-#  define REDIS_TCP_PORT                  6379
+#  define REDISX_TCP_PORT                  6379
 #endif
 
-#ifndef REDIS_TCP_BUF
+#ifndef REDISX_TCP_BUF_SIZE
 /// (bytes) Default TCP buffer size (send/recv) for Redis clients. Values &lt;= 0 will use system default.
-#  define REDIS_TCP_BUF                   0
+#  define REDISX_TCP_BUF_SIZE                   0
 #endif
 
-#ifndef REDIS_CMDBUF_SIZE
+#ifndef REDISX_CMDBUF_SIZE
 /// (bytes) Size of many internal arrays, and the max. send chunk size. At least ~16 bytes...
-#  define REDIS_CMDBUF_SIZE               8192
+#  define REDISX_CMDBUF_SIZE               8192
 #endif
 
-#ifndef REDIS_RCV_CHUNK_SIZE
+#ifndef REDISX_RCVBUF_SIZE
 /// (bytes) Redis receive buffer size (at most that much is read from the socket in a single call).
-#  define REDIS_RCV_CHUNK_SIZE            8192
+#  define REDISX_RCVBUF_SIZE            8192
 #endif
 
 #ifndef REDISX_SET_LISTENER_PRIORITY
@@ -92,7 +92,7 @@
 #define RESP_BULK_STRING        '$'     ///< \hideinitializer RESP bulk string type
 #define RESP_PONG               'P'     ///< \hideinitializer RESP PONG response type
 
-#define REDIS_INVALID_CHANNEL       (-101)  ///< \hideinitializer There is no such channel in the Redis intance.
+#define REDIS_INVALID_CHANNEL       (-101)  ///< \hideinitializer There is no such channel in the Redis instance.
 #define REDIS_NULL                  (-102)  ///< \hideinitializer Redis returned NULL
 #define REDIS_ERROR                 (-103)  ///< \hideinitializer Redis returned an error
 #define REDIS_INCOMPLETE_TRANSFER   (-104)  ///< \hideinitializer The transfer to/from Redis is incomplete
@@ -107,9 +107,9 @@
  * when connecting to the server; and the subscription client is connected as needed to process PUB/SUB requests.
  */
 enum redisx_channel {
-  REDISX_INTERACTIVE_CHANNEL = 0,      ///< \hideinitializer Redis channel number for interactive queries
-  REDISX_PIPELINE_CHANNEL,      ///< \hideinitializer Redis channel number for pipelined transfers
-  REDISX_SUBSCRIPTION_CHANNEL   ///< \hideinitializer Redis channel number for PUB/SUB messages
+  REDISX_INTERACTIVE_CHANNEL = 0,     ///< \hideinitializer Redis channel number for interactive queries
+  REDISX_PIPELINE_CHANNEL,            ///< \hideinitializer Redis channel number for pipelined transfers
+  REDISX_SUBSCRIPTION_CHANNEL         ///< \hideinitializer Redis channel number for PUB/SUB messages
 };
 
 #define REDISX_CHANNELS     (REDISX_SUBSCRIPTION_CHANNEL + 1)  ///< \hideinitializer The number of channels a Redis instance has.

@@ -45,7 +45,7 @@ typedef struct ServerLink {
 static ServerLink *serverList;
 static pthread_mutex_t serverLock = PTHREAD_MUTEX_INITIALIZER;
 
-static int tcpBufSize = REDIS_TCP_BUF;
+static int tcpBufSize = REDISX_TCP_BUF_SIZE;
 
 
 /**
@@ -519,7 +519,7 @@ int rConnectClient(Redis *redis, enum redisx_channel channel) {
   cp = (ClientPrivate *) cl->priv;
 
   serverAddress.sin_family      = AF_INET;
-  serverAddress.sin_port        = htons(REDIS_TCP_PORT);
+  serverAddress.sin_port        = htons(REDISX_TCP_PORT);
   serverAddress.sin_addr.s_addr = p->addr;
   memset(serverAddress.sin_zero, '\0', sizeof(serverAddress.sin_zero));
 
@@ -637,7 +637,7 @@ Redis *redisxInit(const char *server) {
   }
 
   p->addr = inet_addr((char *) ipAddress);
-  p->port = REDIS_TCP_PORT;
+  p->port = REDISX_TCP_PORT;
 
   l = (ServerLink *) calloc(1, sizeof(ServerLink));
   l->redis = redis;
