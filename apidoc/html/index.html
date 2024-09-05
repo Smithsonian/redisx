@@ -413,7 +413,7 @@ Getting and setting keyed values</h3>
 <div class="line">...</div>
 <div class="line"> </div>
 <div class="line"><span class="comment">// Discard the value once it&#39;s no longer needed.</span></div>
-<div class="line">free(value);</div>
+<div class="line">if(value) free(value);</div>
 <div class="ttc" id="aredisx-tab_8c_html_afc875f142146282860b6a8a3ac2f0fc8"><div class="ttname"><a href="redisx-tab_8c.html#afc875f142146282860b6a8a3ac2f0fc8">redisxGetStringValue</a></div><div class="ttdeci">char * redisxGetStringValue(Redis *redis, const char *table, const char *key, int *len)</div><div class="ttdef"><b>Definition</b> redisx-tab.c:259</div></div>
 </div><!-- fragment --><p>The same goes for top-level keyed values, using <code>NULL</code> for the hash table name:</p>
 <div class="fragment"><div class="line"><span class="comment">// Get value for top-level key (not stored in hash table!)</span></div>

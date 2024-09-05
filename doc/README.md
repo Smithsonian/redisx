@@ -432,7 +432,7 @@ Retrieving individual keyed values is simple:
   ...
   
   // Discard the value once it's no longer needed.
-  free(value);
+  if(value) free(value);
 ```
 
 The same goes for top-level keyed values, using `NULL` for the hash table name:
