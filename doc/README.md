@@ -9,6 +9,7 @@ A simple, light-weight C/C++ Redis client library.
  - [Building RedisX](#building-redisx)
  - [Managing Redis server connections](#managing-redis-server-connections)
  - [Simple Redis queries](#simple-redis-queries)
+ - [Accessing key / value data](#accessing-key-value-data)
  - [Publish/subscribe (PUB/SUB) support](#publish-subscribe-support)
  - [Advanced queries](#advanced-queries)
  - [Atomic execution blocks and LUA scripts](#atomic-transaction-blocks-and-lua-scripts)
