@@ -646,12 +646,12 @@ LUA script loading and execution</h3>
 <div class="fragment"><div class="line"><a class="code hl_struct" href="structRedis.html">Redis</a> *redis = ...</div>
 <div class="line"> </div>
 <div class="line">char *keyArgs[] = { <span class="stringliteral">&quot;my-redis-key-argument&quot;</span>, NULL }; <span class="comment">// NULL-terminated array of keyword arguments</span></div>
-<div class="line"><span class="keywordtype">char</span> *params[] = { <span class="stringliteral">&quot;some-string&quot;</span>, <span class="stringliteral">&quot;-1.11&quot;</span>, NULL };   <span class="comment">// NULL-terminated array of additional parameters</span></div>
+<div class="line"><span class="keywordtype">char</span> *params[] = { <span class="stringliteral">&quot;some-string&quot;</span>, <span class="stringliteral">&quot;-1.11&quot;</span>, NULL };   <span class="comment">// NULL-terminated array of extra parameters</span></div>
 <div class="line"> </div>
 <div class="line"><span class="comment">// Execute the script, with the specified keyword arguments and parameters</span></div>
 <div class="line"><a class="code hl_struct" href="structRESP.html">RESP</a> *reply = <a class="code hl_function" href="redisx-script_8c.html#a36374ac4afaaca0a72be2fb95a909869">redisxRunScript</a>(redis, scriptSHA1, keyArgs, params);</div>
 <div class="line"> </div>
-<div class="line"><span class="comment">// Check status and inspect RESP</span></div>
+<div class="line"><span class="comment">// Check and inspect the reply</span></div>
 <div class="line">...</div>
 <div class="ttc" id="aredisx-script_8c_html_a36374ac4afaaca0a72be2fb95a909869"><div class="ttname"><a href="redisx-script_8c.html#a36374ac4afaaca0a72be2fb95a909869">redisxRunScript</a></div><div class="ttdeci">RESP * redisxRunScript(Redis *redis, const char *sha1, const char **keys, const char **params)</div><div class="ttdef"><b>Definition</b> redisx-script.c:120</div></div>
 </div><!-- fragment --><p>Or, you can use <code><a class="el" href="redisx-script_8c.html#a711d6ba68a67ab814ddda0adc998a2ce">redisxRunScriptAsync()</a></code> instead to send the request to run the script, and then collect the response later, as appropriate.</p>
