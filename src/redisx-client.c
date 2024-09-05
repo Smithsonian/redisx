@@ -812,3 +812,35 @@ RESP *redisxReadReplyAsync(RedisClient *cl) {
 
   return resp;
 }
+
+/**
+ * Sends a `RESET` request to the specified Redis client. The server will perform a reset as if the
+ * client disconnected and reconnected again.
+ *
+ * @param cl    The Redis client
+ * @return      X_SUCCESS (0) if successful, or else an error code (&lt;0) from redisx.h / xchange.h.
+ */
+int redisxResetClient(RedisClient *cl) {
+  static const char *funcName = "redisxResetClient()";
+
+  int status = X_SUCCESS;
+
+  if(cl == NULL) return redisxError(funcName, X_NULL);
+
+  status = redisxLockConnected(cl);
+  if(status) return redisxError(funcName, status);
+
+  status = redisxSendRequestAsync(cl, "RESET", NULL, NULL, NULL);
+  if(!status) {
+    RESP *reply = redisxReadReplyAsync(cl);
+    status = redisxCheckRESP(reply, RESP_SIMPLE_STRING, 0);
+    if(!status) if(strcmp("RESET", (char *) reply->value) != 0) status = REDIS_UNEXPECTED_RESP;
+    redisxDestroyRESP(reply);
+  }
+
+  redisxUnlockClient(cl);
+
+  if(status) return redisxError(funcName, status);
+
+  return X_SUCCESS;
+}

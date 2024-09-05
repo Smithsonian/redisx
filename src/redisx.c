@@ -166,49 +166,6 @@ int redisxSetTransmitErrorHandler(Redis *redis, RedisErrorHandler f) {
   return X_SUCCESS;
 }
 
-/**
- * Loads a LUA script into Redis, returning it's SHA1 hash to use as it's call ID.
- *
- * \param[in]  redis         Pointer to a Redis instance.
- * \param[in]  script        String containing the full LUA script.
- * \param[out] sha1          Buffer into which SHA1 key returned by Redis to use as call ID.
- *                           (It must be at least 41 bytes, and will be string terminated).
- *                           By default it will return an empty string.
- *
- * \return      X_SUCCESS (0)           if the script has been successfully loaded into Redis, or
- *              X_NULL                  if the Redis instance is NULL
- *              X_NAME_INVALID          if the script is NULL or empty.
- *              REDIS_UNEXPECTED_RESP   if received a Redis reponse of the wrong type,
- *
- *              ot an error returned by redisxRequest().
- *
- */
-int redisxLoadScript(Redis *redis, const char *script, char **sha1) {
-  static const char *funcName = "redisxLoadScript()";
-  RESP *reply;
-  int status;
-
-  if(redis == NULL) return redisxError(funcName, X_NULL);
-  if(script == NULL) return redisxError(funcName, X_NAME_INVALID);
-  if(*script == '\0') return redisxError(funcName, X_NAME_INVALID);
-
-  *sha1 = NULL;
-
-  reply = redisxRequest(redis, "SCRIPT", "LOAD", script, NULL, &status);
-
-  if(!status) {
-    redisxDestroyRESP(reply);
-    return redisxError(funcName, status);
-  }
-
-  status = redisxCheckDestroyRESP(reply, RESP_BULK_STRING, 0);
-  if(status) return redisxError(funcName, status);
-
-  *sha1 = (char *) reply->value;
-  redisxDestroyRESP(reply);
-
-  return X_SUCCESS;
-}
 
 /**
  * Returns the current time on the Redis server instance.
@@ -307,7 +264,7 @@ int redisxPing(Redis *redis, const char *message) {
  * @sa redisxSelectDB()
  * @sa redisxLockConnected()
  */
-static int redisxSelectClientDBAsync(RedisClient *cl, int idx, boolean confirm) {
+static int redisxSelectDBAsync(RedisClient *cl, int idx, boolean confirm) {
   static const char *funcName = "redisxSelectClientDBAsync()";
 
   char sval[20];
@@ -384,46 +341,13 @@ int redisxSelectDB(Redis *redis, int idx) {
       continue;
     }
 
-    s = redisxSelectClientDBAsync(cl, idx, c != REDISX_PIPELINE_CHANNEL);
+    s = redisxSelectDBAsync(cl, idx, c != REDISX_PIPELINE_CHANNEL);
     redisxUnlockClient(cl);
 
     if(s) status = X_INCOMPLETE;
   }
 
   return status;
-}
-
-
-/**
- * Sends a `RESET` request to the specified Redis client. The server will perform a reset as if the
- * client disconnected and reconnected again.
- *
- * @param cl    The Redis client
- * @return      X_SUCCESS (0) if successful, or else an error code (&lt;0) from redisx.h / xchange.h.
- */
-int redisxResetClient(RedisClient *cl) {
-  static const char *funcName = "redisxResetClient()";
-
-  int status = X_SUCCESS;
-
-  if(cl == NULL) return redisxError(funcName, X_NULL);
-
-  status = redisxLockConnected(cl);
-  if(status) return redisxError(funcName, status);
-
-  status = redisxSendRequestAsync(cl, "RESET", NULL, NULL, NULL);
-  if(!status) {
-    RESP *reply = redisxReadReplyAsync(cl);
-    status = redisxCheckRESP(reply, RESP_SIMPLE_STRING, 0);
-    if(!status) if(strcmp("RESET", (char *) reply->value) != 0) status = REDIS_UNEXPECTED_RESP;
-    redisxDestroyRESP(reply);
-  }
-
-  redisxUnlockClient(cl);
-
-  if(status) return redisxError(funcName, status);
-
-  return X_SUCCESS;
 }
 
 /**
