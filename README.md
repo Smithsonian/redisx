@@ -26,6 +26,7 @@ A simple, light-weight C/C++ Redis client library.
  - [Building RedisX](#building-redisx)
  - [Managing Redis server connections](#managing-redis-server-connections)
  - [Simple Redis queries](#simple-redis-queries)
+ - [Accessing key / value data](#accessing-key-value-data)
  - [Publish/subscribe (PUB/SUB) support](#publish-subscribe-support)
  - [Advanced queries](#advanced-queries)
  - [Atomic execution blocks and LUA scripts](#atomic-transaction-blocks-and-lua-scripts)
@@ -459,7 +460,10 @@ The same goes for top-level keyed values, using `NULL` for the hash table name:
   char *value = redisxGetStringValue(redis, NULL, "my-key", &len);
 ```
 
-In turn, setting values is also straightforward:
+Alternatively, you can get the value as an undigested `RESP`, using `redisxGetValue()` instead, which allows you to
+check and inspect the response in more detail (e.g. to check for potential errors, or unexpected response types).
+
+Setting values is straightforward also:
 
 ```c
   Redis *redis = ...;
@@ -909,7 +913,7 @@ Some obvious ways the library could evolve and grow in the not too distant futur
  - Improved error handling (e.g. by consistently setting `errno` beyond just the __RedisX__ error status).
 
 If you have an idea for a must have feature, please let me (Attila) know. Pull requests, for new features or fixes to
-existing ones are especially welcome! 
+existing ones, are especially welcome! 
  
 -----------------------------------------------------------------------------
 Copyright (C) 2024 Attila Kovács
