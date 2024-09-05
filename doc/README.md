@@ -429,11 +429,10 @@ Retrieving individual keyed values is simple:
     ...
   }
   
-  // Check and process resp
   ...
   
-  // Destroy resp
-  redisxDestroyRESP(resp);
+  // Discard the value once it's no longer needed.
+  free(value);
 ```
 
 The same goes for top-level keyed values, using `NULL` for the hash table name:
