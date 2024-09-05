@@ -39,7 +39,7 @@ typedef struct Hook {
 
 typedef struct {
   Redis *redis;                 ///< Pointer to the enclosing Redis instance
-  enum redisx_channel idx;      ///< e.g. INTERACTIVE_CHANNEL, PIPELINE_CHANNEL, or SUBSCRIPTION_CHANNEL
+  enum redisx_channel idx;      ///< e.g. REDISX_INTERACTIVE_CHANNEL, REDISX_PIPELINE_CHANNEL, or REDISX_SUBSCRIPTION_CHANNEL
   volatile boolean isEnabled;   ///< Whether the client is currecntly enabled for sending/receiving data
   pthread_mutex_t writeLock;    ///< A lock for writing and requests through this channel...
   pthread_mutex_t readLock;     ///< A lock for reading from the channel...

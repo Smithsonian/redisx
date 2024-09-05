@@ -107,12 +107,12 @@
  * when connecting to the server; and the subscription client is connected as needed to process PUB/SUB requests.
  */
 enum redisx_channel {
-  INTERACTIVE_CHANNEL = 0,   ///< \hideinitializer Redis channel number for interactive queries
-  PIPELINE_CHANNEL,          ///< \hideinitializer Redis channel number for pipelined transfers
-  SUBSCRIPTION_CHANNEL       ///< \hideinitializer Redis channel number for PUB/SUB messages
+  REDISX_INTERACTIVE_CHANNEL = 0,      ///< \hideinitializer Redis channel number for interactive queries
+  REDISX_PIPELINE_CHANNEL,      ///< \hideinitializer Redis channel number for pipelined transfers
+  REDISX_SUBSCRIPTION_CHANNEL   ///< \hideinitializer Redis channel number for PUB/SUB messages
 };
 
-#define REDISX_CHANNELS     (SUBSCRIPTION_CHANNEL + 1)  ///< \hideinitializer The number of channels a Redis instance has.
+#define REDISX_CHANNELS     (REDISX_SUBSCRIPTION_CHANNEL + 1)  ///< \hideinitializer The number of channels a Redis instance has.
 
 
 /**

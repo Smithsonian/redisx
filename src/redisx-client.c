@@ -265,7 +265,7 @@ static int rSendBytesAsync(ClientPrivate *cp, const char *buf, int length, boole
  * Returns the redis client for a given connection type in a Redis instance.
  *
  * \param redis         Pointer to a Redis instance.
- * \param channel       INTERACTIVE_CHANNEL, PIPELINE_CHANNEL, or SUBSCRIPTION_CHANNEL
+ * \param channel       REDISX_INTERACTIVE_CHANNEL, REDISX_PIPELINE_CHANNEL, or REDISX_SUBSCRIPTION_CHANNEL
  *
  * \return      Pointer to the matching Redis client, or NULL if the channel argument is invalid.
  *

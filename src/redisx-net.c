@@ -205,7 +205,7 @@ static int rConnectAsync(Redis *redis, boolean usePipeline) {
     static int warnedInteractive;
 
     xvprintf("Redis-X> Connect interactive client.\n");
-    status = rConnectClient(redis, INTERACTIVE_CHANNEL);
+    status = rConnectClient(redis, REDISX_INTERACTIVE_CHANNEL);
 
     if(status) {
       if(!warnedInteractive) {
@@ -222,7 +222,7 @@ static int rConnectAsync(Redis *redis, boolean usePipeline) {
       static int warnedPipeline;
 
       xvprintf("Redis-X> Connect pipeline client.\n");
-      status = rConnectClient(redis, PIPELINE_CHANNEL);
+      status = rConnectClient(redis, REDISX_PIPELINE_CHANNEL);
 
       if(status) {
         if(!warnedPipeline) {
@@ -483,14 +483,14 @@ static void rInitClient(RedisClient *cl, enum redisx_channel idx) {
  */
 boolean rIsLowLatency(const ClientPrivate *cp) {
   if(cp == NULL) return FALSE;
-  return cp->idx != PIPELINE_CHANNEL;
+  return cp->idx != REDISX_PIPELINE_CHANNEL;
 }
 
 /**
  * Connects the specified REDIS client to the REDIS server.
  *
  * \param redis         Pointer to a Redis instance.
- * \param channel       INTERACTIVE_CHANNEL, PIPELINE_CHANNEL, or SUBSCRIPTION_CHANNEL
+ * \param channel       REDISX_INTERACTIVE_CHANNEL, REDISX_PIPELINE_CHANNEL, or REDISX_SUBSCRIPTION_CHANNEL
  *
  * \return              X_SUCCESS (0) if successful, or else:
  *
@@ -562,9 +562,9 @@ int rConnectClient(Redis *redis, enum redisx_channel channel) {
 
   id = (char *) malloc(strlen(host) + 100);      // <host>:pid-<pid>:<channel> + termination;
   switch(cp->idx) {
-    case INTERACTIVE_CHANNEL: channelID = "interactive"; break;
-    case PIPELINE_CHANNEL: channelID = "pipeline"; break;
-    case SUBSCRIPTION_CHANNEL: channelID = "subscription"; break;
+    case REDISX_INTERACTIVE_CHANNEL: channelID = "interactive"; break;
+    case REDISX_PIPELINE_CHANNEL: channelID = "pipeline"; break;
+    case REDISX_SUBSCRIPTION_CHANNEL: channelID = "subscription"; break;
     default: channelID = "unknown";
   }
 
@@ -626,9 +626,9 @@ Redis *redisxInit(const char *server) {
 
   redis = (Redis *) calloc(1, sizeof(Redis));
   redis->priv = p;
-  redis->interactive = &p->clients[INTERACTIVE_CHANNEL];
-  redis->pipeline = &p->clients[PIPELINE_CHANNEL];
-  redis->subscription = &p->clients[SUBSCRIPTION_CHANNEL];
+  redis->interactive = &p->clients[REDISX_INTERACTIVE_CHANNEL];
+  redis->pipeline = &p->clients[REDISX_PIPELINE_CHANNEL];
+  redis->subscription = &p->clients[REDISX_SUBSCRIPTION_CHANNEL];
   redis->id = xStringCopyOf(ipAddress);
 
   for(i=REDISX_CHANNELS; --i >= 0; ) {

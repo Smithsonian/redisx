@@ -378,13 +378,13 @@ int redisxSelectDB(Redis *redis, int idx) {
     int s = redisxLockEnabled(cl);
 
     // We can't switch unconnected clients or the existing subscription client
-    if(s == REDIS_INVALID_CHANNEL || c == SUBSCRIPTION_CHANNEL) {
+    if(s == REDIS_INVALID_CHANNEL || c == REDISX_SUBSCRIPTION_CHANNEL) {
       if(!s) status = X_INCOMPLETE;
       redisxUnlockClient(cl);
       continue;
     }
 
-    s = redisxSelectClientDBAsync(cl, idx, c != PIPELINE_CHANNEL);
+    s = redisxSelectClientDBAsync(cl, idx, c != REDISX_PIPELINE_CHANNEL);
     redisxUnlockClient(cl);
 
     if(s) status = X_INCOMPLETE;

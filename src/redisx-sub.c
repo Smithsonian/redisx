@@ -58,7 +58,7 @@ static int rConnectSubscriptionClientAsync(Redis *redis) {
   }
 
   xvprintf("Redis-X> Connect pub/sub client.\n");
-  status = rConnectClient(redis, SUBSCRIPTION_CHANNEL);
+  status = rConnectClient(redis, REDISX_SUBSCRIPTION_CHANNEL);
 
   if(status) {
     fprintf(stderr, "ERROR! Redis-X : pub/sub client connection failed. code: %d\n", status);
