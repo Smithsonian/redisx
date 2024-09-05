@@ -31,9 +31,9 @@ var redisx_8h =
     [ "RedisErrorHandler", "redisx_8h.html#a1c01a3b6357a4dd0ad9499d85d4c0368", null ],
     [ "RedisSubscriberCall", "redisx_8h.html#aeb7d6976a06d6b51780b1c9d3f927ef8", null ],
     [ "redisx_channel", "redisx_8h.html#a5349b7340813fbd1e32d04ed650bc3d9", [
-      [ "INTERACTIVE_CHANNEL", "redisx_8h.html#a5349b7340813fbd1e32d04ed650bc3d9a414a7601469647f3a8827a3908c2c358", null ],
-      [ "PIPELINE_CHANNEL", "redisx_8h.html#a5349b7340813fbd1e32d04ed650bc3d9a1ff4eb2593538a6dda3cd49a1df30752", null ],
-      [ "SUBSCRIPTION_CHANNEL", "redisx_8h.html#a5349b7340813fbd1e32d04ed650bc3d9ab4a900f2efbd24a3307f89b5e2474462", null ]
+      [ "REDISX_INTERACTIVE_CHANNEL", "redisx_8h.html#a5349b7340813fbd1e32d04ed650bc3d9a65b4f2926885665960480d008ab2a456", null ],
+      [ "REDISX_PIPELINE_CHANNEL", "redisx_8h.html#a5349b7340813fbd1e32d04ed650bc3d9a7a240839c1e943706535b8d69a605f0c", null ],
+      [ "REDISX_SUBSCRIPTION_CHANNEL", "redisx_8h.html#a5349b7340813fbd1e32d04ed650bc3d9afafc30afa687bc5c56c42b0e677f5981", null ]
     ] ],
     [ "redisxAbortBlockAsync", "redisx_8h.html#ab98b0e71d2d0941920e3097a66eae7b8", null ],
     [ "redisxAddConnectHook", "redisx_8h.html#aaa5c67708e8081814fdae646f6179842", null ],

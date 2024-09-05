@@ -198,21 +198,21 @@
       <arglist></arglist>
     </member>
     <member kind="enumvalue">
-      <name>INTERACTIVE_CHANNEL</name>
+      <name>REDISX_INTERACTIVE_CHANNEL</name>
       <anchorfile>redisx_8h.html</anchorfile>
-      <anchor>a5349b7340813fbd1e32d04ed650bc3d9a414a7601469647f3a8827a3908c2c358</anchor>
+      <anchor>a5349b7340813fbd1e32d04ed650bc3d9a65b4f2926885665960480d008ab2a456</anchor>
       <arglist></arglist>
     </member>
     <member kind="enumvalue">
-      <name>PIPELINE_CHANNEL</name>
+      <name>REDISX_PIPELINE_CHANNEL</name>
       <anchorfile>redisx_8h.html</anchorfile>
-      <anchor>a5349b7340813fbd1e32d04ed650bc3d9a1ff4eb2593538a6dda3cd49a1df30752</anchor>
+      <anchor>a5349b7340813fbd1e32d04ed650bc3d9a7a240839c1e943706535b8d69a605f0c</anchor>
       <arglist></arglist>
     </member>
     <member kind="enumvalue">
-      <name>SUBSCRIPTION_CHANNEL</name>
+      <name>REDISX_SUBSCRIPTION_CHANNEL</name>
       <anchorfile>redisx_8h.html</anchorfile>
-      <anchor>a5349b7340813fbd1e32d04ed650bc3d9ab4a900f2efbd24a3307f89b5e2474462</anchor>
+      <anchor>a5349b7340813fbd1e32d04ed650bc3d9afafc30afa687bc5c56c42b0e677f5981</anchor>
       <arglist></arglist>
     </member>
     <member kind="function">

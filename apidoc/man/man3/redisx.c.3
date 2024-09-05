@@ -380,7 +380,7 @@ X_SUCCESS (0) if successful, or X_NULL if the redis argument is NULL, X_INCOMPLE
 .PP
 
 .PP
-References \fBPIPELINE_CHANNEL\fP, \fBREDIS_INVALID_CHANNEL\fP, \fBREDISX_CHANNELS\fP, \fBredisxAddConnectHook()\fP, \fBredisxError()\fP, \fBredisxGetClient()\fP, \fBredisxIsConnected()\fP, \fBredisxLockEnabled()\fP, \fBredisxRemoveConnectHook()\fP, \fBredisxUnlockClient()\fP, \fBSUBSCRIPTION_CHANNEL\fP, \fBX_INCOMPLETE\fP, \fBX_NULL\fP, and \fBX_SUCCESS\fP\&.
+References \fBREDIS_INVALID_CHANNEL\fP, \fBREDISX_CHANNELS\fP, \fBREDISX_PIPELINE_CHANNEL\fP, \fBREDISX_SUBSCRIPTION_CHANNEL\fP, \fBredisxAddConnectHook()\fP, \fBredisxError()\fP, \fBredisxGetClient()\fP, \fBredisxIsConnected()\fP, \fBredisxLockEnabled()\fP, \fBredisxRemoveConnectHook()\fP, \fBredisxUnlockClient()\fP, \fBX_INCOMPLETE\fP, \fBX_NULL\fP, and \fBX_SUCCESS\fP\&.
 .SS "int redisxSetPassword (\fBRedis\fP * redis, const char * passwd)"
 Sets the password to use for authenticating on the \fBRedis\fP server after connection\&. See the AUTH \fBRedis\fP command for more explanation\&. Naturally, you need to call this prior to connecting your \fBRedis\fP instance to have the desired effect\&.
 .PP

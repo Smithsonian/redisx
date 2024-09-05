@@ -7,7 +7,7 @@ var indexSectionsWithContent =
   4: "fiklnpstv",
   5: "r",
   6: "r",
-  7: "ips",
+  7: "r",
   8: "rs",
   9: "crt"
 };

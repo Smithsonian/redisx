@@ -11,7 +11,6 @@ var searchData=
   ['sub_20support_8',['Publish/subscribe (PUB/SUB) support',['../index.html#autotoc_md25',1,'']]],
   ['subscribe_20pub_20sub_20support_9',['Publish/subscribe (PUB/SUB) support',['../index.html#autotoc_md25',1,'']]],
   ['subscription_10',['subscription',['../structRedis.html#aa4878fb8cef61468ee8e7426a973a75c',1,'Redis']]],
-  ['subscription_5fchannel_11',['SUBSCRIPTION_CHANNEL',['../redisx_8h.html#a5349b7340813fbd1e32d04ed650bc3d9ab4a900f2efbd24a3307f89b5e2474462',1,'redisx.h']]],
-  ['subscriptions_12',['Subscriptions',['../index.html#autotoc_md27',1,'']]],
-  ['support_13',['support',['../index.html#autotoc_md38',1,'Debug support'],['../index.html#autotoc_md25',1,'Publish/subscribe (PUB/SUB) support']]]
+  ['subscriptions_11',['Subscriptions',['../index.html#autotoc_md27',1,'']]],
+  ['support_12',['support',['../index.html#autotoc_md38',1,'Debug support'],['../index.html#autotoc_md25',1,'Publish/subscribe (PUB/SUB) support']]]
 ];

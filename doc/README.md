@@ -367,7 +367,7 @@ with the approrpiate mutex locked to prevent concurrency issues.
   // We'll use a dedicated pipeline connection for asynchronous requests
   // This way, interactive requests can still be sent independently on the interactive
   // channel independently, if need be.
-  RedisClient *pipe = redisxGetClient(redis, PIPELINE_CHANNEL);
+  RedisClient *pipe = redisxGetClient(redis, REDISX_PIPELINE_CHANNEL);
 
   // Check that the client is valid...
   if (pipe == NULL) {
@@ -400,6 +400,7 @@ with the approrpiate mutex locked to prevent concurrency issues.
   // other threads may use it now that we sent off our requests...
   redisxUnlockClient(pipe);
 ```
+
 
 -----------------------------------------------------------------------------
 
@@ -559,9 +560,9 @@ Please refer to the Redis documentation on the behavior of the `SCAN` and `HSCAN
   int status = redisxPublish(redis, "hello_channel", "Hello world!", 0);
 ```
 
-The last argument is an optional string length, if readily available, or if sending a substring only (or a string that 
-is not 0-terminated). If zero is used, as in the example above, it will automatically determine the length of the
-0-terminated string message using `strlen()`.
+The last argument is an optional string length, if readily available, or if sending a substring only (or a string or 
+byte sequence that is not 0-terminated). If zero is used, as in the example above, it will automatically determine the 
+length of the 0-terminated string message using `strlen()`.
 
 Alternatively, you may use the `redisxPublishAsync()` instead if you want to publish on a subscription client to which
 you have already have exlusive access (e.g. after an appropriate `redisxLockEnabled()` call).
@@ -738,7 +739,7 @@ atomically. Such an execution block in RedisX may look something like:
   
   // Obtain a lock on the client on which to execute the block.
   // e.g. the INTERACTIVE_CHANNEL
-  RedisClient *cl = redisxGetClient(redis, INTERACTIVE_CHANNEL);
+  RedisClient *cl = redisxGetClient(redis, REDISX_INTERACTIVE_CHANNEL);
   
   int status = redisxLockEnabled(cl);
   if (status != X_SUCCESS) {

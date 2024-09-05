@@ -138,7 +138,7 @@ include/redisx.h
 
 .in +1c
 .ti -1c
-.RI "enum \fBredisx_channel\fP { \fBINTERACTIVE_CHANNEL\fP, \fBPIPELINE_CHANNEL\fP, \fBSUBSCRIPTION_CHANNEL\fP }"
+.RI "enum \fBredisx_channel\fP { \fBREDISX_INTERACTIVE_CHANNEL\fP, \fBREDISX_PIPELINE_CHANNEL\fP, \fBREDISX_SUBSCRIPTION_CHANNEL\fP }"
 .br
 .in -1c
 .SS "Functions"
@@ -419,13 +419,13 @@ RedisX channel IDs\&. RedisX uses up to three separate connections to the server
 \fBEnumerator\fP
 .in +1c
 .TP
-\fB\fIINTERACTIVE_CHANNEL \fP\fP
+\fB\fIREDISX_INTERACTIVE_CHANNEL \fP\fP
 \fBRedis\fP channel number for interactive queries\&. 
 .TP
-\fB\fIPIPELINE_CHANNEL \fP\fP
+\fB\fIREDISX_PIPELINE_CHANNEL \fP\fP
 \fBRedis\fP channel number for pipelined transfers\&. 
 .TP
-\fB\fISUBSCRIPTION_CHANNEL \fP\fP
+\fB\fIREDISX_SUBSCRIPTION_CHANNEL \fP\fP
 \fBRedis\fP channel number for PUB/SUB messages\&. 
 .SH "Function Documentation"
 .PP 
@@ -806,7 +806,7 @@ Returns the redis client for a given connection type in a \fBRedis\fP instance\&
 .RS 4
 \fIredis\fP Pointer to a \fBRedis\fP instance\&. 
 .br
-\fIchannel\fP INTERACTIVE_CHANNEL, PIPELINE_CHANNEL, or SUBSCRIPTION_CHANNEL
+\fIchannel\fP REDISX_INTERACTIVE_CHANNEL, REDISX_PIPELINE_CHANNEL, or REDISX_SUBSCRIPTION_CHANNEL
 .RE
 .PP
 \fBReturns\fP
@@ -1021,7 +1021,7 @@ X_SUCCESS or X_FAILURE if the IP address is invalid\&. X_NULL if the IP address 
 .PP
 
 .PP
-References \fBFALSE\fP, \fBRedis::id\fP, \fBRedis::interactive\fP, \fBINTERACTIVE_CHANNEL\fP, \fBRedis::pipeline\fP, \fBPIPELINE_CHANNEL\fP, \fBREDIS_TCP_PORT\fP, \fBREDISX_CHANNELS\fP, \fBRedis::subscription\fP, \fBSUBSCRIPTION_CHANNEL\fP, \fBTRUE\fP, and \fBxStringCopyOf()\fP\&.
+References \fBFALSE\fP, \fBRedis::id\fP, \fBRedis::interactive\fP, \fBRedis::pipeline\fP, \fBREDIS_TCP_PORT\fP, \fBREDISX_CHANNELS\fP, \fBREDISX_INTERACTIVE_CHANNEL\fP, \fBREDISX_PIPELINE_CHANNEL\fP, \fBREDISX_SUBSCRIPTION_CHANNEL\fP, \fBRedis::subscription\fP, \fBTRUE\fP, and \fBxStringCopyOf()\fP\&.
 .SS "\fBboolean\fP redisxIsConnected (\fBRedis\fP * redis)"
 Checks if a \fBRedis\fP instance is connected\&.
 .PP
@@ -1472,7 +1472,7 @@ X_SUCCESS (0) if successful, or X_NULL if the redis argument is NULL, X_INCOMPLE
 .PP
 
 .PP
-References \fBPIPELINE_CHANNEL\fP, \fBREDIS_INVALID_CHANNEL\fP, \fBREDISX_CHANNELS\fP, \fBredisxAddConnectHook()\fP, \fBredisxError()\fP, \fBredisxGetClient()\fP, \fBredisxIsConnected()\fP, \fBredisxLockEnabled()\fP, \fBredisxRemoveConnectHook()\fP, \fBredisxUnlockClient()\fP, \fBSUBSCRIPTION_CHANNEL\fP, \fBX_INCOMPLETE\fP, \fBX_NULL\fP, and \fBX_SUCCESS\fP\&.
+References \fBREDIS_INVALID_CHANNEL\fP, \fBREDISX_CHANNELS\fP, \fBREDISX_PIPELINE_CHANNEL\fP, \fBREDISX_SUBSCRIPTION_CHANNEL\fP, \fBredisxAddConnectHook()\fP, \fBredisxError()\fP, \fBredisxGetClient()\fP, \fBredisxIsConnected()\fP, \fBredisxLockEnabled()\fP, \fBredisxRemoveConnectHook()\fP, \fBredisxUnlockClient()\fP, \fBX_INCOMPLETE\fP, \fBX_NULL\fP, and \fBX_SUCCESS\fP\&.
 .SS "int redisxSendArrayRequestAsync (\fBRedisClient\fP * cl, char * args[], int lengths[], int n)"
 Send a \fBRedis\fP request with an arbitrary number of arguments\&.
 .PP
