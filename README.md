@@ -17,7 +17,7 @@
 
 # RedisX
 
-A simple, light-weight C/C++ Redis client.
+A simple, light-weight C/C++ Redis client library.
 
 ## Table of Contents
 
@@ -641,8 +641,9 @@ appropriate (provided no other subscription needs it) via `redisxRemoveSubscribe
 <a name="advanced-queries"></a>
 ## Advanced queries
 
-Sometimes you might want to micro manage how requests are sent and responses to them are receieved. __RedisX__ 
-provides a set of asynchronous client functions that do that. These functions should be called with the specific 
+Sometimes you might want to micro manage how requests are sent and responses to them are received. __RedisX__ 
+provides a set of asynchronous client functions that do that. (You've seen these already further above in the 
+[Pipelined transaction](#pipelined-transactions) section.) These functions should be called with the specific 
 client's mutex locked, to ensure that other threads do not interfere with your sequence of requests and responses. 
 E.g.:
 
@@ -693,10 +694,13 @@ while we have exclusive access to the client, might look something like this:
   ...
 ```
    
-In some cases you may be OK with just firing off Redis commands, without necessarily caring about responses. Rather 
-than ignoring the replies with `redisxIgnoreReplyAsync()` you might call `redisxSkiReplyAsync()` instead __before__
-`redisxSendRequestAsync()` to instruct Redis to not even bother about sending a response to your request (it saves 
-time and network bandwidth!):
+For the best performance, you may want to leave the processing of the replies until after you unlock the client. I.e.,
+you only block other threads from accessing the clients while you send off the requests and collect the corresponding responses. Then you leave analyzing the responses at your leisure later, and outside of the mutexed section.
+   
+In some cases you may be OK with just firing off some Redis commands, without necessarily caring about responses. 
+Rather than ignoring the replies with `redisxIgnoreReplyAsync()` you might call `redisxSkiReplyAsync()` instead 
+__before__ `redisxSendRequestAsync()` to instruct Redis to not even bother about sending a response to your request 
+(it saves time and network bandwidth!):
 
 ```c
  // We don't want to receive a response to our next command... 
@@ -726,10 +730,10 @@ what works best for your application.
  - [Custom functions](#custom-functions)
 
 Sometimes you may want to execute a series of Redis command atomically, such that nothing else may alter the database 
-while the set of commands execute, so they may return a coherent state. For example, you want to set or query a 
-collection of related variables so they change together and are reported together. You have two choices. (1) you can 
-execute the Redis commands in an execution block, or else (2) load a LUA script onto the Redis server and call it with 
-some parameters (possibly many times over).
+while the set of commands execute, so that related values are always in a coherent state. For example, you want to set 
+or query a collection of related variables so they change together and are reported together. You have two choices. 
+(1) you can execute the Redis commands in an execution block, or else (2) load a LUA script onto the Redis server and 
+call it with some parameters (possibly many times over).
 
 <a name="execution-blocks"></a>
 ### Execution blocks
@@ -773,18 +777,18 @@ atomically. Such an execution block in RedisX may look something like:
 If at any point things don't go according to plan in the middle of the block, you can call `redisAbortBlockAsync()` to
 abort and discard all prior commands submitted in the execution block already. It is important to remembet that every
 time you call `redisxStartBlockAsync()`, you must call either `redisxExecBlockAsync()` to execute it or else 
-`redisxAbortBlockAsync() to discard it. Failure to do so, will effectively end you up with a hung Redis client.
+`redisxAbortBlockAsync()` to discard it. Failure to do so, will effectively end you up with a hung Redis client.
 
 <a name="lua-script-loading-and-execution"></a>
 ### LUA script loading and execution
 
-LUA scripting offers a more capable version of executing more complex routines on the Redis server. LUA is a scripting
-language akin to python, and allows you to add extra logic, string manipulation etc to your Redis queries. Best of all, 
-once you upload the script to the server, it can reduce network traffic significantly by not having to repeatedly 
-submit the same set of Redis commands every single time. LUA scipts also get executed very efficiently on the server, 
-and produce only the result you want/need.
+[LUA](https://www.lua.org/) scripting offers a more capable version of executing complex routines on the Redis server. 
+LUA is a scripting language akin to python, and allows you to add extra logic, string manipulation etc. to your Redis 
+queries. Best of all, once you upload the script to the server, it can reduce network traffic significantly by not 
+having to repeatedly submit the same set of Redis commands every single time. LUA scipts also get executed very 
+efficiently on the server, and produce only the result you want/need.
 
-Assuming you have prepared your LUA script, you can upload it to the Redis server as:
+Assuming you have prepared your LUA script appropriately, you can upload it to the Redis server as:
 
 ```c
   Redis *redis = ...
@@ -792,7 +796,7 @@ Assuming you have prepared your LUA script, you can upload it to the Redis serve
   char *scriptSHA1 = NULL;   // We'll store the SHA1 sum of the script here
 
   // Load the script onto the Redis server
-  int status = redixLoadScript(redis, script, &scriptSHA);
+  int status = redixLoadScript(redis, script, &scriptSHA1);
   if(status != X_SUCCESS) {
     // Oops, something went wrong...
     ...
@@ -903,4 +907,5 @@ Some obvious ways the library could evolve and grow in the not too distant futur
 If you have an idea for a must have feature, please let me (Attila) know. Pull requests, for new features or fixes to
 existing ones are especially welcome! 
  
-
+-----------------------------------------------------------------------------
+Copyright (C) 2024 Attila Kovács
