@@ -359,7 +359,7 @@ Functions</h2></td></tr>
       </table>
 </div><div class="memdoc">
 <p>Retrieve a variable from <a class="el" href="structRedis.html" title="Structure that represents a Redis database instance, with one or more RedisClient connections.">Redis</a> as a string (or byte array), through the interactive connection. This is not the highest throughput mode (that would be sending asynchronous pipeline request, and then asynchronously collecting the results such as with <a class="el" href="redisx-client_8c.html#afc7b28288c07baf0b3c8fdc9d8ddf263">redisxSendRequestAsync()</a> / <a class="el" href="redisx-client_8c.html#abc855133c2af4f5d929a05292aa634d1">redisxReadReplyAsync()</a>), because it requires separate network roundtrips for each and every request. But, it is simple and perfectly good method when one needs to retrieve only a few (&lt;1000) variables per second...</p>
-<p>The call is effectively implements a <a class="el" href="structRedis.html" title="Structure that represents a Redis database instance, with one or more RedisClient connections.">Redis</a> GET (if the tale argument is NULL) or HGET call.</p>
+<p>The call effectively implements a <a class="el" href="structRedis.html" title="Structure that represents a Redis database instance, with one or more RedisClient connections.">Redis</a> GET (if the table argument is NULL) or HGET call.</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramdir">[in]</td><td class="paramname">redis</td><td>Pointer to a <a class="el" href="structRedis.html" title="Structure that represents a Redis database instance, with one or more RedisClient connections.">Redis</a> instance. </td></tr>
@@ -463,14 +463,14 @@ redisxDEstroyEntries() </dd></dl>
         </tr>
       </table>
 </div><div class="memdoc">
-<p>Retrieve a variable from <a class="el" href="structRedis.html" title="Structure that represents a Redis database instance, with one or more RedisClient connections.">Redis</a>, through the interactive connection. This is not the highest throughput mode (that would be sending asynchronous pipeline request, and then asynchronously collecting the results such as with <a class="el" href="redisx-client_8c.html#afc7b28288c07baf0b3c8fdc9d8ddf263">redisxSendRequestAsync()</a> / <a class="el" href="redisx-client_8c.html#abc855133c2af4f5d929a05292aa634d1">redisxReadReplyAsync()</a>), because it requires separate network roundtrips for each and every request. But, it is simple and perfectly good method when one needs to retrieve only a few (&lt;1000) variables per second...</p>
-<p>The call is effectively implements a <a class="el" href="structRedis.html" title="Structure that represents a Redis database instance, with one or more RedisClient connections.">Redis</a> GET (if the tale argument is NULL) or HGET call.</p>
+<p>Retrieve a variable from <a class="el" href="structRedis.html" title="Structure that represents a Redis database instance, with one or more RedisClient connections.">Redis</a> (as an undigested <a class="el" href="structRESP.html" title="Structure that represents a Redis response (RESP format).">RESP</a>), through the interactive connection. This is not the highest throughput mode (that would be sending asynchronous pipeline request, and then asynchronously collecting the results such as with <a class="el" href="redisx-client_8c.html#afc7b28288c07baf0b3c8fdc9d8ddf263">redisxSendRequestAsync()</a> / <a class="el" href="redisx-client_8c.html#abc855133c2af4f5d929a05292aa634d1">redisxReadReplyAsync()</a>), because it requires separate network roundtrips for each and every request. But, it is simple and perfectly good method when one needs to retrieve only a few (&lt;1000) variables per second...</p>
+<p>The call effectively implements a <a class="el" href="structRedis.html" title="Structure that represents a Redis database instance, with one or more RedisClient connections.">Redis</a> GET (if the table argument is NULL) or HGET call.</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramdir">[in]</td><td class="paramname">redis</td><td>Pointer to a <a class="el" href="structRedis.html" title="Structure that represents a Redis database instance, with one or more RedisClient connections.">Redis</a> instance. </td></tr>
     <tr><td class="paramdir">[in]</td><td class="paramname">table</td><td>Hashtable from which to retrieve a value or NULL if to use the global table. </td></tr>
     <tr><td class="paramdir">[in]</td><td class="paramname">key</td><td>Field name (i.e. variable name). </td></tr>
-    <tr><td class="paramdir">[out]</td><td class="paramname">status</td><td>Pointer to the return error status, which is eithe X_SUCCESS on success or else the error code set by <a class="el" href="redisx_8c.html#a13ae33bc25ee03621b23541236ef5f82">redisxArrayRequest()</a>.</td></tr>
+    <tr><td class="paramdir">[out]</td><td class="paramname">status</td><td>(optional) pointer to the return error status, which is either X_SUCCESS on success or else the error code set by <a class="el" href="redisx_8c.html#a13ae33bc25ee03621b23541236ef5f82">redisxArrayRequest()</a>. It may be NULL if not required.</td></tr>
   </table>
   </dd>
 </dl>

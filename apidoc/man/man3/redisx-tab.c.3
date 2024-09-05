@@ -167,7 +167,7 @@ The current COUNT to use for SCAN-type commands or <0 to use default\&.
 .SS "char * redisxGetStringValue (\fBRedis\fP * redis, const char * table, const char * key, int * len)"
 Retrieve a variable from \fBRedis\fP as a string (or byte array), through the interactive connection\&. This is not the highest throughput mode (that would be sending asynchronous pipeline request, and then asynchronously collecting the results such as with \fBredisxSendRequestAsync()\fP / \fBredisxReadReplyAsync()\fP), because it requires separate network roundtrips for each and every request\&. But, it is simple and perfectly good method when one needs to retrieve only a few (<1000) variables per second\&.\&.\&.
 .PP
-The call is effectively implements a \fBRedis\fP GET (if the tale argument is NULL) or HGET call\&.
+The call effectively implements a \fBRedis\fP GET (if the table argument is NULL) or HGET call\&.
 .PP
 \fBParameters\fP
 .RS 4
@@ -223,9 +223,9 @@ redisxDEstroyEntries()
 .PP
 References \fBRedisEntry::key\fP, \fBRedisEntry::length\fP, \fBRESP::n\fP, \fBredisxCheckDestroyRESP()\fP, \fBredisxDestroyRESP()\fP, \fBredisxError()\fP, \fBredisxRequest()\fP, \fBRESP_ARRAY\fP, \fBRESP::value\fP, \fBRedisEntry::value\fP, \fBX_GROUP_INVALID\fP, and \fBX_NO_INIT\fP\&.
 .SS "\fBRESP\fP * redisxGetValue (\fBRedis\fP * redis, const char * table, const char * key, int * status)"
-Retrieve a variable from \fBRedis\fP, through the interactive connection\&. This is not the highest throughput mode (that would be sending asynchronous pipeline request, and then asynchronously collecting the results such as with \fBredisxSendRequestAsync()\fP / \fBredisxReadReplyAsync()\fP), because it requires separate network roundtrips for each and every request\&. But, it is simple and perfectly good method when one needs to retrieve only a few (<1000) variables per second\&.\&.\&.
+Retrieve a variable from \fBRedis\fP (as an undigested \fBRESP\fP), through the interactive connection\&. This is not the highest throughput mode (that would be sending asynchronous pipeline request, and then asynchronously collecting the results such as with \fBredisxSendRequestAsync()\fP / \fBredisxReadReplyAsync()\fP), because it requires separate network roundtrips for each and every request\&. But, it is simple and perfectly good method when one needs to retrieve only a few (<1000) variables per second\&.\&.\&.
 .PP
-The call is effectively implements a \fBRedis\fP GET (if the tale argument is NULL) or HGET call\&.
+The call effectively implements a \fBRedis\fP GET (if the table argument is NULL) or HGET call\&.
 .PP
 \fBParameters\fP
 .RS 4
@@ -235,7 +235,7 @@ The call is effectively implements a \fBRedis\fP GET (if the tale argument is NU
 .br
 \fIkey\fP Field name (i\&.e\&. variable name)\&. 
 .br
-\fIstatus\fP Pointer to the return error status, which is eithe X_SUCCESS on success or else the error code set by \fBredisxArrayRequest()\fP\&.
+\fIstatus\fP (optional) pointer to the return error status, which is either X_SUCCESS on success or else the error code set by \fBredisxArrayRequest()\fP\&. It may be NULL if not required\&.
 .RE
 .PP
 \fBReturns\fP
