@@ -138,12 +138,14 @@ Functions</h2></td></tr>
 <tr class="separator:a6fed65f9413569c771d5165a0194477a"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a14907be8fba6a13505a352673cea5895" id="r_a14907be8fba6a13505a352673cea5895"><td class="memItemLeft" align="right" valign="top"><a class="el" href="structRedisClient.html">RedisClient</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="redisx-client_8c.html#a14907be8fba6a13505a352673cea5895">redisxGetClient</a> (<a class="el" href="structRedis.html">Redis</a> *redis, enum <a class="el" href="redisx_8h.html#a5349b7340813fbd1e32d04ed650bc3d9">redisx_channel</a> channel)</td></tr>
 <tr class="separator:a14907be8fba6a13505a352673cea5895"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a19d2fb18f2f939edfdc412d064741f9f" id="r_a19d2fb18f2f939edfdc412d064741f9f"><td class="memItemLeft" align="right" valign="top"><a class="el" href="structRedisClient.html">RedisClient</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="redisx-client_8c.html#a19d2fb18f2f939edfdc412d064741f9f">redisxGetLockedConnectedClient</a> (<a class="el" href="structRedis.html">Redis</a> *redis, enum <a class="el" href="redisx_8h.html#a5349b7340813fbd1e32d04ed650bc3d9">redisx_channel</a> channel)</td></tr>
+<tr class="separator:a19d2fb18f2f939edfdc412d064741f9f"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ac0f30d62044638a2ead07583ad723fdf" id="r_ac0f30d62044638a2ead07583ad723fdf"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="redisx-client_8c.html#ac0f30d62044638a2ead07583ad723fdf">redisxIgnoreReplyAsync</a> (<a class="el" href="structRedisClient.html">RedisClient</a> *cl)</td></tr>
 <tr class="separator:ac0f30d62044638a2ead07583ad723fdf"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ac9c69fbcaa2a2fbe95af72d91a7b7e6c" id="r_ac9c69fbcaa2a2fbe95af72d91a7b7e6c"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="redisx-client_8c.html#ac9c69fbcaa2a2fbe95af72d91a7b7e6c">redisxLockClient</a> (<a class="el" href="structRedisClient.html">RedisClient</a> *cl)</td></tr>
 <tr class="separator:ac9c69fbcaa2a2fbe95af72d91a7b7e6c"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ac6c9928f425b6b1d97d721cbddc3cf28" id="r_ac6c9928f425b6b1d97d721cbddc3cf28"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="redisx-client_8c.html#ac6c9928f425b6b1d97d721cbddc3cf28">redisxLockEnabled</a> (<a class="el" href="structRedisClient.html">RedisClient</a> *cl)</td></tr>
-<tr class="separator:ac6c9928f425b6b1d97d721cbddc3cf28"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aad864c08ef9365c264c30bbacb0b77b2" id="r_aad864c08ef9365c264c30bbacb0b77b2"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="redisx-client_8c.html#aad864c08ef9365c264c30bbacb0b77b2">redisxLockConnected</a> (<a class="el" href="structRedisClient.html">RedisClient</a> *cl)</td></tr>
+<tr class="separator:aad864c08ef9365c264c30bbacb0b77b2"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:abc855133c2af4f5d929a05292aa634d1" id="r_abc855133c2af4f5d929a05292aa634d1"><td class="memItemLeft" align="right" valign="top"><a class="el" href="structRESP.html">RESP</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="redisx-client_8c.html#abc855133c2af4f5d929a05292aa634d1">redisxReadReplyAsync</a> (<a class="el" href="structRedisClient.html">RedisClient</a> *cl)</td></tr>
 <tr class="separator:abc855133c2af4f5d929a05292aa634d1"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a899f4f8853add789db4bd4de106fd6d8" id="r_a899f4f8853add789db4bd4de106fd6d8"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="redisx-client_8c.html#a899f4f8853add789db4bd4de106fd6d8">redisxSendArrayRequestAsync</a> (<a class="el" href="structRedisClient.html">RedisClient</a> *cl, char *args[], int lengths[], int n)</td></tr>
@@ -261,6 +263,50 @@ Functions</h2></td></tr>
 
 </div>
 </div>
+<a id="a19d2fb18f2f939edfdc412d064741f9f" name="a19d2fb18f2f939edfdc412d064741f9f"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a19d2fb18f2f939edfdc412d064741f9f">&#9670;&#160;</a></span>redisxGetLockedConnectedClient()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="structRedisClient.html">RedisClient</a> * redisxGetLockedConnectedClient </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="structRedis.html">Redis</a> *&#160;</td>
+          <td class="paramname"><em>redis</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">enum <a class="el" href="redisx_8h.html#a5349b7340813fbd1e32d04ed650bc3d9">redisx_channel</a>&#160;</td>
+          <td class="paramname"><em>channel</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>Returns the redis client for a given connection type in a <a class="el" href="structRedis.html" title="Structure that represents a Redis database instance, with one or more RedisClient connections.">Redis</a> instance, with the exclusive access lock if the client is valid and is connected, or else NULL. It is effectively the combination of <code><a class="el" href="redisx-client_8c.html#a14907be8fba6a13505a352673cea5895">redisxGetClient()</a></code> followed by <code><a class="el" href="redisx-client_8c.html#aad864c08ef9365c264c30bbacb0b77b2">redisxLockConnected()</a></code>.</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">redis</td><td>Pointer to a <a class="el" href="structRedis.html" title="Structure that represents a Redis database instance, with one or more RedisClient connections.">Redis</a> instance. </td></tr>
+    <tr><td class="paramname">channel</td><td>REDISX_INTERACTIVE_CHANNEL, REDISX_PIPELINE_CHANNEL, or REDISX_SUBSCRIPTION_CHANNEL </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>The locked client, if it is enabled, or NULL if the redis argument is NULL, the channel is invalid, or the requested client is not currently connected.</dd></dl>
+<dl class="section see"><dt>See also</dt><dd><a class="el" href="redisx-client_8c.html#a14907be8fba6a13505a352673cea5895">redisxGetClient()</a> </dd>
+<dd>
+<a class="el" href="redisx-client_8c.html#a87efe53c80fcff3fcf189362cbc602f7">redisxUnlockClient()</a> </dd>
+<dd>
+<a class="el" href="redisx-client_8c.html#aad864c08ef9365c264c30bbacb0b77b2">redisxLockConnected()</a> </dd></dl>
+
+<p class="reference">References <a class="el" href="redisx-client_8c.html#a14907be8fba6a13505a352673cea5895">redisxGetClient()</a>, <a class="el" href="redisx-client_8c.html#aad864c08ef9365c264c30bbacb0b77b2">redisxLockConnected()</a>, and <a class="elRef" href="../../xchange/apidoc/html/xchange_8h.html#a7b2679c964ea5f2160380ed55654b873">X_SUCCESS</a>.</p>
+
+</div>
+</div>
 <a id="ac0f30d62044638a2ead07583ad723fdf" name="ac0f30d62044638a2ead07583ad723fdf"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#ac0f30d62044638a2ead07583ad723fdf">&#9670;&#160;</a></span>redisxIgnoreReplyAsync()</h2>
 
@@ -312,7 +358,7 @@ Functions</h2></td></tr>
   </dd>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>X_SUCCESS if the exclusive lock for the channel was successfully obtained X_FAILURE if pthread_mutex_lock() returned an error X_NULL if the client is NULL.</dd></dl>
-<dl class="section see"><dt>See also</dt><dd><a class="el" href="redisx-client_8c.html#ac6c9928f425b6b1d97d721cbddc3cf28">redisxLockEnabled()</a> </dd>
+<dl class="section see"><dt>See also</dt><dd><a class="el" href="redisx-client_8c.html#aad864c08ef9365c264c30bbacb0b77b2">redisxLockConnected()</a> </dd>
 <dd>
 <a class="el" href="redisx-client_8c.html#a87efe53c80fcff3fcf189362cbc602f7">redisxUnlockClient()</a> </dd></dl>
 
@@ -320,14 +366,14 @@ Functions</h2></td></tr>
 
 </div>
 </div>
-<a id="ac6c9928f425b6b1d97d721cbddc3cf28" name="ac6c9928f425b6b1d97d721cbddc3cf28"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ac6c9928f425b6b1d97d721cbddc3cf28">&#9670;&#160;</a></span>redisxLockEnabled()</h2>
+<a id="aad864c08ef9365c264c30bbacb0b77b2" name="aad864c08ef9365c264c30bbacb0b77b2"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aad864c08ef9365c264c30bbacb0b77b2">&#9670;&#160;</a></span>redisxLockConnected()</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">int redisxLockEnabled </td>
+          <td class="memname">int redisxLockConnected </td>
           <td>(</td>
           <td class="paramtype"><a class="el" href="structRedisClient.html">RedisClient</a> *&#160;</td>
           <td class="paramname"><em>cl</em></td><td>)</td>
@@ -342,10 +388,12 @@ Functions</h2></td></tr>
   </table>
   </dd>
 </dl>
-<dl class="section return"><dt>Returns</dt><dd>X_SUCCESS (0) if an excusive lock to the channel has been granted. X_FAILURE if pthread_mutex_lock() returned an error X_NULL if the client is NULL REDIS_INVALID_CHANNEL if the channel is enabled/connected.</dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>X_SUCCESS (0) if an excusive lock to the channel has been granted. X_FAILURE if pthread_mutex_lock() returned an error X_NULL if the client is NULL REDIS_INVALID_CHANNEL if the channel is not enabled/connected.</dd></dl>
 <dl class="section see"><dt>See also</dt><dd><a class="el" href="redisx-client_8c.html#ac9c69fbcaa2a2fbe95af72d91a7b7e6c">redisxLockClient()</a> </dd>
 <dd>
-<a class="el" href="redisx-client_8c.html#a87efe53c80fcff3fcf189362cbc602f7">redisxUnlockClient()</a> </dd></dl>
+<a class="el" href="redisx-client_8c.html#a87efe53c80fcff3fcf189362cbc602f7">redisxUnlockClient()</a> </dd>
+<dd>
+<a class="el" href="redisx-client_8c.html#a19d2fb18f2f939edfdc412d064741f9f">redisxGetLockedConnectedClient()</a> </dd></dl>
 
 <p class="reference">References <a class="el" href="redisx_8h.html#a8827c9e06650c47f2cfd96496af5487e">REDIS_INVALID_CHANNEL</a>, <a class="el" href="redisx_8c.html#ae722b046fa70a55db725341ef8ee56dc">redisxError()</a>, <a class="el" href="redisx-client_8c.html#ac9c69fbcaa2a2fbe95af72d91a7b7e6c">redisxLockClient()</a>, <a class="el" href="redisx-client_8c.html#a87efe53c80fcff3fcf189362cbc602f7">redisxUnlockClient()</a>, and <a class="elRef" href="../../xchange/apidoc/html/xchange_8h.html#a7b2679c964ea5f2160380ed55654b873">X_SUCCESS</a>.</p>
 
@@ -580,7 +628,7 @@ Functions</h2></td></tr>
 <dl class="section return"><dt>Returns</dt><dd>X_SUCCESS if the exclusive lock for the channel was successfully obtained X_FAILURE if pthread_mutex_lock() returned an error X_NULL if the client is NULL</dd></dl>
 <dl class="section see"><dt>See also</dt><dd><a class="el" href="redisx-client_8c.html#ac9c69fbcaa2a2fbe95af72d91a7b7e6c">redisxLockClient()</a> </dd>
 <dd>
-<a class="el" href="redisx-client_8c.html#ac6c9928f425b6b1d97d721cbddc3cf28">redisxLockEnabled()</a> </dd></dl>
+<a class="el" href="redisx-client_8c.html#aad864c08ef9365c264c30bbacb0b77b2">redisxLockConnected()</a> </dd></dl>
 
 <p class="reference">References <a class="el" href="redisx_8c.html#ae722b046fa70a55db725341ef8ee56dc">redisxError()</a>, <a class="elRef" href="../../xchange/apidoc/html/xchange_8h.html#a1d4a0c99f979fd0ecf0e9dcb7191a8d7">X_FAILURE</a>, <a class="elRef" href="../../xchange/apidoc/html/xchange_8h.html#aadbbe3ae01369cbddf4d57d430b33133">X_NULL</a>, and <a class="elRef" href="../../xchange/apidoc/html/xchange_8h.html#a7b2679c964ea5f2160380ed55654b873">X_SUCCESS</a>.</p>
 

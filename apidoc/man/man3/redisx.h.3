@@ -211,6 +211,9 @@ include/redisx.h
 .RI "char ** \fBredisxGetKeys\fP (\fBRedis\fP *redis, const char *table, int *n)"
 .br
 .ti -1c
+.RI "\fBRedisClient\fP * \fBredisxGetLockedConnectedClient\fP (\fBRedis\fP *redis, enum \fBredisx_channel\fP channel)"
+.br
+.ti -1c
 .RI "int \fBredisxGetScanCount\fP (\fBRedis\fP *redis)"
 .br
 .ti -1c
@@ -247,7 +250,7 @@ include/redisx.h
 .RI "int \fBredisxLockClient\fP (\fBRedisClient\fP *cl)"
 .br
 .ti -1c
-.RI "int \fBredisxLockEnabled\fP (\fBRedisClient\fP *cl)"
+.RI "int \fBredisxLockConnected\fP (\fBRedisClient\fP *cl)"
 .br
 .ti -1c
 .RI "int \fBredisxMultiSet\fP (\fBRedis\fP *redis, const char *table, const \fBRedisEntry\fP *entries, int n, \fBboolean\fP isPipelined)"
@@ -540,7 +543,7 @@ A freshly allocated \fBRESP\fP array containing the \fBRedis\fP response, or NUL
 .PP
 
 .PP
-References \fBRedis::interactive\fP, \fBredisxError()\fP, \fBredisxLockEnabled()\fP, \fBredisxReadReplyAsync()\fP, \fBredisxSendArrayRequestAsync()\fP, \fBredisxUnlockClient()\fP, \fBX_NULL\fP, \fBX_SUCCESS\fP, and \fBxvprintf\fP\&.
+References \fBRedis::interactive\fP, \fBredisxError()\fP, \fBredisxLockConnected()\fP, \fBredisxReadReplyAsync()\fP, \fBredisxSendArrayRequestAsync()\fP, \fBredisxUnlockClient()\fP, \fBX_NULL\fP, \fBX_SUCCESS\fP, and \fBxvprintf\fP\&.
 .SS "int redisxCheckDestroyRESP (\fBRESP\fP * resp, char expectedType, int expectedSize)"
 Like \fBredisxCheckRESP()\fP, but it also destroys the \fBRESP\fP in case of an error\&.
 .PP
@@ -846,6 +849,33 @@ An array with pointers to key names from this table or NULL if there was an erro
 
 .PP
 References \fBRESP::n\fP, \fBredisxCheckDestroyRESP()\fP, \fBredisxDestroyRESP()\fP, \fBredisxError()\fP, \fBredisxRequest()\fP, \fBRESP_ARRAY\fP, and \fBRESP::value\fP\&.
+.SS "\fBRedisClient\fP * redisxGetLockedConnectedClient (\fBRedis\fP * redis, enum \fBredisx_channel\fP channel)"
+Returns the redis client for a given connection type in a \fBRedis\fP instance, with the exclusive access lock if the client is valid and is connected, or else NULL\&. It is effectively the combination of \fC\fBredisxGetClient()\fP\fP followed by \fC\fBredisxLockConnected()\fP\fP\&.
+.PP
+\fBParameters\fP
+.RS 4
+\fIredis\fP Pointer to a \fBRedis\fP instance\&. 
+.br
+\fIchannel\fP REDISX_INTERACTIVE_CHANNEL, REDISX_PIPELINE_CHANNEL, or REDISX_SUBSCRIPTION_CHANNEL 
+.RE
+.PP
+\fBReturns\fP
+.RS 4
+The locked client, if it is enabled, or NULL if the redis argument is NULL, the channel is invalid, or the requested client is not currently connected\&.
+.RE
+.PP
+\fBSee also\fP
+.RS 4
+\fBredisxGetClient()\fP 
+.PP
+\fBredisxUnlockClient()\fP 
+.PP
+\fBredisxLockConnected()\fP 
+.RE
+.PP
+
+.PP
+References \fBredisxGetClient()\fP, \fBredisxLockConnected()\fP, and \fBX_SUCCESS\fP\&.
 .SS "int redisxGetScanCount (\fBRedis\fP * redis)"
 Returns the COUNT parameter currently set to be used with \fBRedis\fP SCAN-type commands
 .PP
@@ -1084,7 +1114,7 @@ X_SUCCESS if the exclusive lock for the channel was successfully obtained X_FAIL
 .PP
 \fBSee also\fP
 .RS 4
-\fBredisxLockEnabled()\fP 
+\fBredisxLockConnected()\fP 
 .PP
 \fBredisxUnlockClient()\fP 
 .RE
@@ -1092,7 +1122,7 @@ X_SUCCESS if the exclusive lock for the channel was successfully obtained X_FAIL
 
 .PP
 References \fBredisxError()\fP, \fBX_FAILURE\fP, \fBX_NULL\fP, and \fBX_SUCCESS\fP\&.
-.SS "int redisxLockEnabled (\fBRedisClient\fP * cl)"
+.SS "int redisxLockConnected (\fBRedisClient\fP * cl)"
 Lock a channel, but only if it has been enabled for communication\&.
 .PP
 \fBParameters\fP
@@ -1102,7 +1132,7 @@ Lock a channel, but only if it has been enabled for communication\&.
 .PP
 \fBReturns\fP
 .RS 4
-X_SUCCESS (0) if an excusive lock to the channel has been granted\&. X_FAILURE if pthread_mutex_lock() returned an error X_NULL if the client is NULL REDIS_INVALID_CHANNEL if the channel is enabled/connected\&.
+X_SUCCESS (0) if an excusive lock to the channel has been granted\&. X_FAILURE if pthread_mutex_lock() returned an error X_NULL if the client is NULL REDIS_INVALID_CHANNEL if the channel is not enabled/connected\&.
 .RE
 .PP
 \fBSee also\fP
@@ -1110,6 +1140,8 @@ X_SUCCESS (0) if an excusive lock to the channel has been granted\&. X_FAILURE i
 \fBredisxLockClient()\fP 
 .PP
 \fBredisxUnlockClient()\fP 
+.PP
+\fBredisxGetLockedConnectedClient()\fP 
 .RE
 .PP
 
@@ -1138,7 +1170,7 @@ X_SUCCESS (0) on success or an error code\&.
 .PP
 
 .PP
-References \fBRedisEntry::length\fP, \fBRedis::pipeline\fP, \fBREDIS_ERROR\fP, \fBredisxArrayRequest()\fP, \fBredisxCheckDestroyRESP()\fP, \fBredisxDestroyRESP()\fP, \fBredisxError()\fP, \fBredisxHasPipeline()\fP, \fBredisxLockEnabled()\fP, \fBredisxSendArrayRequestAsync()\fP, \fBredisxSkipReplyAsync()\fP, \fBredisxUnlockClient()\fP, \fBRESP_SIMPLE_STRING\fP, \fBRESP::value\fP, \fBX_FAILURE\fP, \fBX_GROUP_INVALID\fP, \fBX_NO_INIT\fP, \fBX_NULL\fP, \fBX_SIZE_INVALID\fP, and \fBX_SUCCESS\fP\&.
+References \fBRedisEntry::length\fP, \fBRedis::pipeline\fP, \fBREDIS_ERROR\fP, \fBredisxArrayRequest()\fP, \fBredisxCheckDestroyRESP()\fP, \fBredisxDestroyRESP()\fP, \fBredisxError()\fP, \fBredisxHasPipeline()\fP, \fBredisxLockConnected()\fP, \fBredisxSendArrayRequestAsync()\fP, \fBredisxSkipReplyAsync()\fP, \fBredisxUnlockClient()\fP, \fBRESP_SIMPLE_STRING\fP, \fBRESP::value\fP, \fBX_FAILURE\fP, \fBX_GROUP_INVALID\fP, \fBX_NO_INIT\fP, \fBX_NULL\fP, \fBX_SIZE_INVALID\fP, and \fBX_SUCCESS\fP\&.
 .SS "int redisxNotify (\fBRedis\fP * redis, const char * channel, const char * message)"
 Sends a regular string terminated \fBRedis\fP PUB/SUB message on the specified channel\&. Same as \fBredisxPublish()\fP with the length argument set to the length of the string message\&. \fBRedis\fP must be connected before attempting to send messages\&.
 .PP
@@ -1216,7 +1248,7 @@ X_SUCCESS if the message was successfullt sent\&. X_NO_INIT if the \fBRedis\fP l
 .PP
 
 .PP
-References \fBRedis::id\fP, \fBRedis::interactive\fP, \fBredisxError()\fP, \fBredisxLockEnabled()\fP, \fBredisxPublishAsync()\fP, \fBredisxUnlockClient()\fP, \fBX_NULL\fP, \fBX_SUCCESS\fP, and \fBxvprintf\fP\&.
+References \fBRedis::id\fP, \fBRedis::interactive\fP, \fBredisxError()\fP, \fBredisxLockConnected()\fP, \fBredisxPublishAsync()\fP, \fBredisxUnlockClient()\fP, \fBX_NULL\fP, \fBX_SUCCESS\fP, and \fBxvprintf\fP\&.
 .SS "int redisxPublishAsync (\fBRedis\fP * redis, const char * channel, const char * data, int length)"
 Sends a \fBRedis\fP notification asynchronously using the \fBRedis\fP 'PUBLISH' command\&. The caller should have an exclusive lock on the interactive \fBRedis\fP channel before calling this\&.
 .PP
@@ -1467,12 +1499,12 @@ X_SUCCESS (0) if successful, or X_NULL if the redis argument is NULL, X_INCOMPLE
 .RS 4
 \fBredisxSelectDB()\fP 
 .PP
-\fBredisxLockEnabled()\fP 
+\fBredisxLockConnected()\fP 
 .RE
 .PP
 
 .PP
-References \fBREDIS_INVALID_CHANNEL\fP, \fBREDISX_CHANNELS\fP, \fBREDISX_PIPELINE_CHANNEL\fP, \fBREDISX_SUBSCRIPTION_CHANNEL\fP, \fBredisxAddConnectHook()\fP, \fBredisxError()\fP, \fBredisxGetClient()\fP, \fBredisxIsConnected()\fP, \fBredisxLockEnabled()\fP, \fBredisxRemoveConnectHook()\fP, \fBredisxUnlockClient()\fP, \fBX_INCOMPLETE\fP, \fBX_NULL\fP, and \fBX_SUCCESS\fP\&.
+References \fBREDIS_INVALID_CHANNEL\fP, \fBREDISX_CHANNELS\fP, \fBREDISX_PIPELINE_CHANNEL\fP, \fBREDISX_SUBSCRIPTION_CHANNEL\fP, \fBredisxAddConnectHook()\fP, \fBredisxError()\fP, \fBredisxGetClient()\fP, \fBredisxIsConnected()\fP, \fBredisxLockConnected()\fP, \fBredisxRemoveConnectHook()\fP, \fBredisxUnlockClient()\fP, \fBX_INCOMPLETE\fP, \fBX_NULL\fP, and \fBX_SUCCESS\fP\&.
 .SS "int redisxSendArrayRequestAsync (\fBRedisClient\fP * cl, char * args[], int lengths[], int n)"
 Send a \fBRedis\fP request with an arbitrary number of arguments\&.
 .PP
@@ -1684,7 +1716,7 @@ X_SUCCESS if the variable was succesfully set, or:
 .PP
 
 .PP
-References \fBFALSE\fP, \fBRedis::interactive\fP, \fBRedis::pipeline\fP, \fBredisxError()\fP, \fBredisxLockEnabled()\fP, \fBredisxSetValueAsync()\fP, \fBredisxUnlockClient()\fP, \fBX_NULL\fP, and \fBX_SUCCESS\fP\&.
+References \fBFALSE\fP, \fBRedis::interactive\fP, \fBRedis::pipeline\fP, \fBredisxError()\fP, \fBredisxLockConnected()\fP, \fBredisxSetValueAsync()\fP, \fBredisxUnlockClient()\fP, \fBX_NULL\fP, and \fBX_SUCCESS\fP\&.
 .SS "int redisxSetValueAsync (\fBRedisClient\fP * cl, const char * table, const char * key, const char * value, \fBboolean\fP confirm)"
 Sends a request for setting a table value, using the \fBRedis\fP 'SET' or 'HSET' command\&.
 .PP
@@ -1802,7 +1834,7 @@ X_SUCCESS if successfully subscribed to the \fBRedis\fP distribution channel\&. 
 .PP
 
 .PP
-References \fBredisxError()\fP, \fBredisxLockEnabled()\fP, \fBredisxSendRequestAsync()\fP, \fBredisxUnlockClient()\fP, \fBRedis::subscription\fP, \fBX_NULL\fP, and \fBX_SUCCESS\fP\&.
+References \fBredisxError()\fP, \fBredisxLockConnected()\fP, \fBredisxSendRequestAsync()\fP, \fBredisxUnlockClient()\fP, \fBRedis::subscription\fP, \fBX_NULL\fP, and \fBX_SUCCESS\fP\&.
 .SS "int redisxUnlockClient (\fBRedisClient\fP * cl)"
 Relinquish exclusive write access to the specified REDIS channel
 .PP
@@ -1820,7 +1852,7 @@ X_SUCCESS if the exclusive lock for the channel was successfully obtained X_FAIL
 .RS 4
 \fBredisxLockClient()\fP 
 .PP
-\fBredisxLockEnabled()\fP 
+\fBredisxLockConnected()\fP 
 .RE
 .PP
 
@@ -1852,7 +1884,7 @@ redisxEndSubscribe()
 .PP
 
 .PP
-References \fBredisxError()\fP, \fBredisxLockEnabled()\fP, \fBredisxSendRequestAsync()\fP, \fBredisxUnlockClient()\fP, \fBRedis::subscription\fP, \fBX_NULL\fP, and \fBX_SUCCESS\fP\&.
+References \fBredisxError()\fP, \fBredisxLockConnected()\fP, \fBredisxSendRequestAsync()\fP, \fBredisxUnlockClient()\fP, \fBRedis::subscription\fP, \fBX_NULL\fP, and \fBX_SUCCESS\fP\&.
 .SH "Author"
 .PP 
 Generated automatically by Doxygen for RedisX from the source code\&.

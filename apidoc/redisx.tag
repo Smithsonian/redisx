@@ -370,6 +370,13 @@
       <arglist>(Redis *redis, const char *table, int *n)</arglist>
     </member>
     <member kind="function">
+      <type>RedisClient *</type>
+      <name>redisxGetLockedConnectedClient</name>
+      <anchorfile>redisx_8h.html</anchorfile>
+      <anchor>a19d2fb18f2f939edfdc412d064741f9f</anchor>
+      <arglist>(Redis *redis, enum redisx_channel channel)</arglist>
+    </member>
+    <member kind="function">
       <type>int</type>
       <name>redisxGetScanCount</name>
       <anchorfile>redisx_8h.html</anchorfile>
@@ -455,9 +462,9 @@
     </member>
     <member kind="function">
       <type>int</type>
-      <name>redisxLockEnabled</name>
+      <name>redisxLockConnected</name>
       <anchorfile>redisx_8h.html</anchorfile>
-      <anchor>ac6c9928f425b6b1d97d721cbddc3cf28</anchor>
+      <anchor>aad864c08ef9365c264c30bbacb0b77b2</anchor>
       <arglist>(RedisClient *cl)</arglist>
     </member>
     <member kind="function">
@@ -718,6 +725,13 @@
       <arglist>(Redis *redis, enum redisx_channel channel)</arglist>
     </member>
     <member kind="function">
+      <type>RedisClient *</type>
+      <name>redisxGetLockedConnectedClient</name>
+      <anchorfile>redisx-client_8c.html</anchorfile>
+      <anchor>a19d2fb18f2f939edfdc412d064741f9f</anchor>
+      <arglist>(Redis *redis, enum redisx_channel channel)</arglist>
+    </member>
+    <member kind="function">
       <type>int</type>
       <name>redisxIgnoreReplyAsync</name>
       <anchorfile>redisx-client_8c.html</anchorfile>
@@ -733,9 +747,9 @@
     </member>
     <member kind="function">
       <type>int</type>
-      <name>redisxLockEnabled</name>
+      <name>redisxLockConnected</name>
       <anchorfile>redisx-client_8c.html</anchorfile>
-      <anchor>ac6c9928f425b6b1d97d721cbddc3cf28</anchor>
+      <anchor>aad864c08ef9365c264c30bbacb0b77b2</anchor>
       <arglist>(RedisClient *cl)</arglist>
     </member>
     <member kind="function">

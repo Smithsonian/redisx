@@ -31,13 +31,16 @@ src/redisx-client.c
 .RI "\fBRedisClient\fP * \fBredisxGetClient\fP (\fBRedis\fP *redis, enum \fBredisx_channel\fP channel)"
 .br
 .ti -1c
+.RI "\fBRedisClient\fP * \fBredisxGetLockedConnectedClient\fP (\fBRedis\fP *redis, enum \fBredisx_channel\fP channel)"
+.br
+.ti -1c
 .RI "int \fBredisxIgnoreReplyAsync\fP (\fBRedisClient\fP *cl)"
 .br
 .ti -1c
 .RI "int \fBredisxLockClient\fP (\fBRedisClient\fP *cl)"
 .br
 .ti -1c
-.RI "int \fBredisxLockEnabled\fP (\fBRedisClient\fP *cl)"
+.RI "int \fBredisxLockConnected\fP (\fBRedisClient\fP *cl)"
 .br
 .ti -1c
 .RI "\fBRESP\fP * \fBredisxReadReplyAsync\fP (\fBRedisClient\fP *cl)"
@@ -137,6 +140,33 @@ Pointer to the matching \fBRedis\fP client, or NULL if the channel argument is i
 
 .PP
 References \fBREDISX_CHANNELS\fP\&.
+.SS "\fBRedisClient\fP * redisxGetLockedConnectedClient (\fBRedis\fP * redis, enum \fBredisx_channel\fP channel)"
+Returns the redis client for a given connection type in a \fBRedis\fP instance, with the exclusive access lock if the client is valid and is connected, or else NULL\&. It is effectively the combination of \fC\fBredisxGetClient()\fP\fP followed by \fC\fBredisxLockConnected()\fP\fP\&.
+.PP
+\fBParameters\fP
+.RS 4
+\fIredis\fP Pointer to a \fBRedis\fP instance\&. 
+.br
+\fIchannel\fP REDISX_INTERACTIVE_CHANNEL, REDISX_PIPELINE_CHANNEL, or REDISX_SUBSCRIPTION_CHANNEL 
+.RE
+.PP
+\fBReturns\fP
+.RS 4
+The locked client, if it is enabled, or NULL if the redis argument is NULL, the channel is invalid, or the requested client is not currently connected\&.
+.RE
+.PP
+\fBSee also\fP
+.RS 4
+\fBredisxGetClient()\fP 
+.PP
+\fBredisxUnlockClient()\fP 
+.PP
+\fBredisxLockConnected()\fP 
+.RE
+.PP
+
+.PP
+References \fBredisxGetClient()\fP, \fBredisxLockConnected()\fP, and \fBX_SUCCESS\fP\&.
 .SS "int redisxIgnoreReplyAsync (\fBRedisClient\fP * cl)"
 Silently consumes a reply from the specified \fBRedis\fP channel\&.
 .PP
@@ -168,7 +198,7 @@ X_SUCCESS if the exclusive lock for the channel was successfully obtained X_FAIL
 .PP
 \fBSee also\fP
 .RS 4
-\fBredisxLockEnabled()\fP 
+\fBredisxLockConnected()\fP 
 .PP
 \fBredisxUnlockClient()\fP 
 .RE
@@ -176,7 +206,7 @@ X_SUCCESS if the exclusive lock for the channel was successfully obtained X_FAIL
 
 .PP
 References \fBredisxError()\fP, \fBX_FAILURE\fP, \fBX_NULL\fP, and \fBX_SUCCESS\fP\&.
-.SS "int redisxLockEnabled (\fBRedisClient\fP * cl)"
+.SS "int redisxLockConnected (\fBRedisClient\fP * cl)"
 Lock a channel, but only if it has been enabled for communication\&.
 .PP
 \fBParameters\fP
@@ -186,7 +216,7 @@ Lock a channel, but only if it has been enabled for communication\&.
 .PP
 \fBReturns\fP
 .RS 4
-X_SUCCESS (0) if an excusive lock to the channel has been granted\&. X_FAILURE if pthread_mutex_lock() returned an error X_NULL if the client is NULL REDIS_INVALID_CHANNEL if the channel is enabled/connected\&.
+X_SUCCESS (0) if an excusive lock to the channel has been granted\&. X_FAILURE if pthread_mutex_lock() returned an error X_NULL if the client is NULL REDIS_INVALID_CHANNEL if the channel is not enabled/connected\&.
 .RE
 .PP
 \fBSee also\fP
@@ -194,6 +224,8 @@ X_SUCCESS (0) if an excusive lock to the channel has been granted\&. X_FAILURE i
 \fBredisxLockClient()\fP 
 .PP
 \fBredisxUnlockClient()\fP 
+.PP
+\fBredisxGetLockedConnectedClient()\fP 
 .RE
 .PP
 
@@ -330,7 +362,7 @@ X_SUCCESS if the exclusive lock for the channel was successfully obtained X_FAIL
 .RS 4
 \fBredisxLockClient()\fP 
 .PP
-\fBredisxLockEnabled()\fP 
+\fBredisxLockConnected()\fP 
 .RE
 .PP
 
