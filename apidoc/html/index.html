@@ -418,7 +418,8 @@ Getting and setting keyed values</h3>
 </div><!-- fragment --><p>The same goes for top-level keyed values, using <code>NULL</code> for the hash table name:</p>
 <div class="fragment"><div class="line"><span class="comment">// Get value for top-level key (not stored in hash table!)</span></div>
 <div class="line"><span class="keywordtype">char</span> *value = <a class="code hl_function" href="redisx-tab_8c.html#afc875f142146282860b6a8a3ac2f0fc8">redisxGetStringValue</a>(redis, NULL, <span class="stringliteral">&quot;my-key&quot;</span>, &amp;len);</div>
-</div><!-- fragment --><p>In turn, setting values is also straightforward:</p>
+</div><!-- fragment --><p>Alternatively, you can get the value as an undigested <code><a class="el" href="structRESP.html" title="Structure that represents a Redis response (RESP format).">RESP</a></code>, using <code><a class="el" href="redisx-tab_8c.html#a01bf1f5d830d1af19456ab78457a54ab">redisxGetValue()</a></code> instead, which allows you to check and inspect the response in more detail (e.g. to check for potential errors, or unexpected response types).</p>
+<p>Setting values is straightforward also:</p>
 <div class="fragment"><div class="line"><a class="code hl_struct" href="structRedis.html">Redis</a> *redis = ...;</div>
 <div class="line"> </div>
 <div class="line"><span class="comment">// Set the &quot;property&quot; field in the &quot;system:subsystem&quot; hash table to -2.5</span></div>
@@ -708,7 +709,7 @@ Future plans</h2>
 <li>Improved debug capabilities (e.g. with built-in error traces)</li>
 <li>Improved error handling (e.g. by consistently setting <code>errno</code> beyond just the <b>RedisX</b> error status).</li>
 </ul>
-<p>If you have an idea for a must have feature, please let me (Attila) know. Pull requests, for new features or fixes to existing ones are especially welcome!</p>
+<p>If you have an idea for a must have feature, please let me (Attila) know. Pull requests, for new features or fixes to existing ones, are especially welcome!</p>
 <hr  />
 <p> Copyright (C) 2024 Attila Kovács </p>
 </div></div><!-- PageDoc -->
