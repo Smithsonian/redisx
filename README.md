@@ -900,9 +900,9 @@ Some obvious ways the library could evolve and grow in the not too distant futur
 
  - Automated regression testing and coverage tracking.
  - Support for the [RESP3](https://github.com/antirez/RESP3/blob/master/spec.md) standard and Redis `HELLO`.
- - Support for Redis sentinel, high-availability server configurations.
+ - Support for [Redis Sentinel](https://redis.io/docs/latest/develop/reference/sentinel-clients/) clients, for high-availability server configurations.
  - TLS support (perhaps...)
- - Ass high-level support for managing and calling custom Redis functions.
+ - Add high-level support for managing and calling custom Redis functions.
  - Add support for `CLIENT TRACKING` / `CLIENT CACHING`. 
  - Add more high-level redis commands, e.g. for lists, streams, etc.
  - Improved debug capabilities (e.g. with built-in error traces)
