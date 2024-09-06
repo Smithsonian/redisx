@@ -400,7 +400,7 @@ Listing and Scanning</h3>
 <div class="line"><span class="comment">// Once done using the &#39;keys&#39; array, we should destroy it</span></div>
 <div class="line">redisxDestroyKeys(keys, nMatches);</div>
 <div class="ttc" id="aredisx-tab_8c_html_a67dd05115ae75dac9637ac04220d73b6"><div class="ttname"><a href="redisx-tab_8c.html#a67dd05115ae75dac9637ac04220d73b6">redisxScanKeys</a></div><div class="ttdeci">char ** redisxScanKeys(Redis *redis, const char *pattern, int *n, int *status)</div><div class="ttdef"><b>Definition</b> redisx-tab.c:505</div></div>
-</div><!-- fragment --><p>Similarly, to retrieve a set of keywords from a table, matching a glob pattern:</p>
+</div><!-- fragment --><p>Or, to retrieve the values from a hash table for a set of keywords that match a glob pattern:</p>
 <div class="fragment"><div class="line">...</div>
 <div class="line"> </div>
 <div class="line"><span class="comment">// Scan all key/value pairs in hash table &quot;system:subsystem&quot;</span></div>
@@ -417,7 +417,7 @@ Listing and Scanning</h3>
 <div class="line"><span class="comment">// Once done using the &#39;keys&#39; array, we should destroy it</span></div>
 <div class="line">redisxDestroyEntries(entries, nMatches);</div>
 <div class="ttc" id="aredisx-tab_8c_html_a47d28fd9f2f35f0af5abd67a1ae7b987"><div class="ttname"><a href="redisx-tab_8c.html#a47d28fd9f2f35f0af5abd67a1ae7b987">redisxScanTable</a></div><div class="ttdeci">RedisEntry * redisxScanTable(Redis *redis, const char *table, const char *pattern, int *n, int *status)</div><div class="ttdef"><b>Definition</b> redisx-tab.c:668</div></div>
-</div><!-- fragment --><p>Finally, you may use <code><a class="el" href="redisx-tab_8c.html#ad299cc621ad0dab54c6f7a7fd6770db9">redisxSetScanCount()</a></code> to tune just how many results should individial scan queries return. Please refer to the <a class="el" href="structRedis.html" title="Structure that represents a Redis database instance, with one or more RedisClient connections.">Redis</a> documentation on the behavior of the <code>SCAN</code> and <code>HSCAN</code> commands to learn more.</p>
+</div><!-- fragment --><p>Finally, you may use <code><a class="el" href="redisx-tab_8c.html#ad299cc621ad0dab54c6f7a7fd6770db9">redisxSetScanCount()</a></code> to tune just how many results should individial scan queries should return (but only if you are really itching to tweak it). Please refer to the <a class="el" href="structRedis.html" title="Structure that represents a Redis database instance, with one or more RedisClient connections.">Redis</a> documentation on the behavior of the <code>SCAN</code> and <code>HSCAN</code> commands to learn more.</p>
 <hr  />
 <p><a class="anchor" id="publish-subscribe-support"></a> </p>
 <h2><a class="anchor" id="autotoc_md24"></a>
@@ -456,7 +456,7 @@ Subscriptions</h3>
 <div class="line">  ...</div>
 <div class="line">}</div>
 <div class="ttc" id="aredisx-sub_8c_html_a8a31ecaa0f83150366b72aa9b47755f0"><div class="ttname"><a href="redisx-sub_8c.html#a8a31ecaa0f83150366b72aa9b47755f0">redisxAddSubscriber</a></div><div class="ttdeci">void redisxAddSubscriber(Redis *redis, const char *channelStem, RedisSubscriberCall f)</div><div class="ttdef"><b>Definition</b> redisx-sub.c:205</div></div>
-</div><!-- fragment --><p>We should also start subsribing to specific channels and/or channel patterns (seethe <a class="el" href="structRedis.html" title="Structure that represents a Redis database instance, with one or more RedisClient connections.">Redis</a> <code>SUBSCRIBE</code> and <code>PSUBSCRIBE</code> commands for details).</p>
+</div><!-- fragment --><p>We should also start subsribing to specific channels and/or channel patterns.</p>
 <div class="fragment"><div class="line"><a class="code hl_struct" href="structRedis.html">Redis</a> *redis = ...</div>
 <div class="line"> </div>
 <div class="line"><span class="comment">// We subscribe to all channels that beging with &quot;event:&quot;...</span></div>
@@ -466,7 +466,8 @@ Subscriptions</h3>
 <div class="line">  ...</div>
 <div class="line">}</div>
 <div class="ttc" id="aredisx-sub_8c_html_a0aa27b4fce0d0986cae75dfe7fa12f19"><div class="ttname"><a href="redisx-sub_8c.html#a0aa27b4fce0d0986cae75dfe7fa12f19">redisxSubscribe</a></div><div class="ttdeci">int redisxSubscribe(Redis *redis, const char *pattern)</div><div class="ttdef"><b>Definition</b> redisx-sub.c:369</div></div>
-</div><!-- fragment --><p>Now, we are capturing and processing all messages published to channels whose name begins with <code>"event:"</code>, using our custom <code>my_event_processor</code> function.</p>
+</div><!-- fragment --><p>The <code>redisxSuibscribe()</code> function will translate to either a <a class="el" href="structRedis.html" title="Structure that represents a Redis database instance, with one or more RedisClient connections.">Redis</a> <code>PSUBSCRIBE</code> or <code>SUBSCRIBE</code> command, depending whether the <code>pattern</code> argument contains globbing patterns or not (respectively).</p>
+<p>Now, we are capturing and processing all messages published to channels whose name begins with <code>"event:"</code>, using our custom <code>my_event_processor</code> function.</p>
 <p>To end the subscription, we trace back the same steps by calling <code><a class="el" href="redisx-sub_8c.html#accafa9bf1ced851cc2e95c2d9fa1e9f8">redisxUnsubscribe()</a></code> to stop receiving further messages to the subscription channel or pattern, and by removing the <code>my_event_procesor</code> subscriber function as appropriate (provided no other subscription needs it) via <code>redisxRemoveSubscriber()</code>.</p>
 <hr  />
 <p><a class="anchor" id="atomic-transaction-blocks-and-lua-scripts"></a> </p>
@@ -620,14 +621,14 @@ Asynchronous client processing</h3>
 <h3><a class="anchor" id="autotoc_md35"></a>
 Pipelined transactions</h3>
 <p>Depending on round-trip times over the network, interactive queries may be suitable for running up to a few thousand queries per second. For higher throughput (up to millions <a class="el" href="structRedis.html" title="Structure that represents a Redis database instance, with one or more RedisClient connections.">Redis</a> transactions per second) you may need to access the <a class="el" href="structRedis.html" title="Structure that represents a Redis database instance, with one or more RedisClient connections.">Redis</a> database in pipelined mode. RedisX provides a dedicated pipeline client/channel to the <a class="el" href="structRedis.html" title="Structure that represents a Redis database instance, with one or more RedisClient connections.">Redis</a> server (provided the option to enable it has been used when <code>redixConnect()</code> was called).</p>
-<p>In pipeline mode, requests are sent to the <a class="el" href="structRedis.html" title="Structure that represents a Redis database instance, with one or more RedisClient connections.">Redis</a> server in quick succession without waiting for responses to return for each one individually. Responses are processed in the background by a designated callback function (or else discarded if no callback function has been set). This is what a callback function looks like:</p>
+<p>In pipeline mode, requests are sent to the <a class="el" href="structRedis.html" title="Structure that represents a Redis database instance, with one or more RedisClient connections.">Redis</a> server over the pipeline client in quick succession, without waiting for responses to return for each one individually. Responses are processed in the background by a designated callback function (or else discarded if no callback function has been set). This is what a callback function looks like:</p>
 <div class="fragment"><div class="line"><span class="comment">// Your own function to process responses to pipelined requests...</span></div>
 <div class="line"><span class="keywordtype">void</span> my_resp_processor(<a class="code hl_struct" href="structRESP.html">RESP</a> *r) {</div>
 <div class="line">  <span class="comment">// Do what you need to do with the asynchronous responses</span></div>
 <div class="line">  <span class="comment">// that come from Redis to bulk requests</span></div>
 <div class="line">  ...</div>
 <div class="line">}</div>
-</div><!-- fragment --><p>Before sending the requests, the user first needs to specify the function to process the responses, e.g.:</p>
+</div><!-- fragment --><p>Before sending the pipelined requests, the user first needs to specify the function to process the responses, e.g.:</p>
 <div class="fragment"><div class="line"><a class="code hl_struct" href="structRedis.html">Redis</a> *redis = ...</div>
 <div class="line"> </div>
 <div class="line">redisxSetPipelineConsumer(redis, my_resp_processor);</div>
@@ -666,11 +667,11 @@ Pipelined transactions</h3>
 <div class="line"><span class="comment">// other threads may use it now that we sent off our requests...</span></div>
 <div class="line"><a class="code hl_function" href="redisx-client_8c.html#a87efe53c80fcff3fcf189362cbc602f7">redisxUnlockClient</a>(pipe);</div>
 <div class="ttc" id="aredisx_8h_html_a5349b7340813fbd1e32d04ed650bc3d9a7a240839c1e943706535b8d69a605f0c"><div class="ttname"><a href="redisx_8h.html#a5349b7340813fbd1e32d04ed650bc3d9a7a240839c1e943706535b8d69a605f0c">REDISX_PIPELINE_CHANNEL</a></div><div class="ttdeci">@ REDISX_PIPELINE_CHANNEL</div><div class="ttdoc">Redis channel number for pipelined transfers.</div><div class="ttdef"><b>Definition</b> redisx.h:111</div></div>
-</div><!-- fragment --><p>It is important to remember that on the pipeline client you should never try to process responses directly from the same function from which commands are being sent. That's what the interactive connection is for. Pipeline responses are always processed by a background thread (if you don't specify your callback function they will be discarded simply). The only thing your callback function can count on is that the same number of responses will be received as the number of asynchronous requests that were sent out, and that the responses arrive in the same order as the order in which the requests were sent.</p>
+</div><!-- fragment --><p>It is important to remember that on the pipeline client you should never try to process responses directly from the same function from which commands are being sent. That's what the interactive connection is for. Pipeline responses are always processed by a background thread (or, if you don't specify your callback function they will be discarded). The only thing your callback function can count on is that the same number of responses will be received as the number of asynchronous requests that were sent out, and that the responses arrive in the same order as the order in which the requests were sent.</p>
 <p>It is up to you and your callback function to keep track of what responses are expected and in what order. Some best practices to help deal with pipeline responses are summarized here:</p>
 <ul>
 <li>Use <code><a class="el" href="redisx-client_8c.html#a44c5d0bd24f5a4f2f131218f14c9c599">redisxSkipReplyAsync()</a></code> prior to sending pipeline requests for which you do not need a response. (This way your callback does not have to deal with unnecessary responses at all.</li>
-<li>For requests that return a value, keep a record (in a FIFO) of the expected types and your data that depends on the content of the responses. For example, for pipelined <code>HGET</code> commands, your FIFO should have a record that specifies that a bulk string response is expected, and a pointer to data which is used to store the returned value &ndash; so that you pipeline response processing callback function can check that the reponse is the expected type (and size) and knows to assign/process the response approrpriately to your application data.</li>
+<li>For requests that return a value, keep a record (in a FIFO) of the expected types and your data that depends on the content of the responses. For example, for pipelined <code>HGET</code> commands, your FIFO should have a record that specifies that a bulk string response is expected, and a pointer to data which is used to store the returned value &ndash; so that you pipeline response processing callback function can check that the reponse is the expected type (and size) and knows to assign/process the response appropriately to your application data.</li>
 <li>You may insert <a class="el" href="structRedis.html" title="Structure that represents a Redis database instance, with one or more RedisClient connections.">Redis</a> <code>PING</code>/<code>ECHO</code> commands to section your responses, or to provide directives to your pipeline response processor function. You can tag them uniquely so that the echoed responses can be parsed and interpreted by your callback function. For example, you may send a <code>PING</code>/<code>ECHO</code> commands to <a class="el" href="structRedis.html" title="Structure that represents a Redis database instance, with one or more RedisClient connections.">Redis</a> with the tag <code>"@my_resp_processor: START sequence A"</code>, or something else meaningful that you can uniquely distinguish from all other responses that you might receive.</li>
 </ul>
 <hr  />

@@ -447,7 +447,7 @@ something like:
   redisxDestroyKeys(keys, nMatches);
 ```
 
-Similarly, to retrieve a set of keywords from a table, matching a glob pattern:
+Or, to retrieve the values from a hash table for a set of keywords that match a glob pattern:
 
 ```c
   ...
@@ -467,8 +467,9 @@ Similarly, to retrieve a set of keywords from a table, matching a glob pattern:
   redisxDestroyEntries(entries, nMatches);
 ```
 
-Finally, you may use `redisxSetScanCount()` to tune just how many results should individial scan queries return. 
-Please refer to the Redis documentation on the behavior of the `SCAN` and `HSCAN` commands to learn more. 
+Finally, you may use `redisxSetScanCount()` to tune just how many results should individial scan queries should return 
+(but only if you are really itching to tweak it). Please refer to the Redis documentation on the behavior of the 
+`SCAN` and `HSCAN` commands to learn more. 
 
 -----------------------------------------------------------------------------
 
@@ -535,8 +536,7 @@ Once the function is defined, you can activate it via:
   }
 ```
 
-We should also start subsribing to specific channels and/or channel patterns (seethe Redis `SUBSCRIBE` and 
-`PSUBSCRIBE` commands for details).
+We should also start subsribing to specific channels and/or channel patterns.
 
 ```c
   Redis *redis = ...
@@ -548,6 +548,9 @@ We should also start subsribing to specific channels and/or channel patterns (se
     ...
   }
 ```
+
+The `redisxSuibscribe()` function will translate to either a Redis `PSUBSCRIBE` or `SUBSCRIBE` command, depending 
+whether the `pattern` argument contains globbing patterns or not (respectively).
 
 Now, we are capturing and processing all messages published to channels whose name begins with `"event:"`, using our
 custom `my_event_processor` function.
@@ -613,6 +616,7 @@ If at any point things don't go according to plan in the middle of the block, yo
 abort and discard all prior commands submitted in the execution block already. It is important to remembet that every
 time you call `redisxStartBlockAsync()`, you must call either `redisxExecBlockAsync()` to execute it or else 
 `redisxAbortBlockAsync()` to discard it. Failure to do so, will effectively end you up with a hung Redis client.
+
 
 <a name="lua-script-loading-and-execution"></a>
 ### LUA script loading and execution
@@ -682,11 +686,10 @@ Stay tuned.
 <a name="asynchronous-client-processing"></a>
 ### Asynchronous client processing
 
-Sometimes you might want to micro manage how requests are sent and responses to them are received. __RedisX__ 
-provides a set of asynchronous client functions that do that. (You've seen these already further above in the 
-[Pipelined transaction](#pipelined-transactions) section.) These functions should be called with the specific 
-client's mutex locked, to ensure that other threads do not interfere with your sequence of requests and responses. 
-E.g.:
+Sometimes you might want to micro manage how requests are sent and responses to them are received. __RedisX__ provides 
+a set of asynchronous client functions that do that. (You've seen these already further above in the 
+[Pipelined transaction](#pipelined-transactions) section.) These functions should be called with the specific client's 
+mutex locked, to ensure that other threads do not interfere with your sequence of requests and responses. E.g.:
 
 ```c
   // Obtain the appropriate client with an exclusive lock on it.
@@ -768,9 +771,9 @@ queries per second. For higher throughput (up to millions Redis transactions per
 Redis database in pipelined mode. RedisX provides a dedicated pipeline client/channel to the Redis server (provided
 the option to enable it has been used when `redixConnect()` was called).
 
-In pipeline mode, requests are sent to the Redis server in quick succession without waiting for responses to return 
-for each one individually. Responses are processed in the background by a designated callback function (or else 
-discarded if no callback function has been set). This is what a callback function looks like:
+In pipeline mode, requests are sent to the Redis server over the pipeline client in quick succession, without waiting 
+for responses to return for each one individually. Responses are processed in the background by a designated callback 
+function (or else discarded if no callback function has been set). This is what a callback function looks like:
 
 ```c
   // Your own function to process responses to pipelined requests...
@@ -781,7 +784,7 @@ discarded if no callback function has been set). This is what a callback functio
   }
 ```
 
-Before sending the requests, the user first needs to specify the function to process the responses, e.g.:
+Before sending the pipelined requests, the user first needs to specify the function to process the responses, e.g.:
 
 ```c
   Redis *redis = ...
@@ -832,10 +835,10 @@ for processing the responses.
 
 It is important to remember that on the pipeline client you should never try to process responses directly from the 
 same function from which commands are being sent. That's what the interactive connection is for. Pipeline responses 
-are always processed by a background thread (if you don't specify your callback function they will be discarded 
-simply). The only thing your callback function can count on is that the same number of responses will be received as
-the number of asynchronous requests that were sent out, and that the responses arrive in the same order as the order 
-in which the requests were sent. 
+are always processed by a background thread (or, if you don't specify your callback function they will be discarded). 
+The only thing your callback function can count on is that the same number of responses will be received as the number 
+of asynchronous requests that were sent out, and that the responses arrive in the same order as the order in which the 
+requests were sent. 
 
 It is up to you and your callback function to keep track of what responses are expected and in what order. Some best 
 practices to help deal with pipeline responses are summarized here:
@@ -847,7 +850,7 @@ practices to help deal with pipeline responses are summarized here:
    the content of the responses. For example, for pipelined `HGET` commands, your FIFO should have a record that
    specifies that a bulk string response is expected, and a pointer to data which is used to store the returned value 
    -- so that you pipeline response processing callback function can check that the reponse is the expected type
-   (and size) and knows to assign/process the response approrpriately to your application data.
+   (and size) and knows to assign/process the response appropriately to your application data.
  
  - You may insert Redis `PING`/`ECHO` commands to section your responses, or to provide directives to your pipeline
    response processor function. You can tag them uniquely so that the echoed responses can be parsed and interpreted
