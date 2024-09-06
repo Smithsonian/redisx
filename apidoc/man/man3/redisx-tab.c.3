@@ -39,7 +39,10 @@ src/redisx-tab.c
 .RI "\fBRESP\fP * \fBredisxGetValue\fP (\fBRedis\fP *redis, const char *table, const char *key, int *status)"
 .br
 .ti -1c
-.RI "int \fBredisxMultiSet\fP (\fBRedis\fP *redis, const char *table, const \fBRedisEntry\fP *entries, int n, \fBboolean\fP isPipelined)"
+.RI "int \fBredisxMultiSet\fP (\fBRedis\fP *redis, const char *table, const \fBRedisEntry\fP *entries, int n, \fBboolean\fP confirm)"
+.br
+.ti -1c
+.RI "int \fBredisxMultiSetAsync\fP (\fBRedisClient\fP *cl, const char *table, const \fBRedisEntry\fP *entries, int n, \fBboolean\fP confirm)"
 .br
 .ti -1c
 .RI "char ** \fBredisxScanKeys\fP (\fBRedis\fP *redis, const char *pattern, int *n, int *status)"
@@ -51,7 +54,7 @@ src/redisx-tab.c
 .RI "void \fBredisxSetScanCount\fP (\fBRedis\fP *redis, int count)"
 .br
 .ti -1c
-.RI "int \fBredisxSetValue\fP (\fBRedis\fP *redis, const char *table, const char *key, const char *value, \fBboolean\fP isPipelined)"
+.RI "int \fBredisxSetValue\fP (\fBRedis\fP *redis, const char *table, const char *key, const char *value, \fBboolean\fP confirm)"
 .br
 .ti -1c
 .RI "int \fBredisxSetValueAsync\fP (\fBRedisClient\fP *cl, const char *table, const char *key, const char *value, \fBboolean\fP confirm)"
@@ -251,7 +254,7 @@ A freshly allocated \fBRESP\fP array containing the \fBRedis\fP response, or NUL
 
 .PP
 References \fBredisxError()\fP, \fBredisxRequest()\fP, \fBX_NAME_INVALID\fP, and \fBX_NULL\fP\&.
-.SS "int redisxMultiSet (\fBRedis\fP * redis, const char * table, const \fBRedisEntry\fP * entries, int n, \fBboolean\fP isPipelined)"
+.SS "int redisxMultiSet (\fBRedis\fP * redis, const char * table, const \fBRedisEntry\fP * entries, int n, \fBboolean\fP confirm)"
 Sets multiple key/value pairs in a given hash table\&.
 .PP
 \fBParameters\fP
@@ -264,7 +267,7 @@ Sets multiple key/value pairs in a given hash table\&.
 .br
 \fIn\fP Number of entries\&. 
 .br
-\fIisPipelined\fP If TRUE the call will be sent on the pipeline channel and no response will be requested\&. Otherwise, the request will be sent on the interactive channel, and checked for confirmation\&.
+\fIconfirm\fP Whether we should get a confirmation from the server (requires a round-trip)\&.
 .RE
 .PP
 \fBReturns\fP
@@ -274,7 +277,38 @@ X_SUCCESS (0) on success or an error code\&.
 .PP
 
 .PP
-References \fBRedisEntry::length\fP, \fBRedis::pipeline\fP, \fBREDIS_ERROR\fP, \fBredisxArrayRequest()\fP, \fBredisxCheckDestroyRESP()\fP, \fBredisxDestroyRESP()\fP, \fBredisxError()\fP, \fBredisxHasPipeline()\fP, \fBredisxLockConnected()\fP, \fBredisxSendArrayRequestAsync()\fP, \fBredisxSkipReplyAsync()\fP, \fBredisxUnlockClient()\fP, \fBRESP_SIMPLE_STRING\fP, \fBRESP::value\fP, \fBX_FAILURE\fP, \fBX_GROUP_INVALID\fP, \fBX_NO_INIT\fP, \fBX_NULL\fP, \fBX_SIZE_INVALID\fP, and \fBX_SUCCESS\fP\&.
+References \fBRedis::interactive\fP, \fBREDIS_ERROR\fP, \fBredisxCheckRESP()\fP, \fBredisxDestroyRESP()\fP, \fBredisxError()\fP, \fBredisxLockConnected()\fP, \fBredisxMultiSetAsync()\fP, \fBredisxReadReplyAsync()\fP, \fBRESP_SIMPLE_STRING\fP, \fBRESP::value\fP, \fBX_GROUP_INVALID\fP, \fBX_NO_INIT\fP, \fBX_NULL\fP, \fBX_SIZE_INVALID\fP, and \fBX_SUCCESS\fP\&.
+.SS "int redisxMultiSetAsync (\fBRedisClient\fP * cl, const char * table, const \fBRedisEntry\fP * entries, int n, \fBboolean\fP confirm)"
+Sets multiple key/value pairs in a given hash table\&. This function should be called with exclusive access to the client\&.
+.PP
+\fBParameters\fP
+.RS 4
+\fIcl\fP A \fBRedis\fP client to which we have exclusive access\&. 
+.br
+\fItable\fP Hashtable from which to retrieve a value or NULL if to use the global table\&. 
+.br
+\fIentries\fP Pointer to an array of key/value pairs\&. 
+.br
+\fIn\fP Number of entries\&. 
+.br
+\fIconfirm\fP Whether we should get a confirmation from the server (requires a round-trip)\&.
+.RE
+.PP
+\fBReturns\fP
+.RS 4
+X_SUCCESS (0) on success or an error code\&.
+.RE
+.PP
+\fBSee also\fP
+.RS 4
+\fBredisxMultiSet()\fP 
+.PP
+\fBredisxLockClient()\fP 
+.RE
+.PP
+
+.PP
+References \fBRedisEntry::length\fP, \fBredisxError()\fP, \fBredisxSendArrayRequestAsync()\fP, \fBredisxSkipReplyAsync()\fP, \fBX_FAILURE\fP, \fBX_GROUP_INVALID\fP, \fBX_NULL\fP, \fBX_SIZE_INVALID\fP, and \fBX_SUCCESS\fP\&.
 .SS "char ** redisxScanKeys (\fBRedis\fP * redis, const char * pattern, int * n, int * status)"
 Returns an alphabetical list of the \fBRedis\fP keys using the \fBRedis\fP SCAN command\&. Because it uses the scan command, it is guaranteed to not hog the database for excessive periods, and hence it is preferable to redisxGetKeys(table=NULL)\&.
 .PP
@@ -371,7 +405,7 @@ Sets the COUNT parameter to use with \fBRedis\fP SCAN type commands\&. COUNT spe
 .RE
 .PP
 
-.SS "int redisxSetValue (\fBRedis\fP * redis, const char * table, const char * key, const char * value, \fBboolean\fP isPipelined)"
+.SS "int redisxSetValue (\fBRedis\fP * redis, const char * table, const char * key, const char * value, \fBboolean\fP confirm)"
 Sets a global or hashtable value on \fBRedis\fP\&.
 .PP
 \fBParameters\fP
@@ -384,7 +418,7 @@ Sets a global or hashtable value on \fBRedis\fP\&.
 .br
 \fIvalue\fP A proper 0-terminated string value to store\&. 
 .br
-\fIisPipelined\fP If TRUE the call will be sent on the pipeline channel and no response will be requested\&. Otherwise, the request will be sent on the interactive channel, and checked for confirmation\&.
+\fIconfirm\fP Whether we should get a confirmation from the server (requires a round-trip)\&.
 .RE
 .PP
 \fBReturns\fP
@@ -405,7 +439,7 @@ X_SUCCESS if the variable was succesfully set, or:
 .PP
 
 .PP
-References \fBFALSE\fP, \fBRedis::interactive\fP, \fBRedis::pipeline\fP, \fBredisxError()\fP, \fBredisxLockConnected()\fP, \fBredisxSetValueAsync()\fP, \fBredisxUnlockClient()\fP, \fBX_NULL\fP, and \fBX_SUCCESS\fP\&.
+References \fBRedis::interactive\fP, \fBredisxCheckRESP()\fP, \fBredisxDestroyRESP()\fP, \fBredisxError()\fP, \fBredisxLockConnected()\fP, \fBredisxReadReplyAsync()\fP, \fBredisxSetValueAsync()\fP, \fBredisxUnlockClient()\fP, \fBRESP_INT\fP, \fBX_NULL\fP, and \fBX_SUCCESS\fP\&.
 .SS "int redisxSetValueAsync (\fBRedisClient\fP * cl, const char * table, const char * key, const char * value, \fBboolean\fP confirm)"
 Sends a request for setting a table value, using the \fBRedis\fP 'SET' or 'HSET' command\&.
 .PP

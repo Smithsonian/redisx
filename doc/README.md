@@ -333,12 +333,13 @@ with that response (or `NULL` if there was an error).
 <a name="pipelined-transactions"></a>
 ### Pipelined transactions
 
-Depending on round-trip times over the network, interactive queries may be suitable for running up to a few hundred 
-(or a few thousand) queries per second. For higher throughput (up to millions Redis transactions per second) you may 
-need to access the Redis database in pipelined mode.
+Depending on round-trip times over the network, interactive queries may be suitable for running up to a few thousand 
+queries per second. For higher throughput (up to millions Redis transactions per second) you may need to access the 
+Redis database in pipelined mode.
 
 In pipeline mode, requests are sent to the Redis server in quick succession without waiting for responses to return 
-for each one individually. Responses are then processed in the background by a designated callback function.
+for each one individually. Responses are processed in the background by a designated callback function (or else 
+discarded if no callback function has been set). This is what a callback function looks like:
 
 ```c
   // Your own function to process responses to pipelined requests...
@@ -359,7 +360,8 @@ Before sending the requests, the user first needs to specify the function to pro
 
 Request are sent via the `redisxSendRequestAsync()` and `redisxSendArrayRequestAsync()` functions. Note, the `Async` 
 naming, which indicates the asynchronous nature of this calls -- and which also suggests that these should be called
-with the approrpiate mutex locked to prevent concurrency issues.
+with the approrpiate mutex locked to prevent concurrency issues and to maintain a predictable order (very important!) 
+for processing the responses.
 
 ```c
   Redis *redis = ...
@@ -397,6 +399,31 @@ with the approrpiate mutex locked to prevent concurrency issues.
   redisxUnlockClient(pipe);
 ```
 
+It is important to remember that on the pipeline client you should never try to process responses directly from the 
+same function from which commands are being sent. That's what the interactive connection is for. Pipeline responses 
+are always processed by a background thread (if you don't specify your callback function they will be discarded 
+simply). The only thing your callback function can count on is that the same number of responses will be received as
+the number of asynchronous requests that were sent out, and that the responses arrive in the same order as the order 
+in which the requests were sent. 
+
+It is up to you and your callback function to keep track of what responses are expected and in what order. Some best 
+practices to help deal with pipeline responses are summarized here:
+
+ - Use `redisxSkipReplyAsync()` prior to sending pipeline requests for which you do not need a response. (This way
+   your callback does not have to deal with unnecessary responses at all.
+ 
+ - For requests that return a value, keep a record (in a FIFO) of the expected types and your data that depends on 
+   the content of the responses. For example, for pipelined `HGET` commands, your FIFO should have a record that
+   specifies that a bulk string response is expected, and a pointer to data which is used to store the returned value 
+   -- so that you pipeline response processing callback function can check that the reponse is the expected type
+   (and size) and knows to assign/process the response approrpriately to your application data.
+ 
+ - You may insert Redis `PING`/`ECHO` commands to section your responses, or to provide directives to your pipeline
+   response processor function. You can tag them uniquely so that the echoed responses can be parsed and interpreted
+   by your callback function. For example, you may send a `PING`/`ECHO` commands to Redis with the tag 
+   `"@my_resp_processor: START sequence A"`, or something else meaningful that you can uniquely distinguish from all
+   other responses that you might receive.
+  
 
 -----------------------------------------------------------------------------
 
@@ -449,7 +476,7 @@ Setting values is straightforward also:
   Redis *redis = ...;
   
   // Set the "property" field in the "system:subsystem" hash table to -2.5
-  // using the interactive client connection. 
+  // using the interactive client connection, without requiring confirmation. 
   int status = redisxSetValue(redis, "system:subsystem", "property", "-2.5", FALSE);
   if (status != X_SUCCESS) {
     // Oops something went wrong.

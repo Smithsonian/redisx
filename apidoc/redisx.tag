@@ -471,8 +471,15 @@
       <type>int</type>
       <name>redisxMultiSet</name>
       <anchorfile>redisx_8h.html</anchorfile>
-      <anchor>ada49b9dad00af34819a8de323b59be16</anchor>
-      <arglist>(Redis *redis, const char *table, const RedisEntry *entries, int n, boolean isPipelined)</arglist>
+      <anchor>aa8fd65a355394af08c86b4f0e943d3a6</anchor>
+      <arglist>(Redis *redis, const char *table, const RedisEntry *entries, int n, boolean confirm)</arglist>
+    </member>
+    <member kind="function">
+      <type>int</type>
+      <name>redisxMultiSetAsync</name>
+      <anchorfile>redisx_8h.html</anchorfile>
+      <anchor>a750023f759dd5192dd3c802a542af770</anchor>
+      <arglist>(RedisClient *cl, const char *table, const RedisEntry *entries, int n, boolean confirm)</arglist>
     </member>
     <member kind="function">
       <type>int</type>
@@ -632,8 +639,8 @@
       <type>int</type>
       <name>redisxSetValue</name>
       <anchorfile>redisx_8h.html</anchorfile>
-      <anchor>aaf4dbea72c62bad0ed91800db9644cd9</anchor>
-      <arglist>(Redis *redis, const char *table, const char *key, const char *value, boolean isPipelined)</arglist>
+      <anchor>a1465b1a965ddd685e16bccbf0b34f08b</anchor>
+      <arglist>(Redis *redis, const char *table, const char *key, const char *value, boolean confirm)</arglist>
     </member>
     <member kind="function">
       <type>int</type>
@@ -1075,8 +1082,15 @@
       <type>int</type>
       <name>redisxMultiSet</name>
       <anchorfile>redisx-tab_8c.html</anchorfile>
-      <anchor>ada49b9dad00af34819a8de323b59be16</anchor>
-      <arglist>(Redis *redis, const char *table, const RedisEntry *entries, int n, boolean isPipelined)</arglist>
+      <anchor>aa8fd65a355394af08c86b4f0e943d3a6</anchor>
+      <arglist>(Redis *redis, const char *table, const RedisEntry *entries, int n, boolean confirm)</arglist>
+    </member>
+    <member kind="function">
+      <type>int</type>
+      <name>redisxMultiSetAsync</name>
+      <anchorfile>redisx-tab_8c.html</anchorfile>
+      <anchor>a750023f759dd5192dd3c802a542af770</anchor>
+      <arglist>(RedisClient *cl, const char *table, const RedisEntry *entries, int n, boolean confirm)</arglist>
     </member>
     <member kind="function">
       <type>char **</type>
@@ -1103,8 +1117,8 @@
       <type>int</type>
       <name>redisxSetValue</name>
       <anchorfile>redisx-tab_8c.html</anchorfile>
-      <anchor>aaf4dbea72c62bad0ed91800db9644cd9</anchor>
-      <arglist>(Redis *redis, const char *table, const char *key, const char *value, boolean isPipelined)</arglist>
+      <anchor>a1465b1a965ddd685e16bccbf0b34f08b</anchor>
+      <arglist>(Redis *redis, const char *table, const char *key, const char *value, boolean confirm)</arglist>
     </member>
     <member kind="function">
       <type>int</type>
