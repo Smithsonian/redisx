@@ -1352,8 +1352,8 @@
     <docanchor file="index.html">disconnecting</docanchor>
     <docanchor file="index.html">connection-hooks</docanchor>
     <docanchor file="index.html">simple-redis-queries</docanchor>
-    <docanchor file="index.html">resp-data-type</docanchor>
     <docanchor file="index.html">interactive-transactions</docanchor>
+    <docanchor file="index.html">resp-data-type</docanchor>
     <docanchor file="index.html">accessing-key-value-data</docanchor>
     <docanchor file="index.html">getting-and-setting-keyed-values</docanchor>
     <docanchor file="index.html">listing-and-scanning</docanchor>

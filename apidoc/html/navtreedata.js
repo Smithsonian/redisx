@@ -37,8 +37,8 @@ var NAVTREE =
         [ "Connection hooks", "index.html#autotoc_md14", null ]
       ] ],
       [ "Simple Redis queries", "index.html#autotoc_md16", [
-        [ "RESP data type", "index.html#autotoc_md17", null ],
-        [ "Interactive transactions", "index.html#autotoc_md18", null ]
+        [ "Interactive transactions", "index.html#autotoc_md17", null ],
+        [ "RESP data type", "index.html#autotoc_md18", null ]
       ] ],
       [ "Accessing key / value data", "index.html#autotoc_md20", [
         [ "Getting and setting keyed values", "index.html#autotoc_md21", null ],

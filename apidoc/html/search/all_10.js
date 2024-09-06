@@ -114,7 +114,7 @@ var searchData=
   ['redisxunlockclient_111',['redisxunlockclient',['../redisx-client_8c.html#a87efe53c80fcff3fcf189362cbc602f7',1,'redisxUnlockClient(RedisClient *cl):&#160;redisx-client.c'],['../redisx_8h.html#a87efe53c80fcff3fcf189362cbc602f7',1,'redisxUnlockClient(RedisClient *cl):&#160;redisx-client.c']]],
   ['redisxunsubscribe_112',['redisxunsubscribe',['../redisx-sub_8c.html#accafa9bf1ced851cc2e95c2d9fa1e9f8',1,'redisxUnsubscribe(Redis *redis, const char *pattern):&#160;redisx-sub.c'],['../redisx_8h.html#af64c112d9c395f1e08af52acd6f5c3ec',1,'redisxUnsubscribe(Redis *redis, const char *channel):&#160;redisx-sub.c']]],
   ['resp_113',['RESP',['../structRESP.html',1,'']]],
-  ['resp_20data_20type_114',['RESP data type',['../index.html#autotoc_md17',1,'']]],
+  ['resp_20data_20type_114',['RESP data type',['../index.html#autotoc_md18',1,'']]],
   ['resp_5farray_115',['RESP_ARRAY',['../redisx_8h.html#ae140df45d32af33e2334fb677213e887',1,'redisx.h']]],
   ['resp_5fbulk_5fstring_116',['RESP_BULK_STRING',['../redisx_8h.html#a980fc225ec0392474ff67e319a33f028',1,'redisx.h']]],
   ['resp_5ferror_117',['RESP_ERROR',['../redisx_8h.html#a37dfdba3cdcf140c38564c1a6856c04a',1,'redisx.h']]],

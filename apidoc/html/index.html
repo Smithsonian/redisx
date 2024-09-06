@@ -256,12 +256,41 @@ Connection hooks</h3>
 <h2><a class="anchor" id="autotoc_md16"></a>
 Simple Redis queries</h2>
 <ul>
+<li><a class="el" href="index.html#interactive-transactions">Interactive transactions</a><ul>
 <li><a class="el" href="index.html#resp-data-type">RESP data type</a></li>
-<li><a class="el" href="index.html#interactive-transactions">Interactive transactions</a></li>
+</ul>
+</li>
 </ul>
 <p><a class="el" href="structRedis.html" title="Structure that represents a Redis database instance, with one or more RedisClient connections.">Redis</a> queries are sent as strings, according the the specification of the <a class="el" href="structRedis.html" title="Structure that represents a Redis database instance, with one or more RedisClient connections.">Redis</a> protocol. All responses sent back by the server using the <a class="el" href="structRESP.html" title="Structure that represents a Redis response (RESP format).">RESP</a> protocol. Specifically, <a class="el" href="structRedis.html" title="Structure that represents a Redis database instance, with one or more RedisClient connections.">Redis</a> uses version 2.0 of the <a class="el" href="structRESP.html" title="Structure that represents a Redis response (RESP format).">RESP</a> protocol (a.k.a. RESP2) by default, with optional support for the newer RESP3 introduced in <a class="el" href="structRedis.html" title="Structure that represents a Redis database instance, with one or more RedisClient connections.">Redis</a> version 6.0. The RedisX library currently processes the standard RESP2 replies only. RESP3 support to the library may be added in the future (stay tuned...)</p>
-<p><a class="anchor" id="resp-data-type"></a> </p>
+<p><a class="anchor" id="interactive-transactions"></a> </p>
 <h3><a class="anchor" id="autotoc_md17"></a>
+Interactive transactions</h3>
+<p>The simplest way for running a few <a class="el" href="structRedis.html" title="Structure that represents a Redis database instance, with one or more RedisClient connections.">Redis</a> queries is to do it in interactive mode:</p>
+<div class="fragment"><div class="line"><a class="code hl_struct" href="structRedis.html">Redis</a> *redis = ...</div>
+<div class="line">RESP *resp;</div>
+<div class="line"><span class="keywordtype">int</span> status;</div>
+<div class="line"> </div>
+<div class="line"><span class="comment">// Send &quot;HGET my_table my_key&quot; request</span></div>
+<div class="line">resp = <a class="code hl_function" href="redisx_8c.html#a09092bd97eead5c5fa73fa0d9241018c">redisxRequest</a>(redis, <span class="stringliteral">&quot;HGET&quot;</span>, <span class="stringliteral">&quot;my_table&quot;</span>, <span class="stringliteral">&quot;my_key&quot;</span>, NULL, &amp;status);</div>
+<div class="line"> </div>
+<div class="line"><span class="comment">// Check return status...</span></div>
+<div class="line"><span class="keywordflow">if</span> (status != X_SUCCESS) {</div>
+<div class="line">  <span class="comment">// Oops something went wrong...</span></div>
+<div class="line">  ...</div>
+<div class="line">}</div>
+<div class="line">...</div>
+<div class="ttc" id="aredisx_8c_html_a09092bd97eead5c5fa73fa0d9241018c"><div class="ttname"><a href="redisx_8c.html#a09092bd97eead5c5fa73fa0d9241018c">redisxRequest</a></div><div class="ttdeci">RESP * redisxRequest(Redis *redis, const char *command, const char *arg1, const char *arg2, const char *arg3, int *status)</div><div class="ttdef"><b>Definition</b> redisx.c:505</div></div>
+</div><!-- fragment --><p>The <code><a class="el" href="redisx_8c.html#a09092bd97eead5c5fa73fa0d9241018c">redisxRequest()</a></code> sends a command with up to three arguments. If the command takes fewer than 3 parameters, then the remaining ones must be set to <code>NULL</code>. This function thus offers a simple interface for running most basic sequential queries. In cases where 3 parameters are nut sufficient, you may use <code><a class="el" href="redisx_8c.html#a13ae33bc25ee03621b23541236ef5f82">redisxArrayRequest()</a></code> instead, e.g.:</p>
+<div class="fragment"><div class="line">...</div>
+<div class="line">char *args[] = { <span class="stringliteral">&quot;my_table&quot;</span>, <span class="stringliteral">&quot;my_key&quot;</span> };  <span class="comment">// parameters as an array...</span></div>
+<div class="line"> </div>
+<div class="line"><span class="comment">// Send &quot;HGET my_table my_key&quot; request with an array of 2 parameters...</span></div>
+<div class="line">resp = <a class="code hl_function" href="redisx_8c.html#a09092bd97eead5c5fa73fa0d9241018c">redisxRequest</a>(redis, <span class="stringliteral">&quot;HGET&quot;</span>, args, NULL, 2, &amp;status);</div>
+<div class="line">...</div>
+</div><!-- fragment --><p>The 4th argument in the list is an optional <code>int[]</code> array defining the individual string lengths of the parameters (if need be, or else readily available). Here, we used <code>NULL</code> instead, which will use <code>strlen()</code> on each supplied string-terminated parameter to determine its length automatically. Specifying the length may be necessary if the individual parameters are not 0-terminated strings, or else substrings from a continuing string are to be used as the parameter value.</p>
+<p>In interactive mode, each request is sent to the <a class="el" href="structRedis.html" title="Structure that represents a Redis database instance, with one or more RedisClient connections.">Redis</a> server, and the response is collected before the call returns with that response (or <code>NULL</code> if there was an error).</p>
+<p><a class="anchor" id="resp-data-type"></a> </p>
+<h3><a class="anchor" id="autotoc_md18"></a>
 RESP data type</h3>
 <p>All responses coming from the <a class="el" href="structRedis.html" title="Structure that represents a Redis database instance, with one or more RedisClient connections.">Redis</a> server are represented by a dynamically allocated <code><a class="el" href="structRESP.html" title="Structure that represents a Redis response (RESP format).">RESP</a></code> type (defined in <code><a class="el" href="redisx_8h.html">redisx.h</a></code>) structure. Each <code><a class="el" href="structRESP.html" title="Structure that represents a Redis response (RESP format).">RESP</a></code> has a type (e.g. <code>RESP_SIMPLE_STRING</code>), an integer value <code>n</code>, and a <code>value</code> pointer to further data. If the type is <code>RESP_INT</code>, then <code>n</code> represents the actual return value (and the <code>value</code> pointer is not used). For string type values <code>n</code> is the number of characters in the string <code>value</code> (not including termination), while for <code>RESP_ARRAY</code> types the <code>value</code> is a pointer to an embedded <code><a class="el" href="structRESP.html" title="Structure that represents a Redis response (RESP format).">RESP</a></code> array and <code>n</code> is the number of elements in that.</p>
 <p>You may check the integrity of a <code><a class="el" href="structRESP.html" title="Structure that represents a Redis response (RESP format).">RESP</a></code> using <code><a class="el" href="redisx_8c.html#a2d3ffb89129ab04483e3966835a5ff71">redisxCheckRESP()</a></code>. Since <code><a class="el" href="structRESP.html" title="Structure that represents a Redis response (RESP format).">RESP</a></code> data is dynamically allocated, the user is responsible for discarding them once they are no longer needed, e.g. by calling <code><a class="el" href="redisx_8c.html#aa4e23a7454f7055711915ec430599011">redisxDestroyRESP()</a></code>. The two steps may be combined to automatically discard invalid or unexpected <code><a class="el" href="structRESP.html" title="Structure that represents a Redis response (RESP format).">RESP</a></code> data in a single step by calling <code><a class="el" href="redisx_8c.html#a67b8bd13975dd286600f20dc80bdb462">redisxCheckDestroyRESP()</a></code>.</p>
@@ -302,34 +331,7 @@ RESP data type</h3>
 <div class="line">}</div>
 <div class="ttc" id="aredisx_8h_html_ab2bc8d02a9fa90910d487412704b99f3"><div class="ttname"><a href="redisx_8h.html#ab2bc8d02a9fa90910d487412704b99f3">RESP_SIMPLE_STRING</a></div><div class="ttdeci">#define RESP_SIMPLE_STRING</div><div class="ttdoc">RESP simple string type.</div><div class="ttdef"><b>Definition</b> redisx.h:90</div></div>
 <div class="ttc" id="astructRESP_html_a0f61d63b009d0880a89c843bd50d8d76"><div class="ttname"><a href="structRESP.html#a0f61d63b009d0880a89c843bd50d8d76">RESP::value</a></div><div class="ttdeci">void * value</div><div class="ttdoc">Pointer to text (char *) content to an array of components (RESP**)...</div><div class="ttdef"><b>Definition</b> redisx.h:127</div></div>
-</div><!-- fragment --><p><a class="anchor" id="interactive-transactions"></a> </p>
-<h3><a class="anchor" id="autotoc_md18"></a>
-Interactive transactions</h3>
-<p>The simplest way for running a few <a class="el" href="structRedis.html" title="Structure that represents a Redis database instance, with one or more RedisClient connections.">Redis</a> queries is to do it in interactive mode:</p>
-<div class="fragment"><div class="line"><a class="code hl_struct" href="structRedis.html">Redis</a> *redis = ...</div>
-<div class="line">RESP *resp;</div>
-<div class="line"><span class="keywordtype">int</span> status;</div>
-<div class="line"> </div>
-<div class="line"><span class="comment">// Send &quot;HGET my_table my_key&quot; request</span></div>
-<div class="line">resp = <a class="code hl_function" href="redisx_8c.html#a09092bd97eead5c5fa73fa0d9241018c">redisxRequest</a>(redis, <span class="stringliteral">&quot;HGET&quot;</span>, <span class="stringliteral">&quot;my_table&quot;</span>, <span class="stringliteral">&quot;my_key&quot;</span>, NULL, &amp;status);</div>
-<div class="line"> </div>
-<div class="line"><span class="comment">// Check return status...</span></div>
-<div class="line"><span class="keywordflow">if</span> (status != X_SUCCESS) {</div>
-<div class="line">  <span class="comment">// Oops something went wrong...</span></div>
-<div class="line">  ...</div>
-<div class="line">}</div>
-<div class="line">...</div>
-<div class="ttc" id="aredisx_8c_html_a09092bd97eead5c5fa73fa0d9241018c"><div class="ttname"><a href="redisx_8c.html#a09092bd97eead5c5fa73fa0d9241018c">redisxRequest</a></div><div class="ttdeci">RESP * redisxRequest(Redis *redis, const char *command, const char *arg1, const char *arg2, const char *arg3, int *status)</div><div class="ttdef"><b>Definition</b> redisx.c:505</div></div>
-</div><!-- fragment --><p>The <code><a class="el" href="redisx_8c.html#a09092bd97eead5c5fa73fa0d9241018c">redisxRequest()</a></code> sends a command with up to three arguments. If the command takes fewer than 3 parameters, then the remaining ones must be set to <code>NULL</code>. This function thus offers a simple interface for running most basic sequential queries. In cases where 3 parameters are nut sufficient, you may use <code><a class="el" href="redisx_8c.html#a13ae33bc25ee03621b23541236ef5f82">redisxArrayRequest()</a></code> instead, e.g.:</p>
-<div class="fragment"><div class="line">...</div>
-<div class="line">char *args[] = { <span class="stringliteral">&quot;my_table&quot;</span>, <span class="stringliteral">&quot;my_key&quot;</span> };  <span class="comment">// parameters as an array...</span></div>
-<div class="line"> </div>
-<div class="line"><span class="comment">// Send &quot;HGET my_table my_key&quot; request with an array of 2 parameters...</span></div>
-<div class="line">resp = <a class="code hl_function" href="redisx_8c.html#a09092bd97eead5c5fa73fa0d9241018c">redisxRequest</a>(redis, <span class="stringliteral">&quot;HGET&quot;</span>, args, NULL, 2, &amp;status);</div>
-<div class="line">...</div>
-</div><!-- fragment --><p>The 4th argument in the list is an optional <code>int[]</code> array defining the individual string lengths of the parameters (if need be, or else readily available). Here, we used <code>NULL</code> instead, which will use <code>strlen()</code> on each supplied string-terminated parameter to determine its length automatically. Specifying the length may be necessary if the individual parameters are not 0-terminated strings, or else substrings from a continuing string are to be used as the parameter value.</p>
-<p>In interactive mode, each request is sent to the <a class="el" href="structRedis.html" title="Structure that represents a Redis database instance, with one or more RedisClient connections.">Redis</a> server, and the response is collected before the call returns with that response (or <code>NULL</code> if there was an error).</p>
-<hr  />
+</div><!-- fragment --><hr  />
 <p><a class="anchor" id="accessing-key-value-data"></a> </p>
 <h2><a class="anchor" id="autotoc_md20"></a>
 Accessing key / value data</h2>

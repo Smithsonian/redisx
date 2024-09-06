@@ -9,8 +9,8 @@
       <topic label="Disconnecting" href="index.html#autotoc_md13"/>
       <topic label="Connection hooks" href="index.html#autotoc_md14"/>
     <topic label="Simple Redis queries" href="index.html#autotoc_md16">
-      <topic label="RESP data type" href="index.html#autotoc_md17"/>
-      <topic label="Interactive transactions" href="index.html#autotoc_md18"/>
+      <topic label="Interactive transactions" href="index.html#autotoc_md17"/>
+      <topic label="RESP data type" href="index.html#autotoc_md18"/>
     </topic>
     <topic label="Accessing key / value data" href="index.html#autotoc_md20">
       <topic label="Getting and setting keyed values" href="index.html#autotoc_md21"/>

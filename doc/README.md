@@ -222,13 +222,58 @@ The same goes for disconnect hooks, using `redisxAddDisconnectHook()` instead.
 <a name="simple-redis-queries"></a>
 ## Simple Redis queries
 
- - [RESP data type](#resp-data-type)
  - [Interactive transactions](#interactive-transactions)
+  - [RESP data type](#resp-data-type)
 
 Redis queries are sent as strings, according the the specification of the Redis protocol. All responses sent back by 
 the server using the RESP protocol. Specifically, Redis uses version 2.0 of the RESP protocol (a.k.a. RESP2) by 
 default, with optional support for the newer RESP3 introduced in Redis version 6.0. The RedisX library currently
 processes the standard RESP2 replies only. RESP3 support to the library may be added in the future (stay tuned...)
+
+
+<a name="interactive-transactions"></a>
+### Interactive transactions
+
+The simplest way for running a few Redis queries is to do it in interactive mode:
+
+```c
+  Redis *redis = ...
+  RESP *resp;
+  int status;
+
+  // Send "HGET my_table my_key" request
+  resp = redisxRequest(redis, "HGET", "my_table", "my_key", NULL, &status);
+  
+  // Check return status...
+  if (status != X_SUCCESS) {
+    // Oops something went wrong...
+    ...
+  }
+  ...
+```
+
+The `redisxRequest()` sends a command with up to three arguments. If the command takes fewer than 3 parameters, then
+the remaining ones must be set to `NULL`. This function thus offers a simple interface for running most basic 
+sequential queries. In cases where 3 parameters are nut sufficient, you may use `redisxArrayRequest()` instead, e.g.:
+
+```c
+  ...
+  char *args[] = { "my_table", "my_key" };  // parameters as an array...
+
+  // Send "HGET my_table my_key" request with an array of 2 parameters...
+  resp = redisxRequest(redis, "HGET", args, NULL, 2, &status);
+  ...
+
+```
+
+The 4th argument in the list is an optional `int[]` array defining the individual string lengths of the parameters (if 
+need be, or else readily available). Here, we used `NULL` instead, which will use `strlen()` on each supplied 
+string-terminated parameter to determine its length automatically. Specifying the length may be necessary if the 
+individual parameters are not 0-terminated strings, or else substrings from a continuing string are to be used as 
+the parameter value. 
+
+In interactive mode, each request is sent to the Redis server, and the response is collected before the call returns 
+with that response (or `NULL` if there was an error).
 
 <a name="resp-data-type"></a>
 ### RESP data type
@@ -284,50 +329,6 @@ as is (without making copies), e.g.:
     redisxDestroyRESP(r);     // The 'stringValue' is still a valid pointer after! 
   }
 ```
-
-<a name="interactive-transactions"></a>
-### Interactive transactions
-
-The simplest way for running a few Redis queries is to do it in interactive mode:
-
-```c
-  Redis *redis = ...
-  RESP *resp;
-  int status;
-
-  // Send "HGET my_table my_key" request
-  resp = redisxRequest(redis, "HGET", "my_table", "my_key", NULL, &status);
-  
-  // Check return status...
-  if (status != X_SUCCESS) {
-    // Oops something went wrong...
-    ...
-  }
-  ...
-```
-
-The `redisxRequest()` sends a command with up to three arguments. If the command takes fewer than 3 parameters, then
-the remaining ones must be set to `NULL`. This function thus offers a simple interface for running most basic 
-sequential queries. In cases where 3 parameters are nut sufficient, you may use `redisxArrayRequest()` instead, e.g.:
-
-```c
-  ...
-  char *args[] = { "my_table", "my_key" };  // parameters as an array...
-
-  // Send "HGET my_table my_key" request with an array of 2 parameters...
-  resp = redisxRequest(redis, "HGET", args, NULL, 2, &status);
-  ...
-
-```
-
-The 4th argument in the list is an optional `int[]` array defining the individual string lengths of the parameters (if 
-need be, or else readily available). Here, we used `NULL` instead, which will use `strlen()` on each supplied 
-string-terminated parameter to determine its length automatically. Specifying the length may be necessary if the 
-individual parameters are not 0-terminated strings, or else substrings from a continuing string are to be used as 
-the parameter value. 
-
-In interactive mode, each request is sent to the Redis server, and the response is collected before the call returns 
-with that response (or `NULL` if there was an error).
 
 
 -----------------------------------------------------------------------------
