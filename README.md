@@ -239,13 +239,58 @@ The same goes for disconnect hooks, using `redisxAddDisconnectHook()` instead.
 <a name="simple-redis-queries"></a>
 ## Simple Redis queries
 
- - [RESP data type](#resp-data-type)
  - [Interactive transactions](#interactive-transactions)
+  - [RESP data type](#resp-data-type)
 
 Redis queries are sent as strings, according the the specification of the Redis protocol. All responses sent back by 
 the server using the RESP protocol. Specifically, Redis uses version 2.0 of the RESP protocol (a.k.a. RESP2) by 
 default, with optional support for the newer RESP3 introduced in Redis version 6.0. The RedisX library currently
 processes the standard RESP2 replies only. RESP3 support to the library may be added in the future (stay tuned...)
+
+
+<a name="interactive-transactions"></a>
+### Interactive transactions
+
+The simplest way for running a few Redis queries is to do it in interactive mode:
+
+```c
+  Redis *redis = ...
+  RESP *resp;
+  int status;
+
+  // Send "HGET my_table my_key" request
+  resp = redisxRequest(redis, "HGET", "my_table", "my_key", NULL, &status);
+  
+  // Check return status...
+  if (status != X_SUCCESS) {
+    // Oops something went wrong...
+    ...
+  }
+  ...
+```
+
+The `redisxRequest()` sends a command with up to three arguments. If the command takes fewer than 3 parameters, then
+the remaining ones must be set to `NULL`. This function thus offers a simple interface for running most basic 
+sequential queries. In cases where 3 parameters are nut sufficient, you may use `redisxArrayRequest()` instead, e.g.:
+
+```c
+  ...
+  char *args[] = { "my_table", "my_key" };  // parameters as an array...
+
+  // Send "HGET my_table my_key" request with an array of 2 parameters...
+  resp = redisxRequest(redis, "HGET", args, NULL, 2, &status);
+  ...
+
+```
+
+The 4th argument in the list is an optional `int[]` array defining the individual string lengths of the parameters (if 
+need be, or else readily available). Here, we used `NULL` instead, which will use `strlen()` on each supplied 
+string-terminated parameter to determine its length automatically. Specifying the length may be necessary if the 
+individual parameters are not 0-terminated strings, or else substrings from a continuing string are to be used as 
+the parameter value. 
+
+In interactive mode, each request is sent to the Redis server, and the response is collected before the call returns 
+with that response (or `NULL` if there was an error).
 
 <a name="resp-data-type"></a>
 ### RESP data type
@@ -301,50 +346,6 @@ as is (without making copies), e.g.:
     redisxDestroyRESP(r);     // The 'stringValue' is still a valid pointer after! 
   }
 ```
-
-<a name="interactive-transactions"></a>
-### Interactive transactions
-
-The simplest way for running a few Redis queries is to do it in interactive mode:
-
-```c
-  Redis *redis = ...
-  RESP *resp;
-  int status;
-
-  // Send "HGET my_table my_key" request
-  resp = redisxRequest(redis, "HGET", "my_table", "my_key", NULL, &status);
-  
-  // Check return status...
-  if (status != X_SUCCESS) {
-    // Oops something went wrong...
-    ...
-  }
-  ...
-```
-
-The `redisxRequest()` sends a command with up to three arguments. If the command takes fewer than 3 parameters, then
-the remaining ones must be set to `NULL`. This function thus offers a simple interface for running most basic 
-sequential queries. In cases where 3 parameters are nut sufficient, you may use `redisxArrayRequest()` instead, e.g.:
-
-```c
-  ...
-  char *args[] = { "my_table", "my_key" };  // parameters as an array...
-
-  // Send "HGET my_table my_key" request with an array of 2 parameters...
-  resp = redisxRequest(redis, "HGET", args, NULL, 2, &status);
-  ...
-
-```
-
-The 4th argument in the list is an optional `int[]` array defining the individual string lengths of the parameters (if 
-need be, or else readily available). Here, we used `NULL` instead, which will use `strlen()` on each supplied 
-string-terminated parameter to determine its length automatically. Specifying the length may be necessary if the 
-individual parameters are not 0-terminated strings, or else substrings from a continuing string are to be used as 
-the parameter value. 
-
-In interactive mode, each request is sent to the Redis server, and the response is collected before the call returns 
-with that response (or `NULL` if there was an error).
 
 
 -----------------------------------------------------------------------------
@@ -464,7 +465,7 @@ something like:
   redisxDestroyKeys(keys, nMatches);
 ```
 
-Similarly, to retrieve a set of keywords from a table, matching a glob pattern:
+Or, to retrieve the values from a hash table for a set of keywords that match a glob pattern:
 
 ```c
   ...
@@ -484,8 +485,9 @@ Similarly, to retrieve a set of keywords from a table, matching a glob pattern:
   redisxDestroyEntries(entries, nMatches);
 ```
 
-Finally, you may use `redisxSetScanCount()` to tune just how many results should individial scan queries return. 
-Please refer to the Redis documentation on the behavior of the `SCAN` and `HSCAN` commands to learn more. 
+Finally, you may use `redisxSetScanCount()` to tune just how many results should individial scan queries should return 
+(but only if you are really itching to tweak it). Please refer to the Redis documentation on the behavior of the 
+`SCAN` and `HSCAN` commands to learn more. 
 
 -----------------------------------------------------------------------------
 
@@ -552,8 +554,7 @@ Once the function is defined, you can activate it via:
   }
 ```
 
-We should also start subsribing to specific channels and/or channel patterns (seethe Redis `SUBSCRIBE` and 
-`PSUBSCRIBE` commands for details).
+We should also start subsribing to specific channels and/or channel patterns.
 
 ```c
   Redis *redis = ...
@@ -565,6 +566,9 @@ We should also start subsribing to specific channels and/or channel patterns (se
     ...
   }
 ```
+
+The `redisxSuibscribe()` function will translate to either a Redis `PSUBSCRIBE` or `SUBSCRIBE` command, depending 
+whether the `pattern` argument contains globbing patterns or not (respectively).
 
 Now, we are capturing and processing all messages published to channels whose name begins with `"event:"`, using our
 custom `my_event_processor` function.
@@ -630,6 +634,7 @@ If at any point things don't go according to plan in the middle of the block, yo
 abort and discard all prior commands submitted in the execution block already. It is important to remembet that every
 time you call `redisxStartBlockAsync()`, you must call either `redisxExecBlockAsync()` to execute it or else 
 `redisxAbortBlockAsync()` to discard it. Failure to do so, will effectively end you up with a hung Redis client.
+
 
 <a name="lua-script-loading-and-execution"></a>
 ### LUA script loading and execution
@@ -699,11 +704,10 @@ Stay tuned.
 <a name="asynchronous-client-processing"></a>
 ### Asynchronous client processing
 
-Sometimes you might want to micro manage how requests are sent and responses to them are received. __RedisX__ 
-provides a set of asynchronous client functions that do that. (You've seen these already further above in the 
-[Pipelined transaction](#pipelined-transactions) section.) These functions should be called with the specific 
-client's mutex locked, to ensure that other threads do not interfere with your sequence of requests and responses. 
-E.g.:
+Sometimes you might want to micro manage how requests are sent and responses to them are received. __RedisX__ provides 
+a set of asynchronous client functions that do that. (You've seen these already further above in the 
+[Pipelined transaction](#pipelined-transactions) section.) These functions should be called with the specific client's 
+mutex locked, to ensure that other threads do not interfere with your sequence of requests and responses. E.g.:
 
 ```c
   // Obtain the appropriate client with an exclusive lock on it.
@@ -785,9 +789,9 @@ queries per second. For higher throughput (up to millions Redis transactions per
 Redis database in pipelined mode. RedisX provides a dedicated pipeline client/channel to the Redis server (provided
 the option to enable it has been used when `redixConnect()` was called).
 
-In pipeline mode, requests are sent to the Redis server in quick succession without waiting for responses to return 
-for each one individually. Responses are processed in the background by a designated callback function (or else 
-discarded if no callback function has been set). This is what a callback function looks like:
+In pipeline mode, requests are sent to the Redis server over the pipeline client in quick succession, without waiting 
+for responses to return for each one individually. Responses are processed in the background by a designated callback 
+function (or else discarded if no callback function has been set). This is what a callback function looks like:
 
 ```c
   // Your own function to process responses to pipelined requests...
@@ -798,7 +802,7 @@ discarded if no callback function has been set). This is what a callback functio
   }
 ```
 
-Before sending the requests, the user first needs to specify the function to process the responses, e.g.:
+Before sending the pipelined requests, the user first needs to specify the function to process the responses, e.g.:
 
 ```c
   Redis *redis = ...
@@ -849,10 +853,10 @@ for processing the responses.
 
 It is important to remember that on the pipeline client you should never try to process responses directly from the 
 same function from which commands are being sent. That's what the interactive connection is for. Pipeline responses 
-are always processed by a background thread (if you don't specify your callback function they will be discarded 
-simply). The only thing your callback function can count on is that the same number of responses will be received as
-the number of asynchronous requests that were sent out, and that the responses arrive in the same order as the order 
-in which the requests were sent. 
+are always processed by a background thread (or, if you don't specify your callback function they will be discarded). 
+The only thing your callback function can count on is that the same number of responses will be received as the number 
+of asynchronous requests that were sent out, and that the responses arrive in the same order as the order in which the 
+requests were sent. 
 
 It is up to you and your callback function to keep track of what responses are expected and in what order. Some best 
 practices to help deal with pipeline responses are summarized here:
@@ -864,7 +868,7 @@ practices to help deal with pipeline responses are summarized here:
    the content of the responses. For example, for pipelined `HGET` commands, your FIFO should have a record that
    specifies that a bulk string response is expected, and a pointer to data which is used to store the returned value 
    -- so that you pipeline response processing callback function can check that the reponse is the expected type
-   (and size) and knows to assign/process the response approrpriately to your application data.
+   (and size) and knows to assign/process the response appropriately to your application data.
  
  - You may insert Redis `PING`/`ECHO` commands to section your responses, or to provide directives to your pipeline
    response processor function. You can tag them uniquely so that the echoed responses can be parsed and interpreted
