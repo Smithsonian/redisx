@@ -227,7 +227,7 @@ int redisxGetTime(Redis *redis, struct timespec *t) {
 }
 
 /**
- * Pings the Redis server (see the Redis `PING` command), and check the response.
+ * Pings the Redis server (see the Redis `PING` command), and checks the response.
  *
  * @param redis     Pointer to a Redis instance.
  * @param message   Optional message , or NULL for `PING` without an argument.
