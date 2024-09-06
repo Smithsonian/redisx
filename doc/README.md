@@ -11,8 +11,8 @@ A simple, light-weight C/C++ Redis client library.
  - [Simple Redis queries](#simple-redis-queries)
  - [Accessing key / value data](#accessing-key-value-data)
  - [Publish/subscribe (PUB/SUB) support](#publish-subscribe-support)
- - [Advanced queries](#advanced-queries)
  - [Atomic execution blocks and LUA scripts](#atomic-transaction-blocks-and-lua-scripts)
+ - [Advanced queries and pipelining](#advanced-queries)
  - [Error handling](#error-handling)
  - [Debug support](#debug-support)
  - [Future plans](#future-plans)
@@ -224,7 +224,6 @@ The same goes for disconnect hooks, using `redisxAddDisconnectHook()` instead.
 
  - [RESP data type](#resp-data-type)
  - [Interactive transactions](#interactive-transactions)
- - [Pipelined transactions](#pipelined-transactions)
 
 Redis queries are sent as strings, according the the specification of the Redis protocol. All responses sent back by 
 the server using the RESP protocol. Specifically, Redis uses version 2.0 of the RESP protocol (a.k.a. RESP2) by 
@@ -328,102 +327,8 @@ individual parameters are not 0-terminated strings, or else substrings from a co
 the parameter value. 
 
 In interactive mode, each request is sent to the Redis server, and the response is collected before the call returns 
-with that response (or `NULL` if there was an error). 
+with that response (or `NULL` if there was an error).
 
-<a name="pipelined-transactions"></a>
-### Pipelined transactions
-
-Depending on round-trip times over the network, interactive queries may be suitable for running up to a few thousand 
-queries per second. For higher throughput (up to millions Redis transactions per second) you may need to access the 
-Redis database in pipelined mode.
-
-In pipeline mode, requests are sent to the Redis server in quick succession without waiting for responses to return 
-for each one individually. Responses are processed in the background by a designated callback function (or else 
-discarded if no callback function has been set). This is what a callback function looks like:
-
-```c
-  // Your own function to process responses to pipelined requests...
-  void my_resp_processor(RESP *r) {
-    // Do what you need to do with the asynchronous responses
-    // that come from Redis to bulk requests
-    ...
-  }
-```
-
-Before sending the requests, the user first needs to specify the function to process the responses, e.g.:
-
-```c
-  Redis *redis = ...
-
-  redisxSetPipelineConsumer(redis, my_resp_processor);
-```
-
-Request are sent via the `redisxSendRequestAsync()` and `redisxSendArrayRequestAsync()` functions. Note, the `Async` 
-naming, which indicates the asynchronous nature of this calls -- and which also suggests that these should be called
-with the approrpiate mutex locked to prevent concurrency issues and to maintain a predictable order (very important!) 
-for processing the responses.
-
-```c
-  Redis *redis = ...
-
-  // We'll use a dedicated pipeline connection for asynchronous requests
-  // This way, interactive requests can still be sent independently on the interactive
-  // channel independently, if need be.
-  RedisClient *pipe = redisxGetLockedConnectedClient(redis, REDISX_PIPELINE_CHANNEL);
-
-  // Check that the client is valid...
-  if (pipe == NULL) {
-     // Abort: we do not appear to have an active pipeline connection...
-     return;
-  }
-
-  // -------------------------------------------------------------------------
-  // Submit a whole bunch of asynchronous requests, e.g. from a loop...
-  for (...) {
-    int status = redisxSendRequestAsync(pipe, ...);
-    if (status != X_SUCCESS) {
-      // Oops, that did not go through...
-      ...
-    }
-    else {
-      // We probably want to keep a record of what was requested and in what order
-      // so our processing function can make sense of the reponses as they arrive
-      // (in the same order...)
-      ...
-    }
-  }
-  // -------------------------------------------------------------------------
-  
-  // Release the exclusive lock on the pipeline channel, so
-  // other threads may use it now that we sent off our requests...
-  redisxUnlockClient(pipe);
-```
-
-It is important to remember that on the pipeline client you should never try to process responses directly from the 
-same function from which commands are being sent. That's what the interactive connection is for. Pipeline responses 
-are always processed by a background thread (if you don't specify your callback function they will be discarded 
-simply). The only thing your callback function can count on is that the same number of responses will be received as
-the number of asynchronous requests that were sent out, and that the responses arrive in the same order as the order 
-in which the requests were sent. 
-
-It is up to you and your callback function to keep track of what responses are expected and in what order. Some best 
-practices to help deal with pipeline responses are summarized here:
-
- - Use `redisxSkipReplyAsync()` prior to sending pipeline requests for which you do not need a response. (This way
-   your callback does not have to deal with unnecessary responses at all.
- 
- - For requests that return a value, keep a record (in a FIFO) of the expected types and your data that depends on 
-   the content of the responses. For example, for pipelined `HGET` commands, your FIFO should have a record that
-   specifies that a bulk string response is expected, and a pointer to data which is used to store the returned value 
-   -- so that you pipeline response processing callback function can check that the reponse is the expected type
-   (and size) and knows to assign/process the response approrpriately to your application data.
- 
- - You may insert Redis `PING`/`ECHO` commands to section your responses, or to provide directives to your pipeline
-   response processor function. You can tag them uniquely so that the echoed responses can be parsed and interpreted
-   by your callback function. For example, you may send a `PING`/`ECHO` commands to Redis with the tag 
-   `"@my_resp_processor: START sequence A"`, or something else meaningful that you can uniquely distinguish from all
-   other responses that you might receive.
-  
 
 -----------------------------------------------------------------------------
 
@@ -559,7 +464,7 @@ Similarly, to retrieve a set of keywords from a table, matching a glob pattern:
   ...
   
   // Once done using the 'keys' array, we should destroy it
-  redisxDEstroyEntries(entries, nMatches);
+  redisxDestroyEntries(entries, nMatches);
 ```
 
 Finally, you may use `redisxSetScanCount()` to tune just how many results should individial scan queries return. 
@@ -651,87 +556,6 @@ To end the subscription, we trace back the same steps by calling `redisxUnsubscr
 messages to the subscription channel or pattern, and by removing the `my_event_procesor` subscriber function as 
 appropriate (provided no other subscription needs it) via `redisxRemoveSubscriber()`.
 
------------------------------------------------------------------------------
-
-<a name="advanced-queries"></a>
-## Advanced queries
-
-Sometimes you might want to micro manage how requests are sent and responses to them are received. __RedisX__ 
-provides a set of asynchronous client functions that do that. (You've seen these already further above in the 
-[Pipelined transaction](#pipelined-transactions) section.) These functions should be called with the specific 
-client's mutex locked, to ensure that other threads do not interfere with your sequence of requests and responses. 
-E.g.:
-
-```c
-  // Obtain the appropriate client with an exclusive lock on it.
-  RedisClient *cl = redisxGetLockedConnectedClient(...);
-  if (cl == NULL) {
-    // Abort: no such client is connected
-    return;
-  }
-  
-  // Now send commands, and receive responses as you like using the redisx...Async() calls
-  ...
-  
-  // When done, release the lock
-  redisxUnlockClient(cl);
-```
-
-While you have the exclusive lock you may send any number of requests, e.g. via `redisxSendRequestAsync()` and/or 
-`redixSendArrayRequestAsync()`. Then collect replies either with `redisxReadReplyAsync()` or else 
-`redisxIgnoreReplyAsync()`. For example, the basic anatomy of sending a single request and then receiving a response, 
-while we have exclusive access to the client, might look something like this:
-
-```c
-  ...
-  // Send a command to Redis
-  int status = redisxSendRequestAsync(cl, ...);
-  
-  if(status == X_SUCCESS) {
-    // Read the response
-    RESP *reply = redisxReadReplyAsync(cl);
-    
-    // check and process the response
-    if(redisxCheckRESP(reply, ...) != X_SUCCESS) {
-      // Ooops, not the reply what we expected...
-      ...
-    } 
-    else {
-      // Process the response
-      ...
-    }
-    
-    // Destroy the reply
-    redisxDestroyRESP(reply);
-  }
-  ...
-```
-   
-For the best performance, you may want to leave the processing of the replies until after you unlock the client. I.e.,
-you only block other threads from accessing the clients while you send off the requests and collect the corresponding responses. Then you leave analyzing the responses at your leisure later, and outside of the mutexed section.
-   
-In some cases you may be OK with just firing off some Redis commands, without necessarily caring about responses. 
-Rather than ignoring the replies with `redisxIgnoreReplyAsync()` you might call `redisxSkiReplyAsync()` instead 
-__before__ `redisxSendRequestAsync()` to instruct Redis to not even bother about sending a response to your request 
-(it saves time and network bandwidth!):
-
-```c
- // We don't want to receive a response to our next command... 
- int status = redisxSkipReplyAsync(cl);
- 
- if (status == X_SUCCESS) {
-   // Now send the request...
-   status = redisxSendRequest(cl, ...);
- }
- 
- if (status != X_SUCCESS) {
-    // Ooops, the request did not go through...
-    ...
- }
-```
-
-Of course you can build up arbitrarily complex set of queries and deal with a set of responses in different ways. Do 
-what works best for your application.
 
 -----------------------------------------------------------------------------
 
@@ -740,7 +564,7 @@ what works best for your application.
 
  - [Execution blocks](#execution-blocks)
  - [LUA script loading and execution](#lua-script-loading-and-execution)
- - [Custom functions](#custom-functions)
+ - [Custom Redis functions](#custom-functions)
 
 Sometimes you may want to execute a series of Redis command atomically, such that nothing else may alter the database 
 while the set of commands execute, so that related values are always in a coherent state. For example, you want to set 
@@ -838,7 +662,7 @@ Redis server is restarted.
 
 
 <a name="custom-functions"></a>
-### Custom functions
+### Custom Redis functions
 
 Functions, introduced in Redis 7, offer another evolutionary step over the LUA scripting described above. Unlike 
 scripts, functions are persistent and they can be called by name rather than a cryptic SHA1 sum. Otherwise, they offer
@@ -846,6 +670,191 @@ more or less the same functionality as scripts. __RedisX__ does not currently ha
 for managing and calling user-defined functions, but it is a feature that may be added in the not-too-distant future.
 Stay tuned.
 
+
+-----------------------------------------------------------------------------
+
+<a name="advanced-queries"></a>
+## Advanced queries and pipelining
+
+ - [Asynchronous client processing](#asynchronous-client-processing)
+ - [Pipelined transactions](#pipelined-transactions)
+
+<a name="asynchronous-client-processing"></a>
+### Asynchronous client processing
+
+Sometimes you might want to micro manage how requests are sent and responses to them are received. __RedisX__ 
+provides a set of asynchronous client functions that do that. (You've seen these already further above in the 
+[Pipelined transaction](#pipelined-transactions) section.) These functions should be called with the specific 
+client's mutex locked, to ensure that other threads do not interfere with your sequence of requests and responses. 
+E.g.:
+
+```c
+  // Obtain the appropriate client with an exclusive lock on it.
+  RedisClient *cl = redisxGetLockedConnectedClient(...);
+  if (cl == NULL) {
+    // Abort: no such client is connected
+    return;
+  }
+  
+  // Now send commands, and receive responses as you like using the redisx...Async() calls
+  ...
+  
+  // When done, release the lock
+  redisxUnlockClient(cl);
+```
+
+While you have the exclusive lock you may send any number of requests, e.g. via `redisxSendRequestAsync()` and/or 
+`redixSendArrayRequestAsync()`. Then collect replies either with `redisxReadReplyAsync()` or else 
+`redisxIgnoreReplyAsync()`. For example, the basic anatomy of sending a single request and then receiving a response, 
+while we have exclusive access to the client, might look something like this:
+
+```c
+  ...
+  // Send a command to Redis
+  int status = redisxSendRequestAsync(cl, ...);
+  
+  if(status == X_SUCCESS) {
+    // Read the response
+    RESP *reply = redisxReadReplyAsync(cl);
+    
+    // check and process the response
+    if(redisxCheckRESP(reply, ...) != X_SUCCESS) {
+      // Ooops, not the reply what we expected...
+      ...
+    } 
+    else {
+      // Process the response
+      ...
+    }
+    
+    // Destroy the reply
+    redisxDestroyRESP(reply);
+  }
+  ...
+```
+   
+For the best performance, you may want to leave the processing of the replies until after you unlock the client. I.e.,
+you only block other threads from accessing the clients while you send off the requests and collect the corresponding responses. Then you leave analyzing the responses at your leisure later, and outside of the mutexed section.
+   
+In some cases you may be OK with just firing off some Redis commands, without necessarily caring about responses. 
+Rather than ignoring the replies with `redisxIgnoreReplyAsync()` you might call `redisxSkiReplyAsync()` instead 
+__before__ `redisxSendRequestAsync()` to instruct Redis to not even bother about sending a response to your request 
+(it saves time and network bandwidth!):
+
+```c
+ // We don't want to receive a response to our next command... 
+ int status = redisxSkipReplyAsync(cl);
+ 
+ if (status == X_SUCCESS) {
+   // Now send the request...
+   status = redisxSendRequest(cl, ...);
+ }
+ 
+ if (status != X_SUCCESS) {
+    // Ooops, the request did not go through...
+    ...
+ }
+```
+
+Of course you can build up arbitrarily complex set of queries and deal with a set of responses in different ways. Do 
+what works best for your application.
+
+
+<a name="pipelined-transactions"></a>
+### Pipelined transactions
+
+Depending on round-trip times over the network, interactive queries may be suitable for running up to a few thousand 
+queries per second. For higher throughput (up to millions Redis transactions per second) you may need to access the 
+Redis database in pipelined mode. RedisX provides a dedicated pipeline client/channel to the Redis server (provided
+the option to enable it has been used when `redixConnect()` was called).
+
+In pipeline mode, requests are sent to the Redis server in quick succession without waiting for responses to return 
+for each one individually. Responses are processed in the background by a designated callback function (or else 
+discarded if no callback function has been set). This is what a callback function looks like:
+
+```c
+  // Your own function to process responses to pipelined requests...
+  void my_resp_processor(RESP *r) {
+    // Do what you need to do with the asynchronous responses
+    // that come from Redis to bulk requests
+    ...
+  }
+```
+
+Before sending the requests, the user first needs to specify the function to process the responses, e.g.:
+
+```c
+  Redis *redis = ...
+
+  redisxSetPipelineConsumer(redis, my_resp_processor);
+```
+
+Request are sent via the `redisxSendRequestAsync()` and `redisxSendArrayRequestAsync()` functions. Note again, the 
+`Async` naming, which indicates the asynchronous nature of this calls -- and which suggests that these should be called
+with the approrpiate mutex locked to prevent concurrency issues and to maintain a predictable order (very important!) 
+for processing the responses.
+
+```c
+  Redis *redis = ...
+
+  // We'll use a dedicated pipeline connection for asynchronous requests
+  // This way, interactive requests can still be sent independently on the interactive
+  // channel independently, if need be.
+  RedisClient *pipe = redisxGetLockedConnectedClient(redis, REDISX_PIPELINE_CHANNEL);
+
+  // Check that the client is valid...
+  if (pipe == NULL) {
+     // Abort: we do not appear to have an active pipeline connection...
+     return;
+  }
+
+  // -------------------------------------------------------------------------
+  // Submit a whole bunch of asynchronous requests, e.g. from a loop...
+  for (...) {
+    int status = redisxSendRequestAsync(pipe, ...);
+    if (status != X_SUCCESS) {
+      // Oops, that did not go through...
+      ...
+    }
+    else {
+      // We probably want to keep a record of what was requested and in what order
+      // so our processing function can make sense of the reponses as they arrive
+      // (in the same order...)
+      ...
+    }
+  }
+  // -------------------------------------------------------------------------
+  
+  // Release the exclusive lock on the pipeline channel, so
+  // other threads may use it now that we sent off our requests...
+  redisxUnlockClient(pipe);
+```
+
+It is important to remember that on the pipeline client you should never try to process responses directly from the 
+same function from which commands are being sent. That's what the interactive connection is for. Pipeline responses 
+are always processed by a background thread (if you don't specify your callback function they will be discarded 
+simply). The only thing your callback function can count on is that the same number of responses will be received as
+the number of asynchronous requests that were sent out, and that the responses arrive in the same order as the order 
+in which the requests were sent. 
+
+It is up to you and your callback function to keep track of what responses are expected and in what order. Some best 
+practices to help deal with pipeline responses are summarized here:
+
+ - Use `redisxSkipReplyAsync()` prior to sending pipeline requests for which you do not need a response. (This way
+   your callback does not have to deal with unnecessary responses at all.
+ 
+ - For requests that return a value, keep a record (in a FIFO) of the expected types and your data that depends on 
+   the content of the responses. For example, for pipelined `HGET` commands, your FIFO should have a record that
+   specifies that a bulk string response is expected, and a pointer to data which is used to store the returned value 
+   -- so that you pipeline response processing callback function can check that the reponse is the expected type
+   (and size) and knows to assign/process the response approrpriately to your application data.
+ 
+ - You may insert Redis `PING`/`ECHO` commands to section your responses, or to provide directives to your pipeline
+   response processor function. You can tag them uniquely so that the echoed responses can be parsed and interpreted
+   by your callback function. For example, you may send a `PING`/`ECHO` commands to Redis with the tag 
+   `"@my_resp_processor: START sequence A"`, or something else meaningful that you can uniquely distinguish from all
+   other responses that you might receive.
+  
 
 -----------------------------------------------------------------------------
 
