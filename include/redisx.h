@@ -56,7 +56,7 @@
 #define REDISX_MINOR_VERSION  9
 
 /// Integer sub version of the release
-#define REDISX_PATCHLEVEL     0
+#define REDISX_PATCHLEVEL     1
 
 /// Additional release information in version, e.g. "-1", or "-rc1".
 #define REDISX_RELEASE_STRING "-devel"
@@ -90,7 +90,6 @@
 #define RESP_SIMPLE_STRING      '+'     ///< \hideinitializer RESP simple string type
 #define RESP_ERROR              '-'     ///< \hideinitializer RESP error message type
 #define RESP_BULK_STRING        '$'     ///< \hideinitializer RESP bulk string type
-#define RESP_PONG               'P'     ///< \hideinitializer RESP PONG response type
 
 #define REDIS_INVALID_CHANNEL       (-101)  ///< \hideinitializer There is no such channel in the Redis instance.
 #define REDIS_NULL                  (-102)  ///< \hideinitializer Redis returned NULL
@@ -122,7 +121,7 @@ enum redisx_channel {
  */
 typedef struct RESP {
   char type;                    ///< RESP_ARRAY, RESP_INT ...
-  int n;                        ///< Either the integer value of a RESP_INT response, or the dimension of
+  int n;                       ///< Either the integer value of a RESP_INT response, or the dimension of
                                 ///< the value field.
   void *value;                  ///< Pointer to text (char *) content to an array of components (RESP**)...
 } RESP;
@@ -135,7 +134,7 @@ typedef struct RESP {
 typedef struct RedisEntry {
   char *key;                    ///< The Redis key or field name
   char *value;                  ///< The string value stored for that field.
-  int length;                   ///< Bytes in value.
+  int length;                  ///< Bytes in value.
 } RedisEntry;
 
 
@@ -224,7 +223,7 @@ boolean redisxIsVerbose();
 void redisxSetTcpBuf(int size);
 int redisxSetTransmitErrorHandler(Redis *redis, RedisErrorHandler f);
 
-void redisxSetPort(Redis *redis, int port);
+int redisxSetPort(Redis *redis, int port);
 int redisxSetUser(Redis *redis, const char *username);
 int redisxSetPassword(Redis *redis, const char *passwd);
 int redisxSelectDB(Redis *redis, int idx);
@@ -242,12 +241,12 @@ boolean redisxHasPipeline(Redis *redis);
 RedisClient *redisxGetClient(Redis *redis, enum redisx_channel channel);
 RedisClient *redisxGetLockedConnectedClient(Redis *redis, enum redisx_channel channel);
 
-void redisxAddConnectHook(Redis *redis, void (*setupCall)(Redis *));
-void redisxRemoveConnectHook(Redis *redis, void (*setupCall)(Redis *));
+int redisxAddConnectHook(Redis *redis, void (*setupCall)(Redis *));
+int redisxRemoveConnectHook(Redis *redis, void (*setupCall)(Redis *));
 void redisxClearConnectHooks(Redis *redis);
 
-void redisxAddDisconnectHook(Redis *redis, void (*cleanupCall)(Redis *));
-void redisxRemoveDisconnectHook(Redis *redis, void (*cleanupCall)(Redis *));
+int redisxAddDisconnectHook(Redis *redis, void (*cleanupCall)(Redis *));
+int redisxRemoveDisconnectHook(Redis *redis, void (*cleanupCall)(Redis *));
 void redisxClearDisconnectHooks(Redis *redis);
 
 RESP *redisxRequest(Redis *redis, const char *command, const char *arg1, const char *arg2, const char *arg3, int *status);
@@ -260,7 +259,7 @@ RedisEntry *redisxScanTable(Redis *redis, const char *table, const char *pattern
 int redisxMultiSet(Redis *redis, const char *table, const RedisEntry *entries, int n, boolean confirm);
 char **redisxGetKeys(Redis *redis, const char *table, int *n);
 char **redisxScanKeys(Redis *redis, const char *pattern, int *n, int *status);
-void redisxSetScanCount(Redis *redis, int count);
+int redisxSetScanCount(Redis *redis, int count);
 int redisxGetScanCount(Redis *redis);
 void redisxDestroyEntries(RedisEntry *entries, int count);
 void redisxDestroyKeys(char **keys, int count);
@@ -271,10 +270,10 @@ int redisxPublish(Redis *redis, const char *channel, const char *message, int le
 int redisxNotify(Redis *redis, const char *channel, const char *message);
 int redisxSubscribe(Redis *redis, const char *channel);
 int redisxUnsubscribe(Redis *redis, const char *channel);
-void redisxAddSubscriber(Redis *redis, const char *channelStem, RedisSubscriberCall f);
+int redisxAddSubscriber(Redis *redis, const char *channelStem, RedisSubscriberCall f);
 int redisxRemoveSubscribers(Redis *redis, RedisSubscriberCall f);
 int redisxClearSubscribers(Redis *redis);
-void redisxEndSubscription(Redis *redis);
+int redisxEndSubscription(Redis *redis);
 
 int redisxStartBlockAsync(RedisClient *cl);
 int redisxAbortBlockAsync(RedisClient *cl);

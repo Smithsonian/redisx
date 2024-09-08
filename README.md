@@ -155,7 +155,7 @@ the default 6379), and the database authentication (if any):
 ```
 
 You might also tweak the send/receive buffer sizes to use for clients, if you find the socket defaults sub-optimal for
-you application:
+your application:
 
 ```c
    // (optional) Set the TCP send/rcv buffer sizes to use if not default values.
@@ -163,7 +163,7 @@ you application:
    redisxSetTcpBuf(65536);
 ```
 
-Optionally you can select the database index to use now (or later, after connecting), if not the default (index 
+Optionally, you can select the database index to use now (or later, after connecting), if not the default (index 
 0):
 
 ```c
@@ -876,7 +876,9 @@ practices to help deal with pipeline responses are summarized here:
    `"@my_resp_processor: START sequence A"`, or something else meaningful that you can uniquely distinguish from all
    other responses that you might receive.
   
-
+__RedisX__ optimizes the pipeline client for high throughput (bandwidth), whereas the interactive and subscription 
+clients are optimized for low-latency, at the socket level.
+  
 -----------------------------------------------------------------------------
 
 <a name="error-handling"></a>

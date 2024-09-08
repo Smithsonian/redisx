@@ -9,6 +9,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <errno.h>
 
 #include "redisx-priv.h"
 
@@ -26,15 +27,17 @@ static Hook *createHook(Redis *redis, void (*f)(Redis *)) {
  * \param setupCall     User-specified callback routine to be called after the Redis instance has been connected.
  *                      It will be passed a pointer to the Redis instance, which triggered the call by
  *                      having established connection.
+ * @return  X_SUCCESS (0) if successful or else X_NULL if either of the arguments is NULL.
  *
  */
 // cppcheck-suppress constParameter
 // cppcheck-suppress constParameterPointer
-void redisxAddConnectHook(Redis *redis, void (*setupCall)(Redis *)) {
+int redisxAddConnectHook(Redis *redis, void (*setupCall)(Redis *)) {
+  static const char *fn = "redisxAddConnectHook";
   RedisPrivate *p;
 
-  if(redis == NULL) return;
-  if(setupCall == NULL) return;
+  if(redis == NULL) return x_error(X_NULL, EINVAL, fn, "redis is NULL");
+  if(setupCall == NULL) return x_error(X_NULL, EINVAL, fn, "setupCall is NULL");
 
   xvprintf("Redis-X> Adding a connect callback.\n");
 
@@ -52,6 +55,8 @@ void redisxAddConnectHook(Redis *redis, void (*setupCall)(Redis *)) {
     }
   }
   rConfigUnlock(redis);
+
+  return X_SUCCESS;
 }
 
 /**
@@ -60,15 +65,18 @@ void redisxAddConnectHook(Redis *redis, void (*setupCall)(Redis *)) {
  * \param redis         Pointer to a Redis instance.
  * \param setupCall     User-specified callback routine to be called after the Redis instance has been connected.
  *
+ * @return  X_SUCCESS (0) if successful or else X_NULL if either of the arguments is NULL.
  */
 // cppcheck-suppress constParameter
 // cppcheck-suppress constParameterPointer
-void redisxRemoveConnectHook(Redis *redis, void (*setupCall)(Redis *)) {
+int redisxRemoveConnectHook(Redis *redis, void (*setupCall)(Redis *)) {
+  static const char *fn = "redisxRemoveConnectHook";
+
   RedisPrivate *p;
   Hook *c, *last = NULL;
 
-  if(redis == NULL) return;
-  if(setupCall == NULL) return;
+  if(redis == NULL) x_error(X_NULL, EINVAL, fn, "redis is NULL");
+  if(setupCall == NULL) x_error(X_NULL, EINVAL, fn, "setupCall is NULL");
 
   xvprintf("Redis-X> Removing a connect callback.\n");
 
@@ -89,6 +97,8 @@ void redisxRemoveConnectHook(Redis *redis, void (*setupCall)(Redis *)) {
     c = next;
   }
   rConfigUnlock(redis);
+
+  return X_SUCCESS;
 }
 
 /**
@@ -96,7 +106,6 @@ void redisxRemoveConnectHook(Redis *redis, void (*setupCall)(Redis *)) {
  * Redis instance is connected.
  *
  * \param redis         Pointer to a Redis instance.
- *
  */
 void redisxClearConnectHooks(Redis *redis) {
   RedisPrivate *p;
@@ -128,14 +137,17 @@ void redisxClearConnectHooks(Redis *redis) {
  *                      a pointer to the Redis instance, which triggered the call by having
  *                      disconnected from the Redis server.
  *
+ * @return  X_SUCCESS (0) if successful or else X_NULL if either of the arguments is NULL.
  */
 // cppcheck-suppress constParameter
 // cppcheck-suppress constParameterPointer
-void redisxAddDisconnectHook(Redis *redis, void (*cleanupCall)(Redis *)) {
+int redisxAddDisconnectHook(Redis *redis, void (*cleanupCall)(Redis *)) {
+  static const char *fn = "redisxAddDisconnectHook";
+
   RedisPrivate *p;
 
-  if(redis == NULL) return;
-  if(cleanupCall == NULL) return;
+  if(redis == NULL) return x_error(X_NULL, EINVAL, fn, "redis is NULL");
+  if(cleanupCall == NULL) return x_error(X_NULL, EINVAL, fn, "cleanupCall is NULL");
 
   xvprintf("Redis-X> Adding a disconnect callback.\n");
 
@@ -153,6 +165,8 @@ void redisxAddDisconnectHook(Redis *redis, void (*cleanupCall)(Redis *)) {
     }
   }
   rConfigUnlock(redis);
+
+  return X_SUCCESS;
 }
 
 /**
@@ -161,15 +175,18 @@ void redisxAddDisconnectHook(Redis *redis, void (*cleanupCall)(Redis *)) {
  * \param redis         Pointer to a Redis instance.
  * \param cleanupCall   User specified function to call when Redis is disconnected.
  *
+ * @return  X_SUCCESS (0) if successful or else X_NULL if the argument is NULL.
  */
 // cppcheck-suppress constParameter
 // cppcheck-suppress constParameterPointer
-void redisxRemoveDisconnectHook(Redis *redis, void (*cleanupCall)(Redis *)) {
+int redisxRemoveDisconnectHook(Redis *redis, void (*cleanupCall)(Redis *)) {
+  static const char *fn = "redisxRemoveDisconnectHook";
+
   RedisPrivate *p;
   Hook *c, *last = NULL;
 
-  if(redis == NULL) return;
-  if(cleanupCall == NULL) return;
+  if(redis == NULL) return x_error(X_NULL, EINVAL, fn, "redis is NULL");
+  if(cleanupCall == NULL) return x_error(X_NULL, EINVAL, fn, "cleanupCall is NULL");
 
   xvprintf("Redis-X> Removing a disconnect callback.\n");
 
@@ -190,6 +207,8 @@ void redisxRemoveDisconnectHook(Redis *redis, void (*cleanupCall)(Redis *)) {
     c = next;
   }
   rConfigUnlock(redis);
+
+  return X_SUCCESS;
 }
 
 /**
@@ -197,7 +216,6 @@ void redisxRemoveDisconnectHook(Redis *redis, void (*cleanupCall)(Redis *)) {
  * specified Redis instance is disconnected.
  *
  * \param redis         Pointer to a Redis instance.
- *
  */
 void redisxClearDisconnectHooks(Redis *redis) {
   RedisPrivate *p;

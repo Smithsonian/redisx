@@ -11,6 +11,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <errno.h>
+#include <limits.h>
 #if __Lynx__
 #  include <socket.h>
 #else
@@ -96,7 +97,7 @@ static int rReadChunkAsync(ClientPrivate *cp) {
  *                 Values < 0 indicate an error.
  */
 static int rReadToken(ClientPrivate *cp, char *buf, int length) {
-  static const char *funcName = "rReadToken()";
+  static const char *fn = "rReadToken";
   int foundTerms = 0, L;
 
   length--; // leave room for termination in incomplete tokens...
@@ -105,7 +106,7 @@ static int rReadToken(ClientPrivate *cp, char *buf, int length) {
 
   if(!cp->isEnabled) {
     pthread_mutex_unlock(&cp->readLock);
-    return redisxError(funcName, X_NO_SERVICE);
+    return x_error(X_NO_SERVICE, ENXIO, fn, "client is not connected");
   }
 
   for(L=0; cp->isEnabled && foundTerms < 2; L++) {
@@ -116,7 +117,7 @@ static int rReadToken(ClientPrivate *cp, char *buf, int length) {
       int status = rReadChunkAsync(cp);
       if(status) {
         pthread_mutex_unlock(&cp->readLock);
-        return redisxError(funcName, status);
+        return x_trace(fn, NULL, status);
       }
     }
 
@@ -161,7 +162,7 @@ static int rReadToken(ClientPrivate *cp, char *buf, int length) {
     return L;
   }
 
-  return foundTerms==2 ? L : redisxError(funcName, REDIS_INCOMPLETE_TRANSFER);
+  return foundTerms==2 ? L : x_error(REDIS_INCOMPLETE_TRANSFER, EIO, fn, "missing \\r\\n termination");
 }
 
 /**
@@ -176,14 +177,14 @@ static int rReadToken(ClientPrivate *cp, char *buf, int length) {
  * \return     Number of bytes successfully read (>=0), or else X_NO_SERVICE.
  */
 static int rReadBytes(ClientPrivate *cp, char *buf, int length) {
-  static const char *funcName = "rReadBytes()";
+  static const char *fn = "rReadBytes";
   int L;
 
   pthread_mutex_lock(&cp->readLock);
 
   if(!cp->isEnabled) {
     pthread_mutex_unlock(&cp->readLock);
-    return redisxError(funcName, X_NO_SERVICE);
+    return x_error(X_NO_SERVICE, ENXIO, fn, "client not connected");
   }
 
   for(L=0; cp->isEnabled && L<length; L++) {
@@ -192,7 +193,7 @@ static int rReadBytes(ClientPrivate *cp, char *buf, int length) {
       int status = rReadChunkAsync(cp);
       if(status) {
         pthread_mutex_unlock(&cp->readLock);
-        return redisxError(funcName, status);
+        return x_trace(fn, NULL, status);
       }
     }
 
@@ -273,7 +274,10 @@ static int rSendBytesAsync(ClientPrivate *cp, const char *buf, int length, boole
 RedisClient *redisxGetClient(Redis *redis, enum redisx_channel channel) {
   RedisPrivate *p;
 
-  if(redis == NULL) return NULL;
+  if(redis == NULL) {
+    x_error(0, EINVAL, "redisxGetClient", "redis is NULL");
+    return NULL;
+  }
 
   p = (RedisPrivate *) redis->priv;
   if(channel < 0 || channel >= REDISX_CHANNELS) return NULL;
@@ -296,10 +300,12 @@ RedisClient *redisxGetClient(Redis *redis, enum redisx_channel channel) {
  * @sa redisxLockConnected()
  */
 RedisClient *redisxGetLockedConnectedClient(Redis *redis, enum redisx_channel channel) {
-  RedisClient *cl = redisxGetClient(redis, channel);
-  if(!cl) return NULL;
+  static const char *fn = "redisxGetLockedConnectedClient";
 
-  if(redisxLockConnected(cl) != X_SUCCESS) return NULL;
+  RedisClient *cl = redisxGetClient(redis, channel);
+  if(!cl) return x_trace_null(fn, NULL);
+
+  if(redisxLockConnected(cl) != X_SUCCESS) return x_trace_null(fn, NULL);
   return cl;
 }
 
@@ -316,18 +322,15 @@ RedisClient *redisxGetLockedConnectedClient(Redis *redis, enum redisx_channel ch
  * @sa redisxUnlockClient()
  */
 int redisxLockClient(RedisClient *cl) {
-  static const char *funcName = "redisxLockClient()";
+  static const char *fn = "redisxLockClient";
   ClientPrivate *cp;
   int status;
 
-  if(cl == NULL) return redisxError(funcName, X_NULL);
+  if(cl == NULL) return x_error(X_NULL, EINVAL, fn, "client is NULL");
   cp = (ClientPrivate *) cl->priv;
 
   status = pthread_mutex_lock(&cp->writeLock);
-  if(status) {
-    fprintf(stderr, "WARNING! Redis-X : %s failed with code: %d.\n", funcName, status);
-    return redisxError(funcName, X_FAILURE);
-  }
+  if(status) return x_error(X_FAILURE, errno, fn, "mutex error");
 
   return X_SUCCESS;
 }
@@ -347,15 +350,15 @@ int redisxLockClient(RedisClient *cl) {
  * @sa redisxGetLockedConnectedClient()
  */
 int redisxLockConnected(RedisClient *cl) {
-  static const char *funcName = "redisxLockConnected()";
+  static const char *fn = "redisxLockConnected";
   const ClientPrivate *cp;
-  int status = redisxLockClient(cl);
-  if(status) return redisxError(funcName, status);
+
+  prop_error(fn, redisxLockClient(cl));
 
   cp = (ClientPrivate *) cl->priv;
   if(!cp->isEnabled) {
     redisxUnlockClient(cl);
-    return redisxError(funcName, REDIS_INVALID_CHANNEL);
+    return x_error(X_NO_SERVICE, ENXIO, fn, "client is not connected");
   }
 
   return X_SUCCESS;
@@ -374,17 +377,17 @@ int redisxLockConnected(RedisClient *cl) {
  * @sa redisxLockConnected()
  */
 int redisxUnlockClient(RedisClient *cl) {
-  static const char *funcName = "redisxUnlockClient()";
+  static const char *fn = "redisxUnlockClient";
   ClientPrivate *cp;
   int status;
 
-  if(cl == NULL) return redisxError(funcName, X_NULL);
+  if(cl == NULL) return x_error(X_NULL, EINVAL, fn, "client is NULL");
   cp = (ClientPrivate *) cl->priv;
 
   status = pthread_mutex_unlock(&cp->writeLock);
-  if(status) fprintf(stderr, "WARNING! Redis-X : %s failed with code: %d.\n", funcName, status);
+  if(status) return x_error(X_FAILURE, errno, fn, "mutex error");
 
-  return status ? redisxError(funcName, X_FAILURE) : X_SUCCESS;
+  return X_SUCCESS;
 }
 
 /**
@@ -401,15 +404,12 @@ int redisxUnlockClient(RedisClient *cl) {
  *                          X_NULL      if the client is NULL.
  */
 int redisxSkipReplyAsync(RedisClient *cl) {
-  static const char *funcName = "redisSkipReplyAsync()";
-  static char cmd[] = "*3\r\n$6\r\nCLIENT\r\n$5\r\nREPLY\r\n$4\r\nSKIP\r\n";
+  static const char *fn = "redisSkipReplyAsync";
+  static const char cmd[] = "*3\r\n$6\r\nCLIENT\r\n$5\r\nREPLY\r\n$4\r\nSKIP\r\n";
 
-  int status;
+  if(cl == NULL) return x_error(X_NULL, EINVAL, fn, "client is NULL");
 
-  if(cl == NULL) return redisxError(funcName, X_NULL);
-
-  status = rSendBytesAsync((ClientPrivate *) cl->priv, cmd, sizeof(cmd) - 1, TRUE);
-  if(status) return redisxError(funcName, status);
+  prop_error(fn, rSendBytesAsync((ClientPrivate *) cl->priv, cmd, sizeof(cmd) - 1, TRUE));
 
   return X_SUCCESS;
 }
@@ -436,15 +436,12 @@ int redisxSkipReplyAsync(RedisClient *cl) {
  *
  */
 int redisxStartBlockAsync(RedisClient *cl) {
-  static const char *funcName = "redisxStartBlockAsync()";
-  static char cmd[] = "*1\r\n$5\r\nMULTI\r\n";
+  static const char *fn = "redisxStartBlockAsync";
+  static const char cmd[] = "*1\r\n$5\r\nMULTI\r\n";
 
-  int status;
+  if(cl == NULL) return x_error(X_NULL, EINVAL, fn, "client is NULL");
 
-  if(cl == NULL) return redisxError(funcName, X_NULL);
-
-  status = rSendBytesAsync((ClientPrivate *) cl->priv, cmd, sizeof(cmd) - 1, TRUE);
-  if(status) return redisxError(funcName, status);
+  prop_error(fn, rSendBytesAsync((ClientPrivate *) cl->priv, cmd, sizeof(cmd) - 1, TRUE));
 
   return X_SUCCESS;
 }
@@ -460,15 +457,12 @@ int redisxStartBlockAsync(RedisClient *cl) {
  *
  */
 int redisxAbortBlockAsync(RedisClient *cl) {
-  static const char *funcName = "redisxAbortBlockAsync()";
-  static char cmd[] = "*1\r\n$7\r\nDISCARD\r\n";
+  static const char *fn = "redisxAbortBlockAsync";
+  static const char cmd[] = "*1\r\n$7\r\nDISCARD\r\n";
 
-  int status;
+  if(cl == NULL) return x_error(X_NULL, EINVAL, fn, "client is NULL");
 
-  if(cl == NULL) return redisxError(funcName, X_NULL);
-
-  status = rSendBytesAsync((ClientPrivate *) cl->priv, cmd, sizeof(cmd) - 1, TRUE);
-  if(status) return redisxError(funcName, status);
+  prop_error(fn, rSendBytesAsync((ClientPrivate *) cl->priv, cmd, sizeof(cmd) - 1, TRUE));
 
   redisxIgnoreReplyAsync(cl);
 
@@ -489,34 +483,26 @@ int redisxAbortBlockAsync(RedisClient *cl) {
  *
  */
 RESP *redisxExecBlockAsync(RedisClient *cl) {
-  static const char *funcName = "redisxExecBlockAsync()";
-  static char cmd[] = "*1\r\n$4\r\nEXEC\r\n";
+  static const char *fn = "redisxExecBlockAsync";
+  static const char cmd[] = "*1\r\n$4\r\nEXEC\r\n";
 
   int status;
 
   if(cl == NULL) {
-    redisxError(funcName, X_NULL);
+    x_error(0, EINVAL, fn, "client is NULL");
     return NULL;
   }
 
   status = redisxSkipReplyAsync(cl);
-  if(status) {
-    redisxError(funcName, status);
-    return NULL;
-  }
+  if(status) return x_trace_null(fn, NULL);
 
   status = rSendBytesAsync((ClientPrivate *) cl->priv, cmd, sizeof(cmd) - 1, TRUE);
-  if(status) {
-    redisxError(funcName, status);
-    return NULL;
-  }
+  if(status) return x_trace_null(fn, NULL);
 
   for(;;) {
     RESP *reply = redisxReadReplyAsync(cl);
-    if(!reply) {
-      redisxError(funcName, REDIS_NULL);
-      return NULL;
-    }
+    if(!reply) return x_trace_null(fn, NULL);
+
     if(reply->type == RESP_ARRAY) return reply;
     if(reply->type == RESP_ERROR) {
       redisxDestroyRESP(reply);
@@ -544,15 +530,13 @@ RESP *redisxExecBlockAsync(RedisClient *cl) {
  *                      or the errno set by send().
  */
 int redisxSendRequestAsync(RedisClient *cl, const char *command, const char *arg1, const char *arg2, const char *arg3) {
+  static const char *fn = "redisxSendRequestAsync";
+
   const char *args[] = { command, arg1, arg2, arg3 };
   int n;
-  const ClientPrivate *cp;
 
-  if(cl == NULL) return X_NULL;
-
-  cp = (ClientPrivate *) cl->priv;
-  if(!cp->isEnabled) return X_NO_INIT;
-  if(command == NULL) return X_NAME_INVALID;
+  if(cl == NULL) return x_error(X_NULL, EINVAL, fn, "client is NULL");
+  if(command == NULL) return x_error(X_NAME_INVALID, EINVAL, fn, "command is NULL");
 
   // Count the non-null arguments...
   if(arg1 == NULL) n = 1;
@@ -560,7 +544,8 @@ int redisxSendRequestAsync(RedisClient *cl, const char *command, const char *arg
   else if(arg3 == NULL) n = 3;
   else n = 4;
 
-  return redisxSendArrayRequestAsync(cl, (char **) args, NULL, n);
+  prop_error("redisxSendRequestAsync", redisxSendArrayRequestAsync(cl, (char **) args, NULL, n));
+  return X_SUCCESS;
 }
 
 /**
@@ -579,12 +564,12 @@ int redisxSendRequestAsync(RedisClient *cl, const char *command, const char *arg
  *                      or the errno set by send().
  */
 int redisxSendArrayRequestAsync(RedisClient *cl, char *args[], int lengths[], int n) {
-  const char *funcName = "redisxSendArrayRequestAsync()";
+  const char *fn = "redisxSendArrayRequestAsync";
   char buf[REDISX_CMDBUF_SIZE];
-  int status, i, L;
+  int i, L;
   ClientPrivate *cp;
 
-  if(cl == NULL) return redisxError(funcName, X_NULL);
+  if(cl == NULL) return x_error(X_NULL, EINVAL, fn, "client is NULL");
   cp = (ClientPrivate *) cl->priv;
 
   // Send the number of string elements in the command...
@@ -603,18 +588,14 @@ int redisxSendArrayRequestAsync(RedisClient *cl, char *args[], int lengths[], in
 
     if((L + L1) > REDISX_CMDBUF_SIZE) {
       // If buf cannot include the next argument, then flush the buffer...
-      status = rSendBytesAsync(cp, buf, L, FALSE);
-      if(status) return redisxError(funcName, status);
+      prop_error(fn, rSendBytesAsync(cp, buf, L, FALSE));
 
       L = 0;
 
       // If the next argument does not fit into the buffer, then send it piecemeal
       if(L1 > REDISX_CMDBUF_SIZE) {
-        status = rSendBytesAsync(cp, args[i], l, FALSE);
-        if(status) return redisxError(funcName, status);
-
-        status = rSendBytesAsync(cp, "\r\n", 2, i == (n-1));
-        if(status) return redisxError(funcName, status);
+        prop_error(fn, rSendBytesAsync(cp, args[i], l, FALSE));
+        prop_error(fn, rSendBytesAsync(cp, "\r\n", 2, i == (n-1)));
       }
       else {
         memcpy(buf, args[i], l);            // Copy argument into buffer.
@@ -630,8 +611,7 @@ int redisxSendArrayRequestAsync(RedisClient *cl, char *args[], int lengths[], in
 
   // flush the remaining bits in the buffer...
   if(L > 0) {
-    status = rSendBytesAsync(cp, buf, L, TRUE);
-    if(status) return redisxError(funcName, status);
+    prop_error(fn, rSendBytesAsync(cp, buf, L, TRUE));
   }
 
   pthread_mutex_lock(&cp->pendingLock);
@@ -651,13 +631,13 @@ int redisxSendArrayRequestAsync(RedisClient *cl, char *args[], int lengths[], in
  *
  */
 int redisxIgnoreReplyAsync(RedisClient *cl) {
-  static const char *funcName = "redisxIgnoreReplyAsync()";
+  static const char *fn = "redisxIgnoreReplyAsync";
   RESP *resp;
 
-  if(cl == NULL) return redisxError(funcName, X_NULL);
+  if(cl == NULL) return x_error(X_NULL, EINVAL, fn, "client is NULL");
 
   resp = redisxReadReplyAsync(cl);
-  if(resp == NULL) return redisxError(funcName, REDIS_NULL);
+  if(resp == NULL) return x_trace(fn, NULL, REDIS_NULL);
   else redisxDestroyRESP(resp);
   return X_SUCCESS;
 }
@@ -672,7 +652,7 @@ int redisxIgnoreReplyAsync(RedisClient *cl) {
  *              or EBADMSG if the message was corrupted and/or unparseable.
  */
 RESP *redisxReadReplyAsync(RedisClient *cl) {
-  static const char *funcName = "redisxReadReplyAsync()";
+  static const char *fn = "redisxReadReplyAsync";
 
   ClientPrivate *cp;
   RESP *resp = NULL;
@@ -685,15 +665,19 @@ RESP *redisxReadReplyAsync(RedisClient *cl) {
 
   if(!cp->isEnabled) return NULL;
 
-  size = rReadToken(cp, buf, REDIS_SIMPLE_STRING_SIZE+1);
+  size = rReadToken(cp, buf, REDIS_SIMPLE_STRING_SIZE + 1);
   if(size < 0) {
     // Either read/recv had an error, or we got garbage...
-    if(cp->isEnabled) redisxError(funcName, size);
+    if(cp->isEnabled) x_trace_null(fn, NULL);
     cp->isEnabled = FALSE;  // Disable this client so we don't attempt to read from it again...
     return NULL;
   }
 
   resp = (RESP *) calloc(1, sizeof(RESP));
+  if(!resp) {
+    perror("ERROR! calloc() error");
+    exit(errno);
+  }
   resp->type = buf[0];
 
   // Get the integer / size value...
@@ -717,8 +701,7 @@ RESP *redisxReadReplyAsync(RedisClient *cl) {
 
       resp->value = (RESP **) malloc(resp->n * sizeof(RESP *));
       if(resp->value == NULL) {
-        fprintf(stderr, "WARNING! Redis-X : alloc %d RESP arrays: %s\n", resp->n, strerror(errno));
-        status = X_FAILURE;
+        status = x_error(X_FAILURE, errno, fn, "malloc() error (%d RESP)", resp->n);
         // We should get the data from the input even if we have nowhere to store...
       }
 
@@ -730,7 +713,7 @@ RESP *redisxReadReplyAsync(RedisClient *cl) {
       }
 
       // Consistency check. Discard response if incomplete (because of read errors...)
-      if(resp->value) for(i=0; i<resp->n; i++) if(component[i] == NULL) {
+      if(resp->value) for(i = 0; i < resp->n; i++) if(component[i] == NULL) {
         fprintf(stderr, "WARNING! Redis-X : incomplete array received (index %d of %d).\n", (i+1), resp->n);
         if(!status) status = REDIS_INCOMPLETE_TRANSFER;
         break;
@@ -744,8 +727,8 @@ RESP *redisxReadReplyAsync(RedisClient *cl) {
 
       resp->value = malloc(resp->n + 2);              // <string>\r\n
       if(resp->value == NULL) {
-        fprintf(stderr, "WARNING! Redis-X : alloc string of %d bytes: %s\n", resp->n + 2, strerror(errno));
-        status = X_FAILURE;
+        status = x_error(X_FAILURE, errno, fn, "malloc() error (%d bytes)", (resp->n + 2));
+        fprintf(stderr, "WARNING! Redis-X : not enough memory for bulk string reply (%d bytes). Skipping.\n", (resp->n + 2));
         // We still want to consume the bytes from the input...
       }
 
@@ -766,8 +749,8 @@ RESP *redisxReadReplyAsync(RedisClient *cl) {
       resp->value = malloc(size);
 
       if(resp->value == NULL) {
-        fprintf(stderr, "WARNING! Redis-X : alloc simple string of %d bytes: %s\n", size, strerror(errno));
-        status = X_FAILURE;
+        status = x_error(X_FAILURE, errno, fn, "malloc() error (%d bytes)", size);
+        fprintf(stderr, "WARNING! Redis-X : not enough memory for simple string reply (%d bytes). Skipping.\n", size);
         break;
       }
 
@@ -778,13 +761,6 @@ RESP *redisxReadReplyAsync(RedisClient *cl) {
       break;
 
     case RESP_INT:          // Nothing left to do for INT type response.
-      break;
-
-    case RESP_PONG:
-      if(strcmp(buf, "PONG\r\n")) {
-        fprintf(stderr, "WARNING! Redis-X : garbled PONG?\n");
-        status = X_PARSE_ERROR;
-      }
       break;
 
     default:
@@ -802,8 +778,7 @@ RESP *redisxReadReplyAsync(RedisClient *cl) {
   // Check for errors, and return NULL if there were any.
   if(status) {
     redisxDestroyRESP(resp);
-    redisxError(funcName, status);
-    return NULL;
+    return x_trace_null(fn, NULL);
   }
 
   pthread_mutex_lock(&cp->pendingLock);
@@ -821,26 +796,26 @@ RESP *redisxReadReplyAsync(RedisClient *cl) {
  * @return      X_SUCCESS (0) if successful, or else an error code (&lt;0) from redisx.h / xchange.h.
  */
 int redisxResetClient(RedisClient *cl) {
-  static const char *funcName = "redisxResetClient()";
+  static const char *fn = "redisxResetClient";
 
   int status = X_SUCCESS;
 
-  if(cl == NULL) return redisxError(funcName, X_NULL);
+  if(cl == NULL) return x_error(X_NULL, EINVAL, fn, "client is NULL");
 
-  status = redisxLockConnected(cl);
-  if(status) return redisxError(funcName, status);
+  prop_error(fn, redisxLockConnected(cl));
 
   status = redisxSendRequestAsync(cl, "RESET", NULL, NULL, NULL);
   if(!status) {
     RESP *reply = redisxReadReplyAsync(cl);
     status = redisxCheckRESP(reply, RESP_SIMPLE_STRING, 0);
-    if(!status) if(strcmp("RESET", (char *) reply->value) != 0) status = REDIS_UNEXPECTED_RESP;
+    if(!status) if(strcmp("RESET", (char *) reply->value) != 0)
+      status = x_error(REDIS_UNEXPECTED_RESP, EBADE, fn, "expected 'RESET', got '%s'", (char *) reply->value);
     redisxDestroyRESP(reply);
   }
 
   redisxUnlockClient(cl);
 
-  if(status) return redisxError(funcName, status);
+  prop_error(fn, status);
 
   return X_SUCCESS;
 }

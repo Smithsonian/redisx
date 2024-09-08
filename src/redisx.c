@@ -97,10 +97,12 @@ boolean redisxIsVerbose() {
  * @sa redisxSetPassword()
  */
 int redisxSetUser(Redis *redis, const char *username) {
+  static const char *fn = "redisxSetUser";
+
   RedisPrivate *p;
 
-  if(!redis) return X_NULL;
-  if(redisxIsConnected(redis)) return redisxError("redisxSetUser()", X_ALREADY_OPEN);
+  if(!redis) return x_error(X_NULL, EINVAL, fn, "redis is NULL");
+  if(redisxIsConnected(redis)) return x_error(X_ALREADY_OPEN, EALREADY, fn, "already connected");
 
   p = (RedisPrivate *) redis->priv;
   if(p->username) free(p->username);
@@ -123,10 +125,12 @@ int redisxSetUser(Redis *redis, const char *username) {
  * @sa redisxSetUser()
  */
 int redisxSetPassword(Redis *redis, const char *passwd) {
+  static const char *fn = "redisxSetPassword";
+
   RedisPrivate *p;
 
-  if(!redis) return X_NULL;
-   if(redisxIsConnected(redis)) return redisxError("redisxSetPassword()", X_ALREADY_OPEN);
+  if(!redis) return x_error(X_NULL, EINVAL, fn, "redis is NULL");
+  if(redisxIsConnected(redis)) return x_error(X_ALREADY_OPEN, EALREADY, fn, "already connected");
 
   p = (RedisPrivate *) redis->priv;
   if(p->password) free(p->password);
@@ -156,7 +160,7 @@ int redisxSetPassword(Redis *redis, const char *passwd) {
 int redisxSetTransmitErrorHandler(Redis *redis, RedisErrorHandler f) {
   RedisPrivate *p;
 
-  if(!redis) return X_NULL;
+  if(!redis) return x_error(X_NULL, EINVAL, "redisxSetTransmitErrorHandler", "redis is NULL");
 
   rConfigLock(redis);
   p = (RedisPrivate *) redis->priv;
@@ -171,54 +175,56 @@ int redisxSetTransmitErrorHandler(Redis *redis, RedisErrorHandler f) {
  * Returns the current time on the Redis server instance.
  *
  * @param redis     Pointer to a Redis instance.
- * @param t         Pointer to a timespec structure in which to return the server time.
+ * @param[out] t         Pointer to a timespec structure in which to return the server time.
  * @return          X_SUCCESS (0) if successful, or X_NULL if either argument is NULL, or X_PARSE_ERROR
  *                  if could not parse the response, or another error returned by redisxCheckRESP().
  */
 int redisxGetTime(Redis *redis, struct timespec *t) {
-  static const char *funcName = "redisxGetTime()";
+  static const char *fn = "redisxGetTime";
 
   RESP *reply, **components;
   int status = X_SUCCESS;
   char *tail;
 
-  if(!redis || !t) return redisxError(funcName, X_NULL);
+  if(!redis) return x_error(X_NULL, EINVAL, fn, "redis is NULL");
+  if(!t) return x_error(X_NULL, EINVAL, fn, "output timespec is NULL");
 
   memset(t, 0, sizeof(*t));
 
   reply = redisxRequest(redis, "TIME", NULL, NULL, NULL, &status);
   if(status) {
     redisxDestroyRESP(reply);
-    return redisxError(funcName, status);
+    return x_trace(fn, NULL, status);
   }
 
   status = redisxCheckDestroyRESP(reply, RESP_ARRAY, 2);
-  if(status) return redisxError(funcName, status);
+  prop_error(fn, status);
 
   components = (RESP **) reply->value;
   status = redisxCheckRESP(components[0], RESP_BULK_STRING, 0);
   if(status) {
     redisxDestroyRESP(reply);
-    return redisxError(funcName, status);
+    return x_trace(fn, NULL, status);
   }
 
   // [1] seconds.
   t->tv_sec = strtol((char *) components[0]->value, &tail, 10);
   if(tail == components[0]->value || errno == ERANGE) {
     redisxDestroyRESP(reply);
-    return redisxError(funcName, X_PARSE_ERROR);
+    return x_error(X_PARSE_ERROR, errno, fn, "tv_sec parse error: '%s'", (char *) components[0]->value);
   }
 
   status = redisxCheckRESP(components[0], RESP_BULK_STRING, 0);
   if(status) {
     redisxDestroyRESP(reply);
-    return redisxError(funcName, status);
+    return x_trace(fn, NULL, status);
   }
 
   // [2] microseconds.
   t->tv_nsec = 1000 * strtol((char *) components[1]->value, &tail, 10);
 
-  if(tail == components[1]->value || errno == ERANGE) status = redisxError(funcName, X_PARSE_ERROR);
+  if(tail == components[1]->value || errno == ERANGE)
+    status = x_error(X_PARSE_ERROR, errno, fn, "tv_nsec parse error: '%s'", (char *) components[1]->value);
   else status = X_SUCCESS;
 
   redisxDestroyRESP(reply);
@@ -235,19 +241,24 @@ int redisxGetTime(Redis *redis, struct timespec *t) {
  *
  */
 int redisxPing(Redis *redis, const char *message) {
-  static const char *funcName = "redisxPing()";
+  static const char *fn = "redisxPing";
   int status = X_SUCCESS;
+
+  if(!redis) return x_error(X_NULL, EINVAL, fn, "redis is NULL");
 
   RESP *reply = redisxRequest(redis, "PING", message, NULL, NULL, &status);
 
-  if(!reply) return redisxError(funcName, X_NULL);
   if(!status) {
-    status = redisxCheckRESP(reply, message ? RESP_BULK_STRING : RESP_SIMPLE_STRING, 0);
-    if(!status) if(strcmp(message ? message : "PONG", (char *)reply->value) != 0) status = REDIS_UNEXPECTED_RESP;
+    if(!reply) status = x_error(X_NULL, errno, fn, "reply was NULL");
+    else {
+      status = redisxCheckRESP(reply, message ? RESP_BULK_STRING : RESP_SIMPLE_STRING, 0);
+      if(!status) if(strcmp(message ? message : "PONG", (char *)reply->value) != 0)
+        status = x_error(REDIS_UNEXPECTED_RESP, EBADE, fn, "expected 'PONG', got '%s'", (char *)reply->value);
+    }
   }
 
   redisxDestroyRESP(reply);
-  if(status) return redisxError(funcName, status);
+  prop_error(fn, status);
 
   return X_SUCCESS;
 }
@@ -265,28 +276,24 @@ int redisxPing(Redis *redis, const char *message) {
  * @sa redisxLockConnected()
  */
 static int redisxSelectDBAsync(RedisClient *cl, int idx, boolean confirm) {
-  static const char *funcName = "redisxSelectClientDBAsync()";
+  static const char *fn = "redisxSelectClientDBAsync";
 
   char sval[20];
-  int status;
-
-  if(cl == NULL) return redisxError(funcName, X_NULL);
 
   if(!confirm) {
-    status = redisxSkipReplyAsync(cl);
-    if(status) return redisxError(funcName, status);
+    prop_error(fn, redisxSkipReplyAsync(cl));
   }
 
   sprintf(sval, "%d", idx);
-  status = redisxSendRequestAsync(cl, "SELECT", sval, NULL, NULL);
-  if(status) return redisxError(funcName, status);
+  prop_error(fn, redisxSendRequestAsync(cl, "SELECT", sval, NULL, NULL));
 
   if(confirm) {
     RESP *reply = redisxReadReplyAsync(cl);
-    status = redisxCheckRESP(reply, RESP_SIMPLE_STRING, 0);
-    if(!status) if(strcmp("OK", (char *) reply->value) != 0) status = REDIS_UNEXPECTED_RESP;
+    int status = redisxCheckRESP(reply, RESP_SIMPLE_STRING, 0);
+    if(!status) if(strcmp("OK", (char *) reply->value) != 0)
+      status = x_error(REDIS_UNEXPECTED_RESP, EBADE, fn, "expected 'OK', got '%s'", (char *) reply->value);
     redisxDestroyRESP(reply);
-    if(status) return redisxError(funcName, status);
+    prop_error(fn, status);
   }
 
   return X_SUCCESS;
@@ -314,11 +321,13 @@ static void rAffirmDB(Redis *redis) {
  * @sa redisxLockConnected()
  */
 int redisxSelectDB(Redis *redis, int idx) {
+  static const char *fn = "redisxSelectDB";
+
   RedisPrivate *p;
   enum redisx_channel c;
   int status = X_SUCCESS;
 
-  if(!redis) return redisxError("redisxSelectDB()", X_NULL);
+  if(!redis) return x_error(X_NULL, EINVAL, fn, "redis is NULL");
 
   p = (RedisPrivate *) redis->priv;
   if(p->dbIndex == idx) return X_SUCCESS;
@@ -344,7 +353,13 @@ int redisxSelectDB(Redis *redis, int idx) {
     s = redisxSelectDBAsync(cl, idx, c != REDISX_PIPELINE_CHANNEL);
     redisxUnlockClient(cl);
 
-    if(s) status = X_INCOMPLETE;
+    if(s) {
+      char str[20];
+      sprintf(str, "%d", idx);
+
+      status = X_INCOMPLETE;
+      x_trace(fn, str, status);
+    }
   }
 
   return status;
@@ -466,7 +481,7 @@ boolean redisxHasPipeline(Redis *redis) {
 int redisxSetPipelineConsumer(Redis *redis, void (*f)(RESP *)) {
   RedisPrivate *p;
 
-  if(redis == NULL) return redisxError("redisxSetPipelineConsumer()", X_NULL);
+  if(redis == NULL) return x_error(X_NULL, EINVAL, "redisxSetPipelineConsumer", "redis is NULL");
 
   p = (RedisPrivate *) redis->priv;
   rConfigLock(redis);
@@ -503,10 +518,14 @@ int redisxSetPipelineConsumer(Redis *redis, void (*f)(RESP *)) {
  * @sa redisxReadReplyAsync()
  */
 RESP *redisxRequest(Redis *redis, const char *command, const char *arg1, const char *arg2, const char *arg3, int *status) {
-  const char *args[] = { command, arg1, arg2, arg3 };
-  int n;
+  static const char *fn = "redisxRequest";
 
-  if(redis == NULL) return NULL;
+  RESP *reply;
+  const char *args[] = { command, arg1, arg2, arg3 };
+  int n, s;
+
+
+  if(redis == NULL) x_error(X_NULL, EINVAL, fn, "redis is NULL");
 
   if(command == NULL) n = 0;
   else if(arg1 == NULL) n = 1;
@@ -514,7 +533,12 @@ RESP *redisxRequest(Redis *redis, const char *command, const char *arg1, const c
   else if(arg3 == NULL) n = 3;
   else n = 4;
 
-  return redisxArrayRequest(redis, (char **) args, NULL, n, status);
+  reply = redisxArrayRequest(redis, (char **) args, NULL, n, &s);
+
+  if(status) *status = s;
+  if(s) x_trace_null(fn, NULL);
+
+  return reply;
 }
 
 /**
@@ -548,32 +572,29 @@ RESP *redisxRequest(Redis *redis, const char *command, const char *arg1, const c
  * @sa redisxReadReplyAsync()
  */
 RESP *redisxArrayRequest(Redis *redis, char *args[], int lengths[], int n, int *status) {
-  static const char *funcName = "redisxArrayRequest()";
+  static const char *fn = "redisxArrayRequest";
   RESP *reply = NULL;
   RedisClient *cl;
 
-  if(redis == NULL || args == NULL || n < 1) *status = X_NULL;
-  else *status = X_SUCCESS;
 
-  if(*status) {
-    redisxError(funcName, *status);
+  if(redis == NULL || args == NULL || n < 1 || status == NULL) {
+    x_error(0, EINVAL, fn, "invalid parameter: redis=%p, args=%p, n=%d, status=%p", redis, args, n, status);
+    if(status) *status = X_NULL;
     return NULL;
   }
+  else *status = X_SUCCESS;
 
   xvprintf("Redis-X> request %s... [%d].\n", args[0], n);
 
   cl = redis->interactive;
   *status = redisxLockConnected(cl);
-  if(*status) {
-    redisxError(funcName, *status);
-    return NULL;
-  }
+  if(*status) return x_trace_null(fn, NULL);
 
   *status = redisxSendArrayRequestAsync(cl, args, lengths, n);
   if(!(*status)) reply = redisxReadReplyAsync(cl);
   redisxUnlockClient(cl);
 
-  if(*status) redisxError(funcName, *status);
+  if(*status) x_trace_null(fn, NULL);
 
   return reply;
 }

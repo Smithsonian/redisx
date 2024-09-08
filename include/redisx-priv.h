@@ -16,6 +16,7 @@
 #include <pthread.h>
 #include <stdint.h>
 
+#define __XCHANGE_INTERNAL_API__
 #include "redisx.h"
 
 #define IP_ADDRESS_LENGTH             40  ///< IPv6: 39 chars + termination.

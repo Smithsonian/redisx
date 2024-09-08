@@ -32,13 +32,13 @@
  *
  */
 int redisxLoadScript(Redis *redis, const char *script, char **sha1) {
-  static const char *funcName = "redisxLoadScript()";
+  static const char *fn = "redisxLoadScript";
   RESP *reply;
   int status;
 
-  if(redis == NULL) return redisxError(funcName, X_NULL);
-  if(script == NULL) return redisxError(funcName, X_NAME_INVALID);
-  if(*script == '\0') return redisxError(funcName, X_NAME_INVALID);
+  if(redis == NULL) return x_error(X_NULL, EINVAL, fn, "redis is NULL");
+  if(script == NULL) return x_error(X_NULL, EINVAL, fn, "input script is NULL");
+  if(*script == '\0') return x_error(X_NULL, EINVAL, fn, "input script is empty");
 
   *sha1 = NULL;
 
@@ -46,11 +46,10 @@ int redisxLoadScript(Redis *redis, const char *script, char **sha1) {
 
   if(!status) {
     redisxDestroyRESP(reply);
-    return redisxError(funcName, status);
+    return x_trace(fn, NULL, status);
   }
 
-  status = redisxCheckDestroyRESP(reply, RESP_BULK_STRING, 0);
-  if(status) return redisxError(funcName, status);
+  prop_error(fn, redisxCheckDestroyRESP(reply, RESP_BULK_STRING, 0));
 
   *sha1 = (char *) reply->value;
   redisxDestroyRESP(reply);
@@ -78,10 +77,13 @@ int redisxLoadScript(Redis *redis, const char *script, char **sha1) {
  */
 
 int redisxRunScriptAsync(RedisClient *cl, const char *sha1, const char **keys, const char **params) {
+  static const char *fn = "redisxRunScriptAsync";
+
   int i = 0, k, nkeys = 0, nparams = 0, nargs;
   char sn[20], **args;
 
-  if(cl == NULL || sha1 == NULL) return redisxError("redisxRunScriptAsync()", X_NULL);
+  if(cl == NULL) return x_error(X_NULL, EINVAL, fn, "client is NULL");
+   if(sha1 == NULL) return x_error(X_NULL, EINVAL, fn, "input script SHA1 sum is NULL");
 
   if(keys) while(keys[nkeys]) nkeys++;
   if(params) while(params[nparams]) nparams++;
@@ -100,7 +102,9 @@ int redisxRunScriptAsync(RedisClient *cl, const char *sha1, const char **keys, c
   i = redisxSendArrayRequestAsync(cl, args, NULL, nargs);
   free(args);
 
-  return i;
+  prop_error(fn, i);
+
+  return X_SUCCESS;
 }
 
 /**
@@ -120,17 +124,20 @@ int redisxRunScriptAsync(RedisClient *cl, const char *sha1, const char **keys, c
  * @sa redisxLoadScript()
  */
 RESP *redisxRunScript(Redis *redis, const char *sha1, const char **keys, const char **params) {
+  static const char *fn = "redisxRunScript";
+
   RESP *reply = NULL;
-  int status;
 
   if(redis == NULL || sha1 == NULL) return NULL;
 
-  status = redisxLockConnected(redis->interactive);
-  if (status) return NULL;
+  if(redisxLockConnected(redis->interactive) != X_SUCCESS) return x_trace_null(fn, NULL);
 
-  status = redisxRunScriptAsync(redis->interactive, sha1, keys, params);
-  if (status == X_SUCCESS) reply = redisxReadReplyAsync(redis->interactive);
+  if(redisxRunScriptAsync(redis->interactive, sha1, keys, params) == X_SUCCESS)
+    reply = redisxReadReplyAsync(redis->interactive);
 
   redisxUnlockClient(redis->interactive);
+
+  if(reply == NULL) return x_trace_null(fn, NULL);
+
   return reply;
 }
