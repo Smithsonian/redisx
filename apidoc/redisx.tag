@@ -164,13 +164,6 @@
     </member>
     <member kind="define">
       <type>#define</type>
-      <name>RESP_PONG</name>
-      <anchorfile>redisx_8h.html</anchorfile>
-      <anchor>ad5f0f923a5a47b31f21ee4301d250b6d</anchor>
-      <arglist></arglist>
-    </member>
-    <member kind="define">
-      <type>#define</type>
       <name>RESP_SIMPLE_STRING</name>
       <anchorfile>redisx_8h.html</anchorfile>
       <anchor>ab2bc8d02a9fa90910d487412704b99f3</anchor>
@@ -223,24 +216,24 @@
       <arglist>(RedisClient *cl)</arglist>
     </member>
     <member kind="function">
-      <type>void</type>
+      <type>int</type>
       <name>redisxAddConnectHook</name>
       <anchorfile>redisx_8h.html</anchorfile>
-      <anchor>aaa5c67708e8081814fdae646f6179842</anchor>
+      <anchor>aab103bdeb66dd1daded10e1f6e993568</anchor>
       <arglist>(Redis *redis, void(*setupCall)(Redis *))</arglist>
     </member>
     <member kind="function">
-      <type>void</type>
+      <type>int</type>
       <name>redisxAddDisconnectHook</name>
       <anchorfile>redisx_8h.html</anchorfile>
-      <anchor>a84029a60375dd995580a8690f6813f9a</anchor>
+      <anchor>a37d95c69831058865b078f0f0f20d540</anchor>
       <arglist>(Redis *redis, void(*cleanupCall)(Redis *))</arglist>
     </member>
     <member kind="function">
-      <type>void</type>
+      <type>int</type>
       <name>redisxAddSubscriber</name>
       <anchorfile>redisx_8h.html</anchorfile>
-      <anchor>a8a31ecaa0f83150366b72aa9b47755f0</anchor>
+      <anchor>a4c268c33f23438af67117b09c26ec615</anchor>
       <arglist>(Redis *redis, const char *channelStem, RedisSubscriberCall f)</arglist>
     </member>
     <member kind="function">
@@ -328,10 +321,10 @@
       <arglist>(Redis *redis)</arglist>
     </member>
     <member kind="function">
-      <type>void</type>
+      <type>int</type>
       <name>redisxEndSubscription</name>
       <anchorfile>redisx_8h.html</anchorfile>
-      <anchor>a07c0e7c85c3839ff0dac3ee5ae5bbcbc</anchor>
+      <anchor>acaa8ac50fb154551bfebf7fafcdc3df2</anchor>
       <arglist>(Redis *redis)</arglist>
     </member>
     <member kind="function">
@@ -524,17 +517,17 @@
       <arglist>(Redis *redis, boolean usePipeline)</arglist>
     </member>
     <member kind="function">
-      <type>void</type>
+      <type>int</type>
       <name>redisxRemoveConnectHook</name>
       <anchorfile>redisx_8h.html</anchorfile>
-      <anchor>adee8fd1fee45e38eec5ff8e1356bd6f1</anchor>
+      <anchor>aa6b85dc9160e50da8a47152d2995a3dd</anchor>
       <arglist>(Redis *redis, void(*setupCall)(Redis *))</arglist>
     </member>
     <member kind="function">
-      <type>void</type>
+      <type>int</type>
       <name>redisxRemoveDisconnectHook</name>
       <anchorfile>redisx_8h.html</anchorfile>
-      <anchor>a1cbb19408f67f3a1997bb7c0793b2380</anchor>
+      <anchor>a7d57699ce7c728a4c936a4ba040b12f0</anchor>
       <arglist>(Redis *redis, void(*cleanupCall)(Redis *))</arglist>
     </member>
     <member kind="function">
@@ -601,17 +594,17 @@
       <arglist>(Redis *redis, void(*f)(RESP *))</arglist>
     </member>
     <member kind="function">
-      <type>void</type>
+      <type>int</type>
       <name>redisxSetPort</name>
       <anchorfile>redisx_8h.html</anchorfile>
-      <anchor>a7e632b56ced17fe2103f325f2aea53a3</anchor>
+      <anchor>a37f39ede48014a2463e4c72bf6eb5a3e</anchor>
       <arglist>(Redis *redis, int port)</arglist>
     </member>
     <member kind="function">
-      <type>void</type>
+      <type>int</type>
       <name>redisxSetScanCount</name>
       <anchorfile>redisx_8h.html</anchorfile>
-      <anchor>ad299cc621ad0dab54c6f7a7fd6770db9</anchor>
+      <anchor>a3bd0d2964966ed6655358ff2fe0802c0</anchor>
       <arglist>(Redis *redis, int count)</arglist>
     </member>
     <member kind="function">
@@ -814,17 +807,17 @@
     <path>src/</path>
     <filename>redisx-hooks_8c.html</filename>
     <member kind="function">
-      <type>void</type>
+      <type>int</type>
       <name>redisxAddConnectHook</name>
       <anchorfile>redisx-hooks_8c.html</anchorfile>
-      <anchor>aaa5c67708e8081814fdae646f6179842</anchor>
+      <anchor>aab103bdeb66dd1daded10e1f6e993568</anchor>
       <arglist>(Redis *redis, void(*setupCall)(Redis *))</arglist>
     </member>
     <member kind="function">
-      <type>void</type>
+      <type>int</type>
       <name>redisxAddDisconnectHook</name>
       <anchorfile>redisx-hooks_8c.html</anchorfile>
-      <anchor>a84029a60375dd995580a8690f6813f9a</anchor>
+      <anchor>a37d95c69831058865b078f0f0f20d540</anchor>
       <arglist>(Redis *redis, void(*cleanupCall)(Redis *))</arglist>
     </member>
     <member kind="function">
@@ -842,17 +835,17 @@
       <arglist>(Redis *redis)</arglist>
     </member>
     <member kind="function">
-      <type>void</type>
+      <type>int</type>
       <name>redisxRemoveConnectHook</name>
       <anchorfile>redisx-hooks_8c.html</anchorfile>
-      <anchor>adee8fd1fee45e38eec5ff8e1356bd6f1</anchor>
+      <anchor>aa6b85dc9160e50da8a47152d2995a3dd</anchor>
       <arglist>(Redis *redis, void(*setupCall)(Redis *))</arglist>
     </member>
     <member kind="function">
-      <type>void</type>
+      <type>int</type>
       <name>redisxRemoveDisconnectHook</name>
       <anchorfile>redisx-hooks_8c.html</anchorfile>
-      <anchor>a1cbb19408f67f3a1997bb7c0793b2380</anchor>
+      <anchor>a7d57699ce7c728a4c936a4ba040b12f0</anchor>
       <arglist>(Redis *redis, void(*cleanupCall)(Redis *))</arglist>
     </member>
   </compound>
@@ -910,10 +903,10 @@
       <arglist>(Redis *redis, boolean usePipeline)</arglist>
     </member>
     <member kind="function">
-      <type>void</type>
+      <type>int</type>
       <name>redisxSetPort</name>
       <anchorfile>redisx-net_8c.html</anchorfile>
-      <anchor>a7e632b56ced17fe2103f325f2aea53a3</anchor>
+      <anchor>a37f39ede48014a2463e4c72bf6eb5a3e</anchor>
       <arglist>(Redis *redis, int port)</arglist>
     </member>
     <member kind="function">
@@ -955,10 +948,10 @@
     <path>src/</path>
     <filename>redisx-sub_8c.html</filename>
     <member kind="function">
-      <type>void</type>
+      <type>int</type>
       <name>redisxAddSubscriber</name>
       <anchorfile>redisx-sub_8c.html</anchorfile>
-      <anchor>a8a31ecaa0f83150366b72aa9b47755f0</anchor>
+      <anchor>a4c268c33f23438af67117b09c26ec615</anchor>
       <arglist>(Redis *redis, const char *channelStem, RedisSubscriberCall f)</arglist>
     </member>
     <member kind="function">
@@ -969,10 +962,10 @@
       <arglist>(Redis *redis)</arglist>
     </member>
     <member kind="function">
-      <type>void</type>
+      <type>int</type>
       <name>redisxEndSubscription</name>
       <anchorfile>redisx-sub_8c.html</anchorfile>
-      <anchor>a07c0e7c85c3839ff0dac3ee5ae5bbcbc</anchor>
+      <anchor>acaa8ac50fb154551bfebf7fafcdc3df2</anchor>
       <arglist>(Redis *redis)</arglist>
     </member>
     <member kind="function">
@@ -1107,10 +1100,10 @@
       <arglist>(Redis *redis, const char *table, const char *pattern, int *n, int *status)</arglist>
     </member>
     <member kind="function">
-      <type>void</type>
+      <type>int</type>
       <name>redisxSetScanCount</name>
       <anchorfile>redisx-tab_8c.html</anchorfile>
-      <anchor>ad299cc621ad0dab54c6f7a7fd6770db9</anchor>
+      <anchor>a3bd0d2964966ed6655358ff2fe0802c0</anchor>
       <arglist>(Redis *redis, int count)</arglist>
     </member>
     <member kind="function">

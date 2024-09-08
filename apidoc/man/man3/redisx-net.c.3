@@ -31,7 +31,7 @@ src/redisx-net.c
 .RI "int \fBredisxReconnect\fP (\fBRedis\fP *redis, \fBboolean\fP usePipeline)"
 .br
 .ti -1c
-.RI "void \fBredisxSetPort\fP (\fBRedis\fP *redis, int port)"
+.RI "int \fBredisxSetPort\fP (\fBRedis\fP *redis, int port)"
 .br
 .ti -1c
 .RI "void \fBredisxSetTcpBuf\fP (int size)"
@@ -69,7 +69,7 @@ Always NULL\&.
 .PP
 
 .PP
-References \fBFALSE\fP, \fBRESP::n\fP, \fBRedis::pipeline\fP, \fBredisxDestroyRESP()\fP, \fBredisxError()\fP, \fBredisxReadReplyAsync()\fP, \fBRESP_SIMPLE_STRING\fP, \fBRESP::type\fP, \fBX_NULL\fP, and \fBxvprintf\fP\&.
+References \fBFALSE\fP, \fBRESP::n\fP, \fBRedis::pipeline\fP, \fBredisxDestroyRESP()\fP, \fBredisxReadReplyAsync()\fP, \fBRESP_SIMPLE_STRING\fP, \fBRESP::type\fP, \fBx_error()\fP, and \fBxvprintf\fP\&.
 .SS "int redisxConnect (\fBRedis\fP * redis, \fBboolean\fP usePipeline)"
 Connects to a REDIS server\&.
 .PP
@@ -104,7 +104,7 @@ X_SUCCESS (0) if successfully connected to the REDIS server\&. X_NO_INIT if libr
 .PP
 
 .PP
-References \fBredisxError()\fP, \fBX_NULL\fP, and \fBX_SUCCESS\fP\&.
+References \fBx_error()\fP, \fBX_NULL\fP, and \fBX_SUCCESS\fP\&.
 .SS "void redisxDestroy (\fBRedis\fP * redis)"
 Destroys a \fBRedis\fP intance, disconnecting any clients that may be connected, and freeing all resources used by that \fBRedis\fP instance\&.
 .PP
@@ -140,7 +140,7 @@ X_SUCCESS or X_FAILURE if the IP address is invalid\&. X_NULL if the IP address 
 .PP
 
 .PP
-References \fBFALSE\fP, \fBRedis::id\fP, \fBRedis::interactive\fP, \fBRedis::pipeline\fP, \fBREDISX_CHANNELS\fP, \fBREDISX_INTERACTIVE_CHANNEL\fP, \fBREDISX_PIPELINE_CHANNEL\fP, \fBREDISX_SUBSCRIPTION_CHANNEL\fP, \fBREDISX_TCP_PORT\fP, \fBRedis::subscription\fP, \fBTRUE\fP, and \fBxStringCopyOf()\fP\&.
+References \fBFALSE\fP, \fBRedis::id\fP, \fBRedis::interactive\fP, \fBRedis::pipeline\fP, \fBREDISX_CHANNELS\fP, \fBREDISX_INTERACTIVE_CHANNEL\fP, \fBREDISX_PIPELINE_CHANNEL\fP, \fBREDISX_SUBSCRIPTION_CHANNEL\fP, \fBREDISX_TCP_PORT\fP, \fBRedis::subscription\fP, \fBTRUE\fP, \fBx_error()\fP, \fBx_trace_null()\fP, and \fBxStringCopyOf()\fP\&.
 .SS "\fBboolean\fP redisxIsConnected (\fBRedis\fP * redis)"
 Checks if a \fBRedis\fP instance is connected\&.
 .PP
@@ -174,8 +174,8 @@ X_SUCCESS (0) if successful X_NULL if the \fBRedis\fP instance is NULL
 .PP
 or else an error as would be returned by \fBredisxConnect()\fP\&. 
 .PP
-References \fBredisxError()\fP, and \fBX_NULL\fP\&.
-.SS "void redisxSetPort (\fBRedis\fP * redis, int port)"
+References \fBx_error()\fP, \fBX_NULL\fP, and \fBX_SUCCESS\fP\&.
+.SS "int redisxSetPort (\fBRedis\fP * redis, int port)"
 Sets a non-standard TCP port number to use for the \fBRedis\fP server, prior to calling \fC\fBredisxConnect()\fP\fP\&.
 .PP
 \fBParameters\fP
@@ -192,7 +192,7 @@ Sets a non-standard TCP port number to use for the \fBRedis\fP server, prior to 
 .PP
 
 .PP
-References \fBredisxError()\fP, and \fBX_NULL\fP\&.
+References \fBx_error()\fP, \fBX_NULL\fP, and \fBX_SUCCESS\fP\&.
 .SS "void redisxSetTcpBuf (int size)"
 Set the size of the TCP/IP buffers (send and receive) for future client connections\&.
 .PP

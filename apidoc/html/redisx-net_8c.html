@@ -134,8 +134,8 @@ Functions</h2></td></tr>
 <tr class="separator:a94326ebfa5868579c8448cdbb941b3da"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a55a2efad7c8d8f840f4144a217f58965" id="r_a55a2efad7c8d8f840f4144a217f58965"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="redisx-net_8c.html#a55a2efad7c8d8f840f4144a217f58965">redisxReconnect</a> (<a class="el" href="structRedis.html">Redis</a> *redis, <a class="elRef" href="../../xchange/apidoc/html/xchange_8h.html#a621c38f1f10a1c565d897e3178b16d6e">boolean</a> usePipeline)</td></tr>
 <tr class="separator:a55a2efad7c8d8f840f4144a217f58965"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a7e632b56ced17fe2103f325f2aea53a3" id="r_a7e632b56ced17fe2103f325f2aea53a3"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="redisx-net_8c.html#a7e632b56ced17fe2103f325f2aea53a3">redisxSetPort</a> (<a class="el" href="structRedis.html">Redis</a> *redis, int port)</td></tr>
-<tr class="separator:a7e632b56ced17fe2103f325f2aea53a3"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a37f39ede48014a2463e4c72bf6eb5a3e" id="r_a37f39ede48014a2463e4c72bf6eb5a3e"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="redisx-net_8c.html#a37f39ede48014a2463e4c72bf6eb5a3e">redisxSetPort</a> (<a class="el" href="structRedis.html">Redis</a> *redis, int port)</td></tr>
+<tr class="separator:a37f39ede48014a2463e4c72bf6eb5a3e"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a83fce113d042490e77efdc574e64d76f" id="r_a83fce113d042490e77efdc574e64d76f"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="redisx-net_8c.html#a83fce113d042490e77efdc574e64d76f">redisxSetTcpBuf</a> (int size)</td></tr>
 <tr class="separator:a83fce113d042490e77efdc574e64d76f"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
@@ -168,7 +168,7 @@ Functions</h2></td></tr>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>Always NULL. </dd></dl>
 
-<p class="reference">References <a class="elRef" href="../../xchange/apidoc/html/xchange_8h.html#aa93f0eb578d23995850d61f7d61c55c1">FALSE</a>, <a class="el" href="structRESP.html#a76f11d9a0a47b94f72c2d0e77fb32240">RESP::n</a>, <a class="el" href="structRedis.html#a59d367a240bf9c00366465d842402de8">Redis::pipeline</a>, <a class="el" href="redisx_8c.html#aa4e23a7454f7055711915ec430599011">redisxDestroyRESP()</a>, <a class="el" href="redisx_8c.html#ae722b046fa70a55db725341ef8ee56dc">redisxError()</a>, <a class="el" href="redisx-client_8c.html#abc855133c2af4f5d929a05292aa634d1">redisxReadReplyAsync()</a>, <a class="el" href="redisx_8h.html#ab2bc8d02a9fa90910d487412704b99f3">RESP_SIMPLE_STRING</a>, <a class="el" href="structRESP.html#aff17911edc8208aa8ddb1c7c52c78389">RESP::type</a>, <a class="elRef" href="../../xchange/apidoc/html/xchange_8h.html#aadbbe3ae01369cbddf4d57d430b33133">X_NULL</a>, and <a class="elRef" href="../../xchange/apidoc/html/xchange_8h.html#a1f038bf7ddb58819805cfc44162cb403">xvprintf</a>.</p>
+<p class="reference">References <a class="elRef" href="../../xchange/apidoc/html/xchange_8h.html#aa93f0eb578d23995850d61f7d61c55c1">FALSE</a>, <a class="el" href="structRESP.html#a76f11d9a0a47b94f72c2d0e77fb32240">RESP::n</a>, <a class="el" href="structRedis.html#a59d367a240bf9c00366465d842402de8">Redis::pipeline</a>, <a class="el" href="redisx_8c.html#aa4e23a7454f7055711915ec430599011">redisxDestroyRESP()</a>, <a class="el" href="redisx-client_8c.html#abc855133c2af4f5d929a05292aa634d1">redisxReadReplyAsync()</a>, <a class="el" href="redisx_8h.html#ab2bc8d02a9fa90910d487412704b99f3">RESP_SIMPLE_STRING</a>, <a class="el" href="structRESP.html#aff17911edc8208aa8ddb1c7c52c78389">RESP::type</a>, <a class="elRef" href="../../xchange/apidoc/html/xchange_8c.html#ae73aaf705dc4e7d58dfb0fd81f4805c7">x_error()</a>, and <a class="elRef" href="../../xchange/apidoc/html/xchange_8h.html#a1f038bf7ddb58819805cfc44162cb403">xvprintf</a>.</p>
 
 </div>
 </div>
@@ -208,7 +208,7 @@ Functions</h2></td></tr>
 <dl class="section return"><dt>Returns</dt><dd>X_SUCCESS (0) if successfully connected to the REDIS server. X_NO_INIT if library was not initialized via initRedis(). X_ALREADY_OPEN if already connected. X_NO_SERVICE if the connection failed. X_NULL if the redis argument is NULL.</dd></dl>
 <dl class="section see"><dt>See also</dt><dd><a class="el" href="redisx-net_8c.html#a5c78c2189a76a077231016564a0cecd5">redisxInit()</a> </dd>
 <dd>
-<a class="el" href="redisx-net_8c.html#a7e632b56ced17fe2103f325f2aea53a3">redisxSetPort()</a> </dd>
+<a class="el" href="redisx-net_8c.html#a37f39ede48014a2463e4c72bf6eb5a3e">redisxSetPort()</a> </dd>
 <dd>
 <a class="el" href="redisx_8c.html#a3beff3a9e373a0f1de626a8e64da98cf">redisxSetUser()</a> </dd>
 <dd>
@@ -220,7 +220,7 @@ Functions</h2></td></tr>
 <dd>
 <a class="el" href="redisx-net_8c.html#acae5ab8af4db1c4ab13c4069aa744a44">redisxDisconnect()</a> </dd></dl>
 
-<p class="reference">References <a class="el" href="redisx_8c.html#ae722b046fa70a55db725341ef8ee56dc">redisxError()</a>, <a class="elRef" href="../../xchange/apidoc/html/xchange_8h.html#aadbbe3ae01369cbddf4d57d430b33133">X_NULL</a>, and <a class="elRef" href="../../xchange/apidoc/html/xchange_8h.html#a7b2679c964ea5f2160380ed55654b873">X_SUCCESS</a>.</p>
+<p class="reference">References <a class="elRef" href="../../xchange/apidoc/html/xchange_8c.html#ae73aaf705dc4e7d58dfb0fd81f4805c7">x_error()</a>, <a class="elRef" href="../../xchange/apidoc/html/xchange_8h.html#aadbbe3ae01369cbddf4d57d430b33133">X_NULL</a>, and <a class="elRef" href="../../xchange/apidoc/html/xchange_8h.html#a7b2679c964ea5f2160380ed55654b873">X_SUCCESS</a>.</p>
 
 </div>
 </div>
@@ -300,7 +300,7 @@ Functions</h2></td></tr>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>X_SUCCESS or X_FAILURE if the IP address is invalid. X_NULL if the IP address is NULL. </dd></dl>
 
-<p class="reference">References <a class="elRef" href="../../xchange/apidoc/html/xchange_8h.html#aa93f0eb578d23995850d61f7d61c55c1">FALSE</a>, <a class="el" href="structRedis.html#aecb3b0d045ada529257a2fbf8f829599">Redis::id</a>, <a class="el" href="structRedis.html#af51011d99955d6f036a9f2c291577749">Redis::interactive</a>, <a class="el" href="structRedis.html#a59d367a240bf9c00366465d842402de8">Redis::pipeline</a>, <a class="el" href="redisx_8h.html#aa748f96c61478c3fbef8074021dee901">REDISX_CHANNELS</a>, <a class="el" href="redisx_8h.html#a5349b7340813fbd1e32d04ed650bc3d9a65b4f2926885665960480d008ab2a456">REDISX_INTERACTIVE_CHANNEL</a>, <a class="el" href="redisx_8h.html#a5349b7340813fbd1e32d04ed650bc3d9a7a240839c1e943706535b8d69a605f0c">REDISX_PIPELINE_CHANNEL</a>, <a class="el" href="redisx_8h.html#a5349b7340813fbd1e32d04ed650bc3d9afafc30afa687bc5c56c42b0e677f5981">REDISX_SUBSCRIPTION_CHANNEL</a>, <a class="el" href="redisx_8h.html#aecec1b5bff8cfc6bd9407b848b09f20d">REDISX_TCP_PORT</a>, <a class="el" href="structRedis.html#aa4878fb8cef61468ee8e7426a973a75c">Redis::subscription</a>, <a class="elRef" href="../../xchange/apidoc/html/xchange_8h.html#aa8cecfc5c5c054d2875c03e77b7be15d">TRUE</a>, and <a class="elRef" href="../../xchange/apidoc/html/xchange_8h.html#a01d730a1a98963816de2dd73e72957a5">xStringCopyOf()</a>.</p>
+<p class="reference">References <a class="elRef" href="../../xchange/apidoc/html/xchange_8h.html#aa93f0eb578d23995850d61f7d61c55c1">FALSE</a>, <a class="el" href="structRedis.html#aecb3b0d045ada529257a2fbf8f829599">Redis::id</a>, <a class="el" href="structRedis.html#af51011d99955d6f036a9f2c291577749">Redis::interactive</a>, <a class="el" href="structRedis.html#a59d367a240bf9c00366465d842402de8">Redis::pipeline</a>, <a class="el" href="redisx_8h.html#aa748f96c61478c3fbef8074021dee901">REDISX_CHANNELS</a>, <a class="el" href="redisx_8h.html#a5349b7340813fbd1e32d04ed650bc3d9a65b4f2926885665960480d008ab2a456">REDISX_INTERACTIVE_CHANNEL</a>, <a class="el" href="redisx_8h.html#a5349b7340813fbd1e32d04ed650bc3d9a7a240839c1e943706535b8d69a605f0c">REDISX_PIPELINE_CHANNEL</a>, <a class="el" href="redisx_8h.html#a5349b7340813fbd1e32d04ed650bc3d9afafc30afa687bc5c56c42b0e677f5981">REDISX_SUBSCRIPTION_CHANNEL</a>, <a class="el" href="redisx_8h.html#aecec1b5bff8cfc6bd9407b848b09f20d">REDISX_TCP_PORT</a>, <a class="el" href="structRedis.html#aa4878fb8cef61468ee8e7426a973a75c">Redis::subscription</a>, <a class="elRef" href="../../xchange/apidoc/html/xchange_8h.html#aa8cecfc5c5c054d2875c03e77b7be15d">TRUE</a>, <a class="elRef" href="../../xchange/apidoc/html/xchange_8c.html#ae73aaf705dc4e7d58dfb0fd81f4805c7">x_error()</a>, <a class="elRef" href="../../xchange/apidoc/html/xchange_8c.html#ac39ae03ca89b115d49a12f633522dc31">x_trace_null()</a>, and <a class="elRef" href="../../xchange/apidoc/html/xchange_8h.html#a01d730a1a98963816de2dd73e72957a5">xStringCopyOf()</a>.</p>
 
 </div>
 </div>
@@ -368,18 +368,18 @@ Functions</h2></td></tr>
 <dl class="section return"><dt>Returns</dt><dd>X_SUCCESS (0) if successful X_NULL if the <a class="el" href="structRedis.html" title="Structure that represents a Redis database instance, with one or more RedisClient connections.">Redis</a> instance is NULL</dd></dl>
 <p>or else an error as would be returned by <a class="el" href="redisx-net_8c.html#ad71822356ffd40ed4b1c71d065f48809">redisxConnect()</a>. </p>
 
-<p class="reference">References <a class="el" href="redisx_8c.html#ae722b046fa70a55db725341ef8ee56dc">redisxError()</a>, and <a class="elRef" href="../../xchange/apidoc/html/xchange_8h.html#aadbbe3ae01369cbddf4d57d430b33133">X_NULL</a>.</p>
+<p class="reference">References <a class="elRef" href="../../xchange/apidoc/html/xchange_8c.html#ae73aaf705dc4e7d58dfb0fd81f4805c7">x_error()</a>, <a class="elRef" href="../../xchange/apidoc/html/xchange_8h.html#aadbbe3ae01369cbddf4d57d430b33133">X_NULL</a>, and <a class="elRef" href="../../xchange/apidoc/html/xchange_8h.html#a7b2679c964ea5f2160380ed55654b873">X_SUCCESS</a>.</p>
 
 </div>
 </div>
-<a id="a7e632b56ced17fe2103f325f2aea53a3" name="a7e632b56ced17fe2103f325f2aea53a3"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a7e632b56ced17fe2103f325f2aea53a3">&#9670;&#160;</a></span>redisxSetPort()</h2>
+<a id="a37f39ede48014a2463e4c72bf6eb5a3e" name="a37f39ede48014a2463e4c72bf6eb5a3e"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a37f39ede48014a2463e4c72bf6eb5a3e">&#9670;&#160;</a></span>redisxSetPort()</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">void redisxSetPort </td>
+          <td class="memname">int redisxSetPort </td>
           <td>(</td>
           <td class="paramtype"><a class="el" href="structRedis.html">Redis</a> *&#160;</td>
           <td class="paramname"><em>redis</em>, </td>
@@ -407,7 +407,7 @@ Functions</h2></td></tr>
 </dl>
 <dl class="section see"><dt>See also</dt><dd><a class="el" href="redisx-net_8c.html#ad71822356ffd40ed4b1c71d065f48809">redisxConnect()</a>; </dd></dl>
 
-<p class="reference">References <a class="el" href="redisx_8c.html#ae722b046fa70a55db725341ef8ee56dc">redisxError()</a>, and <a class="elRef" href="../../xchange/apidoc/html/xchange_8h.html#aadbbe3ae01369cbddf4d57d430b33133">X_NULL</a>.</p>
+<p class="reference">References <a class="elRef" href="../../xchange/apidoc/html/xchange_8c.html#ae73aaf705dc4e7d58dfb0fd81f4805c7">x_error()</a>, <a class="elRef" href="../../xchange/apidoc/html/xchange_8h.html#aadbbe3ae01369cbddf4d57d430b33133">X_NULL</a>, and <a class="elRef" href="../../xchange/apidoc/html/xchange_8h.html#a7b2679c964ea5f2160380ed55654b873">X_SUCCESS</a>.</p>
 
 </div>
 </div>

@@ -24,6 +24,5 @@ var searchData=
   ['resp_5fbulk_5fstring_21',['RESP_BULK_STRING',['../redisx_8h.html#a980fc225ec0392474ff67e319a33f028',1,'redisx.h']]],
   ['resp_5ferror_22',['RESP_ERROR',['../redisx_8h.html#a37dfdba3cdcf140c38564c1a6856c04a',1,'redisx.h']]],
   ['resp_5fint_23',['RESP_INT',['../redisx_8h.html#aea77070444458837e0955ae1e89bd9d0',1,'redisx.h']]],
-  ['resp_5fpong_24',['RESP_PONG',['../redisx_8h.html#ad5f0f923a5a47b31f21ee4301d250b6d',1,'redisx.h']]],
-  ['resp_5fsimple_5fstring_25',['RESP_SIMPLE_STRING',['../redisx_8h.html#ab2bc8d02a9fa90910d487412704b99f3',1,'redisx.h']]]
+  ['resp_5fsimple_5fstring_24',['RESP_SIMPLE_STRING',['../redisx_8h.html#ab2bc8d02a9fa90910d487412704b99f3',1,'redisx.h']]]
 ];

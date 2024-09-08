@@ -55,7 +55,7 @@ X_SUCCESS (0) if the script has been successfully loaded into \fBRedis\fP, or X_
 .PP
 ot an error returned by \fBredisxRequest()\fP\&. 
 .PP
-References \fBredisxCheckDestroyRESP()\fP, \fBredisxDestroyRESP()\fP, \fBredisxError()\fP, \fBredisxRequest()\fP, \fBRESP_BULK_STRING\fP, \fBRESP::value\fP, \fBX_NAME_INVALID\fP, \fBX_NULL\fP, and \fBX_SUCCESS\fP\&.
+References \fBredisxCheckDestroyRESP()\fP, \fBredisxDestroyRESP()\fP, \fBredisxRequest()\fP, \fBRESP_BULK_STRING\fP, \fBRESP::value\fP, \fBx_error()\fP, \fBX_NULL\fP, \fBX_SUCCESS\fP, and \fBx_trace()\fP\&.
 .SS "\fBRESP\fP * redisxRunScript (\fBRedis\fP * redis, const char * sha1, const char ** keys, const char ** params)"
 Runs a LUA script that has been loaded into the \fBRedis\fP database, returning the response received, or NULL if there was an error\&.
 .PP
@@ -84,7 +84,7 @@ The response received from the script or the EVALSHA request, or NULL if there w
 .PP
 
 .PP
-References \fBRedis::interactive\fP, \fBredisxLockConnected()\fP, \fBredisxReadReplyAsync()\fP, \fBredisxRunScriptAsync()\fP, \fBredisxUnlockClient()\fP, and \fBX_SUCCESS\fP\&.
+References \fBRedis::interactive\fP, \fBredisxLockConnected()\fP, \fBredisxReadReplyAsync()\fP, \fBredisxRunScriptAsync()\fP, \fBredisxUnlockClient()\fP, \fBX_SUCCESS\fP, and \fBx_trace_null()\fP\&.
 .SS "int redisxRunScriptAsync (\fBRedisClient\fP * cl, const char * sha1, const char ** keys, const char ** params)"
 Send a request to runs a LUA script that has been loaded into the \fBRedis\fP database\&. This function should be called with the connected client's mutex locked\&. The call returns as soon as the request has been sent, without waiting for a response to come back\&.
 .PP
@@ -115,7 +115,7 @@ X_SUCCESS (0) if successful or else X_NULL if the \fCredis\fP or \fCsha1\fP para
 .PP
 
 .PP
-References \fBredisxError()\fP, \fBredisxSendArrayRequestAsync()\fP, and \fBX_NULL\fP\&.
+References \fBredisxSendArrayRequestAsync()\fP, \fBx_error()\fP, \fBX_NULL\fP, and \fBX_SUCCESS\fP\&.
 .SH "Author"
 .PP 
 Generated automatically by Doxygen for RedisX from the source code\&.

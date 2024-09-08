@@ -21,10 +21,10 @@ A simple, light-weight C/C++ Redis client library.
 <a name="introduction"></a>
 ## Introduction
 
-__RedisX__ is a light-weight [Redis](https://redis.io) client for C/C++. As such, it should also work with Redis forks 
-/ clones like [Dragonfly](https://dragonfly.io) or [Valkey](https://valkey.io). It supports both interactive and 
-pipelined Redis queries, managing and processing subscriptions, atomic execution blocks, and LUA scripts loading. It 
-can be used with multiple Redis servers simultaneously also.
+__RedisX__ is a light-weight [Redis](https://redis.io) client library for C/C++. As such, it should also work with 
+Redis forks / clones like [Dragonfly](https://dragonfly.io) or [Valkey](https://valkey.io). It supports both 
+interactive and pipelined Redis queries, managing and processing subscriptions, atomic execution blocks, and LUA 
+scripts loading. It can be used with multiple Redis servers simultaneously also.
 
 While there are other C/C++ Redis clients available, this one is C90 compatible, and hence can be used on older 
 platforms also. It is also small and fast, but still capable and versatile.
@@ -138,7 +138,7 @@ the default 6379), and the database authentication (if any):
 ```
 
 You might also tweak the send/receive buffer sizes to use for clients, if you find the socket defaults sub-optimal for
-you application:
+your application:
 
 ```c
    // (optional) Set the TCP send/rcv buffer sizes to use if not default values.
@@ -146,7 +146,7 @@ you application:
    redisxSetTcpBuf(65536);
 ```
 
-Optionally you can select the database index to use now (or later, after connecting), if not the default (index 
+Optionally, you can select the database index to use now (or later, after connecting), if not the default (index 
 0):
 
 ```c
@@ -859,7 +859,9 @@ practices to help deal with pipeline responses are summarized here:
    `"@my_resp_processor: START sequence A"`, or something else meaningful that you can uniquely distinguish from all
    other responses that you might receive.
   
-
+__RedisX__ optimizes the pipeline client for high throughput (bandwidth), whereas the interactive and subscription 
+clients are optimized for low-latency, at the socket level.
+  
 -----------------------------------------------------------------------------
 
 <a name="error-handling"></a>

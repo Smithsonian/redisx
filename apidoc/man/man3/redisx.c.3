@@ -123,7 +123,7 @@ A freshly allocated \fBRESP\fP array containing the \fBRedis\fP response, or NUL
 .PP
 
 .PP
-References \fBRedis::interactive\fP, \fBredisxError()\fP, \fBredisxLockConnected()\fP, \fBredisxReadReplyAsync()\fP, \fBredisxSendArrayRequestAsync()\fP, \fBredisxUnlockClient()\fP, \fBX_NULL\fP, \fBX_SUCCESS\fP, and \fBxvprintf\fP\&.
+References \fBRedis::interactive\fP, \fBredisxLockConnected()\fP, \fBredisxReadReplyAsync()\fP, \fBredisxSendArrayRequestAsync()\fP, \fBredisxUnlockClient()\fP, \fBx_error()\fP, \fBX_NULL\fP, \fBX_SUCCESS\fP, \fBx_trace_null()\fP, and \fBxvprintf\fP\&.
 .SS "int redisxCheckDestroyRESP (\fBRESP\fP * resp, char expectedType, int expectedSize)"
 Like \fBredisxCheckRESP()\fP, but it also destroys the \fBRESP\fP in case of an error\&.
 .PP
@@ -231,7 +231,7 @@ X_SUCCESS (0) if successful, or X_NULL if either argument is NULL, or X_PARSE_ER
 .PP
 
 .PP
-References \fBredisxCheckDestroyRESP()\fP, \fBredisxCheckRESP()\fP, \fBredisxDestroyRESP()\fP, \fBredisxError()\fP, \fBredisxRequest()\fP, \fBRESP_ARRAY\fP, \fBRESP_BULK_STRING\fP, \fBRESP::value\fP, \fBX_NULL\fP, \fBX_PARSE_ERROR\fP, and \fBX_SUCCESS\fP\&.
+References \fBredisxCheckDestroyRESP()\fP, \fBredisxCheckRESP()\fP, \fBredisxDestroyRESP()\fP, \fBredisxRequest()\fP, \fBRESP_ARRAY\fP, \fBRESP_BULK_STRING\fP, \fBRESP::value\fP, \fBx_error()\fP, \fBX_NULL\fP, \fBX_PARSE_ERROR\fP, \fBX_SUCCESS\fP, and \fBx_trace()\fP\&.
 .SS "\fBboolean\fP redisxHasPipeline (\fBRedis\fP * redis)"
 Checks if a \fBRedis\fP instance has the pipeline connection enabled\&.
 .PP
@@ -276,7 +276,7 @@ X_SUCCESS (0) if successful, or else an error code (<0) from \fBredisx\&.h\fP / 
 .PP
 
 .PP
-References \fBREDIS_UNEXPECTED_RESP\fP, \fBredisxCheckRESP()\fP, \fBredisxDestroyRESP()\fP, \fBredisxError()\fP, \fBredisxRequest()\fP, \fBRESP_BULK_STRING\fP, \fBRESP_SIMPLE_STRING\fP, \fBRESP::value\fP, \fBX_NULL\fP, and \fBX_SUCCESS\fP\&.
+References \fBREDIS_UNEXPECTED_RESP\fP, \fBredisxCheckRESP()\fP, \fBredisxDestroyRESP()\fP, \fBredisxRequest()\fP, \fBRESP_BULK_STRING\fP, \fBRESP_SIMPLE_STRING\fP, \fBRESP::value\fP, \fBx_error()\fP, \fBX_NULL\fP, and \fBX_SUCCESS\fP\&.
 .SS "\fBRESP\fP * redisxRequest (\fBRedis\fP * redis, const char * command, const char * arg1, const char * arg2, const char * arg3, int * status)"
 Returns the result of a \fBRedis\fP command with up to 3 regularly terminated string arguments\&. This is not the highest throughput mode (that would be sending asynchronous pipeline request, and then asynchronously collecting the results such as with \fBredisxSendRequestAsync()\fP / \fBredisxReadReplyAsync()\fP, because it requires separate network roundtrips for each and every request\&. But, it is simple and perfectly good method when one needs to retrieve only a few (<1000) variables per second\&.\&.\&.
 .PP
@@ -313,7 +313,7 @@ A freshly allocated \fBRESP\fP array containing the \fBRedis\fP response, or NUL
 .PP
 
 .PP
-References \fBredisxArrayRequest()\fP\&.
+References \fBredisxArrayRequest()\fP, \fBx_error()\fP, \fBX_NULL\fP, and \fBx_trace_null()\fP\&.
 .SS "int redisxSelectDB (\fBRedis\fP * redis, int idx)"
 Switches to another database index on the \fBRedis\fP server\&. Note that you cannot change the database on an active PUB/SUB channel, hence the call will return X_INCOMPLETE if attempted\&. You should instead switch DB when there are no active subscriptions\&.
 .PP
@@ -338,7 +338,7 @@ X_SUCCESS (0) if successful, or X_NULL if the redis argument is NULL, X_INCOMPLE
 .PP
 
 .PP
-References \fBREDIS_INVALID_CHANNEL\fP, \fBREDISX_CHANNELS\fP, \fBREDISX_PIPELINE_CHANNEL\fP, \fBREDISX_SUBSCRIPTION_CHANNEL\fP, \fBredisxAddConnectHook()\fP, \fBredisxError()\fP, \fBredisxGetClient()\fP, \fBredisxIsConnected()\fP, \fBredisxLockConnected()\fP, \fBredisxRemoveConnectHook()\fP, \fBredisxUnlockClient()\fP, \fBX_INCOMPLETE\fP, \fBX_NULL\fP, and \fBX_SUCCESS\fP\&.
+References \fBREDIS_INVALID_CHANNEL\fP, \fBREDISX_CHANNELS\fP, \fBREDISX_PIPELINE_CHANNEL\fP, \fBREDISX_SUBSCRIPTION_CHANNEL\fP, \fBredisxAddConnectHook()\fP, \fBredisxGetClient()\fP, \fBredisxIsConnected()\fP, \fBredisxLockConnected()\fP, \fBredisxRemoveConnectHook()\fP, \fBredisxUnlockClient()\fP, \fBx_error()\fP, \fBX_INCOMPLETE\fP, \fBX_NULL\fP, \fBX_SUCCESS\fP, and \fBx_trace()\fP\&.
 .SS "int redisxSetPassword (\fBRedis\fP * redis, const char * passwd)"
 Sets the password to use for authenticating on the \fBRedis\fP server after connection\&. See the AUTH \fBRedis\fP command for more explanation\&. Naturally, you need to call this prior to connecting your \fBRedis\fP instance to have the desired effect\&.
 .PP
@@ -361,7 +361,7 @@ X_SUCCESS (0) if successful, X_NULL if the redis argument is NULL, or X_ALREADY_
 .PP
 
 .PP
-References \fBredisxError()\fP, \fBredisxIsConnected()\fP, \fBX_ALREADY_OPEN\fP, \fBX_NULL\fP, \fBX_SUCCESS\fP, and \fBxStringCopyOf()\fP\&.
+References \fBredisxIsConnected()\fP, \fBX_ALREADY_OPEN\fP, \fBx_error()\fP, \fBX_NULL\fP, \fBX_SUCCESS\fP, and \fBxStringCopyOf()\fP\&.
 .SS "int redisxSetPipelineConsumer (\fBRedis\fP * redis, void(*)(\fBRESP\fP *) f)"
 Sets the function processing valid pipeline responses\&.
 .PP
@@ -379,7 +379,7 @@ X_SUCCESS (0) if successful, or X_NULL if the \fBRedis\fP instance is NULL\&.
 .PP
 
 .PP
-References \fBredisxError()\fP, \fBX_NULL\fP, and \fBX_SUCCESS\fP\&.
+References \fBx_error()\fP, \fBX_NULL\fP, and \fBX_SUCCESS\fP\&.
 .SS "int redisxSetTransmitErrorHandler (\fBRedis\fP * redis, \fBRedisErrorHandler\fP f)"
 Sets the user-specific error handler to call if a socket level trasmit error occurs\&. It replaces any prior handlers set earlier\&.
 .PP
@@ -397,7 +397,7 @@ X_SUCCESS if the handler was successfully configured, or X_NULL if the \fBRedis\
 .PP
 
 .PP
-References \fBX_NULL\fP, and \fBX_SUCCESS\fP\&.
+References \fBx_error()\fP, \fBX_NULL\fP, and \fBX_SUCCESS\fP\&.
 .SS "int redisxSetUser (\fBRedis\fP * redis, const char * username)"
 Sets the user name to use for authenticating on the \fBRedis\fP server after connection\&. See the \fCAUTH\fP \fBRedis\fP command for more explanation\&. Naturally, you need to call this prior to connecting your \fBRedis\fP instance to have the desired effect\&.
 .PP
@@ -420,7 +420,7 @@ X_SUCCESS (0) if successful, X_NULL if the redis argument is NULL, or X_ALREADY_
 .PP
 
 .PP
-References \fBredisxError()\fP, \fBredisxIsConnected()\fP, \fBX_ALREADY_OPEN\fP, \fBX_NULL\fP, \fBX_SUCCESS\fP, and \fBxStringCopyOf()\fP\&.
+References \fBredisxIsConnected()\fP, \fBX_ALREADY_OPEN\fP, \fBx_error()\fP, \fBX_NULL\fP, \fBX_SUCCESS\fP, and \fBxStringCopyOf()\fP\&.
 .SS "void redisxSetVerbose (\fBboolean\fP value)"
 Enable or disable verbose reporting of all \fBRedis\fP operations (and possibly some details of them)\&. Reporting is done on the standard output (stdout)\&. It may be useful when debugging programs that use the redisx interface\&. Verbose reporting is DISABLED by default\&.
 .PP

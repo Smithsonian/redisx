@@ -1,8 +1,8 @@
 var redisx_sub_8c =
 [
-    [ "redisxAddSubscriber", "redisx-sub_8c.html#a8a31ecaa0f83150366b72aa9b47755f0", null ],
+    [ "redisxAddSubscriber", "redisx-sub_8c.html#a4c268c33f23438af67117b09c26ec615", null ],
     [ "redisxClearSubscribers", "redisx-sub_8c.html#af70948d6e1b0e3b8f4fde82d0ce27094", null ],
-    [ "redisxEndSubscription", "redisx-sub_8c.html#a07c0e7c85c3839ff0dac3ee5ae5bbcbc", null ],
+    [ "redisxEndSubscription", "redisx-sub_8c.html#acaa8ac50fb154551bfebf7fafcdc3df2", null ],
     [ "redisxNotify", "redisx-sub_8c.html#ace918fd1adb80e26cfae107685a314e0", null ],
     [ "redisxPublish", "redisx-sub_8c.html#a3ae6a78cececda6a1a495eebefbd57e9", null ],
     [ "redisxPublishAsync", "redisx-sub_8c.html#a89b6c2128548882616c081553ea2436c", null ],
