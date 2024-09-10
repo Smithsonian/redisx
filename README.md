@@ -939,6 +939,7 @@ You can also turn debug messages by defining the `DEBUG` constant for the compil
 Some obvious ways the library could evolve and grow in the not too distant future:
 
  - Automated regression testing and coverage tracking.
+ - Keep track of subscription patterns, and automatically resubscribe to them on reconnecting.
  - Support for the [RESP3](https://github.com/antirez/RESP3/blob/master/spec.md) standard and Redis `HELLO`.
  - Support for [Redis Sentinel](https://redis.io/docs/latest/develop/reference/sentinel-clients/) clients, for high-availability server configurations.
  - TLS support (perhaps...)

@@ -40,6 +40,10 @@
 #  define SEND_YIELD_COUNT          (-1)
 #endif
 
+#define trprintf if(debugTraffic) printf  ///< Use for debugging Redis bound traffic
+
+int debugTraffic = FALSE;    ///< Whether to print excerpts of all traffic to/from the Redis server.
+
 /// \endcond
 
 /**
@@ -76,7 +80,7 @@ static int rReadChunkAsync(ClientPrivate *cp) {
 
   cp->next = 0;
   cp->available = recv(sock, cp->in, REDISX_RCVBUF_SIZE, 0);
-  xdprintf(" ... read %d bytes from client %d socket.\n", cp->available, cp->idx);
+  trprintf(" ... read %d bytes from client %d socket.\n", cp->available, cp->idx);
   if(cp->available <= 0) {
     if(cp->available == 0) errno = ECONNRESET;        // 0 return is remote cleared connection. So set ECONNRESET...
     return rTransmitError(cp, "read");
@@ -155,7 +159,7 @@ static int rReadToken(ClientPrivate *cp, char *buf, int length) {
   // Terminate string in buffer
   buf[L] = '\0';
 
-  xdprintf("[%s]\n", buf);
+  trprintf("[%s]\n", buf);
 
   if(*buf == RESP_ERROR) {
     fprintf(stderr, "Redis-X> error message: %s\n", &buf[1]);
@@ -229,7 +233,7 @@ static int rSendBytesAsync(ClientPrivate *cp, const char *buf, int length, boole
 
   if(!buf) return X_NULL;
 
-  xdprintf(" >>> '%s'\n", buf);
+  trprintf(" >>> '%s'\n", buf);
 
   if(!cp->isEnabled) return X_NO_INIT;
   if(sock < 0) return X_NO_INIT;
@@ -735,7 +739,7 @@ RESP *redisxReadReplyAsync(RedisClient *cl) {
       }
       else if(resp->value) {
         ((char *) resp->value)[resp->n] = '\0';
-        xdprintf("\"%s\"\n", (char *) resp->value);
+        trprintf("\"%s\"\n", (char *) resp->value);
       }
 
       break;

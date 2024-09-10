@@ -33,10 +33,11 @@
 
 #define REDISX_LISTENER_PRIORITY    (XPRIO_MIN + (int) (REDISX_LISTENER_REL_PRIORITY * XPRIO_RANGE))
 
+extern int debugTraffic;            ///< Whether to print excerpts of all traffic to/from the Redis server.
+
 /// \endcond
 
-/// \cond PRIVATE
-
+/// \cond PROTECTED
 
 /**
  * Waits to get exlusive access to configuring the properties of a Redis instance.
@@ -69,6 +70,7 @@ void rConfigUnlock(Redis *redis) {
  *
  * \param value         TRUE to enable verbose reporting, or FALSE to disable.
  *
+ * @sa redisxDebugTraffic()
  */
 void redisxSetVerbose(boolean value) {
   xSetVerbose(value);
@@ -82,6 +84,19 @@ void redisxSetVerbose(boolean value) {
 boolean redisxIsVerbose() {
   return xIsVerbose();
 }
+
+/**
+ * Enable or disable verbose reporting of all Redis bound traffic. It may be useful when debugging
+ * programs that use the redisx interface. Verbose reporting is DISABLED by default.
+ *
+ * \param value         TRUE to enable verbose reporting, or FALSE to disable.
+ *
+ * @sa redisxSetVerbose()
+ */
+void redisxDebugTraffic(boolean value) {
+  debugTraffic = value ? TRUE : FALSE;
+}
+
 
 /**
  * Sets the user name to use for authenticating on the Redis server after connection. See the

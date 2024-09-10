@@ -219,6 +219,7 @@ typedef void (*RedisErrorHandler)(Redis *redis, enum redisx_channel channel, con
 
 void redisxSetVerbose(boolean value);
 boolean redisxIsVerbose();
+void redisxDebugTraffic(boolean value);
 
 void redisxSetTcpBuf(int size);
 int redisxSetTransmitErrorHandler(Redis *redis, RedisErrorHandler f);
