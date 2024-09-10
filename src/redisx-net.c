@@ -155,7 +155,7 @@ static void rConfigSocket(int socket, boolean lowLatency) {
  *
  * @param cl    Pointer to the Redis client to authenticate
  * @return      X_SUCCESS (0) if succssfully authenticated on the server, or else an
- *              appropriate error.
+ *              appropriate error (&lt;0).
  *
  * @sa redisxSetPassword()
  */
@@ -187,9 +187,8 @@ static int rAuthAsync(RedisClient *cl) {
  *
  * \return      X_SUCCESS (0)       if successful, or
  *              X_ALREADY_OPEN      if the Redis instance is alreast connected.
- *              X_NO_SERVICE        if there was an error connecting to Redis
- *
- *              or else an error returned by rConnectClientAsync().
+ *              X_NO_SERVICE        if there was an error connecting to Redis,
+ *              or else an error (&lt;0) returned by rConnectClientAsync().
  *
  * \sa rConnectClientAsync()
  *
@@ -380,7 +379,7 @@ void redisxDisconnect(Redis *redis) {
  * \return      X_SUCCESS (0)   if successful
  *              X_NULL          if the Redis instance is NULL
  *
- *              or else an error as would be returned by redisxConnect().
+ *              or else an error (&lt;0) as would be returned by redisxConnect().
  *
  */
 int redisxReconnect(Redis *redis, boolean usePipeline) {

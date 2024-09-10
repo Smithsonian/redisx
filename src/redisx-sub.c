@@ -78,8 +78,7 @@ static int rConnectSubscriptionClientAsync(Redis *redis) {
  * \return      X_SUCCESS (0)   if successful, or else
  *              X_NULL          if the redis instance is NULL
  *              X_NAME_INVALID  if the PUB/SUB channel is null or empty
- *
- *              or an error code returned by redisxSendArrayRequestAsync().
+ *              or an error code (&lt;0) returned by redisxSendArrayRequestAsync().
  *
  * @sa redisxPublish()
  * @sa redisxNotify()

@@ -119,7 +119,6 @@ RedisEntry *redisxGetTable(Redis *redis, const char *table, int *n) {
  * \param confirm       Whether we should get a confirmation from the server (requires a round-trip).
  *
  * \return      X_SUCCESS if the variable was succesfully set, or:
- *
  *                  X_NO_INIT
  *                  X_NAME_INVALID
  *                  X_NULL
@@ -161,8 +160,7 @@ int redisxSetValue(Redis *redis, const char *table, const char *key, const char 
  * \return          X_SUCCESS (0)   if successful, or
  *                  X_NULL          if the client or value is NULL
  *                  X_NAME_INVALID  if key is invalid,
- *
- *                  or an error returned by redisxSendRequestAsync().
+ *                  or an error (&lt;0) returned by redisxSendRequestAsync().
  */
 int redisxSetValueAsync(RedisClient *cl, const char *table, const char *key, const char *value, boolean confirm) {
   static const char *fn = "redisxSetValueAsync";
@@ -315,7 +313,7 @@ char *redisxGetStringValue(Redis *redis, const char *table, const char *key, int
  * \param n             Number of entries.
  * \param confirm       Whether we should get a confirmation from the server (requires a round-trip).
  *
- * \return              X_SUCCESS (0) on success or an error code.
+ * \return              X_SUCCESS (0) on success or an error code (&lt;0) from redisx.h / xchange.h.
  *
  * @sa redisxMultiSet()
  * @sa redisxLockClient()
@@ -376,7 +374,7 @@ int redisxMultiSetAsync(RedisClient *cl, const char *table, const RedisEntry *en
  * \param n             Number of entries.
  * \param confirm       Whether we should get a confirmation from the server (requires a round-trip).
  *
- * \return              X_SUCCESS (0) on success or an error code (&lt;0).
+ * \return              X_SUCCESS (0) on success or an error code (&lt;0) from redisx.h / xchange.h.
  *
  */
 int redisxMultiSet(Redis *redis, const char *table, const RedisEntry *entries, int n, boolean confirm) {
@@ -415,7 +413,8 @@ int redisxMultiSet(Redis *redis, const char *table, const RedisEntry *entries, i
  *                          REDIS_NULL          If got a null or empty response from Redis
  *                          UNEXPECTED_RESP     If the response from Redis was not the expected array type
  *
- * \return               An array with pointers to key names from this table or NULL if there was an error (see parameter n).
+ * \return               An array with pointers to key names from this table or NULL if there was an error
+ *                       (see parameter n for an error status from redisx.h / xchange.h).
  *
  * @sa redisxScanKeys()
  * @sa redisxDestroyKeys()

@@ -27,8 +27,7 @@
  *              X_NULL                  if the Redis instance is NULL
  *              X_NAME_INVALID          if the script is NULL or empty.
  *              REDIS_UNEXPECTED_RESP   if received a Redis reponse of the wrong type,
- *
- *              ot an error returned by redisxRequest().
+ *              or an error (&lt;0) returned by redisxRequest().
  *
  */
 int redisxLoadScript(Redis *redis, const char *script, char **sha1) {
@@ -69,7 +68,7 @@ int redisxLoadScript(Redis *redis, const char *script, char **sha1) {
  * @param params    A NULL-terminated array of additional parameters to pass onto the script, or
  *                  NULL if the script does not take any parameters.
  * @return          X_SUCCESS (0) if successful or else X_NULL if the `redis` or `sha1` parameters
- *                  are NULL, or else an error code from redisxSendArrayRequestAsync().
+ *                  are NULL, or else an error code (&lt;0) from redisxSendArrayRequestAsync().
  *
  * @sa redisxRunScript()
  * @sa redisxLoadScript()

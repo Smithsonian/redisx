@@ -398,11 +398,11 @@ int redisxUnlockClient(RedisClient *cl) {
  *
  * \param cl            Pointer to the Redis client to use.
  *
- * \return              X_SUCCESS (0) on success or an error code on failure, is either X_NO_SERVICE
- *                      if not connected to the Redis server on the requested channel, or
- *                      if send() failed.
+ * \return              X_SUCCESS (0) on success or X_NULL if the client is NULL, or else X_NO_SERVICE
+ *                      if not connected to the Redis server on the requested channel, or if send()
+ *                      failed.
  *
- *                          X_NULL      if the client is NULL.
+ *
  */
 int redisxSkipReplyAsync(RedisClient *cl) {
   static const char *fn = "redisSkipReplyAsync";
@@ -429,7 +429,7 @@ int redisxSkipReplyAsync(RedisClient *cl) {
  *
  * \return          X_SUCCESS (0)   if successful, or
  *                  X_NULL          if the Redis client is NULL, or
- *                  X_NO_SERVICE    if send() failed.
+ *                  X_NO_SERVICE    if not connected to the client server or if send() failed.
  *
  * @sa redisxExecBlockAsync()
  * @sa redisxAbortBlockAsync()
@@ -451,7 +451,8 @@ int redisxStartBlockAsync(RedisClient *cl) {
  *
  * \param cl    Pointer to a Redis client
  *
- * \return      X_SUCCESS (0) if successful or else X_NO_SERVICE if send() failed.
+ * \return      X_SUCCESS (0) if successful, or X_NULL if the client is NULL, or else
+ *              X_NO_SERVICE if not connected ot the client or if send() failed.
  *
  * @sa redisxStartBlockAsync()
  *
@@ -525,9 +526,8 @@ RESP *redisxExecBlockAsync(RedisClient *cl) {
  * \param arg2          Optional second string argument or NULL.
  * \param arg3          Optional third string argument or NULL.
  *
- * \return              X_SUCCESS (0) on success or an error code on failure, is either X_NO_SERVICE
- *                      if not connected to the Redis server on the requested channel or if send()
- *                      failed
+ * \return              X_SUCCESS (0) on success or X_NULL if the client is NULL, or else
+ *                      X_NO_SERVICE if not connected to the client or if send() failed
  */
 int redisxSendRequestAsync(RedisClient *cl, const char *command, const char *arg1, const char *arg2, const char *arg3) {
   static const char *fn = "redisxSendRequestAsync";
@@ -559,9 +559,8 @@ int redisxSendRequestAsync(RedisClient *cl, const char *command, const char *arg
  *                      lengths of all string arguments automatically.
  * \param n             The number of arguments to send.
  *
- * \return              X_SUCCESS (0) on success or an error code on failure, is either X_NO_SERVICE
- *                      if not connected to the Redis server on the requested channel or if send()
- *                      failed
+ * \return              X_SUCCESS (0) on success or X_NULL if the client is NULL, or else
+ *                      X_NO_SERVICE if not connected to the client or if send() failed.
  */
 int redisxSendArrayRequestAsync(RedisClient *cl, char *args[], int lengths[], int n) {
   const char *fn = "redisxSendArrayRequestAsync";
@@ -790,7 +789,8 @@ RESP *redisxReadReplyAsync(RedisClient *cl) {
  * client disconnected and reconnected again.
  *
  * @param cl    The Redis client
- * @return      X_SUCCESS (0) if successful, or else an error code (&lt;0) from redisx.h / xchange.h.
+ * @return      X_SUCCESS (0) if successful, or X_NULL if the client is NULL, or another error code
+ *              (&lt;0) from redisx.h / xchange.h.
  */
 int redisxResetClient(RedisClient *cl) {
   static const char *fn = "redisxResetClient";
