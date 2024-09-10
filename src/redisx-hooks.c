@@ -15,6 +15,7 @@
 
 static Hook *createHook(Redis *redis, void (*f)(Redis *)) {
   Hook *h = (Hook *) calloc(1, sizeof(Hook));
+  x_check_alloc(h);
   h->call = f;
   h->arg = redis;
   return h;

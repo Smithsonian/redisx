@@ -85,7 +85,7 @@ static int hostnameToIP(const char *hostName, char *ip) {
 }
 
 /**
- * Configure the REDIS client sockets for optimal performance...
+ * Configure the Redis client sockets for optimal performance...
  *
  * \param socket        The socket file descriptor.
  * \param lowLatency    TRUE (non-zero) if socket is to be configured for low latency, or else FALSE (0).
@@ -272,9 +272,9 @@ static void rDisconnectClientAsync(RedisClient *cl) {
 }
 
 /**
- * Resets the client properties for the specified REDIS client.
+ * Resets the client properties for the specified Redis client.
  *
- * \param client        Pointer to the REDIS client that is to be reset/initialized.
+ * \param client        Pointer to the Redis client that is to be reset/initialized.
  *
  */
 static void rResetClientAsync(RedisClient *cl) {
@@ -291,7 +291,7 @@ static void rResetClientAsync(RedisClient *cl) {
 }
 
 /**
- * Closes the REDIS client on the specified communication channel. It is assused the caller
+ * Closes the Redis client on the specified communication channel. It is assused the caller
  * has an exclusive lock on the Redis configuration to which the client belongs. This
  * call assumes that the caller has an exlusive lock on the client's configuration settings.
  *
@@ -307,7 +307,7 @@ static void rCloseClientAsync(RedisClient *cl) {
 /// \cond PRIVATE
 
 /**
- * Closes the REDIS client on the specified communication channel. It is assused the caller
+ * Closes the Redis client on the specified communication channel. It is assused the caller
  * has an exclusive lock on the Redis configuration to which the client belongs.
  *
  * \param cl        Pointer to the Redis client instance.
@@ -358,7 +358,7 @@ static int rReconnectAsync(Redis *redis, boolean usePipeline) {
 }
 
 /**
- * Disconnect all clients from the REDIS server.
+ * Disconnect all clients from the Redis server.
  *
  * \param redis         Pointer to a Redis instance.
  *
@@ -475,12 +475,16 @@ static void rUnregisterServer(const Redis *redis) {
 static void rInitClient(RedisClient *cl, enum redisx_channel idx) {
   ClientPrivate *cp;
 
-  cl->priv = calloc(1, sizeof(ClientPrivate));
-  cp = (ClientPrivate *) cl->priv;
+  cp = calloc(1, sizeof(ClientPrivate));
+  x_check_alloc(cp);
+
   cp->idx = idx;
   pthread_mutex_init(&cp->readLock, NULL);
   pthread_mutex_init(&cp->writeLock, NULL);
   pthread_mutex_init(&cp->pendingLock, NULL);
+
+  cl->priv = cp;
+
   rResetClientAsync(cl);
 }
 
@@ -500,7 +504,7 @@ boolean rIsLowLatency(const ClientPrivate *cp) {
 }
 
 /**
- * Connects the specified REDIS client to the REDIS server.
+ * Connects the specified Redis client to the Redis server.
  *
  * \param redis         Pointer to a Redis instance.
  * \param channel       REDISX_INTERACTIVE_CHANNEL, REDISX_PIPELINE_CHANNEL, or REDISX_SUBSCRIPTION_CHANNEL
@@ -626,14 +630,19 @@ Redis *redisxInit(const char *server) {
   }
 
   p = (RedisPrivate *) calloc(1, sizeof(RedisPrivate));
+  x_check_alloc(p);
+
   pthread_mutex_init(&p->configLock, NULL);
   pthread_mutex_init(&p->subscriberLock, NULL);
   p->clients = (RedisClient *) calloc(3, sizeof(RedisClient));
+  x_check_alloc(p->clients);
 
   // Initialize the store access mutexes for each client channel.
   for(i = REDISX_CHANNELS; --i >= 0; ) rInitClient(&p->clients[i], i);
 
   redis = (Redis *) calloc(1, sizeof(Redis));
+  x_check_alloc(redis);
+
   redis->priv = p;
   redis->interactive = &p->clients[REDISX_INTERACTIVE_CHANNEL];
   redis->pipeline = &p->clients[REDISX_PIPELINE_CHANNEL];
@@ -649,6 +658,7 @@ Redis *redisxInit(const char *server) {
   p->port = REDISX_TCP_PORT;
 
   l = (ServerLink *) calloc(1, sizeof(ServerLink));
+  x_check_alloc(l);
   l->redis = redis;
 
   pthread_mutex_lock(&serverLock);
@@ -722,13 +732,13 @@ int redisxSetPort(Redis *redis, int port) {
 }
 
 /**
- * Connects to a REDIS server.
+ * Connects to a Redis server.
  *
  * \param redis         Pointer to a Redis instance.
  * \param usePipeline   TRUE (non-zero) if Redis should be connected with a pipeline client also, or
  *                      FALSE (0) if only the interactive client is needed.
  *
- * \return              X_SUCCESS (0)      if successfully connected to the REDIS server.
+ * \return              X_SUCCESS (0)      if successfully connected to the Redis server.
  *                      X_NO_INIT          if library was not initialized via initRedis().
  *                      X_ALREADY_OPEN     if already connected.
  *                      X_NO_SERVICE       if the connection failed.

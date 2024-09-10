@@ -554,7 +554,7 @@ Once the function is defined, you can activate it via:
   }
 ```
 
-We should also start subsribing to specific channels and/or channel patterns.
+We should also start subscribing to specific channels and/or channel patterns.
 
 ```c
   Redis *redis = ...
@@ -755,10 +755,10 @@ while we have exclusive access to the client, might look something like this:
 ```
    
 For the best performance, you may want to leave the processing of the replies until after you unlock the client. I.e.,
-you only block other threads from accessing the clients while you send off the requests and collect the corresponding responses. Then you leave analyzing the responses at your leisure later, and outside of the mutexed section.
+you only block other threads from accessing the client while you send off the requests and collect the corresponding responses. You can then analyze the responses at your leisure outside of the mutexed section.
    
 In some cases you may be OK with just firing off some Redis commands, without necessarily caring about responses. 
-Rather than ignoring the replies with `redisxIgnoreReplyAsync()` you might call `redisxSkiReplyAsync()` instead 
+Rather than ignoring the replies with `redisxIgnoreReplyAsync()` you might call `redisxSkipReplyAsync()` instead 
 __before__ `redisxSendRequestAsync()` to instruct Redis to not even bother about sending a response to your request 
 (it saves time and network bandwidth!):
 
@@ -925,9 +925,8 @@ clients used, your handler will report it the way you want it.
 
 The __xchange__ library provides two macros: `xvprintf()` and `xdprintf()`, for printing verbose and debug messages
 to `stderr`. Both work just like `printf()`, but they are conditional on verbosity being enabled via 
-`redisxSetVerbose(boolean)` and the global variable `xDebug` being `TRUE` (non-zero), respectively. Applications using 
-__RedisX__ may use these macros to produce their own verbose and/or debugging outputs conditional on the same global 
-settings. 
+`xSetVerbose(boolean)` and `xSetDebug(boolean)`, respectively. Applications using __RedisX__ may use these macros 
+to produce their own verbose and/or debugging outputs conditional on the same global settings. 
 
 You can also turn debug messages by defining the `DEBUG` constant for the compiler, e.g. by adding `-DDEBUG` to 
 `CFLAGS` prior to calling `make`. 
@@ -946,8 +945,6 @@ Some obvious ways the library could evolve and grow in the not too distant futur
  - Add high-level support for managing and calling custom Redis functions.
  - Add support for `CLIENT TRACKING` / `CLIENT CACHING`. 
  - Add more high-level redis commands, e.g. for lists, streams, etc.
- - Improved debug capabilities (e.g. with built-in error traces)
- - Improved error handling (e.g. by consistently setting `errno` beyond just the __RedisX__ error status).
 
 If you have an idea for a must have feature, please let me (Attila) know. Pull requests, for new features or fixes to
 existing ones, are especially welcome! 

@@ -91,6 +91,7 @@ int redisxRunScriptAsync(RedisClient *cl, const char *sha1, const char **keys, c
   nargs = 3 + nkeys + nparams;
   sprintf(sn, "%d", nkeys);
   args = (char **) malloc(nargs * sizeof(char *));
+  if(!args) return x_error(X_NULL, errno, fn, "malloc() error");
 
   args[i++] = "EVALSHA";
   args[i++] = (char *) sha1;

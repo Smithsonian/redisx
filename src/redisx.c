@@ -253,7 +253,7 @@ int redisxPing(Redis *redis, const char *message) {
     else {
       status = redisxCheckRESP(reply, message ? RESP_BULK_STRING : RESP_SIMPLE_STRING, 0);
       if(!status) if(strcmp(message ? message : "PONG", (char *)reply->value) != 0)
-        status = x_error(REDIS_UNEXPECTED_RESP, EBADE, fn, "expected 'PONG', got '%s'", (char *)reply->value);
+        status = x_error(REDIS_UNEXPECTED_RESP, ENOMSG, fn, "expected 'PONG', got '%s'", (char *)reply->value);
     }
   }
 
@@ -291,7 +291,7 @@ static int redisxSelectDBAsync(RedisClient *cl, int idx, boolean confirm) {
     RESP *reply = redisxReadReplyAsync(cl);
     int status = redisxCheckRESP(reply, RESP_SIMPLE_STRING, 0);
     if(!status) if(strcmp("OK", (char *) reply->value) != 0)
-      status = x_error(REDIS_UNEXPECTED_RESP, EBADE, fn, "expected 'OK', got '%s'", (char *) reply->value);
+      status = x_error(REDIS_UNEXPECTED_RESP, ENOMSG, fn, "expected 'OK', got '%s'", (char *) reply->value);
     redisxDestroyRESP(reply);
     prop_error(fn, status);
   }

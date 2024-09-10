@@ -158,7 +158,7 @@ int redisxSetValue(Redis *redis, const char *table, const char *key, const char 
  * \param value     The string value to set (assumes normal string termination).'
  * \param confirm   Whether confirmation is required from Redis to acknowledge.
  *
- * \return           X_SUCCESS (0)   if successful, or
+ * \return          X_SUCCESS (0)   if successful, or
  *                  X_NULL          if the client or value is NULL
  *                  X_NAME_INVALID  if key is invalid,
  *
@@ -376,7 +376,7 @@ int redisxMultiSetAsync(RedisClient *cl, const char *table, const RedisEntry *en
  * \param n             Number of entries.
  * \param confirm       Whether we should get a confirmation from the server (requires a round-trip).
  *
- * \return              X_SUCCESS (0) on success or an error code.
+ * \return              X_SUCCESS (0) on success or an error code (&lt;0).
  *
  */
 int redisxMultiSet(Redis *redis, const char *table, const RedisEntry *entries, int n, boolean confirm) {

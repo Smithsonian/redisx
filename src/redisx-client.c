@@ -85,7 +85,7 @@ static int rReadChunkAsync(ClientPrivate *cp) {
 }
 
 /**
- * Tries to read a REDIS "\r\n" terminated token into the specified buffer, using up to the specified amount
+ * Tries to read a Redis "\r\n" terminated token into the specified buffer, using up to the specified amount
  * of space available, without the CR+LF termination used by Redis. The string returned in the supplied buffer
  * is properly terminated with '\0'.
  *
@@ -215,7 +215,8 @@ static int rReadBytes(ClientPrivate *cp, char *buf, int length) {
  * \param length        The number of bytes that should be sent from the buffer.
  * \param isLast        TRUE if this is the last component of a longer message, or FALSE
  *                      if more data will follow imminently.
- * \return              0 if the data was successfully sent, otherwise the errno set by send().
+ * \return              0 if the data was successfully sent, or X_NO_SERVICE if there was
+ *                      an error with send().
  *
  */
 static int rSendBytesAsync(ClientPrivate *cp, const char *buf, int length, boolean isLast) {
@@ -247,7 +248,7 @@ static int rSendBytesAsync(ClientPrivate *cp, const char *buf, int length, boole
     n = send(sock, from, length, 0);
 #endif
 
-    if(n < 0) return rTransmitError(cp, "send");
+    if(n) return rTransmitError(cp, "send");
 
     from += n;
     length -= n;
@@ -310,7 +311,7 @@ RedisClient *redisxGetLockedConnectedClient(Redis *redis, enum redisx_channel ch
 }
 
 /**
- * Get exclusive write access to the specified REDIS channel.
+ * Get exclusive write access to the specified Redis channel.
  *
  * \param cl        Pointer to the Redis client instance.
  *
@@ -365,7 +366,7 @@ int redisxLockConnected(RedisClient *cl) {
 }
 
 /**
- * Relinquish exclusive write access to the specified REDIS channel
+ * Relinquish exclusive write access to the specified Redis channel
  *
  * \param cl        Pointer to the Redis client instance
  *
@@ -398,8 +399,8 @@ int redisxUnlockClient(RedisClient *cl) {
  * \param cl            Pointer to the Redis client to use.
  *
  * \return              X_SUCCESS (0) on success or an error code on failure, is either X_NO_SERVICE
- *                      (if not connected to the REDIS server on the requested channel)
- *                      or the errno set by send().
+ *                      if not connected to the Redis server on the requested channel, or
+ *                      if send() failed.
  *
  *                          X_NULL      if the client is NULL.
  */
@@ -427,9 +428,8 @@ int redisxSkipReplyAsync(RedisClient *cl) {
  * \param cl        Pointer to a Redis client.
  *
  * \return          X_SUCCESS (0)   if successful, or
- *                  X_NULL          if the Redis client is NULL
- *
- *                  or else the error set by send().
+ *                  X_NULL          if the Redis client is NULL, or
+ *                  X_NO_SERVICE    if send() failed.
  *
  * @sa redisxExecBlockAsync()
  * @sa redisxAbortBlockAsync()
@@ -451,7 +451,7 @@ int redisxStartBlockAsync(RedisClient *cl) {
  *
  * \param cl    Pointer to a Redis client
  *
- * \return      X_SUCCESS (0) if successful or else an error code from send() (see errno.h).
+ * \return      X_SUCCESS (0) if successful or else X_NO_SERVICE if send() failed.
  *
  * @sa redisxStartBlockAsync()
  *
@@ -515,19 +515,19 @@ RESP *redisxExecBlockAsync(RedisClient *cl) {
 }
 
 /**
- * Send a command (with up to 3 arguments) to the REDIS server. The caller must have an
+ * Send a command (with up to 3 arguments) to the Redis server. The caller must have an
  * exclusive lock on the client for this version. The arguments supplied will be used up
  * to the first non-NULL value.
  *
  * \param cl            Pointer to the Redis client instance.
- * \param command       REDIS command string.
+ * \param command       Redis command string.
  * \param arg1          Optional first string argument or NULL.
  * \param arg2          Optional second string argument or NULL.
  * \param arg3          Optional third string argument or NULL.
  *
- * \return              0 on success or an error code on failure, is either X_NO_SERVICE
- *                      (if not connected to the REDIS server on the requested channel)
- *                      or the errno set by send().
+ * \return              X_SUCCESS (0) on success or an error code on failure, is either X_NO_SERVICE
+ *                      if not connected to the Redis server on the requested channel or if send()
+ *                      failed
  */
 int redisxSendRequestAsync(RedisClient *cl, const char *command, const char *arg1, const char *arg2, const char *arg3) {
   static const char *fn = "redisxSendRequestAsync";
@@ -559,9 +559,9 @@ int redisxSendRequestAsync(RedisClient *cl, const char *command, const char *arg
  *                      lengths of all string arguments automatically.
  * \param n             The number of arguments to send.
  *
- * \return              0 on success or an error code on failure, is either X_NO_SERVICE
- *                      (if not connected to the REDIS server on the requested channel)
- *                      or the errno set by send().
+ * \return              X_SUCCESS (0) on success or an error code on failure, is either X_NO_SERVICE
+ *                      if not connected to the Redis server on the requested channel or if send()
+ *                      failed
  */
 int redisxSendArrayRequestAsync(RedisClient *cl, char *args[], int lengths[], int n) {
   const char *fn = "redisxSendArrayRequestAsync";
@@ -674,10 +674,7 @@ RESP *redisxReadReplyAsync(RedisClient *cl) {
   }
 
   resp = (RESP *) calloc(1, sizeof(RESP));
-  if(!resp) {
-    perror("ERROR! calloc() error");
-    exit(errno);
-  }
+  x_check_alloc(resp);
   resp->type = buf[0];
 
   // Get the integer / size value...
@@ -809,7 +806,7 @@ int redisxResetClient(RedisClient *cl) {
     RESP *reply = redisxReadReplyAsync(cl);
     status = redisxCheckRESP(reply, RESP_SIMPLE_STRING, 0);
     if(!status) if(strcmp("RESET", (char *) reply->value) != 0)
-      status = x_error(REDIS_UNEXPECTED_RESP, EBADE, fn, "expected 'RESET', got '%s'", (char *) reply->value);
+      status = x_error(REDIS_UNEXPECTED_RESP, ENOMSG, fn, "expected 'RESET', got '%s'", (char *) reply->value);
     redisxDestroyRESP(reply);
   }
 

@@ -40,7 +40,7 @@ static void rSubscriberUnlock(Redis *redis) {
 }
 
 /**
- * Connects the subscription client/channel to the REDIS server, for sending and receiving
+ * Connects the subscription client/channel to the Redis server, for sending and receiving
  * PUB/SUB commands and messages, and starts the SubscriptionListener thread for
  * consuming incoming PUB/SUB messages in the background.
  *
@@ -123,7 +123,7 @@ int redisxPublishAsync(Redis *redis, const char *channel, const char *data, int 
  *              X_NO_INIT       if the Redis library was not initialized via initRedis().
  *              X_NO_SERVICE    if there was a connection problem.
  *              PARSE_ERROR     if the Redis response could not be confirmed.
- *              or the errno returned by send().
+ *
  *
  * @sa redisxNotify()
  * @sa redisxPublishAsync()
@@ -166,7 +166,6 @@ int redisxPublish(Redis *redis, const char *channel, const char *data, int lengt
  *              X_NO_INIT       if the Redis library was not initialized via initRedis().
  *              X_NO_SERVICE    if there was a connection problem.
  *              PARSE_ERROR     if the Redis response could not be confirmed.
- *              or the errno returned by send();
  *
  * @sa redisxPublish()
  * @sa redisxPublishAsync()
@@ -226,6 +225,7 @@ int redisxAddSubscriber(Redis *redis, const char *channelStem, RedisSubscriberCa
   }
 
   c = (MessageConsumer *) calloc(1, sizeof(MessageConsumer));
+  x_check_alloc(c);
 
   c->func = f;
   c->channelStem = xStringCopyOf(channelStem);
@@ -446,6 +446,7 @@ int redisxUnsubscribe(Redis *redis, const char *pattern) {
  * of the affected Redis instance.
  *
  * @param redis     Pointer to a Redis instance.
+ * @return          X_SUCCESS (0) if successful or else an error code (&lt;0).
  *
  * @sa redisxEndSubscribe()
  * @sa redisxUnsubscribe()
@@ -478,6 +479,7 @@ static int rEndSubscriptionAsync(Redis *redis) {
  * client connection.
  *
  * @param redis     Pointer to a Redis instance.
+ * @return          X_SUCCESS (0) if successful or else an error code (&lt;0).
  *
  * @sa redisxUnsubscribe()
  */
@@ -519,6 +521,8 @@ static void rNotifyConsumers(Redis *redis, char *pattern, char *channel, char *m
   if(n) {
     // Put matching subscribers into an array...
     f = (RedisSubscriberCall *) calloc(n, sizeof(*f));
+    x_check_alloc(f);
+
     n = 0;
     for(c = p->subscriberList ; c != NULL; c = c->next) {
       if(c->channelStem != NULL) if(strncmp(c->channelStem, channel, strlen(c->channelStem))) continue;
