@@ -76,7 +76,7 @@ static int rTransmitError(ClientPrivate *cp, const char *op) {
 static int rReadChunkAsync(ClientPrivate *cp) {
   const int sock = cp->socket;      // Local copy of socket fd that won't possibly change mid-call.
 
-  if(sock < 0) return X_NO_INIT;
+  if(sock < 0) return x_error(X_NO_INIT, ENOTCONN, "rReadChunkAsync", "client %d: not connected", cp->idx);
 
   cp->next = 0;
   cp->available = recv(sock, cp->in, REDISX_RCVBUF_SIZE, 0);
@@ -110,7 +110,7 @@ static int rReadToken(ClientPrivate *cp, char *buf, int length) {
 
   if(!cp->isEnabled) {
     pthread_mutex_unlock(&cp->readLock);
-    return x_error(X_NO_SERVICE, ENXIO, fn, "client is not connected");
+    return x_error(X_NO_SERVICE, ENOTCONN, fn, "client is not connected");
   }
 
   for(L=0; cp->isEnabled && foundTerms < 2; L++) {
@@ -147,7 +147,7 @@ static int rReadToken(ClientPrivate *cp, char *buf, int length) {
   // If client was disabled before we got everything, then simply return X_NO_SERVICE
   if(!cp->isEnabled) {
     *buf = '\0';
-    return X_NO_SERVICE;
+    return x_trace(fn, NULL, X_NO_SERVICE);
   }
 
   // From here on L is the number of characters actually buffered.
@@ -166,7 +166,7 @@ static int rReadToken(ClientPrivate *cp, char *buf, int length) {
     return L;
   }
 
-  return foundTerms==2 ? L : x_error(REDIS_INCOMPLETE_TRANSFER, EIO, fn, "missing \\r\\n termination");
+  return foundTerms==2 ? L : x_error(REDIS_INCOMPLETE_TRANSFER, ENOMSG, fn, "missing \\r\\n termination");
 }
 
 /**
@@ -188,7 +188,7 @@ static int rReadBytes(ClientPrivate *cp, char *buf, int length) {
 
   if(!cp->isEnabled) {
     pthread_mutex_unlock(&cp->readLock);
-    return x_error(X_NO_SERVICE, ENXIO, fn, "client not connected");
+    return x_error(X_NO_SERVICE, ENOTCONN, fn, "client not connected");
   }
 
   for(L=0; cp->isEnabled && L<length; L++) {
@@ -224,6 +224,8 @@ static int rReadBytes(ClientPrivate *cp, char *buf, int length) {
  *
  */
 static int rSendBytesAsync(ClientPrivate *cp, const char *buf, int length, boolean isLast) {
+  static const char *fn = "rSendBytesAsync";
+
 #if SEND_YIELD_COUNT > 0
   static int count;   // Total bytes sent;
 #endif
@@ -231,12 +233,12 @@ static int rSendBytesAsync(ClientPrivate *cp, const char *buf, int length, boole
   const int sock = cp->socket;      // Local copy of socket fd that won't possibly change mid-call.
   char *from = (char *) buf;                 // Pointer to the next byte to send from buf...
 
-  if(!buf) return X_NULL;
+  if(!buf) return x_error(X_NULL, EINVAL, fn, "buffer is NULL");
 
   trprintf(" >>> '%s'\n", buf);
 
-  if(!cp->isEnabled) return X_NO_INIT;
-  if(sock < 0) return X_NO_INIT;
+  if(!cp->isEnabled) return x_error(X_NO_INIT, ENOTCONN, fn, "client %d: disabled", cp->idx);
+  if(sock < 0) return x_error(X_NO_INIT, ENOTCONN, fn, "client %d: not connected", cp->idx);
 
   while(length > 0) {
     int n;
@@ -363,7 +365,7 @@ int redisxLockConnected(RedisClient *cl) {
   cp = (ClientPrivate *) cl->priv;
   if(!cp->isEnabled) {
     redisxUnlockClient(cl);
-    return x_error(X_NO_SERVICE, ENXIO, fn, "client is not connected");
+    return x_error(X_NO_SERVICE, ENOTCONN, fn, "client is not connected");
   }
 
   return X_SUCCESS;
