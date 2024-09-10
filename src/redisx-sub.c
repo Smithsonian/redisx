@@ -55,7 +55,7 @@ static int rConnectSubscriptionClientAsync(Redis *redis) {
   const ClientPrivate *sp = (ClientPrivate *) redis->subscription->priv;
 
   if(sp->isEnabled) {
-    x_warn(fn, "Redis-X : pub/sub client is already connected.\n");
+    x_warn(fn, "Redis-X : pub/sub client is already connected at %s.\n", redis->id);
     return X_SUCCESS;
   }
 
