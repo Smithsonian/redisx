@@ -243,10 +243,11 @@ int redisxGetTime(Redis *redis, struct timespec *t) {
 int redisxPing(Redis *redis, const char *message) {
   static const char *fn = "redisxPing";
   int status = X_SUCCESS;
+  RESP *reply;
 
   if(!redis) return x_error(X_NULL, EINVAL, fn, "redis is NULL");
 
-  RESP *reply = redisxRequest(redis, "PING", message, NULL, NULL, &status);
+  reply = redisxRequest(redis, "PING", message, NULL, NULL, &status);
 
   if(!status) {
     if(!reply) status = x_error(X_NULL, errno, fn, "reply was NULL");

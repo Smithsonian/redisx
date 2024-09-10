@@ -248,7 +248,7 @@ static int rSendBytesAsync(ClientPrivate *cp, const char *buf, int length, boole
     n = send(sock, from, length, 0);
 #endif
 
-    if(n) return rTransmitError(cp, "send");
+    if(n < 0) return rTransmitError(cp, "send");
 
     from += n;
     length -= n;
