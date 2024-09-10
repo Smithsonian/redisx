@@ -131,7 +131,7 @@ REDIS_NULL If got a null or empty response from \fBRedis\fP UNEXPECTED_RESP If t
 .PP
 \fBReturns\fP
 .RS 4
-An array with pointers to key names from this table or NULL if there was an error (see parameter n)\&.
+An array with pointers to key names from this table or NULL if there was an error (see parameter n for an error status from \fBredisx\&.h\fP / \fBxchange\&.h\fP)\&.
 .RE
 .PP
 \fBSee also\fP
@@ -274,7 +274,7 @@ Sets multiple key/value pairs in a given hash table\&.
 .PP
 \fBReturns\fP
 .RS 4
-X_SUCCESS (0) on success or an error code\&. 
+X_SUCCESS (0) on success or an error code (<0) from \fBredisx\&.h\fP / \fBxchange\&.h\fP\&. 
 .RE
 .PP
 
@@ -298,7 +298,7 @@ Sets multiple key/value pairs in a given hash table\&. This function should be c
 .PP
 \fBReturns\fP
 .RS 4
-X_SUCCESS (0) on success or an error code\&.
+X_SUCCESS (0) on success or an error code (<0) from \fBredisx\&.h\fP / \fBxchange\&.h\fP\&.
 .RE
 .PP
 \fBSee also\fP
@@ -427,18 +427,7 @@ Sets a global or hashtable value on \fBRedis\fP\&.
 .PP
 \fBReturns\fP
 .RS 4
-X_SUCCESS if the variable was succesfully set, or: 
-.PP
-.nf
-             X_NO_INIT
-             X_NAME_INVALID
-             X_NULL
-             X_NO_SERVICE
-             X_FAILURE
-
-.fi
-.PP
- 
+X_SUCCESS if the variable was succesfully set, or: X_NO_INIT X_NAME_INVALID X_NULL X_NO_SERVICE X_FAILURE 
 .RE
 .PP
 
@@ -462,10 +451,10 @@ Sends a request for setting a table value, using the \fBRedis\fP 'SET' or 'HSET'
 .PP
 \fBReturns\fP
 .RS 4
-X_SUCCESS (0) if successful, or X_NULL if the client or value is NULL X_NAME_INVALID if key is invalid,
+X_SUCCESS (0) if successful, or X_NULL if the client or value is NULL X_NAME_INVALID if key is invalid, or an error (<0) returned by \fBredisxSendRequestAsync()\fP\&. 
 .RE
 .PP
-or an error returned by \fBredisxSendRequestAsync()\fP\&. 
+
 .PP
 References \fBredisxCheckRESP()\fP, \fBredisxDestroyRESP()\fP, \fBredisxReadReplyAsync()\fP, \fBredisxSendRequestAsync()\fP, \fBredisxSkipReplyAsync()\fP, \fBRESP_INT\fP, \fBx_error()\fP, \fBX_NAME_INVALID\fP, \fBX_NULL\fP, \fBX_SUCCESS\fP, and \fBxvprintf\fP\&.
 .SH "Author"

@@ -50,10 +50,10 @@ Loads a LUA script into \fBRedis\fP, returning its SHA1 hash to use as it's call
 .PP
 \fBReturns\fP
 .RS 4
-X_SUCCESS (0) if the script has been successfully loaded into \fBRedis\fP, or X_NULL if the \fBRedis\fP instance is NULL X_NAME_INVALID if the script is NULL or empty\&. REDIS_UNEXPECTED_RESP if received a \fBRedis\fP reponse of the wrong type,
+X_SUCCESS (0) if the script has been successfully loaded into \fBRedis\fP, or X_NULL if the \fBRedis\fP instance is NULL X_NAME_INVALID if the script is NULL or empty\&. REDIS_UNEXPECTED_RESP if received a \fBRedis\fP reponse of the wrong type, or an error (<0) returned by \fBredisxRequest()\fP\&. 
 .RE
 .PP
-ot an error returned by \fBredisxRequest()\fP\&. 
+
 .PP
 References \fBredisxCheckDestroyRESP()\fP, \fBredisxDestroyRESP()\fP, \fBredisxRequest()\fP, \fBRESP_BULK_STRING\fP, \fBRESP::value\fP, \fBx_error()\fP, \fBX_NULL\fP, \fBX_SUCCESS\fP, and \fBx_trace()\fP\&.
 .SS "\fBRESP\fP * redisxRunScript (\fBRedis\fP * redis, const char * sha1, const char ** keys, const char ** params)"
@@ -101,7 +101,7 @@ Send a request to runs a LUA script that has been loaded into the \fBRedis\fP da
 .PP
 \fBReturns\fP
 .RS 4
-X_SUCCESS (0) if successful or else X_NULL if the \fCredis\fP or \fCsha1\fP parameters are NULL, or else an error code from \fBredisxSendArrayRequestAsync()\fP\&.
+X_SUCCESS (0) if successful or else X_NULL if the \fCredis\fP or \fCsha1\fP parameters are NULL, or else an error code (<0) from \fBredisxSendArrayRequestAsync()\fP\&.
 .RE
 .PP
 \fBSee also\fP

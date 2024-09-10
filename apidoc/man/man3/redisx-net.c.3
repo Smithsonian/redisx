@@ -71,7 +71,7 @@ Always NULL\&.
 .PP
 References \fBFALSE\fP, \fBRESP::n\fP, \fBRedis::pipeline\fP, \fBredisxDestroyRESP()\fP, \fBredisxReadReplyAsync()\fP, \fBRESP_SIMPLE_STRING\fP, \fBRESP::type\fP, \fBx_error()\fP, and \fBxvprintf\fP\&.
 .SS "int redisxConnect (\fBRedis\fP * redis, \fBboolean\fP usePipeline)"
-Connects to a REDIS server\&.
+Connects to a \fBRedis\fP server\&.
 .PP
 \fBParameters\fP
 .RS 4
@@ -82,7 +82,7 @@ Connects to a REDIS server\&.
 .PP
 \fBReturns\fP
 .RS 4
-X_SUCCESS (0) if successfully connected to the REDIS server\&. X_NO_INIT if library was not initialized via initRedis()\&. X_ALREADY_OPEN if already connected\&. X_NO_SERVICE if the connection failed\&. X_NULL if the redis argument is NULL\&.
+X_SUCCESS (0) if successfully connected to the \fBRedis\fP server\&. X_NO_INIT if library was not initialized via initRedis()\&. X_ALREADY_OPEN if already connected\&. X_NO_SERVICE if the connection failed\&. X_NULL if the redis argument is NULL\&.
 .RE
 .PP
 \fBSee also\fP
@@ -117,7 +117,7 @@ Destroys a \fBRedis\fP intance, disconnecting any clients that may be connected,
 .PP
 References \fBREDISX_CHANNELS\fP, \fBredisxDisconnect()\fP, and \fBredisxIsConnected()\fP\&.
 .SS "void redisxDisconnect (\fBRedis\fP * redis)"
-Disconnect all clients from the REDIS server\&.
+Disconnect all clients from the \fBRedis\fP server\&.
 .PP
 \fBParameters\fP
 .RS 4
@@ -172,7 +172,7 @@ Disconnects from \fBRedis\fP, and then connects again\&.\&.\&.
 X_SUCCESS (0) if successful X_NULL if the \fBRedis\fP instance is NULL
 .RE
 .PP
-or else an error as would be returned by \fBredisxConnect()\fP\&. 
+or else an error (<0) as would be returned by \fBredisxConnect()\fP\&. 
 .PP
 References \fBx_error()\fP, \fBX_NULL\fP, and \fBX_SUCCESS\fP\&.
 .SS "int redisxSetPort (\fBRedis\fP * redis, int port)"

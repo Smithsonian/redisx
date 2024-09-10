@@ -441,7 +441,7 @@ Abort an atomic transaction block\&. It sends \fCDISCARD\fP\&.
 .PP
 \fBReturns\fP
 .RS 4
-X_SUCCESS (0) if successful or else an error code from send() (see errno\&.h)\&.
+X_SUCCESS (0) if successful, or X_NULL if the client is NULL, or else X_NO_SERVICE if not connected ot the client or if send() failed\&.
 .RE
 .PP
 \fBSee also\fP
@@ -637,7 +637,7 @@ X_SUCCESS (0) if successful, or X_NULL if the redis instance is NULL\&.
 .PP
 References \fBx_error()\fP, \fBX_NULL\fP, and \fBxvprintf\fP\&.
 .SS "int redisxConnect (\fBRedis\fP * redis, \fBboolean\fP usePipeline)"
-Connects to a REDIS server\&.
+Connects to a \fBRedis\fP server\&.
 .PP
 \fBParameters\fP
 .RS 4
@@ -648,7 +648,7 @@ Connects to a REDIS server\&.
 .PP
 \fBReturns\fP
 .RS 4
-X_SUCCESS (0) if successfully connected to the REDIS server\&. X_NO_INIT if library was not initialized via initRedis()\&. X_ALREADY_OPEN if already connected\&. X_NO_SERVICE if the connection failed\&. X_NULL if the redis argument is NULL\&.
+X_SUCCESS (0) if successfully connected to the \fBRedis\fP server\&. X_NO_INIT if library was not initialized via initRedis()\&. X_ALREADY_OPEN if already connected\&. X_NO_SERVICE if the connection failed\&. X_NULL if the redis argument is NULL\&.
 .RE
 .PP
 \fBSee also\fP
@@ -732,7 +732,7 @@ Frees up the resources used by a \fBRESP\fP structure that was dynamically alloc
 .PP
 References \fBRESP::n\fP, \fBredisxDestroyRESP()\fP, \fBRESP_ARRAY\fP, \fBRESP::type\fP, and \fBRESP::value\fP\&.
 .SS "void redisxDisconnect (\fBRedis\fP * redis)"
-Disconnect all clients from the REDIS server\&.
+Disconnect all clients from the \fBRedis\fP server\&.
 .PP
 \fBParameters\fP
 .RS 4
@@ -745,7 +745,12 @@ Unsubscribes from all channels, stops the subscription listener thread, and clos
 .PP
 \fBParameters\fP
 .RS 4
-\fIredis\fP Pointer to a \fBRedis\fP instance\&.
+\fIredis\fP Pointer to a \fBRedis\fP instance\&. 
+.RE
+.PP
+\fBReturns\fP
+.RS 4
+X_SUCCESS (0) if successful or else an error code (<0)\&.
 .RE
 .PP
 \fBSee also\fP
@@ -847,7 +852,7 @@ REDIS_NULL If got a null or empty response from \fBRedis\fP UNEXPECTED_RESP If t
 .PP
 \fBReturns\fP
 .RS 4
-An array with pointers to key names from this table or NULL if there was an error (see parameter n)\&.
+An array with pointers to key names from this table or NULL if there was an error (see parameter n for an error status from \fBredisx\&.h\fP / \fBxchange\&.h\fP)\&.
 .RE
 .PP
 \fBSee also\fP
@@ -1106,14 +1111,14 @@ Loads a LUA script into \fBRedis\fP, returning its SHA1 hash to use as it's call
 .PP
 \fBReturns\fP
 .RS 4
-X_SUCCESS (0) if the script has been successfully loaded into \fBRedis\fP, or X_NULL if the \fBRedis\fP instance is NULL X_NAME_INVALID if the script is NULL or empty\&. REDIS_UNEXPECTED_RESP if received a \fBRedis\fP reponse of the wrong type,
+X_SUCCESS (0) if the script has been successfully loaded into \fBRedis\fP, or X_NULL if the \fBRedis\fP instance is NULL X_NAME_INVALID if the script is NULL or empty\&. REDIS_UNEXPECTED_RESP if received a \fBRedis\fP reponse of the wrong type, or an error (<0) returned by \fBredisxRequest()\fP\&. 
 .RE
 .PP
-ot an error returned by \fBredisxRequest()\fP\&. 
+
 .PP
 References \fBredisxCheckDestroyRESP()\fP, \fBredisxDestroyRESP()\fP, \fBredisxRequest()\fP, \fBRESP_BULK_STRING\fP, \fBRESP::value\fP, \fBx_error()\fP, \fBX_NULL\fP, \fBX_SUCCESS\fP, and \fBx_trace()\fP\&.
 .SS "int redisxLockClient (\fBRedisClient\fP * cl)"
-Get exclusive write access to the specified REDIS channel\&.
+Get exclusive write access to the specified \fBRedis\fP channel\&.
 .PP
 \fBParameters\fP
 .RS 4
@@ -1178,7 +1183,7 @@ Sets multiple key/value pairs in a given hash table\&.
 .PP
 \fBReturns\fP
 .RS 4
-X_SUCCESS (0) on success or an error code\&. 
+X_SUCCESS (0) on success or an error code (<0) from \fBredisx\&.h\fP / \fBxchange\&.h\fP\&. 
 .RE
 .PP
 
@@ -1202,7 +1207,7 @@ Sets multiple key/value pairs in a given hash table\&. This function should be c
 .PP
 \fBReturns\fP
 .RS 4
-X_SUCCESS (0) on success or an error code\&.
+X_SUCCESS (0) on success or an error code (<0) from \fBredisx\&.h\fP / \fBxchange\&.h\fP\&.
 .RE
 .PP
 \fBSee also\fP
@@ -1229,7 +1234,7 @@ Sends a regular string terminated \fBRedis\fP PUB/SUB message on the specified c
 .PP
 \fBReturns\fP
 .RS 4
-X_SUCCESS if the message was successfullt sent\&. X_NO_INIT if the \fBRedis\fP library was not initialized via initRedis()\&. X_NO_SERVICE if there was a connection problem\&. PARSE_ERROR if the \fBRedis\fP response could not be confirmed\&. or the errno returned by send();
+X_SUCCESS if the message was successfullt sent\&. X_NO_INIT if the \fBRedis\fP library was not initialized via initRedis()\&. X_NO_SERVICE if there was a connection problem\&. PARSE_ERROR if the \fBRedis\fP response could not be confirmed\&.
 .RE
 .PP
 \fBSee also\fP
@@ -1278,7 +1283,7 @@ Sends a generic \fBRedis\fP PUB/SUB message on the specified channel\&. \fBRedis
 .PP
 \fBReturns\fP
 .RS 4
-X_SUCCESS if the message was successfullt sent\&. X_NO_INIT if the \fBRedis\fP library was not initialized via initRedis()\&. X_NO_SERVICE if there was a connection problem\&. PARSE_ERROR if the \fBRedis\fP response could not be confirmed\&. or the errno returned by send()\&.
+X_SUCCESS if the message was successfullt sent\&. X_NO_INIT if the \fBRedis\fP library was not initialized via initRedis()\&. X_NO_SERVICE if there was a connection problem\&. PARSE_ERROR if the \fBRedis\fP response could not be confirmed\&.
 .RE
 .PP
 \fBSee also\fP
@@ -1309,10 +1314,8 @@ Sends a \fBRedis\fP notification asynchronously using the \fBRedis\fP 'PUBLISH' 
 .PP
 \fBReturns\fP
 .RS 4
-X_SUCCESS (0) if successful, or else X_NULL if the redis instance is NULL X_NAME_INVALID if the PUB/SUB channel is null or empty
+X_SUCCESS (0) if successful, or else X_NULL if the redis instance is NULL X_NAME_INVALID if the PUB/SUB channel is null or empty or an error code (<0) returned by \fBredisxSendArrayRequestAsync()\fP\&.
 .RE
-.PP
-or an error code returned by \fBredisxSendArrayRequestAsync()\fP\&.
 .PP
 \fBSee also\fP
 .RS 4
@@ -1355,7 +1358,7 @@ Disconnects from \fBRedis\fP, and then connects again\&.\&.\&.
 X_SUCCESS (0) if successful X_NULL if the \fBRedis\fP instance is NULL
 .RE
 .PP
-or else an error as would be returned by \fBredisxConnect()\fP\&. 
+or else an error (<0) as would be returned by \fBredisxConnect()\fP\&. 
 .PP
 References \fBx_error()\fP, \fBX_NULL\fP, and \fBX_SUCCESS\fP\&.
 .SS "int redisxRemoveConnectHook (\fBRedis\fP * redis, void(*)(\fBRedis\fP *) setupCall)"
@@ -1575,20 +1578,20 @@ Send a \fBRedis\fP request with an arbitrary number of arguments\&.
 .PP
 \fBReturns\fP
 .RS 4
-0 on success or an error code on failure, is either X_NO_SERVICE (if not connected to the REDIS server on the requested channel) or the errno set by send()\&. 
+X_SUCCESS (0) on success or X_NULL if the client is NULL, or else X_NO_SERVICE if not connected to the client or if send() failed\&. 
 .RE
 .PP
 
 .PP
 References \fBFALSE\fP, \fBREDISX_CMDBUF_SIZE\fP, \fBTRUE\fP, \fBx_error()\fP, \fBX_NULL\fP, and \fBX_SUCCESS\fP\&.
 .SS "int redisxSendRequestAsync (\fBRedisClient\fP * cl, const char * command, const char * arg1, const char * arg2, const char * arg3)"
-Send a command (with up to 3 arguments) to the REDIS server\&. The caller must have an exclusive lock on the client for this version\&. The arguments supplied will be used up to the first non-NULL value\&.
+Send a command (with up to 3 arguments) to the \fBRedis\fP server\&. The caller must have an exclusive lock on the client for this version\&. The arguments supplied will be used up to the first non-NULL value\&.
 .PP
 \fBParameters\fP
 .RS 4
 \fIcl\fP Pointer to the \fBRedis\fP client instance\&. 
 .br
-\fIcommand\fP REDIS command string\&. 
+\fIcommand\fP \fBRedis\fP command string\&. 
 .br
 \fIarg1\fP Optional first string argument or NULL\&. 
 .br
@@ -1599,7 +1602,7 @@ Send a command (with up to 3 arguments) to the REDIS server\&. The caller must h
 .PP
 \fBReturns\fP
 .RS 4
-0 on success or an error code on failure, is either X_NO_SERVICE (if not connected to the REDIS server on the requested channel) or the errno set by send()\&. 
+X_SUCCESS (0) on success or X_NULL if the client is NULL, or else X_NO_SERVICE if not connected to the client or if send() failed 
 .RE
 .PP
 
@@ -1756,18 +1759,7 @@ Sets a global or hashtable value on \fBRedis\fP\&.
 .PP
 \fBReturns\fP
 .RS 4
-X_SUCCESS if the variable was succesfully set, or: 
-.PP
-.nf
-             X_NO_INIT
-             X_NAME_INVALID
-             X_NULL
-             X_NO_SERVICE
-             X_FAILURE
-
-.fi
-.PP
- 
+X_SUCCESS if the variable was succesfully set, or: X_NO_INIT X_NAME_INVALID X_NULL X_NO_SERVICE X_FAILURE 
 .RE
 .PP
 
@@ -1791,10 +1783,10 @@ Sends a request for setting a table value, using the \fBRedis\fP 'SET' or 'HSET'
 .PP
 \fBReturns\fP
 .RS 4
-X_SUCCESS (0) if successful, or X_NULL if the client or value is NULL X_NAME_INVALID if key is invalid,
+X_SUCCESS (0) if successful, or X_NULL if the client or value is NULL X_NAME_INVALID if key is invalid, or an error (<0) returned by \fBredisxSendRequestAsync()\fP\&. 
 .RE
 .PP
-or an error returned by \fBredisxSendRequestAsync()\fP\&. 
+
 .PP
 References \fBredisxCheckRESP()\fP, \fBredisxDestroyRESP()\fP, \fBredisxReadReplyAsync()\fP, \fBredisxSendRequestAsync()\fP, \fBredisxSkipReplyAsync()\fP, \fBRESP_INT\fP, \fBx_error()\fP, \fBX_NAME_INVALID\fP, \fBX_NULL\fP, \fBX_SUCCESS\fP, and \fBxvprintf\fP\&.
 .SS "void redisxSetVerbose (\fBboolean\fP value)"
@@ -1820,14 +1812,7 @@ Sends \fCCLIENT REPLY SKIP\fP
 .PP
 \fBReturns\fP
 .RS 4
-X_SUCCESS (0) on success or an error code on failure, is either X_NO_SERVICE (if not connected to the REDIS server on the requested channel) or the errno set by send()\&. 
-.PP
-.nf
-X_NULL      if the client is NULL\&.
-
-.fi
-.PP
- 
+X_SUCCESS (0) on success or X_NULL if the client is NULL, or else X_NO_SERVICE if not connected to the \fBRedis\fP server on the requested channel, or if send() failed\&. 
 .RE
 .PP
 
@@ -1845,10 +1830,8 @@ Once you start a transaction block you may ignore all acknowledgedments such as 
 .PP
 \fBReturns\fP
 .RS 4
-X_SUCCESS (0) if successful, or X_NULL if the \fBRedis\fP client is NULL
+X_SUCCESS (0) if successful, or X_NULL if the \fBRedis\fP client is NULL, or X_NO_SERVICE if not connected to the client server or if send() failed\&.
 .RE
-.PP
-or else the error set by send()\&.
 .PP
 \fBSee also\fP
 .RS 4
@@ -1892,7 +1875,7 @@ X_SUCCESS if successfully subscribed to the \fBRedis\fP distribution channel\&. 
 .PP
 References \fBredisxLockConnected()\fP, \fBredisxSendRequestAsync()\fP, \fBredisxUnlockClient()\fP, \fBRedis::subscription\fP, \fBx_error()\fP, \fBX_NULL\fP, and \fBX_SUCCESS\fP\&.
 .SS "int redisxUnlockClient (\fBRedisClient\fP * cl)"
-Relinquish exclusive write access to the specified REDIS channel
+Relinquish exclusive write access to the specified \fBRedis\fP channel
 .PP
 \fBParameters\fP
 .RS 4

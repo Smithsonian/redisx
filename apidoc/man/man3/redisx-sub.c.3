@@ -97,7 +97,12 @@ Unsubscribes from all channels, stops the subscription listener thread, and clos
 .PP
 \fBParameters\fP
 .RS 4
-\fIredis\fP Pointer to a \fBRedis\fP instance\&.
+\fIredis\fP Pointer to a \fBRedis\fP instance\&. 
+.RE
+.PP
+\fBReturns\fP
+.RS 4
+X_SUCCESS (0) if successful or else an error code (<0)\&.
 .RE
 .PP
 \fBSee also\fP
@@ -122,7 +127,7 @@ Sends a regular string terminated \fBRedis\fP PUB/SUB message on the specified c
 .PP
 \fBReturns\fP
 .RS 4
-X_SUCCESS if the message was successfullt sent\&. X_NO_INIT if the \fBRedis\fP library was not initialized via initRedis()\&. X_NO_SERVICE if there was a connection problem\&. PARSE_ERROR if the \fBRedis\fP response could not be confirmed\&. or the errno returned by send();
+X_SUCCESS if the message was successfullt sent\&. X_NO_INIT if the \fBRedis\fP library was not initialized via initRedis()\&. X_NO_SERVICE if there was a connection problem\&. PARSE_ERROR if the \fBRedis\fP response could not be confirmed\&.
 .RE
 .PP
 \fBSee also\fP
@@ -153,7 +158,7 @@ Sends a generic \fBRedis\fP PUB/SUB message on the specified channel\&. \fBRedis
 .PP
 \fBReturns\fP
 .RS 4
-X_SUCCESS if the message was successfullt sent\&. X_NO_INIT if the \fBRedis\fP library was not initialized via initRedis()\&. X_NO_SERVICE if there was a connection problem\&. PARSE_ERROR if the \fBRedis\fP response could not be confirmed\&. or the errno returned by send()\&.
+X_SUCCESS if the message was successfullt sent\&. X_NO_INIT if the \fBRedis\fP library was not initialized via initRedis()\&. X_NO_SERVICE if there was a connection problem\&. PARSE_ERROR if the \fBRedis\fP response could not be confirmed\&.
 .RE
 .PP
 \fBSee also\fP
@@ -184,10 +189,8 @@ Sends a \fBRedis\fP notification asynchronously using the \fBRedis\fP 'PUBLISH' 
 .PP
 \fBReturns\fP
 .RS 4
-X_SUCCESS (0) if successful, or else X_NULL if the redis instance is NULL X_NAME_INVALID if the PUB/SUB channel is null or empty
+X_SUCCESS (0) if successful, or else X_NULL if the redis instance is NULL X_NAME_INVALID if the PUB/SUB channel is null or empty or an error code (<0) returned by \fBredisxSendArrayRequestAsync()\fP\&.
 .RE
-.PP
-or an error code returned by \fBredisxSendArrayRequestAsync()\fP\&.
 .PP
 \fBSee also\fP
 .RS 4

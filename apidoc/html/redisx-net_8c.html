@@ -197,7 +197,7 @@ Functions</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
-<p>Connects to a REDIS server.</p>
+<p>Connects to a <a class="el" href="structRedis.html" title="Structure that represents a Redis database instance, with one or more RedisClient connections.">Redis</a> server.</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">redis</td><td>Pointer to a <a class="el" href="structRedis.html" title="Structure that represents a Redis database instance, with one or more RedisClient connections.">Redis</a> instance. </td></tr>
@@ -205,7 +205,7 @@ Functions</h2></td></tr>
   </table>
   </dd>
 </dl>
-<dl class="section return"><dt>Returns</dt><dd>X_SUCCESS (0) if successfully connected to the REDIS server. X_NO_INIT if library was not initialized via initRedis(). X_ALREADY_OPEN if already connected. X_NO_SERVICE if the connection failed. X_NULL if the redis argument is NULL.</dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>X_SUCCESS (0) if successfully connected to the <a class="el" href="structRedis.html" title="Structure that represents a Redis database instance, with one or more RedisClient connections.">Redis</a> server. X_NO_INIT if library was not initialized via initRedis(). X_ALREADY_OPEN if already connected. X_NO_SERVICE if the connection failed. X_NULL if the redis argument is NULL.</dd></dl>
 <dl class="section see"><dt>See also</dt><dd><a class="el" href="redisx-net_8c.html#a5c78c2189a76a077231016564a0cecd5">redisxInit()</a> </dd>
 <dd>
 <a class="el" href="redisx-net_8c.html#a37f39ede48014a2463e4c72bf6eb5a3e">redisxSetPort()</a> </dd>
@@ -266,7 +266,7 @@ Functions</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
-<p>Disconnect all clients from the REDIS server.</p>
+<p>Disconnect all clients from the <a class="el" href="structRedis.html" title="Structure that represents a Redis database instance, with one or more RedisClient connections.">Redis</a> server.</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">redis</td><td>Pointer to a <a class="el" href="structRedis.html" title="Structure that represents a Redis database instance, with one or more RedisClient connections.">Redis</a> instance. </td></tr>
@@ -366,7 +366,7 @@ Functions</h2></td></tr>
   </dd>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>X_SUCCESS (0) if successful X_NULL if the <a class="el" href="structRedis.html" title="Structure that represents a Redis database instance, with one or more RedisClient connections.">Redis</a> instance is NULL</dd></dl>
-<p>or else an error as would be returned by <a class="el" href="redisx-net_8c.html#ad71822356ffd40ed4b1c71d065f48809">redisxConnect()</a>. </p>
+<p>or else an error (&lt;0) as would be returned by <a class="el" href="redisx-net_8c.html#ad71822356ffd40ed4b1c71d065f48809">redisxConnect()</a>. </p>
 
 <p class="reference">References <a class="elRef" href="../../xchange/apidoc/html/xchange_8c.html#ae73aaf705dc4e7d58dfb0fd81f4805c7">x_error()</a>, <a class="elRef" href="../../xchange/apidoc/html/xchange_8h.html#aadbbe3ae01369cbddf4d57d430b33133">X_NULL</a>, and <a class="elRef" href="../../xchange/apidoc/html/xchange_8h.html#a7b2679c964ea5f2160380ed55654b873">X_SUCCESS</a>.</p>
 
