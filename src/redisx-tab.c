@@ -953,7 +953,7 @@ int redisxDeleteEntries(Redis *redis, const char *pattern) {
 
   keys = redisxScanKeys(redis, pattern, &n, &status);
   if(status) return status;
-  if(!keys) return X_NULL;
+  if(!keys) return x_trace(fn, NULL, X_NULL);
 
   for(i = 0; i < n ; i++) {
     char *root, *key;

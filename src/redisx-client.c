@@ -166,7 +166,7 @@ static int rReadToken(ClientPrivate *cp, char *buf, int length) {
     return L;
   }
 
-  return foundTerms==2 ? L : x_error(REDIS_INCOMPLETE_TRANSFER, ENOMSG, fn, "missing \\r\\n termination");
+  return foundTerms==2 ? L : x_error(REDIS_INCOMPLETE_TRANSFER, EBADMSG, fn, "missing \\r\\n termination");
 }
 
 /**
@@ -665,10 +665,16 @@ RESP *redisxReadReplyAsync(RedisClient *cl) {
   int size = 0;
   int status = X_SUCCESS;
 
-  if(cl == NULL) return NULL;
+  if(cl == NULL) {
+    x_error(0, EINVAL, fn, "client is NULL");
+    return NULL;
+  }
   cp = (ClientPrivate *) cl->priv;
 
-  if(!cp->isEnabled) return NULL;
+  if(!cp->isEnabled) {
+    x_error(0, ENOTCONN, fn, "client is connected");
+    return NULL;
+  }
 
   size = rReadToken(cp, buf, REDIS_SIMPLE_STRING_SIZE + 1);
   if(size < 0) {

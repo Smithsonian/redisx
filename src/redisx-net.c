@@ -203,7 +203,7 @@ static int rConnectAsync(Redis *redis, boolean usePipeline) {
   Hook *f;
 
   if(redisxIsConnected(redis)) {
-    xvprintf(fn, "WARNING! Redis-X: already connected to %s", redis->id);
+    x_warn(fn, "WARNING! Redis-X: already connected to %s", redis->id);
     return X_ALREADY_OPEN;
   }
 

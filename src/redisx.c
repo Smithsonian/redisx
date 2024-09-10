@@ -407,7 +407,7 @@ void redisxDestroyRESP(RESP *resp) {
  * \param expectedSize      The expected size of the RESP (array or bytes) or <=0 to skip checking
  *
  * \return      X_SUCCESS (0)                   if the RESP passes the tests, or
- *              X_PARSE_ERROR                   if the RESP is NULL (garbled response).
+ *              X_NULL                          if the RESP is NULL (garbled response).
  *              REDIS_NULL                      if Redis returned (nil),
  *              REDIS_UNEXPECTED_TYPE           if got a reply of a different type than expected
  *              REDIS_UNEXPECTED_ARRAY_SIZE     if got a reply of different size than expected.
@@ -416,13 +416,17 @@ void redisxDestroyRESP(RESP *resp) {
  *
  */
 int redisxCheckRESP(const RESP *resp, char expectedType, int expectedSize) {
-  if(resp == NULL) return X_PARSE_ERROR;
+  static const char *fn = "redisxCheckRESP";
+
+  if(resp == NULL) return x_error(X_NULL, EINVAL, fn, "RESP is NULL");
   if(resp->type != RESP_INT) {
-    if(resp->n < 0) return resp->n;
-    if(resp->value == NULL) if(resp->n) return REDIS_NULL;
+    if(resp->n < 0) return x_error(X_FAILURE, EBADMSG, fn, "RESP error code: %d", resp->n);
+    if(resp->value == NULL) if(resp->n) return x_error(REDIS_NULL, ENOMSG, fn, "RESP with NULL value, n=%d", resp->n);
   }
-  if(expectedType) if(resp->type != expectedType) return REDIS_UNEXPECTED_RESP;
-  if(expectedSize > 0) if(resp->n != expectedSize) return REDIS_UNEXPECTED_ARRAY_SIZE;
+  if(expectedType) if(resp->type != expectedType)
+    return x_error(REDIS_UNEXPECTED_RESP, ENOMSG, fn, "unexpected RESP type: expected '%c', got '%c'", expectedType, resp->type);
+  if(expectedSize > 0) if(resp->n != expectedSize)
+    return x_error(REDIS_UNEXPECTED_RESP, ENOMSG, fn, "unexpected RESP size: expected %d, got %d", expectedSize, resp->n);
   return X_SUCCESS;
 }
 
@@ -441,6 +445,7 @@ int redisxCheckRESP(const RESP *resp, char expectedType, int expectedSize) {
 int redisxCheckDestroyRESP(RESP *resp, char expectedType, int expectedSize) {
   int status = redisxCheckRESP(resp, expectedType, expectedSize);
   if(status) redisxDestroyRESP(resp);
+  prop_error("redisxCheckDestroyRESP", status);
   return status;
 }
 
