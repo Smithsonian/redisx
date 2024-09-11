@@ -923,13 +923,23 @@ clients used, your handler will report it the way you want it.
 <a name="debug-support"></a>
 ## Debug support
 
-The __xchange__ library provides two macros: `xvprintf()` and `xdprintf()`, for printing verbose and debug messages
-to `stderr`. Both work just like `printf()`, but they are conditional on verbosity being enabled via 
-`xSetVerbose(boolean)` and `xSetDebug(boolean)`, respectively. Applications using __RedisX__ may use these macros 
-to produce their own verbose and/or debugging outputs conditional on the same global settings. 
+You can enable verbose output of the __RedisX__ library with `xSetVerbose(boolean)`. When enabled, it will produce 
+status messages to `stderr`so you can follow what's going on. In addition (or alternatively), you can enable debug 
+messages with `xSetDebug(boolean)`. When enabled, all errors encountered by the library (such as invalid arguments 
+passed) will be printed to `stderr`, including call traces, so you can walk back to see where the error may have 
+originated from. (You can also enable debug messages by default by defining the `DEBUG` constant for the compiler, 
+e.g. by adding `-DDEBUG` to `CFLAGS` prior to calling `make`). 
 
-You can also turn debug messages by defining the `DEBUG` constant for the compiler, e.g. by adding `-DDEBUG` to 
-`CFLAGS` prior to calling `make`. 
+In addition, you can use `redisxDebugTraffic(boolean)` to debug low-level traffic to/from the Redis server, which 
+prints excerpts of all incoming and outgoing messages from/to Redis to `stderr`.
+
+For helping to debug your application, the __xchange__ library provides two macros: `xvprintf()` and `xdprintf()`, 
+for printing verbose and debug messages to `stderr`. Both work just like `printf()`, but they are conditional on 
+verbosity being enabled via `xSetVerbose(boolean)` and `xSetDebug(boolean)`, respectively. Applications using 
+__RedisX__ may use these macros to produce their own verbose and/or debugging outputs conditional on the same global 
+settings. 
+
+
 
 -----------------------------------------------------------------------------
 
