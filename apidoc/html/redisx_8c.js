@@ -3,6 +3,7 @@ var redisx_8c =
     [ "redisxArrayRequest", "redisx_8c.html#a13ae33bc25ee03621b23541236ef5f82", null ],
     [ "redisxCheckDestroyRESP", "redisx_8c.html#a67b8bd13975dd286600f20dc80bdb462", null ],
     [ "redisxCheckRESP", "redisx_8c.html#a2d3ffb89129ab04483e3966835a5ff71", null ],
+    [ "redisxDebugTraffic", "redisx_8c.html#a7cde25fca6ae274d8d0a66d5c8b63ff5", null ],
     [ "redisxDestroyRESP", "redisx_8c.html#aa4e23a7454f7055711915ec430599011", null ],
     [ "redisxError", "redisx_8c.html#ae722b046fa70a55db725341ef8ee56dc", null ],
     [ "redisxErrorDescription", "redisx_8c.html#a38f3de77ad5a48d37b302bce2e3cd25b", null ],

@@ -129,6 +129,8 @@ Functions</h2></td></tr>
 <tr class="separator:a67b8bd13975dd286600f20dc80bdb462"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a2d3ffb89129ab04483e3966835a5ff71" id="r_a2d3ffb89129ab04483e3966835a5ff71"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="redisx_8c.html#a2d3ffb89129ab04483e3966835a5ff71">redisxCheckRESP</a> (const <a class="el" href="structRESP.html">RESP</a> *resp, char expectedType, int expectedSize)</td></tr>
 <tr class="separator:a2d3ffb89129ab04483e3966835a5ff71"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a7cde25fca6ae274d8d0a66d5c8b63ff5" id="r_a7cde25fca6ae274d8d0a66d5c8b63ff5"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="redisx_8c.html#a7cde25fca6ae274d8d0a66d5c8b63ff5">redisxDebugTraffic</a> (<a class="elRef" href="../../xchange/apidoc/html/xchange_8h.html#a621c38f1f10a1c565d897e3178b16d6e">boolean</a> value)</td></tr>
+<tr class="separator:a7cde25fca6ae274d8d0a66d5c8b63ff5"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aa4e23a7454f7055711915ec430599011" id="r_aa4e23a7454f7055711915ec430599011"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="redisx_8c.html#aa4e23a7454f7055711915ec430599011">redisxDestroyRESP</a> (<a class="el" href="structRESP.html">RESP</a> *resp)</td></tr>
 <tr class="separator:aa4e23a7454f7055711915ec430599011"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ae722b046fa70a55db725341ef8ee56dc" id="r_ae722b046fa70a55db725341ef8ee56dc"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="redisx_8c.html#ae722b046fa70a55db725341ef8ee56dc">redisxError</a> (const char *func, int errorCode)</td></tr>
@@ -320,10 +322,38 @@ Functions</h2></td></tr>
   </table>
   </dd>
 </dl>
-<dl class="section return"><dt>Returns</dt><dd>X_SUCCESS (0) if the <a class="el" href="structRESP.html" title="Structure that represents a Redis response (RESP format).">RESP</a> passes the tests, or X_PARSE_ERROR if the <a class="el" href="structRESP.html" title="Structure that represents a Redis response (RESP format).">RESP</a> is NULL (garbled response). REDIS_NULL if <a class="el" href="structRedis.html" title="Structure that represents a Redis database instance, with one or more RedisClient connections.">Redis</a> returned (nil), REDIS_UNEXPECTED_TYPE if got a reply of a different type than expected REDIS_UNEXPECTED_ARRAY_SIZE if got a reply of different size than expected.</dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>X_SUCCESS (0) if the <a class="el" href="structRESP.html" title="Structure that represents a Redis response (RESP format).">RESP</a> passes the tests, or X_NULL if the <a class="el" href="structRESP.html" title="Structure that represents a Redis response (RESP format).">RESP</a> is NULL (garbled response). REDIS_NULL if <a class="el" href="structRedis.html" title="Structure that represents a Redis database instance, with one or more RedisClient connections.">Redis</a> returned (nil), REDIS_UNEXPECTED_TYPE if got a reply of a different type than expected REDIS_UNEXPECTED_ARRAY_SIZE if got a reply of different size than expected.</dd></dl>
 <p>or the error returned in resp-&gt;n. </p>
 
-<p class="reference">References <a class="el" href="structRESP.html#a76f11d9a0a47b94f72c2d0e77fb32240">RESP::n</a>, <a class="el" href="redisx_8h.html#a7e2f81e12d6982c6aa97b50a77fd98f5">REDIS_NULL</a>, <a class="el" href="redisx_8h.html#a447a38ce70634136b737274965aa5ecc">REDIS_UNEXPECTED_ARRAY_SIZE</a>, <a class="el" href="redisx_8h.html#a9d530bcfae7689b4275749b47a6d9b51">REDIS_UNEXPECTED_RESP</a>, <a class="el" href="redisx_8h.html#aea77070444458837e0955ae1e89bd9d0">RESP_INT</a>, <a class="el" href="structRESP.html#aff17911edc8208aa8ddb1c7c52c78389">RESP::type</a>, <a class="el" href="structRESP.html#a0f61d63b009d0880a89c843bd50d8d76">RESP::value</a>, <a class="elRef" href="../../xchange/apidoc/html/xchange_8h.html#a86d83cc351dfae22fe7346559f5a440e">X_PARSE_ERROR</a>, and <a class="elRef" href="../../xchange/apidoc/html/xchange_8h.html#a7b2679c964ea5f2160380ed55654b873">X_SUCCESS</a>.</p>
+<p class="reference">References <a class="el" href="structRESP.html#a76f11d9a0a47b94f72c2d0e77fb32240">RESP::n</a>, <a class="el" href="redisx_8h.html#a7e2f81e12d6982c6aa97b50a77fd98f5">REDIS_NULL</a>, <a class="el" href="redisx_8h.html#a9d530bcfae7689b4275749b47a6d9b51">REDIS_UNEXPECTED_RESP</a>, <a class="el" href="redisx_8h.html#aea77070444458837e0955ae1e89bd9d0">RESP_INT</a>, <a class="el" href="structRESP.html#aff17911edc8208aa8ddb1c7c52c78389">RESP::type</a>, <a class="el" href="structRESP.html#a0f61d63b009d0880a89c843bd50d8d76">RESP::value</a>, <a class="elRef" href="../../xchange/apidoc/html/xchange_8c.html#ae73aaf705dc4e7d58dfb0fd81f4805c7">x_error()</a>, <a class="elRef" href="../../xchange/apidoc/html/xchange_8h.html#a1d4a0c99f979fd0ecf0e9dcb7191a8d7">X_FAILURE</a>, <a class="elRef" href="../../xchange/apidoc/html/xchange_8h.html#aadbbe3ae01369cbddf4d57d430b33133">X_NULL</a>, and <a class="elRef" href="../../xchange/apidoc/html/xchange_8h.html#a7b2679c964ea5f2160380ed55654b873">X_SUCCESS</a>.</p>
+
+</div>
+</div>
+<a id="a7cde25fca6ae274d8d0a66d5c8b63ff5" name="a7cde25fca6ae274d8d0a66d5c8b63ff5"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a7cde25fca6ae274d8d0a66d5c8b63ff5">&#9670;&#160;</a></span>redisxDebugTraffic()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void redisxDebugTraffic </td>
+          <td>(</td>
+          <td class="paramtype"><a class="elRef" href="../../xchange/apidoc/html/xchange_8h.html#a621c38f1f10a1c565d897e3178b16d6e">boolean</a>&#160;</td>
+          <td class="paramname"><em>value</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>Enable or disable verbose reporting of all <a class="el" href="structRedis.html" title="Structure that represents a Redis database instance, with one or more RedisClient connections.">Redis</a> bound traffic. It may be useful when debugging programs that use the redisx interface. Verbose reporting is DISABLED by default.</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">value</td><td>TRUE to enable verbose reporting, or FALSE to disable.</td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section see"><dt>See also</dt><dd><a class="el" href="redisx_8c.html#a11454a2359f43b6fd024d25a8148644e">redisxSetVerbose()</a> </dd></dl>
+
+<p class="reference">References <a class="elRef" href="../../xchange/apidoc/html/xchange_8h.html#aa93f0eb578d23995850d61f7d61c55c1">FALSE</a>, and <a class="elRef" href="../../xchange/apidoc/html/xchange_8h.html#aa8cecfc5c5c054d2875c03e77b7be15d">TRUE</a>.</p>
 
 </div>
 </div>
@@ -839,10 +869,11 @@ Functions</h2></td></tr>
 <p>Enable or disable verbose reporting of all <a class="el" href="structRedis.html" title="Structure that represents a Redis database instance, with one or more RedisClient connections.">Redis</a> operations (and possibly some details of them). Reporting is done on the standard output (stdout). It may be useful when debugging programs that use the redisx interface. Verbose reporting is DISABLED by default.</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname">value</td><td>TRUE to enable verbose reporting, or FALSE to disable. </td></tr>
+    <tr><td class="paramname">value</td><td>TRUE to enable verbose reporting, or FALSE to disable.</td></tr>
   </table>
   </dd>
 </dl>
+<dl class="section see"><dt>See also</dt><dd><a class="el" href="redisx_8c.html#a7cde25fca6ae274d8d0a66d5c8b63ff5">redisxDebugTraffic()</a> </dd></dl>
 
 <p class="reference">References <a class="elRef" href="../../xchange/apidoc/html/xchange_8h.html#afbe85067ddbc92577cd00ac8f6e3026f">xSetVerbose()</a>.</p>
 

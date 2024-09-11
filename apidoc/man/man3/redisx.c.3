@@ -20,6 +20,9 @@ src/redisx.c \- A \fBRedis\fP client library that compiles on older and newer pl
 .RI "int \fBredisxCheckRESP\fP (const \fBRESP\fP *resp, char expectedType, int expectedSize)"
 .br
 .ti -1c
+.RI "void \fBredisxDebugTraffic\fP (\fBboolean\fP value)"
+.br
+.ti -1c
 .RI "void \fBredisxDestroyRESP\fP (\fBRESP\fP *resp)"
 .br
 .ti -1c
@@ -163,12 +166,28 @@ Checks a \fBRedis\fP \fBRESP\fP for NULL values or unexpected values\&.
 .PP
 \fBReturns\fP
 .RS 4
-X_SUCCESS (0) if the \fBRESP\fP passes the tests, or X_PARSE_ERROR if the \fBRESP\fP is NULL (garbled response)\&. REDIS_NULL if \fBRedis\fP returned (nil), REDIS_UNEXPECTED_TYPE if got a reply of a different type than expected REDIS_UNEXPECTED_ARRAY_SIZE if got a reply of different size than expected\&.
+X_SUCCESS (0) if the \fBRESP\fP passes the tests, or X_NULL if the \fBRESP\fP is NULL (garbled response)\&. REDIS_NULL if \fBRedis\fP returned (nil), REDIS_UNEXPECTED_TYPE if got a reply of a different type than expected REDIS_UNEXPECTED_ARRAY_SIZE if got a reply of different size than expected\&.
 .RE
 .PP
 or the error returned in resp->n\&. 
 .PP
-References \fBRESP::n\fP, \fBREDIS_NULL\fP, \fBREDIS_UNEXPECTED_ARRAY_SIZE\fP, \fBREDIS_UNEXPECTED_RESP\fP, \fBRESP_INT\fP, \fBRESP::type\fP, \fBRESP::value\fP, \fBX_PARSE_ERROR\fP, and \fBX_SUCCESS\fP\&.
+References \fBRESP::n\fP, \fBREDIS_NULL\fP, \fBREDIS_UNEXPECTED_RESP\fP, \fBRESP_INT\fP, \fBRESP::type\fP, \fBRESP::value\fP, \fBx_error()\fP, \fBX_FAILURE\fP, \fBX_NULL\fP, and \fBX_SUCCESS\fP\&.
+.SS "void redisxDebugTraffic (\fBboolean\fP value)"
+Enable or disable verbose reporting of all \fBRedis\fP bound traffic\&. It may be useful when debugging programs that use the redisx interface\&. Verbose reporting is DISABLED by default\&.
+.PP
+\fBParameters\fP
+.RS 4
+\fIvalue\fP TRUE to enable verbose reporting, or FALSE to disable\&.
+.RE
+.PP
+\fBSee also\fP
+.RS 4
+\fBredisxSetVerbose()\fP 
+.RE
+.PP
+
+.PP
+References \fBFALSE\fP, and \fBTRUE\fP\&.
 .SS "void redisxDestroyRESP (\fBRESP\fP * resp)"
 Frees up the resources used by a \fBRESP\fP structure that was dynamically allocated\&. The call will segfault if the same \fBRESP\fP is destroyed twice or if the argument is a static allocation\&.
 .PP
@@ -426,7 +445,12 @@ Enable or disable verbose reporting of all \fBRedis\fP operations (and possibly 
 .PP
 \fBParameters\fP
 .RS 4
-\fIvalue\fP TRUE to enable verbose reporting, or FALSE to disable\&. 
+\fIvalue\fP TRUE to enable verbose reporting, or FALSE to disable\&.
+.RE
+.PP
+\fBSee also\fP
+.RS 4
+\fBredisxDebugTraffic()\fP 
 .RE
 .PP
 

@@ -174,6 +174,9 @@ include/redisx.h
 .RI "int \fBredisxConnect\fP (\fBRedis\fP *redis, \fBboolean\fP usePipeline)"
 .br
 .ti -1c
+.RI "void \fBredisxDebugTraffic\fP (\fBboolean\fP value)"
+.br
+.ti -1c
 .RI "void \fBredisxDestroy\fP (\fBRedis\fP *redis)"
 .br
 .ti -1c
@@ -592,12 +595,12 @@ Checks a \fBRedis\fP \fBRESP\fP for NULL values or unexpected values\&.
 .PP
 \fBReturns\fP
 .RS 4
-X_SUCCESS (0) if the \fBRESP\fP passes the tests, or X_PARSE_ERROR if the \fBRESP\fP is NULL (garbled response)\&. REDIS_NULL if \fBRedis\fP returned (nil), REDIS_UNEXPECTED_TYPE if got a reply of a different type than expected REDIS_UNEXPECTED_ARRAY_SIZE if got a reply of different size than expected\&.
+X_SUCCESS (0) if the \fBRESP\fP passes the tests, or X_NULL if the \fBRESP\fP is NULL (garbled response)\&. REDIS_NULL if \fBRedis\fP returned (nil), REDIS_UNEXPECTED_TYPE if got a reply of a different type than expected REDIS_UNEXPECTED_ARRAY_SIZE if got a reply of different size than expected\&.
 .RE
 .PP
 or the error returned in resp->n\&. 
 .PP
-References \fBRESP::n\fP, \fBREDIS_NULL\fP, \fBREDIS_UNEXPECTED_ARRAY_SIZE\fP, \fBREDIS_UNEXPECTED_RESP\fP, \fBRESP_INT\fP, \fBRESP::type\fP, \fBRESP::value\fP, \fBX_PARSE_ERROR\fP, and \fBX_SUCCESS\fP\&.
+References \fBRESP::n\fP, \fBREDIS_NULL\fP, \fBREDIS_UNEXPECTED_RESP\fP, \fBRESP_INT\fP, \fBRESP::type\fP, \fBRESP::value\fP, \fBx_error()\fP, \fBX_FAILURE\fP, \fBX_NULL\fP, and \fBX_SUCCESS\fP\&.
 .SS "void redisxClearConnectHooks (\fBRedis\fP * redis)"
 Removes all connect hooks, that is no user callbacks will be made when the specifed \fBRedis\fP instance is connected\&.
 .PP
@@ -671,6 +674,22 @@ X_SUCCESS (0) if successfully connected to the \fBRedis\fP server\&. X_NO_INIT i
 
 .PP
 References \fBx_error()\fP, \fBX_NULL\fP, and \fBX_SUCCESS\fP\&.
+.SS "void redisxDebugTraffic (\fBboolean\fP value)"
+Enable or disable verbose reporting of all \fBRedis\fP bound traffic\&. It may be useful when debugging programs that use the redisx interface\&. Verbose reporting is DISABLED by default\&.
+.PP
+\fBParameters\fP
+.RS 4
+\fIvalue\fP TRUE to enable verbose reporting, or FALSE to disable\&.
+.RE
+.PP
+\fBSee also\fP
+.RS 4
+\fBredisxSetVerbose()\fP 
+.RE
+.PP
+
+.PP
+References \fBFALSE\fP, and \fBTRUE\fP\&.
 .SS "void redisxDestroy (\fBRedis\fP * redis)"
 Destroys a \fBRedis\fP intance, disconnecting any clients that may be connected, and freeing all resources used by that \fBRedis\fP instance\&.
 .PP
@@ -1342,7 +1361,7 @@ The \fBRESP\fP structure for the reponse received from \fBRedis\fP, or NULL if a
 .PP
 
 .PP
-References \fBFALSE\fP, \fBRESP::n\fP, \fBREDIS_INCOMPLETE_TRANSFER\fP, \fBREDIS_SIMPLE_STRING_SIZE\fP, \fBREDIS_UNEXPECTED_RESP\fP, \fBredisxDestroyRESP()\fP, \fBredisxReadReplyAsync()\fP, \fBRESP_ARRAY\fP, \fBRESP_BULK_STRING\fP, \fBRESP_ERROR\fP, \fBRESP_INT\fP, \fBRESP_SIMPLE_STRING\fP, \fBRESP::type\fP, \fBRESP::value\fP, \fBx_error()\fP, \fBX_FAILURE\fP, \fBX_PARSE_ERROR\fP, \fBX_SUCCESS\fP, \fBx_trace_null()\fP, and \fBxdprintf\fP\&.
+References \fBFALSE\fP, \fBRESP::n\fP, \fBREDIS_INCOMPLETE_TRANSFER\fP, \fBREDIS_SIMPLE_STRING_SIZE\fP, \fBREDIS_UNEXPECTED_RESP\fP, \fBredisxDestroyRESP()\fP, \fBredisxReadReplyAsync()\fP, \fBRESP_ARRAY\fP, \fBRESP_BULK_STRING\fP, \fBRESP_ERROR\fP, \fBRESP_INT\fP, \fBRESP_SIMPLE_STRING\fP, \fBRESP::type\fP, \fBRESP::value\fP, \fBx_error()\fP, \fBX_FAILURE\fP, \fBX_PARSE_ERROR\fP, \fBX_SUCCESS\fP, and \fBx_trace_null()\fP\&.
 .SS "int redisxReconnect (\fBRedis\fP * redis, \fBboolean\fP usePipeline)"
 Disconnects from \fBRedis\fP, and then connects again\&.\&.\&.
 .PP
@@ -1794,7 +1813,12 @@ Enable or disable verbose reporting of all \fBRedis\fP operations (and possibly 
 .PP
 \fBParameters\fP
 .RS 4
-\fIvalue\fP TRUE to enable verbose reporting, or FALSE to disable\&. 
+\fIvalue\fP TRUE to enable verbose reporting, or FALSE to disable\&.
+.RE
+.PP
+\fBSee also\fP
+.RS 4
+\fBredisxDebugTraffic()\fP 
 .RE
 .PP
 

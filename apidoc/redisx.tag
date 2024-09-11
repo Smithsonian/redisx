@@ -287,6 +287,13 @@
     </member>
     <member kind="function">
       <type>void</type>
+      <name>redisxDebugTraffic</name>
+      <anchorfile>redisx_8h.html</anchorfile>
+      <anchor>a7cde25fca6ae274d8d0a66d5c8b63ff5</anchor>
+      <arglist>(boolean value)</arglist>
+    </member>
+    <member kind="function">
+      <type>void</type>
       <name>redisxDestroy</name>
       <anchorfile>redisx_8h.html</anchorfile>
       <anchor>ac54dd4c46d8615db4da02702c18f062b</anchor>
@@ -1145,6 +1152,13 @@
       <anchorfile>redisx_8c.html</anchorfile>
       <anchor>a2d3ffb89129ab04483e3966835a5ff71</anchor>
       <arglist>(const RESP *resp, char expectedType, int expectedSize)</arglist>
+    </member>
+    <member kind="function">
+      <type>void</type>
+      <name>redisxDebugTraffic</name>
+      <anchorfile>redisx_8c.html</anchorfile>
+      <anchor>a7cde25fca6ae274d8d0a66d5c8b63ff5</anchor>
+      <arglist>(boolean value)</arglist>
     </member>
     <member kind="function">
       <type>void</type>

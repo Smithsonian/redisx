@@ -125,6 +125,7 @@
           <topic label="redisxClearDisconnectHooks" href="redisx_8h.html#aed087a61d22caaaada5d95bdc15bba6a"/>
           <topic label="redisxClearSubscribers" href="redisx_8h.html#af70948d6e1b0e3b8f4fde82d0ce27094"/>
           <topic label="redisxConnect" href="redisx_8h.html#ad71822356ffd40ed4b1c71d065f48809"/>
+          <topic label="redisxDebugTraffic" href="redisx_8h.html#a7cde25fca6ae274d8d0a66d5c8b63ff5"/>
           <topic label="redisxDestroy" href="redisx_8h.html#ac54dd4c46d8615db4da02702c18f062b"/>
           <topic label="redisxDestroyEntries" href="redisx_8h.html#ac21d16334774d91d2d4ea8afcb67cbb7"/>
           <topic label="redisxDestroyKeys" href="redisx_8h.html#a42d64f9b8b0399bf391a5aa3d8cbb9e0"/>
@@ -259,6 +260,7 @@
           <topic label="redisxArrayRequest" href="redisx_8c.html#a13ae33bc25ee03621b23541236ef5f82"/>
           <topic label="redisxCheckDestroyRESP" href="redisx_8c.html#a67b8bd13975dd286600f20dc80bdb462"/>
           <topic label="redisxCheckRESP" href="redisx_8c.html#a2d3ffb89129ab04483e3966835a5ff71"/>
+          <topic label="redisxDebugTraffic" href="redisx_8c.html#a7cde25fca6ae274d8d0a66d5c8b63ff5"/>
           <topic label="redisxDestroyRESP" href="redisx_8c.html#aa4e23a7454f7055711915ec430599011"/>
           <topic label="redisxError" href="redisx_8c.html#ae722b046fa70a55db725341ef8ee56dc"/>
           <topic label="redisxErrorDescription" href="redisx_8c.html#a38f3de77ad5a48d37b302bce2e3cd25b"/>

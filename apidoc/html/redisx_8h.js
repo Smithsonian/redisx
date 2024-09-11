@@ -45,6 +45,7 @@ var redisx_8h =
     [ "redisxClearDisconnectHooks", "redisx_8h.html#aed087a61d22caaaada5d95bdc15bba6a", null ],
     [ "redisxClearSubscribers", "redisx_8h.html#af70948d6e1b0e3b8f4fde82d0ce27094", null ],
     [ "redisxConnect", "redisx_8h.html#ad71822356ffd40ed4b1c71d065f48809", null ],
+    [ "redisxDebugTraffic", "redisx_8h.html#a7cde25fca6ae274d8d0a66d5c8b63ff5", null ],
     [ "redisxDestroy", "redisx_8h.html#ac54dd4c46d8615db4da02702c18f062b", null ],
     [ "redisxDestroyEntries", "redisx_8h.html#ac21d16334774d91d2d4ea8afcb67cbb7", null ],
     [ "redisxDestroyKeys", "redisx_8h.html#a42d64f9b8b0399bf391a5aa3d8cbb9e0", null ],
