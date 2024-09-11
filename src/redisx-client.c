@@ -569,7 +569,7 @@ int redisxSendRequestAsync(RedisClient *cl, const char *command, const char *arg
  *                      X_NO_SERVICE if not connected to the client or if send() failed.
  */
 int redisxSendArrayRequestAsync(RedisClient *cl, char *args[], int lengths[], int n) {
-  const char *fn = "redisxSendArrayRequestAsync";
+  static const char *fn = "redisxSendArrayRequestAsync";
   char buf[REDISX_CMDBUF_SIZE];
   int i, L;
   ClientPrivate *cp;
