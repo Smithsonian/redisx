@@ -52,7 +52,7 @@ test:
 # Remove intermediates
 .PHONY: clean
 clean:
-	rm -f $(OBJECTS) README-orig.md gmon.out
+	rm -f $(OBJECTS) README-redisx.md gmon.out
 
 # Remove all generated files
 .PHONY: distclean
@@ -79,10 +79,10 @@ $(LIB)/libredisx.so.$(SO_VERSION): $(SOURCES)
 # Static library
 $(LIB)/libredisx.a: $(OBJECTS) | $(LIB) Makefile
 
-README-orig.md: README.md
+README-redisx.md: README.md
 	LINE=`sed -n '/\# /{=;q;}' $<` && tail -n +$$((LINE+2)) $< > $@
 
-dox: README-orig.md
+dox: README-redisx.md
 
 .INTERMEDIATE: Doxyfile.local
 Doxyfile.local: Doxyfile Makefile
@@ -92,7 +92,7 @@ Doxyfile.local: Doxyfile Makefile
 # Local documentation without specialized headers. The resulting HTML documents do not have
 # Google Search or Analytics tracking info.
 .PHONY: local-dox
-local-dox: README-orig.md Doxyfile.local
+local-dox: README-redisx.md Doxyfile.local
 	doxygen Doxyfile.local
 
 # Built-in help screen for `make help`

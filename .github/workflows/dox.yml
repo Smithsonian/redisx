@@ -41,6 +41,9 @@ jobs:
 
     runs-on: ubuntu-latest
     steps:
+    
+    - name: install doxygen
+      run: sudo apt-get install doxygen
 
     - name: Checkout source
       uses: actions/checkout@v4
@@ -54,17 +57,11 @@ jobs:
         repository: Smithsonian/xchange
         path: xchange
 
-    - name: Generate headless README for xchange
-      run: make -C xchange README-orig.md
-      
-    - name: Generate xchange apidocs
-      uses: mattnotmitt/doxygen-action@v1.9.8
-      with:
-        additional-packages: font-roboto
-        working-directory: ./xchange
+    - name: Generate docs
+      run: make -C xchange local-dox 
 
     - name: Generate headless README for RedisX
-      run: make -C redisx README-orig.md
+      run: make -C redisx README-redisx.md
 
     - name: Generate RedisX apidocs
       uses: mattnotmitt/doxygen-action@v1.9.8
@@ -85,7 +82,7 @@ jobs:
       run: |
         echo '<img src="/redisx/resources/CfA-logo.png" alt="CfA logo" width="400" height="67" align="right">' > site/doc/README.md
         echo '<br clear="all">' >> site/doc/README.md
-        cat redisx/README-orig.md >> site/doc/README.md
+        cat redisx/README-redisx.md >> site/doc/README.md
 
     - name: Copy CHANGELOG
       run: cp redisx/CHANGELOG.md site/doc/
