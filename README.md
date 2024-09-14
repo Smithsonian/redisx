@@ -912,7 +912,7 @@ Then activate it as:
 ```c
   Redis *redis = ...
   
-  redisSetTransmitErrorHandler(redis, my_error_handler);
+  redisxSetTransmitErrorHandler(redis, my_error_handler);
 ```
 
 After that, every time there is an error with sending or receiving packets over the network to any of the Redis
