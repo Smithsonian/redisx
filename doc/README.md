@@ -45,7 +45,7 @@ Some related links:
 
  - [API documentation](https://smithsonian.github.io/redisx/apidoc/html/files.html)
  - [Project page](https://smithsonian.github.io/redisx) on github.io
- - [xchange](https://smithsonian.github.io/redisx) library dependency
+ - [xchange](https://smithsonian.github.io/xchange) library dependency
 
 
 -----------------------------------------------------------------------------
@@ -895,7 +895,7 @@ Then activate it as:
 ```c
   Redis *redis = ...
   
-  redisSetTransmitErrorHandler(redis, my_error_handler);
+  redisxSetTransmitErrorHandler(redis, my_error_handler);
 ```
 
 After that, every time there is an error with sending or receiving packets over the network to any of the Redis

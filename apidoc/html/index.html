@@ -144,7 +144,7 @@ Introduction</h2>
 <ul>
 <li><a href="https://smithsonian.github.io/redisx/apidoc/html/files.html">API documentation</a></li>
 <li><a href="https://smithsonian.github.io/redisx">Project page</a> on github.io</li>
-<li><a href="https://smithsonian.github.io/redisx">xchange</a> library dependency</li>
+<li><a href="https://smithsonian.github.io/xchange">xchange</a> library dependency</li>
 </ul>
 <hr  />
 <p><a class="anchor" id="prerequisites"></a> </p>
@@ -697,7 +697,7 @@ Error handling</h2>
 </div><!-- fragment --><p>Then activate it as:</p>
 <div class="fragment"><div class="line"><a class="code hl_struct" href="structRedis.html">Redis</a> *redis = ...</div>
 <div class="line"> </div>
-<div class="line">redisSetTransmitErrorHandler(redis, my_error_handler);</div>
+<div class="line">redisxSetTransmitErrorHandler(redis, my_error_handler);</div>
 </div><!-- fragment --><p>After that, every time there is an error with sending or receiving packets over the network to any of the <a class="el" href="structRedis.html" title="Structure that represents a Redis database instance, with one or more RedisClient connections.">Redis</a> clients used, your handler will report it the way you want it.</p>
 <hr  />
 <p><a class="anchor" id="debug-support"></a> </p>
