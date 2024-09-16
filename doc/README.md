@@ -26,7 +26,7 @@ Redis forks / clones like [Dragonfly](https://dragonfly.io) or [Valkey](https://
 interactive and pipelined Redis queries, managing and processing subscriptions, atomic execution blocks, and LUA 
 scripts loading. It can be used with multiple Redis servers simultaneously also.
 
-While there are other C/C++ Redis clients available, this one is C90 compatible, and hence can be used on older 
+While there are other C/C++ Redis clients available, this one is C99 compatible, and hence can be used on older 
 platforms also. It is also small and fast, but still capable and versatile.
 
 Rather than providing high-level support for every possible Redis command (which would probably be impossible given 

@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=11"/>
 <meta charset="utf-8"/>
 <meta name="description" content="A light-weight Redis client library for C/C++"/>
-<meta name="keywords" content="Redis client library, C, C++, C90, software library, open source"/>
+<meta name="keywords" content="Redis client library, C, C++, C99, software library, open source"/>
 <meta name="author" content="Attila Kovacs"/>
 <meta name="copyright" content="(C)2024 Attila Kovacs" />
 <meta name="robots" content="index,follow"/>
@@ -231,7 +231,7 @@ Functions</h2></td></tr>
 <dd>
 <a class="el" href="redisx-client_8c.html#abc855133c2af4f5d929a05292aa634d1">redisxReadReplyAsync()</a> </dd></dl>
 
-<p class="reference">References <a class="el" href="structRedis.html#af51011d99955d6f036a9f2c291577749">Redis::interactive</a>, <a class="el" href="redisx-client_8c.html#aad864c08ef9365c264c30bbacb0b77b2">redisxLockConnected()</a>, <a class="el" href="redisx-client_8c.html#abc855133c2af4f5d929a05292aa634d1">redisxReadReplyAsync()</a>, <a class="el" href="redisx-client_8c.html#a899f4f8853add789db4bd4de106fd6d8">redisxSendArrayRequestAsync()</a>, <a class="el" href="redisx-client_8c.html#a87efe53c80fcff3fcf189362cbc602f7">redisxUnlockClient()</a>, <a class="elRef" href="../../xchange/apidoc/html/xchange_8c.html#ae73aaf705dc4e7d58dfb0fd81f4805c7">x_error()</a>, <a class="elRef" href="../../xchange/apidoc/html/xchange_8h.html#aadbbe3ae01369cbddf4d57d430b33133">X_NULL</a>, <a class="elRef" href="../../xchange/apidoc/html/xchange_8h.html#a7b2679c964ea5f2160380ed55654b873">X_SUCCESS</a>, <a class="elRef" href="../../xchange/apidoc/html/xchange_8c.html#ac39ae03ca89b115d49a12f633522dc31">x_trace_null()</a>, and <a class="elRef" href="../../xchange/apidoc/html/xchange_8h.html#a1f038bf7ddb58819805cfc44162cb403">xvprintf</a>.</p>
+<p class="reference">References <a class="el" href="structRedis.html#af51011d99955d6f036a9f2c291577749">Redis::interactive</a>, <a class="el" href="redisx-client_8c.html#aad864c08ef9365c264c30bbacb0b77b2">redisxLockConnected()</a>, <a class="el" href="redisx-client_8c.html#abc855133c2af4f5d929a05292aa634d1">redisxReadReplyAsync()</a>, <a class="el" href="redisx-client_8c.html#a899f4f8853add789db4bd4de106fd6d8">redisxSendArrayRequestAsync()</a>, <a class="el" href="redisx-client_8c.html#a87efe53c80fcff3fcf189362cbc602f7">redisxUnlockClient()</a>, <a class="elRef" href="../../xchange/apidoc/html/xchange_8c.html#ae73aaf705dc4e7d58dfb0fd81f4805c7">x_error()</a>, <a class="elRef" href="../../xchange/apidoc/html/xchange_8h.html#aadbbe3ae01369cbddf4d57d430b33133">X_NULL</a>, <a class="elRef" href="../../xchange/apidoc/html/xchange_8h.html#a7b2679c964ea5f2160380ed55654b873">X_SUCCESS</a>, <a class="elRef" href="../../xchange/apidoc/html/xchange_8c.html#a41806ac77d095ef2029f26a689ba8b20">x_trace_null()</a>, and <a class="elRef" href="../../xchange/apidoc/html/xchange_8h.html#a1f038bf7ddb58819805cfc44162cb403">xvprintf</a>.</p>
 
 </div>
 </div>
@@ -447,7 +447,7 @@ Functions</h2></td></tr>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>A constant string with the error description. </dd></dl>
 
-<p class="reference">References <a class="el" href="redisx_8h.html#aad063b5d1f8eaeadc0c70f8568113034">REDIS_ERROR</a>, <a class="el" href="redisx_8h.html#a158f2b6af2421e42128d014e50896bb4">REDIS_INCOMPLETE_TRANSFER</a>, <a class="el" href="redisx_8h.html#a8827c9e06650c47f2cfd96496af5487e">REDIS_INVALID_CHANNEL</a>, <a class="el" href="redisx_8h.html#a7e2f81e12d6982c6aa97b50a77fd98f5">REDIS_NULL</a>, <a class="el" href="redisx_8h.html#a447a38ce70634136b737274965aa5ecc">REDIS_UNEXPECTED_ARRAY_SIZE</a>, <a class="el" href="redisx_8h.html#a9d530bcfae7689b4275749b47a6d9b51">REDIS_UNEXPECTED_RESP</a>, and <a class="elRef" href="../../xchange/apidoc/html/xchange_8h.html#acc701c734a3b95d356660ca5ee16a96a">xErrorDescription()</a>.</p>
+<p class="reference">References <a class="el" href="redisx_8h.html#aad063b5d1f8eaeadc0c70f8568113034">REDIS_ERROR</a>, <a class="el" href="redisx_8h.html#a158f2b6af2421e42128d014e50896bb4">REDIS_INCOMPLETE_TRANSFER</a>, <a class="el" href="redisx_8h.html#a8827c9e06650c47f2cfd96496af5487e">REDIS_INVALID_CHANNEL</a>, <a class="el" href="redisx_8h.html#a7e2f81e12d6982c6aa97b50a77fd98f5">REDIS_NULL</a>, <a class="el" href="redisx_8h.html#a447a38ce70634136b737274965aa5ecc">REDIS_UNEXPECTED_ARRAY_SIZE</a>, <a class="el" href="redisx_8h.html#a9d530bcfae7689b4275749b47a6d9b51">REDIS_UNEXPECTED_RESP</a>, and <a class="elRef" href="../../xchange/apidoc/html/xchange_8h.html#ac97fabe4f847b3262187f1dfdc346f0f">xErrorDescription()</a>.</p>
 
 </div>
 </div>
@@ -647,7 +647,7 @@ Functions</h2></td></tr>
 <dd>
 <a class="el" href="redisx-client_8c.html#abc855133c2af4f5d929a05292aa634d1">redisxReadReplyAsync()</a> </dd></dl>
 
-<p class="reference">References <a class="el" href="redisx_8c.html#a13ae33bc25ee03621b23541236ef5f82">redisxArrayRequest()</a>, <a class="elRef" href="../../xchange/apidoc/html/xchange_8c.html#ae73aaf705dc4e7d58dfb0fd81f4805c7">x_error()</a>, <a class="elRef" href="../../xchange/apidoc/html/xchange_8h.html#aadbbe3ae01369cbddf4d57d430b33133">X_NULL</a>, and <a class="elRef" href="../../xchange/apidoc/html/xchange_8c.html#ac39ae03ca89b115d49a12f633522dc31">x_trace_null()</a>.</p>
+<p class="reference">References <a class="el" href="redisx_8c.html#a13ae33bc25ee03621b23541236ef5f82">redisxArrayRequest()</a>, <a class="elRef" href="../../xchange/apidoc/html/xchange_8c.html#ae73aaf705dc4e7d58dfb0fd81f4805c7">x_error()</a>, <a class="elRef" href="../../xchange/apidoc/html/xchange_8h.html#aadbbe3ae01369cbddf4d57d430b33133">X_NULL</a>, and <a class="elRef" href="../../xchange/apidoc/html/xchange_8c.html#a41806ac77d095ef2029f26a689ba8b20">x_trace_null()</a>.</p>
 
 </div>
 </div>
@@ -729,7 +729,7 @@ Functions</h2></td></tr>
 <dl class="section return"><dt>Returns</dt><dd>X_SUCCESS (0) if successful, X_NULL if the redis argument is NULL, or X_ALREADY_OPEN if called after <a class="el" href="structRedis.html" title="Structure that represents a Redis database instance, with one or more RedisClient connections.">Redis</a> was already connected.</dd></dl>
 <dl class="section see"><dt>See also</dt><dd><a class="el" href="redisx_8c.html#a3beff3a9e373a0f1de626a8e64da98cf">redisxSetUser()</a> </dd></dl>
 
-<p class="reference">References <a class="el" href="redisx-net_8c.html#a94326ebfa5868579c8448cdbb941b3da">redisxIsConnected()</a>, <a class="elRef" href="../../xchange/apidoc/html/xchange_8h.html#a9e947ab368178c7e248b3cf8b26defa1">X_ALREADY_OPEN</a>, <a class="elRef" href="../../xchange/apidoc/html/xchange_8c.html#ae73aaf705dc4e7d58dfb0fd81f4805c7">x_error()</a>, <a class="elRef" href="../../xchange/apidoc/html/xchange_8h.html#aadbbe3ae01369cbddf4d57d430b33133">X_NULL</a>, <a class="elRef" href="../../xchange/apidoc/html/xchange_8h.html#a7b2679c964ea5f2160380ed55654b873">X_SUCCESS</a>, and <a class="elRef" href="../../xchange/apidoc/html/xchange_8h.html#a01d730a1a98963816de2dd73e72957a5">xStringCopyOf()</a>.</p>
+<p class="reference">References <a class="el" href="redisx-net_8c.html#a94326ebfa5868579c8448cdbb941b3da">redisxIsConnected()</a>, <a class="elRef" href="../../xchange/apidoc/html/xchange_8h.html#a9e947ab368178c7e248b3cf8b26defa1">X_ALREADY_OPEN</a>, <a class="elRef" href="../../xchange/apidoc/html/xchange_8c.html#ae73aaf705dc4e7d58dfb0fd81f4805c7">x_error()</a>, <a class="elRef" href="../../xchange/apidoc/html/xchange_8h.html#aadbbe3ae01369cbddf4d57d430b33133">X_NULL</a>, <a class="elRef" href="../../xchange/apidoc/html/xchange_8h.html#a7b2679c964ea5f2160380ed55654b873">X_SUCCESS</a>, and <a class="elRef" href="../../xchange/apidoc/html/xchange_8h.html#adf424f5965e2c2bdda4da520548a0c67">xStringCopyOf()</a>.</p>
 
 </div>
 </div>
@@ -847,7 +847,7 @@ Functions</h2></td></tr>
 <dl class="section return"><dt>Returns</dt><dd>X_SUCCESS (0) if successful, X_NULL if the redis argument is NULL, or X_ALREADY_OPEN if called after <a class="el" href="structRedis.html" title="Structure that represents a Redis database instance, with one or more RedisClient connections.">Redis</a> was already connected.</dd></dl>
 <dl class="section see"><dt>See also</dt><dd><a class="el" href="redisx_8c.html#a0e9eda38aa6f084ac151cbebe2886c2f">redisxSetPassword()</a> </dd></dl>
 
-<p class="reference">References <a class="el" href="redisx-net_8c.html#a94326ebfa5868579c8448cdbb941b3da">redisxIsConnected()</a>, <a class="elRef" href="../../xchange/apidoc/html/xchange_8h.html#a9e947ab368178c7e248b3cf8b26defa1">X_ALREADY_OPEN</a>, <a class="elRef" href="../../xchange/apidoc/html/xchange_8c.html#ae73aaf705dc4e7d58dfb0fd81f4805c7">x_error()</a>, <a class="elRef" href="../../xchange/apidoc/html/xchange_8h.html#aadbbe3ae01369cbddf4d57d430b33133">X_NULL</a>, <a class="elRef" href="../../xchange/apidoc/html/xchange_8h.html#a7b2679c964ea5f2160380ed55654b873">X_SUCCESS</a>, and <a class="elRef" href="../../xchange/apidoc/html/xchange_8h.html#a01d730a1a98963816de2dd73e72957a5">xStringCopyOf()</a>.</p>
+<p class="reference">References <a class="el" href="redisx-net_8c.html#a94326ebfa5868579c8448cdbb941b3da">redisxIsConnected()</a>, <a class="elRef" href="../../xchange/apidoc/html/xchange_8h.html#a9e947ab368178c7e248b3cf8b26defa1">X_ALREADY_OPEN</a>, <a class="elRef" href="../../xchange/apidoc/html/xchange_8c.html#ae73aaf705dc4e7d58dfb0fd81f4805c7">x_error()</a>, <a class="elRef" href="../../xchange/apidoc/html/xchange_8h.html#aadbbe3ae01369cbddf4d57d430b33133">X_NULL</a>, <a class="elRef" href="../../xchange/apidoc/html/xchange_8h.html#a7b2679c964ea5f2160380ed55654b873">X_SUCCESS</a>, and <a class="elRef" href="../../xchange/apidoc/html/xchange_8h.html#adf424f5965e2c2bdda4da520548a0c67">xStringCopyOf()</a>.</p>
 
 </div>
 </div>

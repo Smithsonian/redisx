@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=11"/>
 <meta charset="utf-8"/>
 <meta name="description" content="A light-weight Redis client library for C/C++"/>
-<meta name="keywords" content="Redis client library, C, C++, C90, software library, open source"/>
+<meta name="keywords" content="Redis client library, C, C++, C99, software library, open source"/>
 <meta name="author" content="Attila Kovacs"/>
 <meta name="copyright" content="(C)2024 Attila Kovacs" />
 <meta name="robots" content="index,follow"/>
@@ -115,7 +115,7 @@ $(document).ready(function(){initNavTree('index.html',''); initResizable(); });
   <div class="headertitle"><div class="title">RedisX </div></div>
 </div><!--header-->
 <div class="contents">
-<div class="textblock"><p><a class="anchor" id="md_README-orig"></a> A simple, light-weight C/C++ <a class="el" href="structRedis.html" title="Structure that represents a Redis database instance, with one or more RedisClient connections.">Redis</a> client library.</p>
+<div class="textblock"><p><a class="anchor" id="md_README-redisx"></a> A simple, light-weight C/C++ <a class="el" href="structRedis.html" title="Structure that represents a Redis database instance, with one or more RedisClient connections.">Redis</a> client library.</p>
 <h2><a class="anchor" id="autotoc_md3"></a>
 Table of Contents</h2>
 <ul>
@@ -136,7 +136,7 @@ Table of Contents</h2>
 <h2><a class="anchor" id="autotoc_md4"></a>
 Introduction</h2>
 <p><b>RedisX</b> is a light-weight <a href="https://redis.io">Redis</a> client library for C/C++. As such, it should also work with <a class="el" href="structRedis.html" title="Structure that represents a Redis database instance, with one or more RedisClient connections.">Redis</a> forks / clones like <a href="https://dragonfly.io">Dragonfly</a> or <a href="https://valkey.io">Valkey</a>. It supports both interactive and pipelined <a class="el" href="structRedis.html" title="Structure that represents a Redis database instance, with one or more RedisClient connections.">Redis</a> queries, managing and processing subscriptions, atomic execution blocks, and LUA scripts loading. It can be used with multiple <a class="el" href="structRedis.html" title="Structure that represents a Redis database instance, with one or more RedisClient connections.">Redis</a> servers simultaneously also.</p>
-<p>While there are other C/C++ <a class="el" href="structRedis.html" title="Structure that represents a Redis database instance, with one or more RedisClient connections.">Redis</a> clients available, this one is C90 compatible, and hence can be used on older platforms also. It is also small and fast, but still capable and versatile.</p>
+<p>While there are other C/C++ <a class="el" href="structRedis.html" title="Structure that represents a Redis database instance, with one or more RedisClient connections.">Redis</a> clients available, this one is C99 compatible, and hence can be used on older platforms also. It is also small and fast, but still capable and versatile.</p>
 <p>Rather than providing high-level support for every possible <a class="el" href="structRedis.html" title="Structure that represents a Redis database instance, with one or more RedisClient connections.">Redis</a> command (which would probably be impossible given the pace new commands are being introduced all the time), it provides a basic framework for synchronous and asynchronous queries, with some higher-level functions for managing key/value storage types (including hash tables), and PUB/SUB. Future releases may add further higher-level functionality based on demand for such features.</p>
 <p>The <b>RedisX</b> library was created, and is maintained, by Attila Kovács at the Center for Astrophysics | Harvard &amp; Smithsonian, and it is available through the <a href="https://github.com/Smithsonian/redisx">Smithsonian/redisx</a> repository on GitHub.</p>
 <p>There are no official releases of <b>RedisX</b> yet. An initial 1.0.0 release is expected in late 2024 or early 2025. Before then the API may undergo slight changes and tweaks. Use the repository as is at your own risk for now.</p>
