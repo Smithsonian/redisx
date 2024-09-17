@@ -583,8 +583,8 @@ int redisxSendArrayRequestAsync(RedisClient *cl, char *args[], int lengths[], in
   for(i=0; i<n; i++) {
     int l, L1;
 
-    if(!lengths) l = strlen(args[i]);
-    else l = lengths[i] > 0 ? lengths[i] : strlen(args[i]);
+    if(!lengths) l = (int) strlen(args[i]);
+    else l = lengths[i] > 0 ? lengths[i] : (int) strlen(args[i]);
 
     L += sprintf(buf + L, "$%d\r\n", l);
 
