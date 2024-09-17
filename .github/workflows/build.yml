@@ -27,6 +27,7 @@ jobs:
     runs-on: ubuntu-latest
     env:
       CC: gcc
+      CFLAGS: -Os -Wall -Wextra -Werror -std=c99
       XCHANGE: xchange
     steps:
     - name: Check out RedisX
