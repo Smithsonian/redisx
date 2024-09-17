@@ -9,6 +9,14 @@ on:
       - '*.mk'
       - '.github/workflows/check.yml'
 
+  pull_request:
+    paths:
+      - 'src/**'
+      - 'include/**'
+      - 'Makefile'
+      - '*.mk'
+      - '.github/workflows/check.yml'
+
 jobs:
 
   cppcheck:
