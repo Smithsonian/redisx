@@ -775,7 +775,7 @@ RESP *redisxReadReplyAsync(RedisClient *cl) {
       // FIXME workaround for Redis 4.x improper OK reply to QUIT
       if(!strcmp(buf, "OK")) {
         resp->type = RESP_SIMPLE_STRING;
-        resp->value = strdup("OK");
+        resp->value = xStringCopyOf("OK");
       }
       else if(cp->isEnabled) {
         fprintf(stderr, "WARNING! Redis-X : invalid type '%c' in '%s'\n", buf[0], buf);

@@ -520,6 +520,7 @@ int rConnectClient(Redis *redis, enum redisx_channel channel) {
   static const char *fn = "rConnectClient";
 
   struct sockaddr_in serverAddress;
+  struct utsname u;
   const RedisPrivate *p;
   RedisClient *cl;
   ClientPrivate *cp;
@@ -566,7 +567,8 @@ int rConnectClient(Redis *redis, enum redisx_channel channel) {
   }
 
   // Set the client name in Redis.
-  gethostname(host, sizeof(host));
+  uname(&u);
+  strncpy(host, u.nodename, sizeof(host) - 1);
 
   id = (char *) malloc(strlen(host) + 100);      // <host>:pid-<pid>:<channel> + termination;
   switch(cp->idx) {
