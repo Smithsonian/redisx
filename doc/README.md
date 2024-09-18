@@ -294,11 +294,11 @@ whose contents are:
 
  | RESP `type`             | Redis ID | `n`                           |`value` cast in C      |
  |-------------------------|----------|-------------------------------|-----------------------|
- | `RESP_ARRAY`            |   '*'    | number of `RESP *` pointers   | `(RESP **)`           |
- | `RESP_INT`              |   ':'    | integer return value          |                       |
- | `RESP_SIMPLE_STRING`    |   '+'    | string length                 | `(char *)`            |
- | `RESP_ERROR`            |   '-'    | string length                 | `(char *)`            |
- | `RESP_BULK_STRING`      |   '$'    | string length or -1 if `NULL` | `(char *)`            |
+ | `RESP_ARRAY`            |   `*`    | number of `RESP *` pointers   | `(RESP **)`           |
+ | `RESP_INT`              |   `:`    | integer return value          |                       |
+ | `RESP_SIMPLE_STRING`    |   `+`    | string length                 | `(char *)`            |
+ | `RESP_ERROR`            |   `-`    | string length                 | `(char *)`            |
+ | `RESP_BULK_STRING`      |   `$`    | string length or -1 if `NULL` | `(char *)`            |
 
 
 Each `RESP` has a type (e.g. `RESP_SIMPLE_STRING`), an integer value `n`, and a `value` pointer
