@@ -278,7 +278,30 @@ with that response (or `NULL` if there was an error).
 ### RESP data type
   
 All responses coming from the Redis server are represented by a dynamically allocated `RESP` type (defined in 
-`redisx.h`) structure. Each `RESP` has a type (e.g. `RESP_SIMPLE_STRING`), an integer value `n`, and a `value` pointer
+`redisx.h`) structure. 
+
+```c
+typedef struct RESP {
+  char type;                    // RESP type: RESP_ARRAY, RESP_INT ...
+  int n;                        // Either the integer value of a RESP_INT response, or the 
+                                // dimension of the value field.
+  void *value;                  // Pointer to text (char *) content or to an array of components 
+                                // (RESP**)...
+} RESP;
+```
+
+whose contents are:
+
+ | RESP `type`             | Redis ID | `n`                           |`value` cast in C      |
+ |-------------------------|----------|-------------------------------|-----------------------|
+ | `RESP_ARRAY`            |   '*'    | number of `RESP *` pointers   | `(RESP **)`           |
+ | `RESP_INT`              |   ':'    | integer return value          |                       |
+ | `RESP_SIMPLE_STRING`    |   '+'    | string length                 | `(char *)`            |
+ | `RESP_ERROR`            |   '-'    | string length                 | `(char *)`            |
+ | `RESP_BULK_STRING`      |   '$'    | string length or -1 if `NULL` | `(char *)`            |
+
+
+Each `RESP` has a type (e.g. `RESP_SIMPLE_STRING`), an integer value `n`, and a `value` pointer
 to further data. If the type is `RESP_INT`, then `n` represents the actual return value (and the `value` pointer is
 not used). For string type values `n` is the number of characters in the string `value` (not including termination), 
 while for `RESP_ARRAY` types the `value` is a pointer to an embedded `RESP` array and `n` is the number of elements 
