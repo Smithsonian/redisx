@@ -295,7 +295,7 @@ whose contents are:
  | RESP `type`             | Redis ID | `n`                           |`value` cast in C      |
  |-------------------------|----------|-------------------------------|-----------------------|
  | `RESP_ARRAY`            |   `*`    | number of `RESP *` pointers   | `(RESP **)`           |
- | `RESP_INT`              |   `:`    | integer return value          |                       |
+ | `RESP_INT`              |   `:`    | integer return value          | `NULL`                |
  | `RESP_SIMPLE_STRING`    |   `+`    | string length                 | `(char *)`            |
  | `RESP_ERROR`            |   `-`    | string length                 | `(char *)`            |
  | `RESP_BULK_STRING`      |   `$`    | string length or -1 if `NULL` | `(char *)`            |
