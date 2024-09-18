@@ -120,8 +120,8 @@ enum redisx_channel {
  * \sa redisxDestroyRESP()
  */
 typedef struct RESP {
-  char type;                    ///< RESP_ARRAY, RESP_INT ...
-  int n;                       ///< Either the integer value of a RESP_INT response, or the dimension of
+  char type;                    ///< value type RESP_ARRAY, RESP_INT ...
+  int n;                        ///< Either the integer value of a RESP_INT response, or the dimension of
                                 ///< the value field.
   void *value;                  ///< Pointer to text (char *) content to an array of components (RESP**)...
 } RESP;
