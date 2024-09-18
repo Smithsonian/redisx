@@ -286,7 +286,7 @@ typedef struct RESP {
   int n;                        // Either the integer value of a RESP_INT response, or the 
                                 // dimension of the value field.
   void *value;                  // Pointer to text (char *) content or to an array of components 
-                                // (RESP**)...
+                                // (RESP **)
 } RESP;
 ```
 
