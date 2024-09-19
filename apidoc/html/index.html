@@ -116,6 +116,12 @@ $(document).ready(function(){initNavTree('index.html',''); initResizable(); });
 </div><!--header-->
 <div class="contents">
 <div class="textblock"><p><a class="anchor" id="md_README-redisx"></a> A simple, light-weight C/C++ <a class="el" href="structRedis.html" title="Structure that represents a Redis database instance, with one or more RedisClient connections.">Redis</a> client library.</p>
+<ul>
+<li><a href="https://smithsonian.github.io/redisx/apidoc/html/files.html">API documentation</a></li>
+<li><a href="https://smithsonian.github.io/redisx">Project page</a> on github.io</li>
+</ul>
+<p>Author: Attila Kovacs</p>
+<p>Last Updated: 18 September 2024</p>
 <h2><a class="anchor" id="autotoc_md3"></a>
 Table of Contents</h2>
 <ul>
@@ -140,11 +146,6 @@ Introduction</h2>
 <p>Rather than providing high-level support for every possible <a class="el" href="structRedis.html" title="Structure that represents a Redis database instance, with one or more RedisClient connections.">Redis</a> command (which would probably be impossible given the pace new commands are being introduced all the time), it provides a basic framework for synchronous and asynchronous queries, with some higher-level functions for managing key/value storage types (including hash tables), and PUB/SUB. Future releases may add further higher-level functionality based on demand for such features.</p>
 <p>The <b>RedisX</b> library was created, and is maintained, by Attila Kovács at the Center for Astrophysics | Harvard &amp; Smithsonian, and it is available through the <a href="https://github.com/Smithsonian/redisx">Smithsonian/redisx</a> repository on GitHub.</p>
 <p>There are no official releases of <b>RedisX</b> yet. An initial 1.0.0 release is expected in late 2024 or early 2025. Before then the API may undergo slight changes and tweaks. Use the repository as is at your own risk for now.</p>
-<p>Some related links:</p>
-<ul>
-<li><a href="https://smithsonian.github.io/redisx/apidoc/html/files.html">API documentation</a></li>
-<li><a href="https://smithsonian.github.io/redisx">Project page</a> on github.io</li>
-</ul>
 <hr  />
 <p><a class="anchor" id="prerequisites"></a> </p>
 <h2><a class="anchor" id="autotoc_md6"></a>
@@ -160,7 +161,7 @@ Building RedisX</h2>
 <li><code>XCHANGE</code>: the root of the location where the <a href="https://github.com/Smithsonian/xchange">Smithsonian/xchange</a> library is installed. It expects to find <code><a class="elRef" href="../../xchange/apidoc/html/xchange_8h.html">xchange.h</a></code> under <code>$(XCHANGE)/include</code> and <code>libxchange.so</code> under <code>$(XCHANGE)/lib</code> or else in the default <code>LD_LIBRARY_PATH</code>.</li>
 <li><code>CC</code>: The C compiler to use (default: <code>gcc</code>).</li>
 <li><code>CPPFLAGS</code>: C pre-processor flags, such as externally defined compiler constants.</li>
-<li><code>CFLAGS</code>: Flags to pass onto the C compiler (default: <code>-Os -Wall</code>). Note, <code>-Iinclude</code> will be added automatically.</li>
+<li><code>CFLAGS</code>: Flags to pass onto the C compiler (default: <code>-Os -Wall -std=c99</code>). Note, <code>-Iinclude</code> will be added automatically.</li>
 <li><code>LDFLAGS</code>: Linker flags (default is <code>-lm</code>). Note, <code>-lxchange</code> will be added automatically.</li>
 <li><code>BUILD_MODE</code>: You can set it to <code>debug</code> to enable debugging features: it will initialize the global <code>xDebug</code> variable to <code>TRUE</code> and add <code>-g</code> to <code>CFLAGS</code>.</li>
 <li><code>CHECKEXTRA</code>: Extra options to pass to <code>cppcheck</code> for the <code>make check</code> target</li>
@@ -188,7 +189,7 @@ Initializing</h3>
 <div class="line">  <span class="keywordflow">return</span>;</div>
 <div class="line">}</div>
 <div class="ttc" id="aredisx-net_8c_html_a5c78c2189a76a077231016564a0cecd5"><div class="ttname"><a href="redisx-net_8c.html#a5c78c2189a76a077231016564a0cecd5">redisxInit</a></div><div class="ttdeci">Redis * redisxInit(const char *server)</div><div class="ttdef"><b>Definition</b> redisx-net.c:610</div></div>
-<div class="ttc" id="astructRedis_html"><div class="ttname"><a href="structRedis.html">Redis</a></div><div class="ttdoc">Structure that represents a Redis database instance, with one or more RedisClient connections.</div><div class="ttdef"><b>Definition</b> redisx.h:158</div></div>
+<div class="ttc" id="astructRedis_html"><div class="ttname"><a href="structRedis.html">Redis</a></div><div class="ttdoc">Structure that represents a Redis database instance, with one or more RedisClient connections.</div><div class="ttdef"><b>Definition</b> redisx.h:159</div></div>
 </div><!-- fragment --><p>Before connecting to the <a class="el" href="structRedis.html" title="Structure that represents a Redis database instance, with one or more RedisClient connections.">Redis</a> server, you may configure optional settings, such as the TCP port number to use (if not the default 6379), and the database authentication (if any):</p>
 <div class="fragment"><div class="line"><a class="code hl_struct" href="structRedis.html">Redis</a> *redis = ...</div>
 <div class="line"> </div>
@@ -244,7 +245,7 @@ Connection hooks</h3>
 <div class="fragment"><div class="line"><span class="keywordtype">void</span> my_connect_hook(<a class="code hl_struct" href="structRedis.html">Redis</a> *redis) {</div>
 <div class="line">   printf(<span class="stringliteral">&quot;Connected to Redis server: %s\n&quot;</span>, redis-&gt;<a class="code hl_variable" href="structRedis.html#aecb3b0d045ada529257a2fbf8f829599">id</a>);</div>
 <div class="line">}</div>
-<div class="ttc" id="astructRedis_html_aecb3b0d045ada529257a2fbf8f829599"><div class="ttname"><a href="structRedis.html#aecb3b0d045ada529257a2fbf8f829599">Redis::id</a></div><div class="ttdeci">char * id</div><div class="ttdoc">The string ID of the Redis server. Default is IP, e.g. &quot;127.0.0.1&quot;.</div><div class="ttdef"><b>Definition</b> redisx.h:159</div></div>
+<div class="ttc" id="astructRedis_html_aecb3b0d045ada529257a2fbf8f829599"><div class="ttname"><a href="structRedis.html#aecb3b0d045ada529257a2fbf8f829599">Redis::id</a></div><div class="ttdeci">char * id</div><div class="ttdoc">The string ID of the Redis server. Default is IP, e.g. &quot;127.0.0.1&quot;.</div><div class="ttdef"><b>Definition</b> redisx.h:160</div></div>
 </div><!-- fragment --><p>And, it can be added to a <a class="el" href="structRedis.html" title="Structure that represents a Redis database instance, with one or more RedisClient connections.">Redis</a> instance, between the <code><a class="el" href="redisx-net_8c.html#a5c78c2189a76a077231016564a0cecd5">redisxInit()</a></code> and the <code><a class="el" href="redisx-net_8c.html#ad71822356ffd40ed4b1c71d065f48809">redisxConnect()</a></code> calls.</p>
 <div class="fragment"><div class="line"><a class="code hl_struct" href="structRedis.html">Redis</a> *redis = ...</div>
 <div class="line"> </div>
@@ -300,9 +301,9 @@ RESP data type</h3>
 <div class="line">                                <span class="comment">// (RESP **)</span></div>
 <div class="line">} <a class="code hl_struct" href="structRESP.html">RESP</a>;</div>
 <div class="ttc" id="astructRESP_html"><div class="ttname"><a href="structRESP.html">RESP</a></div><div class="ttdoc">Structure that represents a Redis response (RESP format).</div><div class="ttdef"><b>Definition</b> redisx.h:122</div></div>
-<div class="ttc" id="astructRESP_html_a0f61d63b009d0880a89c843bd50d8d76"><div class="ttname"><a href="structRESP.html#a0f61d63b009d0880a89c843bd50d8d76">RESP::value</a></div><div class="ttdeci">void * value</div><div class="ttdoc">Pointer to text (char *) content to an array of components (RESP**)...</div><div class="ttdef"><b>Definition</b> redisx.h:126</div></div>
+<div class="ttc" id="astructRESP_html_a0f61d63b009d0880a89c843bd50d8d76"><div class="ttname"><a href="structRESP.html#a0f61d63b009d0880a89c843bd50d8d76">RESP::value</a></div><div class="ttdeci">void * value</div><div class="ttdef"><b>Definition</b> redisx.h:126</div></div>
 <div class="ttc" id="astructRESP_html_a76f11d9a0a47b94f72c2d0e77fb32240"><div class="ttname"><a href="structRESP.html#a76f11d9a0a47b94f72c2d0e77fb32240">RESP::n</a></div><div class="ttdeci">int n</div><div class="ttdef"><b>Definition</b> redisx.h:124</div></div>
-<div class="ttc" id="astructRESP_html_aff17911edc8208aa8ddb1c7c52c78389"><div class="ttname"><a href="structRESP.html#aff17911edc8208aa8ddb1c7c52c78389">RESP::type</a></div><div class="ttdeci">char type</div><div class="ttdoc">value type RESP_ARRAY, RESP_INT ...</div><div class="ttdef"><b>Definition</b> redisx.h:123</div></div>
+<div class="ttc" id="astructRESP_html_aff17911edc8208aa8ddb1c7c52c78389"><div class="ttname"><a href="structRESP.html#aff17911edc8208aa8ddb1c7c52c78389">RESP::type</a></div><div class="ttdeci">char type</div><div class="ttdoc">RESP type RESP_ARRAY, RESP_INT ...</div><div class="ttdef"><b>Definition</b> redisx.h:123</div></div>
 </div><!-- fragment --><p>whose contents are:</p>
 <table class="markdownTable">
 <tr class="markdownTableHead">
@@ -543,7 +544,7 @@ Execution blocks</h3>
 <div class="ttc" id="aredisx-client_8c_html_a87efe53c80fcff3fcf189362cbc602f7"><div class="ttname"><a href="redisx-client_8c.html#a87efe53c80fcff3fcf189362cbc602f7">redisxUnlockClient</a></div><div class="ttdeci">int redisxUnlockClient(RedisClient *cl)</div><div class="ttdef"><b>Definition</b> redisx-client.c:386</div></div>
 <div class="ttc" id="aredisx-client_8c_html_afc7b28288c07baf0b3c8fdc9d8ddf263"><div class="ttname"><a href="redisx-client_8c.html#afc7b28288c07baf0b3c8fdc9d8ddf263">redisxSendRequestAsync</a></div><div class="ttdeci">int redisxSendRequestAsync(RedisClient *cl, const char *command, const char *arg1, const char *arg2, const char *arg3)</div><div class="ttdef"><b>Definition</b> redisx-client.c:538</div></div>
 <div class="ttc" id="aredisx_8h_html_a5349b7340813fbd1e32d04ed650bc3d9a65b4f2926885665960480d008ab2a456"><div class="ttname"><a href="redisx_8h.html#a5349b7340813fbd1e32d04ed650bc3d9a65b4f2926885665960480d008ab2a456">REDISX_INTERACTIVE_CHANNEL</a></div><div class="ttdeci">@ REDISX_INTERACTIVE_CHANNEL</div><div class="ttdoc">Redis channel number for interactive queries.</div><div class="ttdef"><b>Definition</b> redisx.h:109</div></div>
-<div class="ttc" id="astructRedisClient_html"><div class="ttname"><a href="structRedisClient.html">RedisClient</a></div><div class="ttdoc">Structure that represents a single Redis client connection instance.</div><div class="ttdef"><b>Definition</b> redisx.h:145</div></div>
+<div class="ttc" id="astructRedisClient_html"><div class="ttname"><a href="structRedisClient.html">RedisClient</a></div><div class="ttdoc">Structure that represents a single Redis client connection instance.</div><div class="ttdef"><b>Definition</b> redisx.h:146</div></div>
 </div><!-- fragment --><p>If at any point things don't go according to plan in the middle of the block, you can call <code>redisAbortBlockAsync()</code> to abort and discard all prior commands submitted in the execution block already. It is important to remembet that every time you call <code><a class="el" href="redisx-client_8c.html#a3e49508e4e4fcc283832226fd1bffd85">redisxStartBlockAsync()</a></code>, you must call either <code><a class="el" href="redisx-client_8c.html#a6fed65f9413569c771d5165a0194477a">redisxExecBlockAsync()</a></code> to execute it or else <code><a class="el" href="redisx-client_8c.html#ab98b0e71d2d0941920e3097a66eae7b8">redisxAbortBlockAsync()</a></code> to discard it. Failure to do so, will effectively end you up with a hung <a class="el" href="structRedis.html" title="Structure that represents a Redis database instance, with one or more RedisClient connections.">Redis</a> client.</p>
 <p><a class="anchor" id="lua-script-loading-and-execution"></a> </p>
 <h3><a class="anchor" id="autotoc_md30"></a>

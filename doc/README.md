@@ -2,6 +2,13 @@
 <br clear="all">
 A simple, light-weight C/C++ Redis client library.
 
+ - [API documentation](https://smithsonian.github.io/redisx/apidoc/html/files.html)
+ - [Project page](https://smithsonian.github.io/redisx) on github.io
+ 
+Author: Attila Kovacs
+
+Last Updated: 18 September 2024
+
 ## Table of Contents
 
  - [Introduction](#introduction)
@@ -41,12 +48,6 @@ repository on GitHub.
 There are no official releases of __RedisX__ yet. An initial 1.0.0 release is expected in late 2024 or early 2025. 
 Before then the API may undergo slight changes and tweaks. Use the repository as is at your own risk for now.
 
-Some related links:
-
- - [API documentation](https://smithsonian.github.io/redisx/apidoc/html/files.html)
- - [Project page](https://smithsonian.github.io/redisx) on github.io
-
-
 -----------------------------------------------------------------------------
 
 <a name="prerequisites"></a>
@@ -74,7 +75,8 @@ prior to invoking `make`. The following build variables can be configured:
 
  - `CPPFLAGS`: C pre-processor flags, such as externally defined compiler constants.
  
- - `CFLAGS`: Flags to pass onto the C compiler (default: `-Os -Wall`). Note, `-Iinclude` will be added automatically.
+ - `CFLAGS`: Flags to pass onto the C compiler (default: `-Os -Wall -std=c99`). Note, `-Iinclude` will be added 
+   automatically.
    
  - `LDFLAGS`: Linker flags (default is `-lm`). Note, `-lxchange` will be added automatically.
 
