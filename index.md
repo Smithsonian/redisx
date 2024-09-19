@@ -21,9 +21,6 @@ This site contains various online resources that support the library:
 __Downloads__
 
  - [Releases](https://github.com/Smithsonian/redisx/releases) from GitHub
- - Doxygen [tag file](apidoc/redisx.tag) (`redisx.tag`) for linking 
-   your [Doxygen](https://www.doxygen.nl/) documentation to that of __RedisX__
-
 
 __Documentation__
 
@@ -34,3 +31,6 @@ __Documentation__
  - [Community Forum](https://github.com/Smithsonian/redisx/discussions) &ndash; ask a question, provide feedback, or 
    check announcements.
 
+__Dependencies__
+
+ - [Smithsonian/xchange](https://github.com/Smithsonian/xchange) -- structured data exchange framework
