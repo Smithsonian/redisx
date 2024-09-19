@@ -32,9 +32,6 @@ jobs:
     name: Generate API documentation
 
     runs-on: ubuntu-latest
-    env:
-      CC: gcc
-      XCHANGE: xchange
     steps:
 
     - name: install doxygen
