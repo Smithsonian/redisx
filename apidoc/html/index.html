@@ -162,7 +162,7 @@ Building RedisX</h2>
 <li><code>CC</code>: The C compiler to use (default: <code>gcc</code>).</li>
 <li><code>CPPFLAGS</code>: C pre-processor flags, such as externally defined compiler constants.</li>
 <li><code>CFLAGS</code>: Flags to pass onto the C compiler (default: <code>-Os -Wall -std=c99</code>). Note, <code>-Iinclude</code> will be added automatically.</li>
-<li><code>LDFLAGS</code>: Linker flags (default is <code>-lm</code>). Note, <code>-lxchange</code> will be added automatically.</li>
+<li><code>LDFLAGS</code>: Extra linker flags (default is <em>not set</em>). Note, <code>-lm -lxchange</code> will be added automatically.</li>
 <li><code>BUILD_MODE</code>: You can set it to <code>debug</code> to enable debugging features: it will initialize the global <code>xDebug</code> variable to <code>TRUE</code> and add <code>-g</code> to <code>CFLAGS</code>.</li>
 <li><code>CHECKEXTRA</code>: Extra options to pass to <code>cppcheck</code> for the <code>make check</code> target</li>
 </ul>
