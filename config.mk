@@ -32,18 +32,8 @@ CFLAGS ?= -Os -Wall -std=c99
 # Extra warnings (not supported on all compilers)
 #CFLAGS += -Wextra
 
-# Link against math libs (for e.g. isnan())
-LDFLAGS ?= -lm
-
-# Compile and link against a specific xchange library (if defined)
-ifdef XCHANGE
-  CPPFLAGS += -I$(XCHANGE)/include
-  LDFLAGS += -L$(XCHANGE)/lib
-  LD_LIBRARY_PATH = $(XCHANGE)/lib:$(LD_LIBRARY_PATH)
-endif
-
-# Always link against the xchange lib.
-LDFLAGS += -lxchange
+# Extra linker flags (if any)
+#LDFLAGS=
 
 # cppcheck options for 'check' target
 CHECKOPTS ?= --enable=performance,warning,portability,style --language=c \
@@ -66,6 +56,16 @@ CHECKOPTS += --template='{file}({line}): {severity} ({id}): {message}' --inline-
 # Compiler and linker options etc.
 ifeq ($(BUILD_MODE),debug)
 	CFLAGS += -g -DDEBUG
+endif
+
+# Link against math libs (for e.g. isnan()), and xchange dependency
+LDFLAGS += -lm -lxchange
+
+# Compile and link against a specific xchange library (if defined)
+ifdef XCHANGE
+  CPPFLAGS += -I$(XCHANGE)/include
+  LDFLAGS += -L$(XCHANGE)/lib
+  LD_LIBRARY_PATH = $(XCHANGE)/lib:$(LD_LIBRARY_PATH)
 endif
 
 # Search for files in the designated locations

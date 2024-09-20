@@ -95,7 +95,7 @@ prior to invoking `make`. The following build variables can be configured:
  - `CFLAGS`: Flags to pass onto the C compiler (default: `-Os -Wall -std=c99`). Note, `-Iinclude` will be added 
    automatically.
    
- - `LDFLAGS`: Linker flags (default is `-lm`). Note, `-lxchange` will be added automatically.
+ - `LDFLAGS`: Extra linker flags (default is _not set_). Note, `-lm -lxchange` will be added automatically.
 
  - `BUILD_MODE`: You can set it to `debug` to enable debugging features: it will initialize the global `xDebug` 
    variable to `TRUE` and add `-g` to `CFLAGS`.
