@@ -154,7 +154,7 @@ Optionally, you can select the database index to use now (or later, after connec
   Redis *redis = ...
   
   // Select the database index 2
-  redisxSelectDB(redis); 
+  redisxSelectDB(redis, 2); 
 ```
 
 Note, that you can switch the database index any time, with the caveat that it's not possible to change it for the 
