@@ -50,7 +50,7 @@ Before then the API may undergo slight changes and tweaks. Use the repository as
 
 ### Related links
 
- - [Redix commands](https://redis.io/docs/latest/commands/) reference documentation
+ - [Redis commands](https://redis.io/docs/latest/commands/) reference documentation
  - [SMA eXchange (SMA-X)](https://docs.google.com/document/d/1eYbWDClKkV7JnJxv4MxuNBNV47dFXuUWu7C4Ve_YTf0/edit?usp=sharing) 
    -- A structured realtime database built on Redis
    * [Smithsonian/smax-server](https://github.com/Smithsonian/smax-clib) -- SMA-X server configuration kit
