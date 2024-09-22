@@ -347,7 +347,7 @@ as is (without making copies), e.g.:
   else {
     // Set 'stringValue' and dereference the value field in the RESP so it's not 
     // destroyed with the RESP itself.
-    stringValue = r->value;
+    stringValue = (char *) r->value;
     r->value = NULL;
      
     redisxDestroyRESP(r);     // The 'stringValue' is still a valid pointer after! 

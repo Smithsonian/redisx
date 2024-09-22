@@ -350,7 +350,7 @@ RESP data type</h3>
 <div class="line"><span class="keywordflow">else</span> {</div>
 <div class="line">  <span class="comment">// Set &#39;stringValue&#39; and dereference the value field in the RESP so it&#39;s not </span></div>
 <div class="line">  <span class="comment">// destroyed with the RESP itself.</span></div>
-<div class="line">  stringValue = r-&gt;<a class="code hl_variable" href="structRESP.html#a0f61d63b009d0880a89c843bd50d8d76">value</a>;</div>
+<div class="line">  stringValue = (<span class="keywordtype">char</span> *) r-&gt;<a class="code hl_variable" href="structRESP.html#a0f61d63b009d0880a89c843bd50d8d76">value</a>;</div>
 <div class="line">  r-&gt;<a class="code hl_variable" href="structRESP.html#a0f61d63b009d0880a89c843bd50d8d76">value</a> = NULL;</div>
 <div class="line">   </div>
 <div class="line">  <a class="code hl_function" href="redisx_8c.html#aa4e23a7454f7055711915ec430599011">redisxDestroyRESP</a>(r);     <span class="comment">// The &#39;stringValue&#39; is still a valid pointer after! </span></div>
