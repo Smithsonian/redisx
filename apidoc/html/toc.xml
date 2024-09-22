@@ -1,37 +1,39 @@
 <toc label="RedisX" topic="index.html">
     <topic label="Table of Contents" href="index.html#autotoc_md3"/>
-    <topic label="Introduction" href="index.html#autotoc_md4"/>
-    <topic label="Prerequisites" href="index.html#autotoc_md6"/>
-    <topic label="Building RedisX" href="index.html#autotoc_md8"/>
-    <topic label="Managing Redis server connections" href="index.html#autotoc_md10">
-      <topic label="Initializing" href="index.html#autotoc_md11"/>
-      <topic label="Connecting" href="index.html#autotoc_md12"/>
-      <topic label="Disconnecting" href="index.html#autotoc_md13"/>
-      <topic label="Connection hooks" href="index.html#autotoc_md14"/>
-    <topic label="Simple Redis queries" href="index.html#autotoc_md16">
-      <topic label="Interactive transactions" href="index.html#autotoc_md17"/>
-      <topic label="RESP data type" href="index.html#autotoc_md18"/>
+    <topic label="Introduction" href="index.html#autotoc_md4">
+      <topic label="Related links" href="index.html#autotoc_md5"/>
+    <topic label="Prerequisites" href="index.html#autotoc_md7"/>
+    <topic label="Building RedisX" href="index.html#autotoc_md9"/>
+    <topic label="Managing Redis server connections" href="index.html#autotoc_md11">
+      <topic label="Initializing" href="index.html#autotoc_md12"/>
+      <topic label="Connecting" href="index.html#autotoc_md13"/>
+      <topic label="Disconnecting" href="index.html#autotoc_md14"/>
+      <topic label="Connection hooks" href="index.html#autotoc_md15"/>
     </topic>
-    <topic label="Accessing key / value data" href="index.html#autotoc_md20">
-      <topic label="Getting and setting keyed values" href="index.html#autotoc_md21"/>
-      <topic label="Listing and Scanning" href="index.html#autotoc_md22"/>
+    <topic label="Simple Redis queries" href="index.html#autotoc_md17">
+      <topic label="Interactive transactions" href="index.html#autotoc_md18"/>
+      <topic label="RESP data type" href="index.html#autotoc_md19"/>
     </topic>
-    <topic label="Publish/subscribe (PUB/SUB) support" href="index.html#autotoc_md24">
-      <topic label="Broadcasting messages" href="index.html#autotoc_md25"/>
-      <topic label="Subscriptions" href="index.html#autotoc_md26"/>
+    <topic label="Accessing key / value data" href="index.html#autotoc_md21">
+      <topic label="Getting and setting keyed values" href="index.html#autotoc_md22"/>
+      <topic label="Listing and Scanning" href="index.html#autotoc_md23"/>
     </topic>
-    <topic label="Atomic execution blocks and LUA scripts" href="index.html#autotoc_md28">
-      <topic label="Execution blocks" href="index.html#autotoc_md29"/>
-      <topic label="LUA script loading and execution" href="index.html#autotoc_md30"/>
-      <topic label="Custom Redis functions" href="index.html#autotoc_md31"/>
+    <topic label="Publish/subscribe (PUB/SUB) support" href="index.html#autotoc_md25">
+      <topic label="Broadcasting messages" href="index.html#autotoc_md26"/>
+      <topic label="Subscriptions" href="index.html#autotoc_md27"/>
     </topic>
-    <topic label="Advanced queries and pipelining" href="index.html#autotoc_md33">
-      <topic label="Asynchronous client processing" href="index.html#autotoc_md34"/>
-      <topic label="Pipelined transactions" href="index.html#autotoc_md35"/>
+    <topic label="Atomic execution blocks and LUA scripts" href="index.html#autotoc_md29">
+      <topic label="Execution blocks" href="index.html#autotoc_md30"/>
+      <topic label="LUA script loading and execution" href="index.html#autotoc_md31"/>
+      <topic label="Custom Redis functions" href="index.html#autotoc_md32"/>
     </topic>
-    <topic label="Error handling" href="index.html#autotoc_md37"/>
-    <topic label="Debug support" href="index.html#autotoc_md39"/>
-    <topic label="Future plans" href="index.html#autotoc_md41"/>
+    <topic label="Advanced queries and pipelining" href="index.html#autotoc_md34">
+      <topic label="Asynchronous client processing" href="index.html#autotoc_md35"/>
+      <topic label="Pipelined transactions" href="index.html#autotoc_md36"/>
+    </topic>
+    <topic label="Error handling" href="index.html#autotoc_md38"/>
+    <topic label="Debug support" href="index.html#autotoc_md40"/>
+    <topic label="Future plans" href="index.html#autotoc_md42"/>
   </topic>
   <topic label="Changelog" href="md_CHANGELOG.html">
     <topic label="[Unreleased]" href="md_CHANGELOG.html#autotoc_md1"/>

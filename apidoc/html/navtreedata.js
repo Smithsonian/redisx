@@ -27,39 +27,41 @@ var NAVTREE =
   [ "RedisX", "index.html", [
     [ "Changelog", "../../xchange/apidoc/html/md_CHANGELOG.html", [
       [ "Table of Contents", "index.html#autotoc_md3", null ],
-      [ "Introduction", "index.html#autotoc_md4", null ],
-      [ "Prerequisites", "index.html#autotoc_md6", null ],
-      [ "Building RedisX", "index.html#autotoc_md8", null ],
-      [ "Managing Redis server connections", "index.html#autotoc_md10", [
-        [ "Initializing", "index.html#autotoc_md11", null ],
-        [ "Connecting", "index.html#autotoc_md12", null ],
-        [ "Disconnecting", "index.html#autotoc_md13", null ],
-        [ "Connection hooks", "index.html#autotoc_md14", null ]
+      [ "Introduction", "index.html#autotoc_md4", [
+        [ "Related links", "index.html#autotoc_md5", null ]
       ] ],
-      [ "Simple Redis queries", "index.html#autotoc_md16", [
-        [ "Interactive transactions", "index.html#autotoc_md17", null ],
-        [ "RESP data type", "index.html#autotoc_md18", null ]
+      [ "Prerequisites", "index.html#autotoc_md7", null ],
+      [ "Building RedisX", "index.html#autotoc_md9", null ],
+      [ "Managing Redis server connections", "index.html#autotoc_md11", [
+        [ "Initializing", "index.html#autotoc_md12", null ],
+        [ "Connecting", "index.html#autotoc_md13", null ],
+        [ "Disconnecting", "index.html#autotoc_md14", null ],
+        [ "Connection hooks", "index.html#autotoc_md15", null ]
       ] ],
-      [ "Accessing key / value data", "index.html#autotoc_md20", [
-        [ "Getting and setting keyed values", "index.html#autotoc_md21", null ],
-        [ "Listing and Scanning", "index.html#autotoc_md22", null ]
+      [ "Simple Redis queries", "index.html#autotoc_md17", [
+        [ "Interactive transactions", "index.html#autotoc_md18", null ],
+        [ "RESP data type", "index.html#autotoc_md19", null ]
       ] ],
-      [ "Publish/subscribe (PUB/SUB) support", "index.html#autotoc_md24", [
-        [ "Broadcasting messages", "index.html#autotoc_md25", null ],
-        [ "Subscriptions", "index.html#autotoc_md26", null ]
+      [ "Accessing key / value data", "index.html#autotoc_md21", [
+        [ "Getting and setting keyed values", "index.html#autotoc_md22", null ],
+        [ "Listing and Scanning", "index.html#autotoc_md23", null ]
       ] ],
-      [ "Atomic execution blocks and LUA scripts", "index.html#autotoc_md28", [
-        [ "Execution blocks", "index.html#autotoc_md29", null ],
-        [ "LUA script loading and execution", "index.html#autotoc_md30", null ],
-        [ "Custom Redis functions", "index.html#autotoc_md31", null ]
+      [ "Publish/subscribe (PUB/SUB) support", "index.html#autotoc_md25", [
+        [ "Broadcasting messages", "index.html#autotoc_md26", null ],
+        [ "Subscriptions", "index.html#autotoc_md27", null ]
       ] ],
-      [ "Advanced queries and pipelining", "index.html#autotoc_md33", [
-        [ "Asynchronous client processing", "index.html#autotoc_md34", null ],
-        [ "Pipelined transactions", "index.html#autotoc_md35", null ]
+      [ "Atomic execution blocks and LUA scripts", "index.html#autotoc_md29", [
+        [ "Execution blocks", "index.html#autotoc_md30", null ],
+        [ "LUA script loading and execution", "index.html#autotoc_md31", null ],
+        [ "Custom Redis functions", "index.html#autotoc_md32", null ]
       ] ],
-      [ "Error handling", "index.html#autotoc_md37", null ],
-      [ "Debug support", "index.html#autotoc_md39", null ],
-      [ "Future plans", "index.html#autotoc_md41", null ],
+      [ "Advanced queries and pipelining", "index.html#autotoc_md34", [
+        [ "Asynchronous client processing", "index.html#autotoc_md35", null ],
+        [ "Pipelined transactions", "index.html#autotoc_md36", null ]
+      ] ],
+      [ "Error handling", "index.html#autotoc_md38", null ],
+      [ "Debug support", "index.html#autotoc_md40", null ],
+      [ "Future plans", "index.html#autotoc_md42", null ],
       [ "[Unreleased]", "../../xchange/apidoc/html/md_CHANGELOG.html#autotoc_md1", null ]
     ] ],
     [ "Contributing to RedisX", "../../xchange/apidoc/html/md_CONTRIBUTING.html", null ],
