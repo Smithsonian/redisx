@@ -435,18 +435,20 @@ It's worth noting here, that values in Redis are always represented as 'strings'
 floating-point values, must be converted to strings first. Additionally, the `redisxSetValue()` function works with 
 0-terminated string values only, but Redis may also store unterminated byte sequences of known length also. If you 
 find that you need to store an unterminated string (such as a binary sequence) as a value, you may just use the 
-lower-level `redisxArrayRequest()` instead to process a Redis `GET` or `HGET` command with explicit byte-length 
+lower-level `redisxArrayRequest()` instead to process a Redis `SET` or `HSET` command with explicit byte-length 
 specifications.
 
 In the above example we have set the value using the interactive client to Redis, which means that the call will
-return only after confirmation is received from the server. As such, a subsequent `redisxGetValue()` of the same
-table/key will be guaranteed to return the updated value always. However, we could have set the new value 
-asynchronously over the pipeline connection (by using `TRUE` as the last argument). In that case, the call will return 
-as soon as the request was sent to Redis (but not confirmed, nor possibly transmitted yet!). As such, a subsequent 
-`redisxGetValue()` on the same key/value field may race the request in transit, and may return the previous value on 
-occasion. So, it's important to remember that while pipelining can make setting multiple Redis fields very efficient, 
-we have to be careful about retrieving the same values afterwards from the same program thread. (Arguably, however, 
-there should never be a need to query values we set ourselves, since we readily know what they are.)
+return only after confirmation or result is received back from the server. As such, a subsequent `redisxGetValue()` of 
+the same table/key will be guaranteed to return the updated value always. 
+
+However, we could have set the new value asynchronously over the pipeline connection (by using `TRUE` as the last 
+argument). In that case, the call will return as soon as the request was sent to Redis (but not confirmed, nor 
+possibly transmitted yet!). As such, a subsequent `redisxGetValue()` on the same key/value field may race the request 
+in transit, and may return the previous value on occasion. So, it's important to remember that while pipelining can 
+make setting multiple Redis fields very efficient, we have to be careful about retrieving the same values afterwards 
+from the same program thread. (Arguably, however, there should never be a need to query values we set ourselves, since 
+we readily know what they are.)
 
 Finally, if you want to set values for multiple fields in a Redis hash table atomically, you may use 
 `redisxMultiSet()`, which provides a high-level interface to the Redis `HMSET` command.
@@ -462,7 +464,7 @@ computed.
 This is where scanning offers a less selfish (hence much preferred) alternative. Rather than returning all the keys 
 or key/value pairs contained in a table atomically at once, it allows to do it bit by bit with byte-sized individual 
 transactions that are guaranteed to not block the Redis server long, so it may remain responsive to other queries 
-also. For the caller the result is the same, the only difference being that the result is computed via a series of 
+also. For the caller the result is the same (minus the atomicity), except that the result is computed via a series of 
 quick Redis queries rather than with one potentially very expensive query.
 
 For example, to retrieve all top-level Redis keys, sorted alphabetically, using the scanning approach, you may write 
@@ -475,7 +477,7 @@ something like:
   int status;    // We'll return the error status here...
   
   //  Return all redis keywords starting with "system:"
-  char **keys = redisxScanKeys(redis, "system:*", &n, &status);
+  char **keys = redisxScanKeys(redis, "system:*", &nMatches, &status);
   if (status != X_SUCCESS) {
     // Oops something went wrong...
     ...
@@ -524,6 +526,8 @@ Finally, you may use `redisxSetScanCount()` to tune just how many results should
 <a name="broadcasting-messages"></a>
 ### Broadcasting messages
 
+It is simple to send messages to subscribers of a given channel:
+
 ```c
   Redis *redis = ...
 
@@ -531,9 +535,9 @@ Finally, you may use `redisxSetScanCount()` to tune just how many results should
   int status = redisxPublish(redis, "hello_channel", "Hello world!", 0);
 ```
 
-The last argument is an optional string length, if readily available, or if sending a substring only (or a string or 
-byte sequence that is not 0-terminated). If zero is used, as in the example above, it will automatically determine the 
-length of the 0-terminated string message using `strlen()`.
+The last argument is an optional string length, if readily available, or if sending a substring only, or else a string 
+or byte sequence that is not null-terminated. If zero is used for the length, as in the example above, it will 
+automatically determine the length of the 0-terminated string message using `strlen()`.
 
 Alternatively, you may use the `redisxPublishAsync()` instead if you want to publish on a subscription client to which
 you have already have exlusive access (e.g. after an appropriate `redisxLockConnected()` call).
@@ -564,7 +568,7 @@ its best that the processing function simply places the incoming message onto a 
 thread to the heavy lifting without holding up the subsription processing of other callback routines.
 
 Also, it is important that the call should never attempt to modify or call `free()` on the supplied string arguments, 
-since that would interfere with other subscrivber calls.
+since that would interfere with other subscriber calls.
 
 Once the function is defined, you can activate it via:
 
@@ -809,7 +813,7 @@ what works best for your application.
 ### Pipelined transactions
 
 Depending on round-trip times over the network, interactive queries may be suitable for running up to a few thousand 
-queries per second. For higher throughput (up to millions Redis transactions per second) you may need to access the 
+queries per second. For higher throughput (up to ~1 million Redis transactions per second) you may need to access the 
 Redis database in pipelined mode. RedisX provides a dedicated pipeline client/channel to the Redis server (provided
 the option to enable it has been used when `redixConnect()` was called).
 
