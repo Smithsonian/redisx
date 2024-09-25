@@ -61,11 +61,16 @@ endif
 # Link against math libs (for e.g. isnan()), and xchange dependency
 LDFLAGS += -lm -lxchange
 
+# Search for libraries under LIB
+ifneq ($(findstring $(LIB),$(LD_LIBRARY_PATH)),$LIB)
+  LD_LIBRARY_PATH := $(LIB):$(LD_LIBRARY_PATH)
+endif
+
 # Compile and link against a specific xchange library (if defined)
 ifdef XCHANGE
   CPPFLAGS += -I$(XCHANGE)/include
   LDFLAGS += -L$(XCHANGE)/lib
-  LD_LIBRARY_PATH = $(XCHANGE)/lib:$(LD_LIBRARY_PATH)
+  LD_LIBRARY_PATH := $(XCHANGE)/lib:$(LD_LIBRARY_PATH)
 endif
 
 # Search for files in the designated locations
