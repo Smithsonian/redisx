@@ -63,6 +63,7 @@ LDFLAGS += -lm -lxchange
 
 # Search for libraries under LIB
 ifneq ($(findstring $(LIB),$(LD_LIBRARY_PATH)),$LIB)
+  LDFLAGS += -L$(LIB)
   LD_LIBRARY_PATH := $(LIB):$(LD_LIBRARY_PATH)
 endif
 
