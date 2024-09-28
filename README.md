@@ -100,7 +100,7 @@ prior to invoking `make`. The following build variables can be configured:
    
  - `CC`: The C compiler to use (default: `gcc`).
 
- - `CPPFLAGS`: C pre-processor flags, such as externally defined compiler constants.
+ - `CPPFLAGS`: C preprocessor flags, such as externally defined compiler constants.
  
  - `CFLAGS`: Flags to pass onto the C compiler (default: `-Os -Wall -std=c99`). Note, `-Iinclude` will be added 
    automatically.
@@ -357,8 +357,8 @@ two steps may be combined to automatically discard invalid or unexpected `RESP` 
   }
 ```
 
-Before destroying a RESP structure, the caller may want to de-reference values within it if they are to be used
-as is (without making copies), e.g.:
+Before destroying a RESP structure, the caller may want to dereference values within it if they are to be used as is 
+(without making copies), e.g.:
 
 
 ```c
@@ -393,7 +393,7 @@ as is (without making copies), e.g.:
 <a name="getting-and-setting-keyed-values"></a>
 ### Getting and setting keyed values
 
-Key/value pairs are the bread and butter of Redis. They come in two variaties: (1) there are top-level key-value 
+Key/value pairs are the bread and butter of Redis. They come in two varieties: (1) there are top-level key-value 
 pairs, and (2) there are key-value pairs organized into hash tables, where the table name is a top-level key, but the 
 fields in the table are not. The RedisX library offers a unified approach for dealing with key/value pairs, whether 
 they are top level or hash-tables. Simply, a table name `NULL` is used to refer to top-level keys.
@@ -486,14 +486,14 @@ something like:
   int nMatches;  // We'll return the number of matching Redis keys here...
   int status;    // We'll return the error status here...
   
-  //  Return all redis keywords starting with "system:"
+  //  Return all Redis top-level keywords starting with "system:"
   char **keys = redisxScanKeys(redis, "system:*", &nMatches, &status);
   if (status != X_SUCCESS) {
     // Oops something went wrong...
     ...
   }
   
-  // Use 'keys' as appropriate, possibly de-referencing values we want to
+  // Use 'keys' as appropriate, possibly dereferencing values we want to
   // retain in other persistent data structures...
   ...
   
@@ -513,7 +513,7 @@ Or, to retrieve the values from a hash table for a set of keywords that match a 
     ... 
   }
   
-  // Use 'entries' as appropriate, possibly de-referencing values we want to
+  // Use 'entries' as appropriate, possibly dereferencing values we want to
   // retain in other persistent data structures...
   ...
   
@@ -521,7 +521,7 @@ Or, to retrieve the values from a hash table for a set of keywords that match a 
   redisxDestroyEntries(entries, nMatches);
 ```
 
-Finally, you may use `redisxSetScanCount()` to tune just how many results should individial scan queries should return 
+Finally, you may use `redisxSetScanCount()` to tune just how many results should individual scan queries should return 
 (but only if you are really itching to tweak it). Please refer to the Redis documentation on the behavior of the 
 `SCAN` and `HSCAN` commands to learn more. 
 
@@ -550,7 +550,7 @@ or byte sequence that is not null-terminated. If zero is used for the length, as
 automatically determine the length of the 0-terminated string message using `strlen()`.
 
 Alternatively, you may use the `redisxPublishAsync()` instead if you want to publish on a subscription client to which
-you have already have exlusive access (e.g. after an appropriate `redisxLockConnected()` call).
+you have already have exclusive access (e.g. after an appropriate `redisxLockConnected()` call).
 
 <a name="subscriptions"></a>
 ### Subscriptions
@@ -575,7 +575,7 @@ Here is an example `RedisSubscriberCall` implementation to process messages:
 There are some basic rules (best practices) for message processing. They should be fast, and never block for extended 
 periods. If extensive processing is required, or may need to wait extensively for some resource or mutex locking, then
 its best that the processing function simply places the incoming message onto a queue, and let a separate background 
-thread to the heavy lifting without holding up the subsription processing of other callback routines.
+thread to the heavy lifting without holding up the subscription processing of other callback routines.
 
 Also, it is important that the call should never attempt to modify or call `free()` on the supplied string arguments, 
 since that would interfere with other subscriber calls.
@@ -669,7 +669,7 @@ atomically. Such an execution block in RedisX may look something like:
 ```
 
 If at any point things don't go according to plan in the middle of the block, you can call `redisAbortBlockAsync()` to
-abort and discard all prior commands submitted in the execution block already. It is important to remembet that every
+abort and discard all prior commands submitted in the execution block already. It is important to remember that every
 time you call `redisxStartBlockAsync()`, you must call either `redisxExecBlockAsync()` to execute it or else 
 `redisxAbortBlockAsync()` to discard it. Failure to do so, will effectively end you up with a hung Redis client.
 
@@ -680,7 +680,7 @@ time you call `redisxStartBlockAsync()`, you must call either `redisxExecBlockAs
 [LUA](https://www.lua.org/) scripting offers a more capable version of executing complex routines on the Redis server. 
 LUA is a scripting language akin to python, and allows you to add extra logic, string manipulation etc. to your Redis 
 queries. Best of all, once you upload the script to the server, it can reduce network traffic significantly by not 
-having to repeatedly submit the same set of Redis commands every single time. LUA scipts also get executed very 
+having to repeatedly submit the same set of Redis commands every single time. LUA scripts also get executed very 
 efficiently on the server, and produce only the result you want/need.
 
 Assuming you have prepared your LUA script appropriately, you can upload it to the Redis server as:
@@ -699,7 +699,7 @@ Assuming you have prepared your LUA script appropriately, you can upload it to t
 ```
 
 Redis will refer to the script by its SHA1 sum, so it's important keep a record of it. You'll call the script with
-its SHA1 sum, a set of redis keys the script may use, and a set of other parameters it might need.
+its SHA1 sum, a set of Redis keys the script may use, and a set of other parameters it might need.
 
 ```c
   Redis *redis = ...
@@ -850,7 +850,7 @@ Before sending the pipelined requests, the user first needs to specify the funct
 
 Request are sent via the `redisxSendRequestAsync()` and `redisxSendArrayRequestAsync()` functions. Note again, the 
 `Async` naming, which indicates the asynchronous nature of this calls -- and which suggests that these should be called
-with the approrpiate mutex locked to prevent concurrency issues and to maintain a predictable order (very important!) 
+with the appropriate mutex locked to prevent concurrency issues and to maintain a predictable order (very important!) 
 for processing the responses.
 
 ```c
@@ -905,7 +905,7 @@ practices to help deal with pipeline responses are summarized here:
  - For requests that return a value, keep a record (in a FIFO) of the expected types and your data that depends on 
    the content of the responses. For example, for pipelined `HGET` commands, your FIFO should have a record that
    specifies that a bulk string response is expected, and a pointer to data which is used to store the returned value 
-   -- so that you pipeline response processing callback function can check that the reponse is the expected type
+   -- so that you pipeline response processing callback function can check that the response is the expected type
    (and size) and knows to assign/process the response appropriately to your application data.
  
  - You may insert Redis `PING`/`ECHO` commands to section your responses, or to provide directives to your pipeline
@@ -989,11 +989,12 @@ Some obvious ways the library could evolve and grow in the not too distant futur
  - Automated regression testing and coverage tracking.
  - Keep track of subscription patterns, and automatically resubscribe to them on reconnecting.
  - Support for the [RESP3](https://github.com/antirez/RESP3/blob/master/spec.md) standard and Redis `HELLO`.
- - Support for [Redis Sentinel](https://redis.io/docs/latest/develop/reference/sentinel-clients/) clients, for high-availability server configurations.
+ - Support for [Redis Sentinel](https://redis.io/docs/latest/develop/reference/sentinel-clients/) clients, for 
+   high-availability server configurations.
  - TLS support (perhaps...)
  - Add high-level support for managing and calling custom Redis functions.
  - Add support for `CLIENT TRACKING` / `CLIENT CACHING`. 
- - Add more high-level redis commands, e.g. for lists, streams, etc.
+ - Add more high-level [Redis commands](https://redis.io/docs/latest/commands/), e.g. for lists, streams, etc.
 
 If you have an idea for a must have feature, please let me (Attila) know. Pull requests, for new features or fixes to
 existing ones, are especially welcome! 
