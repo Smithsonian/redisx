@@ -77,7 +77,7 @@ $(LIB)/libredisx.so: $(LIB)/libredisx.so.$(SO_VERSION)
 $(LIB)/libredisx.so.$(SO_VERSION): $(SOURCES)
 
 # Static library
-$(LIB)/libredisx.a: $(OBJECTS) | $(LIB) Makefile
+$(LIB)/libredisx.a: $(OBJECTS)
 
 README-redisx.md: README.md
 	LINE=`sed -n '/\# /{=;q;}' $<` && tail -n +$$((LINE+2)) $< > $@
