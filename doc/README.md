@@ -28,8 +28,8 @@ Last Updated: 18 September 2024
 <a name="introduction"></a>
 ## Introduction
 
-__RedisX__ is a light-weight [Redis](https://redis.io) client library for C/C++. As such, it should also work with 
-Redis forks / clones like [Dragonfly](https://dragonfly.io) or [Valkey](https://valkey.io). It supports both 
+__RedisX__ is a light-weight [Redis](https://redis.io) client library for C/C++. As such, it should work with Redis 
+forks / clones like [Dragonfly](https://dragonfly.io) or [Valkey](https://valkey.io) also. It supports both 
 interactive and pipelined Redis queries, managing and processing subscriptions, atomic execution blocks, and LUA 
 scripts loading. It can be used with multiple Redis servers simultaneously also.
 
@@ -238,7 +238,7 @@ The same goes for disconnect hooks, using `redisxAddDisconnectHook()` instead.
 
 Redis queries are sent as strings, according the the specification of the Redis protocol. All responses sent back by 
 the server using the RESP protocol. Specifically, Redis uses version 2.0 of the RESP protocol (a.k.a. RESP2) by 
-default, with optional support for the newer RESP3 introduced in Redis version 6.0. The RedisX library currently
+default, with optional support for the newer RESP3 introduced in Redis version 6.0. The __RedisX__ library currently
 processes the standard RESP2 replies only. RESP3 support to the library may be added in the future (stay tuned...)
 
 
@@ -249,8 +249,8 @@ The simplest way for running a few Redis queries is to do it in interactive mode
 
 ```c
   Redis *redis = ...
-  RESP *resp;
-  int status;
+  RESP *resp;     // This will be the pointer we receive to the Redis response
+  int status;     // execution status to be populated.
 
   // Send "HGET my_table my_key" request
   resp = redisxRequest(redis, "HGET", "my_table", "my_key", NULL, &status);
@@ -265,7 +265,7 @@ The simplest way for running a few Redis queries is to do it in interactive mode
 
 The `redisxRequest()` sends a command with up to three arguments. If the command takes fewer than 3 parameters, then
 the remaining ones must be set to `NULL`. This function thus offers a simple interface for running most basic 
-sequential queries. In cases where 3 parameters are nut sufficient, you may use `redisxArrayRequest()` instead, e.g.:
+sequential queries. In cases where 3 parameters are not sufficient, you may use `redisxArrayRequest()` instead, e.g.:
 
 ```c
   ...
@@ -280,8 +280,7 @@ sequential queries. In cases where 3 parameters are nut sufficient, you may use 
 The 4th argument in the list is an optional `int[]` array defining the individual string lengths of the parameters (if 
 need be, or else readily available). Here, we used `NULL` instead, which will use `strlen()` on each supplied 
 string-terminated parameter to determine its length automatically. Specifying the length may be necessary if the 
-individual parameters are not 0-terminated strings, or else substrings from a continuing string are to be used as 
-the parameter value. 
+individual parameters are not 0-terminated strings.
 
 In interactive mode, each request is sent to the Redis server, and the response is collected before the call returns 
 with that response (or `NULL` if there was an error).
@@ -424,9 +423,9 @@ Setting values is straightforward also:
   }
 ```
 
-It's worth noting here, that values in Redis are always represented as 'strings', hence non-string data, such as 
+It's worth noting here, that values in Redis are always represented as strings, hence non-string data, such as 
 floating-point values, must be converted to strings first. Additionally, the `redisxSetValue()` function works with 
-0-terminated string values only, but Redis may also store unterminated byte sequences of known length also. If you 
+0-terminated string values only, but Redis allows storing unterminated byte sequences of known length also. If you 
 find that you need to store an unterminated string (such as a binary sequence) as a value, you may just use the 
 lower-level `redisxArrayRequest()` instead to process a Redis `SET` or `HSET` command with explicit byte-length 
 specifications.
@@ -457,8 +456,8 @@ computed.
 This is where scanning offers a less selfish (hence much preferred) alternative. Rather than returning all the keys 
 or key/value pairs contained in a table atomically at once, it allows to do it bit by bit with byte-sized individual 
 transactions that are guaranteed to not block the Redis server long, so it may remain responsive to other queries 
-also. For the caller the result is the same (minus the atomicity), except that the result is computed via a series of 
-quick Redis queries rather than with one potentially very expensive query.
+also. For the caller the result is the same (notwithstanding the atomicity), except that the result is computed via a 
+series of quick Redis queries rather than with one potentially very expensive query.
 
 For example, to retrieve all top-level Redis keys, sorted alphabetically, using the scanning approach, you may write 
 something like:
@@ -528,9 +527,9 @@ It is simple to send messages to subscribers of a given channel:
   int status = redisxPublish(redis, "hello_channel", "Hello world!", 0);
 ```
 
-The last argument is an optional string length, if readily available, or if sending a substring only, or else a string 
-or byte sequence that is not null-terminated. If zero is used for the length, as in the example above, it will 
-automatically determine the length of the 0-terminated string message using `strlen()`.
+The last argument is an optional string length, if readily available, or if sending a byte sequence that is not 
+null-terminated. If zero is used for the length, as in the example above, it will automatically determine the length 
+of the 0-terminated string message using `strlen()`.
 
 Alternatively, you may use the `redisxPublishAsync()` instead if you want to publish on a subscription client to which
 you have already have exclusive access (e.g. after an appropriate `redisxLockConnected()` call).
@@ -558,7 +557,8 @@ Here is an example `RedisSubscriberCall` implementation to process messages:
 There are some basic rules (best practices) for message processing. They should be fast, and never block for extended 
 periods. If extensive processing is required, or may need to wait extensively for some resource or mutex locking, then
 its best that the processing function simply places the incoming message onto a queue, and let a separate background 
-thread to the heavy lifting without holding up the subscription processing of other callback routines.
+thread do the heavy lifting without holding up the subscription processing of other callback routines, or without losing
+responsiveness to other incoming messages.
 
 Also, it is important that the call should never attempt to modify or call `free()` on the supplied string arguments, 
 since that would interfere with other subscriber calls.
@@ -618,7 +618,7 @@ call it with some parameters (possibly many times over).
 ### Execution blocks
 
 Execution blocks offer a fairly simple way of bunching together a set of Redis commands that need to be executed 
-atomically. Such an execution block in RedisX may look something like:
+atomically. Such an execution block in __RedisX__ may look something like:
 
 ```c
   Redis *redis = ...;
@@ -664,7 +664,7 @@ time you call `redisxStartBlockAsync()`, you must call either `redisxExecBlockAs
 LUA is a scripting language akin to python, and allows you to add extra logic, string manipulation etc. to your Redis 
 queries. Best of all, once you upload the script to the server, it can reduce network traffic significantly by not 
 having to repeatedly submit the same set of Redis commands every single time. LUA scripts also get executed very 
-efficiently on the server, and produce only the result you want/need.
+efficiently on the server, and produce only the result you want/need without returning unnecessary intermediates.
 
 Assuming you have prepared your LUA script appropriately, you can upload it to the Redis server as:
 
@@ -776,7 +776,8 @@ while we have exclusive access to the client, might look something like this:
 ```
    
 For the best performance, you may want to leave the processing of the replies until after you unlock the client. I.e.,
-you only block other threads from accessing the client while you send off the requests and collect the corresponding responses. You can then analyze the responses at your leisure outside of the mutexed section.
+you only block other threads from accessing the client while you send off the requests and collect the corresponding 
+responses. You can then analyze the responses at your leisure outside of the mutexed section.
    
 In some cases you may be OK with just firing off some Redis commands, without necessarily caring about responses. 
 Rather than ignoring the replies with `redisxIgnoreReplyAsync()` you might call `redisxSkipReplyAsync()` instead 
@@ -818,11 +819,14 @@ function (or else discarded if no callback function has been set). This is what 
   // Your own function to process responses to pipelined requests...
   void my_resp_processor(RESP *r) {
     // Do what you need to do with the asynchronous responses
-    // that come from Redis to bulk requests
+    // that come from Redis to bulk requests.
     ...
   }
 ```
 
+It is important to note that the processing function should not call `free` on the `RESP` pointer argument, but it may 
+dereference and use parts of it as appropriate (just remember to set the bits referenced elsewhere to `NULL` so they 
+do not get destroyed when the pipeline listener destroys the `RESP` after your function is done processing it).
 Before sending the pipelined requests, the user first needs to specify the function to process the responses, e.g.:
 
 ```c
@@ -832,9 +836,9 @@ Before sending the pipelined requests, the user first needs to specify the funct
 ```
 
 Request are sent via the `redisxSendRequestAsync()` and `redisxSendArrayRequestAsync()` functions. Note again, the 
-`Async` naming, which indicates the asynchronous nature of this calls -- and which suggests that these should be called
-with the appropriate mutex locked to prevent concurrency issues and to maintain a predictable order (very important!) 
-for processing the responses.
+`Async` naming, which indicates the asynchronous nature of this calls -- and which indicates that these functions 
+should be called with the appropriate mutex locked to prevent concurrency issues, and to maintain a predictable order 
+(very important!) for processing the responses.
 
 ```c
   Redis *redis = ...
@@ -905,8 +909,8 @@ clients are optimized for low-latency, at the socket level.
 <a name="error-handling"></a>
 ## Error handling
 
-The principal error handling of RedisX is an extension of that of __xchange__, with further error codes defined in 
-`redisx.h`. The RedisX functions that return an error status (either directly, or into the integer designated by a 
+The principal error handling of __RedisX__ is an extension of that of __xchange__, with further error codes defined in 
+`redisx.h`. The __RedisX__ functions that return an error status (either directly, or into the integer designated by a 
 pointer argument), can be inspected by `redisxErrorDescription()`, e.g.:
 
 ```c
