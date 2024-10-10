@@ -1353,6 +1353,7 @@
     <docanchor file="index.html">introduction</docanchor>
     <docanchor file="index.html">prerequisites</docanchor>
     <docanchor file="index.html">building-redisx</docanchor>
+    <docanchor file="index.html">linking</docanchor>
     <docanchor file="index.html">managing-redis-server-connections</docanchor>
     <docanchor file="index.html">initializing</docanchor>
     <docanchor file="index.html">connecting</docanchor>

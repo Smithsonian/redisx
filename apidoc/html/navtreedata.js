@@ -32,36 +32,37 @@ var NAVTREE =
       ] ],
       [ "Prerequisites", "index.html#autotoc_md7", null ],
       [ "Building RedisX", "index.html#autotoc_md9", null ],
-      [ "Managing Redis server connections", "index.html#autotoc_md11", [
-        [ "Initializing", "index.html#autotoc_md12", null ],
-        [ "Connecting", "index.html#autotoc_md13", null ],
-        [ "Disconnecting", "index.html#autotoc_md14", null ],
-        [ "Connection hooks", "index.html#autotoc_md15", null ]
+      [ "Linking your application against RedisX", "index.html#autotoc_md11", null ],
+      [ "Managing Redis server connections", "index.html#autotoc_md13", [
+        [ "Initializing", "index.html#autotoc_md14", null ],
+        [ "Connecting", "index.html#autotoc_md15", null ],
+        [ "Disconnecting", "index.html#autotoc_md16", null ],
+        [ "Connection hooks", "index.html#autotoc_md17", null ]
       ] ],
-      [ "Simple Redis queries", "index.html#autotoc_md17", [
-        [ "Interactive transactions", "index.html#autotoc_md18", null ],
-        [ "RESP data type", "index.html#autotoc_md19", null ]
+      [ "Simple Redis queries", "index.html#autotoc_md19", [
+        [ "Interactive transactions", "index.html#autotoc_md20", null ],
+        [ "RESP data type", "index.html#autotoc_md21", null ]
       ] ],
-      [ "Accessing key / value data", "index.html#autotoc_md21", [
-        [ "Getting and setting keyed values", "index.html#autotoc_md22", null ],
-        [ "Listing and Scanning", "index.html#autotoc_md23", null ]
+      [ "Accessing key / value data", "index.html#autotoc_md23", [
+        [ "Getting and setting keyed values", "index.html#autotoc_md24", null ],
+        [ "Listing and Scanning", "index.html#autotoc_md25", null ]
       ] ],
-      [ "Publish/subscribe (PUB/SUB) support", "index.html#autotoc_md25", [
-        [ "Broadcasting messages", "index.html#autotoc_md26", null ],
-        [ "Subscriptions", "index.html#autotoc_md27", null ]
+      [ "Publish/subscribe (PUB/SUB) support", "index.html#autotoc_md27", [
+        [ "Broadcasting messages", "index.html#autotoc_md28", null ],
+        [ "Subscriptions", "index.html#autotoc_md29", null ]
       ] ],
-      [ "Atomic execution blocks and LUA scripts", "index.html#autotoc_md29", [
-        [ "Execution blocks", "index.html#autotoc_md30", null ],
-        [ "LUA script loading and execution", "index.html#autotoc_md31", null ],
-        [ "Custom Redis functions", "index.html#autotoc_md32", null ]
+      [ "Atomic execution blocks and LUA scripts", "index.html#autotoc_md31", [
+        [ "Execution blocks", "index.html#autotoc_md32", null ],
+        [ "LUA script loading and execution", "index.html#autotoc_md33", null ],
+        [ "Custom Redis functions", "index.html#autotoc_md34", null ]
       ] ],
-      [ "Advanced queries and pipelining", "index.html#autotoc_md34", [
-        [ "Asynchronous client processing", "index.html#autotoc_md35", null ],
-        [ "Pipelined transactions", "index.html#autotoc_md36", null ]
+      [ "Advanced queries and pipelining", "index.html#autotoc_md36", [
+        [ "Asynchronous client processing", "index.html#autotoc_md37", null ],
+        [ "Pipelined transactions", "index.html#autotoc_md38", null ]
       ] ],
-      [ "Error handling", "index.html#autotoc_md38", null ],
-      [ "Debug support", "index.html#autotoc_md40", null ],
-      [ "Future plans", "index.html#autotoc_md42", null ],
+      [ "Error handling", "index.html#autotoc_md40", null ],
+      [ "Debug support", "index.html#autotoc_md42", null ],
+      [ "Future plans", "index.html#autotoc_md44", null ],
       [ "[Unreleased]", "../../xchange/apidoc/html/md_CHANGELOG.html#autotoc_md1", null ]
     ] ],
     [ "Contributing to RedisX", "../../xchange/apidoc/html/md_CONTRIBUTING.html", null ],

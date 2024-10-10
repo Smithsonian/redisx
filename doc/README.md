@@ -14,6 +14,7 @@ Last Updated: 18 September 2024
  - [Introduction](#introduction)
  - [Prerequisites](#prerequisites)
  - [Building RedisX](#building-redisx)
+ - [Linking your application against RedisX](#linking)
  - [Managing Redis server connections](#managing-redis-server-connections)
  - [Simple Redis queries](#simple-redis-queries)
  - [Accessing key / value data](#accessing-key-value-data)
@@ -100,6 +101,24 @@ After configuring, you can simply run `make`, which will build the `shared` (`li
 (`lib/libredisx.a`) libraries, local HTML documentation (provided `doxygen` is available), and performs static
 analysis via the `check` target. Or, you may build just the components you are interested in, by specifying the
 desired `make` target(s). (You can use `make help` to get a summary of the available `make` targets). 
+
+-----------------------------------------------------------------------------
+
+<a name="linking"></a>
+## Linking your application against RedisX
+
+Provided you have installed the shared (`libredisx.so` and `libxchange.so`) or static (`libredisx.a` and 
+`libxchange.so`) libraries in a location that is in your `LD_LIBRARY_PATH` (e.g. in `/usr/lib` or `/usr/local/lib`) 
+you can simply link your program using the  `-lredisx -lxchange` flags. Your `Makefile` may look like: 
+
+```make
+myprog: ...
+	cc -o $@ $^ $(LDFLAGS) -lredisx -lxchange 
+```
+
+(Or, you might simply add `-lredisx -lxchange` to `LDFLAGS` and use a more standard recipe.) And, in if you installed 
+the __RedisX__ and/or __xchange__ libraries elsewhere, you can simply add their location(s) to `LD_LIBRARY_PATH` prior 
+to linking.
 
 
 -----------------------------------------------------------------------------
