@@ -16,11 +16,13 @@ $(LIB)/%.so.$(SO_VERSION) : | $(LIB) Makefile
 
 # Unversioned shared libs (for linking against)
 $(LIB)/lib%.so:
+	@if [ ! -e $(LIB) ] ; then mkdir $(LIB); fi
 	@rm -f $@
 	ln -sr $< $@
 
 # Static library: *.a
-$(LIB)/%.a: | $(LIB) Makefile
+$(LIB)/%.a:
+	@if [ ! -e $(LIB) ] ; then mkdir $(LIB); fi
 	ar -rc $@ $^
 	ranlib $@	
 
