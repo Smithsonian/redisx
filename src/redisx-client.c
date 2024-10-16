@@ -691,8 +691,9 @@ RESP *redisxReadReplyAsync(RedisClient *cl) {
   // Get the integer / size value...
   if(resp->type == RESP_ARRAY || resp->type == RESP_INT || resp->type == RESP_BULK_STRING) {
     char *tail;
-    resp->n = strtol(&buf[1], &tail, 10);
-    if(errno == ERANGE || tail == &buf[1]) {
+    errno = 0;
+    resp->n = (int) strtol(&buf[1], &tail, 10);
+    if(errno) {
       fprintf(stderr, "WARNING! Redis-X : unparseable dimension '%s'\n", &buf[1]);
       status = X_PARSE_ERROR;
     }

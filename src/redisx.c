@@ -24,7 +24,6 @@
 #if DEBUG
 #define SET_PRIORITIES              FALSE       ///< Disable if you want to use gdb to debug...
 #else
-#define SET_PRIORITIES              REDIS_SET_LISTENER_PRIORITIES        ///< Whether to actually set listener priorities
 #endif
 
 #define XPRIO_MIN                   (sched_get_priority_min(SCHED_RR))
@@ -223,8 +222,9 @@ int redisxGetTime(Redis *redis, struct timespec *t) {
   }
 
   // [1] seconds.
+  errno = 0;
   t->tv_sec = strtol((char *) components[0]->value, &tail, 10);
-  if(tail == components[0]->value || errno == ERANGE) {
+  if(errno) {
     redisxDestroyRESP(reply);
     return x_error(X_PARSE_ERROR, errno, fn, "tv_sec parse error: '%s'", (char *) components[0]->value);
   }
@@ -236,9 +236,10 @@ int redisxGetTime(Redis *redis, struct timespec *t) {
   }
 
   // [2] microseconds.
+  errno = 0;
   t->tv_nsec = 1000 * strtol((char *) components[1]->value, &tail, 10);
 
-  if(tail == components[1]->value || errno == ERANGE)
+  if(errno)
     status = x_error(X_PARSE_ERROR, errno, fn, "tv_nsec parse error: '%s'", (char *) components[1]->value);
   else status = X_SUCCESS;
 
