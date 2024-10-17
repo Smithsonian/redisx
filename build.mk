@@ -5,9 +5,8 @@
 # You can include this in your Makefile also.
 # ============================================================================
 
-
 # Regular object files
-$(OBJ)/%.o: %.c dep/%.d $(OBJ) Makefile
+$(OBJ)/%.o: %.c $(OBJ) Makefile
 	$(CC) -o $@ -c $(CPPFLAGS) $(CFLAGS) $<
 
 # Share library recipe
@@ -33,7 +32,7 @@ dep $(OBJ) $(LIB) $(BIN) apidoc:
 # Remove intermediate files locally
 .PHONY: clean-local
 clean-local:
-	rm -rf obj dep
+	rm -rf obj
 
 # Remove all locally built files, effectively restoring the repo to its 
 # pristine state
@@ -60,12 +59,4 @@ check:
 dox: README.md Doxyfile apidoc $(SRC) $(INC)
 	@echo "   [doxygen]"
 	@$(DOXYGEN)
-
-# Automatic dependence on included header files.
-.PRECIOUS: dep/%.d
-dep/%.d: $(SRC)/%.c dep
-	@echo " > $@" \
-	&& $(CC) $(CPPFLAGS) -MM -MG $< > $@.$$$$ \
-	&& sed 's|\w*\.o[ :]*| $(OBJ)/&|g' < $@.$$$$ > $@; \
-	rm -f $@.$$$$
 
