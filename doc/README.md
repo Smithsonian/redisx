@@ -79,8 +79,8 @@ You can configure the build, either by editing `config.mk` or else by defining t
 prior to invoking `make`. The following build variables can be configured:
 
  - `XCHANGE`: the root of the location where the [Smithsonian/xchange](https://github.com/Smithsonian/xchange) library 
-   is installed. It expects to find `xchange.h` under `$(XCHANGE)/include` and `libxchange.so` under `$(XCHANGE)/lib`
-   or else in the default `LD_LIBRARY_PATH`.
+   is installed. It expects to find `xchange.h` under `$(XCHANGE)/include` and `libxchange.so` / `libredisx.a` under 
+   `$(XCHANGE)/lib` or else in the default `LD_LIBRARY_PATH`.
    
  - `CC`: The C compiler to use (default: `gcc`).
 
@@ -108,7 +108,7 @@ desired `make` target(s). (You can use `make help` to get a summary of the avail
 ## Linking your application against RedisX
 
 Provided you have installed the shared (`libredisx.so` and `libxchange.so`) or static (`libredisx.a` and 
-`libxchange.so`) libraries in a location that is in your `LD_LIBRARY_PATH` (e.g. in `/usr/lib` or `/usr/local/lib`) 
+`libxchange.a`) libraries in a location that is in your `LD_LIBRARY_PATH` (e.g. in `/usr/lib` or `/usr/local/lib`) 
 you can simply link your program using the  `-lredisx -lxchange` flags. Your `Makefile` may look like: 
 
 ```make
