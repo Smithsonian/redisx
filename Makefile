@@ -36,6 +36,10 @@ LDFLAGS += -pthread
 .PHONY: all
 all: shared static $(DOC_TARGETS) check
 
+# Build for distribution
+.PHONY: distro
+distro: shared $(DOC_TARGETS)
+
 # Shared libraries (versioned and unversioned)
 .PHONY: shared
 shared: $(LIB)/libredisx.so
@@ -95,6 +99,43 @@ Doxyfile.local: Doxyfile Makefile
 local-dox: README-redisx.md Doxyfile.local
 	doxygen Doxyfile.local
 
+# Default values for install locations
+# See https://www.gnu.org/prep/standards/html_node/Directory-Variables.html 
+prefix ?= /usr
+exec_prefix ?= $(prefix)
+libdir ?= $(exec_prefix)/lib
+includedir ?= $(prefix)/include
+datarootdir ?= $(prefix)/share
+datadir ?= $(datarootdir)
+mydatadir ?= $(datadir)/redisx
+docdir ?= $(datarootdir)/doc/redisx
+htmldir ?= $(docdir)/html
+
+.PHONY: install
+install: install-libs install-headers install-apidoc
+
+.PHONY: install-libs
+install-libs: shared
+	@echo "installing libraries to $(libdir)"
+	install -d $(libdir)
+	install -m 755 -D $(LIB)/lib*.so* $(libdir)/
+
+.PHONY: install-headers
+install-headers:
+	@echo "installing headers to $(includedir)"
+	install -d $(includedir)
+	install -m 644 -D include/* $(includedir)/
+
+.PHONY: install-apidoc
+install-apidoc: $(DOC_TARGETS)
+	@echo "installing API documentation to $(htmldir)"
+	install -d $(htmldir)/search
+	install -m 644 -D apidoc/html/search/* $(htmldir)/search/
+	install -m 644 -D apidoc/html/*.* $(htmldir)/
+	@echo "installing Doxygen tag file to $(docdir)"
+	install -d $(docdir)
+	install -m 644 -D apidoc/*.tag $(docdir)/
+
 # Built-in help screen for `make help`
 .PHONY: help
 help:
@@ -108,6 +149,7 @@ help:
 	@echo "  local-dox     Compiles local HTML API documentation using 'doxygen'."
 	@echo "  check         Performs static analysis with 'cppcheck'."
 	@echo "  all           All of the above."
+	@echo "  install       Install components (e.g. 'make prefix=<path> install')"
 	@echo "  clean         Removes intermediate products."
 	@echo "  distclean     Deletes all generated files."
 	@echo

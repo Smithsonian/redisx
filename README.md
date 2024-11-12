@@ -119,6 +119,19 @@ After configuring, you can simply run `make`, which will build the `shared` (`li
 analysis via the `check` target. Or, you may build just the components you are interested in, by specifying the
 desired `make` target(s). (You can use `make help` to get a summary of the available `make` targets). 
 
+After building the library you can install the above components to the desired locations on your system. For a 
+system-wide install you may simply run:
+
+```bash
+  $ sudo make install
+```
+
+Or, to install in some other locations, you may set a prefix. For example to install under `/opt` instead, you can:
+
+```bash
+  $ sudo make prefix=/opt install
+```
+
 -----------------------------------------------------------------------------
 
 <a name="linking"></a>
