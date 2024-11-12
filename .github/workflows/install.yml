@@ -40,8 +40,14 @@ jobs:
         repository: Smithsonian/xchange
         path: xchange
 
+    - name: Build xchange dependency
+      run: make -C xchange shared
+
     - name: Install xchange dependency
       run: sudo make -C xchange install
+
+    - name: Build RedisX distro
+      run: make distro
 
     - name: Install RedisX in default location
       run: sudo make install   

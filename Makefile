@@ -115,10 +115,14 @@ htmldir ?= $(docdir)/html
 install: install-libs install-headers install-apidoc
 
 .PHONY: install-libs
-install-libs: shared
+install-libs:
+ifneq ($(wildcard $(LIB)/*),)
 	@echo "installing libraries to $(libdir)"
 	install -d $(libdir)
 	install -m 755 -D $(LIB)/lib*.so* $(libdir)/
+else
+	@echo "WARNING! Skipping libs install: needs 'shared' and/or 'static'"
+endif
 
 .PHONY: install-headers
 install-headers:
@@ -127,7 +131,8 @@ install-headers:
 	install -m 644 -D include/* $(includedir)/
 
 .PHONY: install-apidoc
-install-apidoc: $(DOC_TARGETS)
+install-apidoc:
+ifneq ($(wildcard apidoc/html/search/*),)
 	@echo "installing API documentation to $(htmldir)"
 	install -d $(htmldir)/search
 	install -m 644 -D apidoc/html/search/* $(htmldir)/search/
@@ -135,6 +140,9 @@ install-apidoc: $(DOC_TARGETS)
 	@echo "installing Doxygen tag file to $(docdir)"
 	install -d $(docdir)
 	install -m 644 -D apidoc/*.tag $(docdir)/
+else
+	@echo "WARNING! Skipping apidoc install: needs doxygen and 'local-dox'"
+endif
 
 # Built-in help screen for `make help`
 .PHONY: help
