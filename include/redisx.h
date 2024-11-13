@@ -12,8 +12,7 @@
 
 #include <pthread.h>
 #include <stdint.h>
-
-#include "xchange.h"
+#include <xchange.h>
 
 // Configuration constants ------------------------------------------------------->
 #ifndef REDISX_TCP_PORT
