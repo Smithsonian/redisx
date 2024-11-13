@@ -77,10 +77,6 @@ depending on what suits your needs best.
 
 You can configure the build, either by editing `config.mk` or else by defining the relevant environment variables 
 prior to invoking `make`. The following build variables can be configured:
-
- - `XCHANGE`: the root of the location where the [Smithsonian/xchange](https://github.com/Smithsonian/xchange) library 
-   is installed. It expects to find `xchange.h` under `$(XCHANGE)/include` and `libxchange.so` / `libredisx.a` under 
-   `$(XCHANGE)/lib` or else in the default `LD_LIBRARY_PATH`.
    
  - `CC`: The C compiler to use (default: `gcc`).
 
@@ -96,11 +92,28 @@ prior to invoking `make`. The following build variables can be configured:
 
  - `CHECKEXTRA`: Extra options to pass to `cppcheck` for the `make check` target
  
+ - `XCHANGE`: If the [Smithsonian/xchange](https://github.com/Smithsonian/xchange) library is not installed on your
+   system (e.g. under `/usr`) set `XCHANGE` to where the distribution can be found. The build will expect to find 
+   `xchange.h` under `$(XCHANGE)/include` and `libxchange.so` / `libxchange.a` under `$(XCHANGE)/lib` or else in the 
+   default `LD_LIBRARY_PATH`.
  
 After configuring, you can simply run `make`, which will build the `shared` (`lib/libredisx.so[.1]`) and `static` 
 (`lib/libredisx.a`) libraries, local HTML documentation (provided `doxygen` is available), and performs static
 analysis via the `check` target. Or, you may build just the components you are interested in, by specifying the
 desired `make` target(s). (You can use `make help` to get a summary of the available `make` targets). 
+
+After building the library you can install the above components to the desired locations on your system. For a 
+system-wide install you may simply run:
+
+```bash
+  $ sudo make install
+```
+
+Or, to install in some other locations, you may set a prefix. For example to install under `/opt` instead, you can:
+
+```bash
+  $ sudo make prefix=/opt install
+```
 
 -----------------------------------------------------------------------------
 

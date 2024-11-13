@@ -170,16 +170,20 @@ Building RedisX</h2>
 <p>The <b>RedisX</b> library can be built either as a shared (<code>libredisx.so[.1]</code>) and as a static (<code>libredisx.a</code>) library, depending on what suits your needs best.</p>
 <p>You can configure the build, either by editing <code>config.mk</code> or else by defining the relevant environment variables prior to invoking <code>make</code>. The following build variables can be configured:</p>
 <ul>
-<li><code>XCHANGE</code>: the root of the location where the <a href="https://github.com/Smithsonian/xchange">Smithsonian/xchange</a> library is installed. It expects to find <code><a class="elRef" href="../../xchange/apidoc/html/xchange_8h.html">xchange.h</a></code> under <code>$(XCHANGE)/include</code> and <code>libxchange.so</code> / <code>libredisx.a</code> under <code>$(XCHANGE)/lib</code> or else in the default <code>LD_LIBRARY_PATH</code>.</li>
 <li><code>CC</code>: The C compiler to use (default: <code>gcc</code>).</li>
 <li><code>CPPFLAGS</code>: C preprocessor flags, such as externally defined compiler constants.</li>
 <li><code>CFLAGS</code>: Flags to pass onto the C compiler (default: <code>-Os -Wall -std=c99</code>). Note, <code>-Iinclude</code> will be added automatically.</li>
 <li><code>LDFLAGS</code>: Extra linker flags (default is <em>not set</em>). Note, <code>-lm -lxchange</code> will be added automatically.</li>
 <li><code>BUILD_MODE</code>: You can set it to <code>debug</code> to enable debugging features: it will initialize the global <code>xDebug</code> variable to <code>TRUE</code> and add <code>-g</code> to <code>CFLAGS</code>.</li>
 <li><code>CHECKEXTRA</code>: Extra options to pass to <code>cppcheck</code> for the <code>make check</code> target</li>
+<li><code>XCHANGE</code>: If the <a href="https://github.com/Smithsonian/xchange">Smithsonian/xchange</a> library is not installed on your system (e.g. under <code>/usr</code>) set <code>XCHANGE</code> to where the distribution can be found. The build will expect to find <code><a class="elRef" href="../../xchange/apidoc/html/xchange_8h.html">xchange.h</a></code> under <code>$(XCHANGE)/include</code> and <code>libxchange.so</code> / <code>libxchange.a</code> under <code>$(XCHANGE)/lib</code> or else in the default <code>LD_LIBRARY_PATH</code>.</li>
 </ul>
 <p>After configuring, you can simply run <code>make</code>, which will build the <code>shared</code> (<code>lib/libredisx.so[.1]</code>) and <code>static</code> (<code>lib/libredisx.a</code>) libraries, local HTML documentation (provided <code>doxygen</code> is available), and performs static analysis via the <code>check</code> target. Or, you may build just the components you are interested in, by specifying the desired <code>make</code> target(s). (You can use <code>make help</code> to get a summary of the available <code>make</code> targets).</p>
-<hr  />
+<p>After building the library you can install the above components to the desired locations on your system. For a system-wide install you may simply run:</p>
+<div class="fragment"><div class="line">$ sudo make install</div>
+</div><!-- fragment --><p>Or, to install in some other locations, you may set a prefix. For example to install under <code>/opt</code> instead, you can:</p>
+<div class="fragment"><div class="line">$ sudo make prefix=/opt install</div>
+</div><!-- fragment --><hr  />
 <p><a class="anchor" id="linking"></a> </p>
 <h2><a class="anchor" id="autotoc_md11"></a>
 Linking your application against RedisX</h2>
