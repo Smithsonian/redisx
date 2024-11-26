@@ -46,10 +46,11 @@ Last Updated: 18 September 2024
 <a name="introduction"></a>
 ## Introduction
 
-__RedisX__ is a light-weight [Redis](https://redis.io) client library for C/C++. As such, it should work with Redis 
-forks / clones like [Dragonfly](https://dragonfly.io) or [Valkey](https://valkey.io) also. It supports both 
+__RedisX__ is a free, light-weight [Redis](https://redis.io) client library for C/C++. As such, it should work with 
+Redis forks / clones like [Dragonfly](https://dragonfly.io) or [Valkey](https://valkey.io) also. It supports both 
 interactive and pipelined Redis queries, managing and processing subscriptions, atomic execution blocks, and LUA 
-scripts loading. It can be used with multiple Redis servers simultaneously also.
+scripts loading. It can be used with multiple Redis servers simultaneously also. __RedisX__ is free to use, in any 
+way you like, without licensing restrictions.
 
 While there are other C/C++ Redis clients available, this one is C99 compatible, and hence can be used on older 
 platforms also. It is also small and fast, but still capable and versatile.
@@ -126,10 +127,17 @@ system-wide install you may simply run:
   $ sudo make install
 ```
 
-Or, to install in some other locations, you may set a prefix. For example to install under `/opt` instead, you can:
+Or, to install in some other locations, you may set a prefix and/or `DESTDIR`. For example, to install under `/opt` 
+instead, you can:
 
 ```bash
-  $ sudo make prefix=/opt install
+  $ sudo make prefix="/opt" install
+```
+
+Or, to stage the installation (to `/usr`) under a 'build root':
+
+```bash
+  $ make DESTDIR="/tmp/stage" install
 ```
 
 -----------------------------------------------------------------------------
