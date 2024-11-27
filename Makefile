@@ -53,6 +53,10 @@ static: $(LIB)/libredisx.a
 test:
 	make -C test
 
+# 'test' + 'analyze'
+.PHONY: check
+check: test analyze
+
 # Remove intermediates
 .PHONY: clean
 clean:
@@ -99,6 +103,19 @@ Doxyfile.local: Doxyfile Makefile
 local-dox: README-redisx.md Doxyfile.local
 	doxygen Doxyfile.local
 
+# Some standard GNU targets, that should always exist...
+.PHONY: html
+html: local-dox
+
+.PHONY: dvi
+dvi:
+
+.PHONY: ps
+ps:
+
+.PHONY: pdf
+pdf:
+
 # Default values for install locations
 # See https://www.gnu.org/prep/standards/html_node/Directory-Variables.html 
 prefix ?= /usr
@@ -116,7 +133,7 @@ INSTALL_PROGRAM ?= install
 INSTALL_DATA ?= install -m 644
 
 .PHONY: install
-install: install-libs install-headers install-apidoc
+install: install-libs install-headers install-html
 
 .PHONY: install-libs
 install-libs:
@@ -134,8 +151,8 @@ install-headers:
 	install -d $(DESTDIR)$(includedir)
 	$(INSTALL_DATA) -D include/* $(DESTDIR)$(includedir)/
 
-.PHONY: install-apidoc
-install-apidoc:
+.PHONY: install-html
+install-html:
 ifneq ($(wildcard apidoc/html/search/*),)
 	@echo "installing API documentation to $(DESTDIR)$(htmldir)"
 	install -d $(DESTDIR)$(htmldir)/search
@@ -159,7 +176,7 @@ help:
 	@echo "  shared        Builds the shared 'libredisx.so' (linked to versioned)."
 	@echo "  static        Builds the static 'lib/libredisx.a' library."
 	@echo "  local-dox     Compiles local HTML API documentation using 'doxygen'."
-	@echo "  check         Performs static analysis with 'cppcheck'."
+	@echo "  analyze       Performs static analysis with 'cppcheck'."
 	@echo "  all           All of the above."
 	@echo "  install       Install components (e.g. 'make prefix=<path> install')"
 	@echo "  clean         Removes intermediate products."
@@ -175,4 +192,3 @@ Makefile: config.mk build.mk
 
 include build.mk
 
-	

@@ -49,9 +49,9 @@ clean: clean-local
 distclean: distclean-local
 
 # Static code analysis using 'cppcheck'
-.PHONY: check
+.PHONY: analyze
 check:
-	@echo "   [check]"
+	@echo "   [analyze]"
 	@cppcheck $(CPPFLAGS) $(CHECKOPTS) src
 
 # Doxygen documentation (HTML and man pages) under apidocs/
