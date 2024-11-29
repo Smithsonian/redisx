@@ -808,7 +808,7 @@ RESP *redisxReadReplyAsync(RedisClient *cl) {
 int redisxResetClient(RedisClient *cl) {
   static const char *fn = "redisxResetClient";
 
-  int status = X_SUCCESS;
+  int status;
 
   if(cl == NULL) return x_error(X_NULL, EINVAL, fn, "client is NULL");
 

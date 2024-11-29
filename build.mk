@@ -50,7 +50,7 @@ distclean: distclean-local
 
 # Static code analysis using 'cppcheck'
 .PHONY: analyze
-check:
+analyze:
 	@echo "   [analyze]"
 	@cppcheck $(CPPFLAGS) $(CHECKOPTS) src
 
