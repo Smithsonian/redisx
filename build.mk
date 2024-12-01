@@ -38,7 +38,7 @@ clean-local:
 # pristine state
 .PHONY: distclean-local
 distclean-local: clean-local
-	rm -rf bin lib apidoc
+	rm -rf bin lib apidoc infer-out
 
 # Remove intermediate files (general)
 .PHONY: clean
@@ -53,6 +53,11 @@ distclean: distclean-local
 analyze:
 	@echo "   [analyze]"
 	@cppcheck $(CPPFLAGS) $(CHECKOPTS) src
+
+# Static code analysis via Facebook's infer
+.PHONY: infer
+infer: CC := infer run -- $(CC)
+infer: distclean shared
 
 # Doxygen documentation (HTML and man pages) under apidocs/
 .PHONY: dox

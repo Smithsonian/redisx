@@ -321,9 +321,10 @@ RedisClient *redisxGetLockedConnectedClient(Redis *redis, enum redisx_channel ch
  *
  * \param cl        Pointer to the Redis client instance.
  *
- * \return          X_SUCCESS           if the exclusive lock for the channel was successfully obtained
- *                  X_FAILURE           if pthread_mutex_lock() returned an error
- *                  X_NULL              if the client is NULL.
+ * \return          X_SUCCESS           if the exclusive lock for the channel was successfully obtained, or
+ *                  X_FAILURE           if pthread_mutex_lock() returned an error, or
+ *                  X_NULL              if the client is NULL, or
+ *                  X_NO_INIT           if the client was not initialized.
  *
  * @sa redisxLockConnected()
  * @sa redisxUnlockClient()
@@ -335,6 +336,7 @@ int redisxLockClient(RedisClient *cl) {
 
   if(cl == NULL) return x_error(X_NULL, EINVAL, fn, "client is NULL");
   cp = (ClientPrivate *) cl->priv;
+  if(cp == NULL) return x_error(X_NO_INIT, EINVAL, fn, "client is not initialized");
 
   status = pthread_mutex_lock(&cp->writeLock);
   if(status) return x_error(X_FAILURE, errno, fn, "mutex error");
@@ -347,10 +349,10 @@ int redisxLockClient(RedisClient *cl) {
  *
  * \param cl     Pointer to the Redis client instance
  *
- * \return       X_SUCCESS (0)          if an excusive lock to the channel has been granted.
- *               X_FAILURE              if pthread_mutex_lock() returned an error
- *               X_NULL                 if the client is NULL
- *               REDIS_INVALID_CHANNEL  if the channel is not enabled/connected.
+ * \return       X_SUCCESS (0)          if an excusive lock to the channel has been granted, or
+ *               X_FAILURE              if pthread_mutex_lock() returned an error, or
+ *               X_NULL                 if the client is NULL, or
+ *               X_NO_INIT              if the client was not initialized.
  *
  * @sa redisxLockClient()
  * @sa redisxUnlockClient()
@@ -363,6 +365,8 @@ int redisxLockConnected(RedisClient *cl) {
   prop_error(fn, redisxLockClient(cl));
 
   cp = (ClientPrivate *) cl->priv;
+  if(cp == NULL) return x_error(X_NO_INIT, EINVAL, fn, "client is not initialized");
+
   if(!cp->isEnabled) {
     redisxUnlockClient(cl);
     return x_error(X_NO_SERVICE, ENOTCONN, fn, "client is not connected");
@@ -376,9 +380,10 @@ int redisxLockConnected(RedisClient *cl) {
  *
  * \param cl        Pointer to the Redis client instance
  *
- * \return          X_SUCCESS           if the exclusive lock for the channel was successfully obtained
- *                  X_FAILURE           if pthread_mutex_lock() returned an error
- *                  X_NULL              if the client is NULL
+ * \return          X_SUCCESS           if the exclusive lock for the channel was successfully obtained, or
+ *                  X_FAILURE           if pthread_mutex_lock() returned an error, or
+ *                  X_NULL              if the client is NULL, or
+ *                  X_NO_INIT           if the client was not initialized.
  *
  * @sa redisxLockClient()
  * @sa redisxLockConnected()
@@ -390,6 +395,7 @@ int redisxUnlockClient(RedisClient *cl) {
 
   if(cl == NULL) return x_error(X_NULL, EINVAL, fn, "client is NULL");
   cp = (ClientPrivate *) cl->priv;
+  if(cp == NULL) return x_error(X_NO_INIT, EINVAL, fn, "client is not initialized");
 
   status = pthread_mutex_unlock(&cp->writeLock);
   if(status) return x_error(X_FAILURE, errno, fn, "mutex error");
@@ -406,7 +412,7 @@ int redisxUnlockClient(RedisClient *cl) {
  *
  * \return              X_SUCCESS (0) on success or X_NULL if the client is NULL, or else X_NO_SERVICE
  *                      if not connected to the Redis server on the requested channel, or if send()
- *                      failed.
+ *                      failed, or else X_NO_INIT if the client was not initialized.
  *
  *
  */
@@ -415,6 +421,7 @@ int redisxSkipReplyAsync(RedisClient *cl) {
   static const char cmd[] = "*3\r\n$6\r\nCLIENT\r\n$5\r\nREPLY\r\n$4\r\nSKIP\r\n";
 
   if(cl == NULL) return x_error(X_NULL, EINVAL, fn, "client is NULL");
+  if(cl->priv == NULL) return x_error(X_NO_INIT, EINVAL, fn, "client is not initialized");
 
   prop_error(fn, rSendBytesAsync((ClientPrivate *) cl->priv, cmd, sizeof(cmd) - 1, TRUE));
 
@@ -435,7 +442,8 @@ int redisxSkipReplyAsync(RedisClient *cl) {
  *
  * \return          X_SUCCESS (0)   if successful, or
  *                  X_NULL          if the Redis client is NULL, or
- *                  X_NO_SERVICE    if not connected to the client server or if send() failed.
+ *                  X_NO_SERVICE    if not connected to the client server or if send() failed, or
+ *                  X_NO_INIT       if the client was not initialized.
  *
  * @sa redisxExecBlockAsync()
  * @sa redisxAbortBlockAsync()
@@ -446,6 +454,7 @@ int redisxStartBlockAsync(RedisClient *cl) {
   static const char cmd[] = "*1\r\n$5\r\nMULTI\r\n";
 
   if(cl == NULL) return x_error(X_NULL, EINVAL, fn, "client is NULL");
+  if(cl->priv == NULL) return x_error(X_NO_INIT, EINVAL, fn, "client is not initialized");
 
   prop_error(fn, rSendBytesAsync((ClientPrivate *) cl->priv, cmd, sizeof(cmd) - 1, TRUE));
 
@@ -457,8 +466,9 @@ int redisxStartBlockAsync(RedisClient *cl) {
  *
  * \param cl    Pointer to a Redis client
  *
- * \return      X_SUCCESS (0) if successful, or X_NULL if the client is NULL, or else
- *              X_NO_SERVICE if not connected ot the client or if send() failed.
+ * \return      X_SUCCESS (0)   if successful, or X_NULL if the client is NULL, or
+ *              X_NO_SERVICE    if not connected ot the client or if send() failed, or
+ *              X_NO_INIT       if the client was not initialized.
  *
  * @sa redisxStartBlockAsync()
  *
@@ -468,6 +478,7 @@ int redisxAbortBlockAsync(RedisClient *cl) {
   static const char cmd[] = "*1\r\n$7\r\nDISCARD\r\n";
 
   if(cl == NULL) return x_error(X_NULL, EINVAL, fn, "client is NULL");
+  if(cl->priv == NULL) return x_error(X_NO_INIT, EINVAL, fn, "client is not initialized");
 
   prop_error(fn, rSendBytesAsync((ClientPrivate *) cl->priv, cmd, sizeof(cmd) - 1, TRUE));
 
@@ -497,6 +508,11 @@ RESP *redisxExecBlockAsync(RedisClient *cl) {
 
   if(cl == NULL) {
     x_error(0, EINVAL, fn, "client is NULL");
+    return NULL;
+  }
+
+  if(cl->priv == NULL) {
+    x_error(0, EINVAL, fn, "client is not initialized");
     return NULL;
   }
 
@@ -565,8 +581,9 @@ int redisxSendRequestAsync(RedisClient *cl, const char *command, const char *arg
  *                      lengths of all string arguments automatically.
  * \param n             The number of arguments to send.
  *
- * \return              X_SUCCESS (0) on success or X_NULL if the client is NULL, or else
- *                      X_NO_SERVICE if not connected to the client or if send() failed.
+ * \return              X_SUCCESS (0) on success or X_NULL if the client is NULL, or
+ *                      X_NO_SERVICE if not connected to the client or if send() failed, or
+ *                      X_NO_INIT if the client was not initialized.
  */
 int redisxSendArrayRequestAsync(RedisClient *cl, char *args[], int lengths[], int n) {
   static const char *fn = "redisxSendArrayRequestAsync";
@@ -575,15 +592,19 @@ int redisxSendArrayRequestAsync(RedisClient *cl, char *args[], int lengths[], in
   ClientPrivate *cp;
 
   if(cl == NULL) return x_error(X_NULL, EINVAL, fn, "client is NULL");
+
   cp = (ClientPrivate *) cl->priv;
+  if(cp == NULL) return x_error(X_NO_INIT, EINVAL, fn, "client is not initialized");
+  if(!cp->isEnabled) return x_error(X_NO_SERVICE, ENOTCONN, fn, "client is not connected");
 
   // Send the number of string elements in the command...
   L = sprintf(buf, "*%d\r\n", n);
 
-  for(i=0; i<n; i++) {
+  for(i = 0; i < n; i++) {
     int l, L1;
 
-    if(!lengths) l = (int) strlen(args[i]);
+    if(!args[i]) l = 0; // Check for potential NULL parameters...
+    else if(!lengths) l = (int) strlen(args[i]);
     else l = lengths[i] > 0 ? lengths[i] : (int) strlen(args[i]);
 
     L += sprintf(buf + L, "$%d\r\n", l);
@@ -603,12 +624,12 @@ int redisxSendArrayRequestAsync(RedisClient *cl, char *args[], int lengths[], in
         prop_error(fn, rSendBytesAsync(cp, "\r\n", 2, i == (n-1)));
       }
       else {
-        memcpy(buf, args[i], l);            // Copy argument into buffer.
+        if(l > 0) memcpy(buf, args[i], l);            // Copy argument into buffer.
         L = l + sprintf(buf+l, "\r\n");     // Add \r\n\0...
       }
     }
     else {
-      memcpy(buf+L, args[i], l);            // Copy argument into buffer.
+      if(l > 0) memcpy(buf+L, args[i], l);            // Copy argument into buffer.
       L += l;
       L += sprintf(buf+L, "\r\n");          // Add \r\n\0
     }
@@ -669,10 +690,15 @@ RESP *redisxReadReplyAsync(RedisClient *cl) {
     x_error(0, EINVAL, fn, "client is NULL");
     return NULL;
   }
-  cp = (ClientPrivate *) cl->priv;
 
+  cp = cl->priv;
+
+  if(cp == NULL) {
+    x_error(0, ENOTCONN, fn, "client is not initialized");
+    return NULL;
+  }
   if(!cp->isEnabled) {
-    x_error(0, ENOTCONN, fn, "client is connected");
+    x_error(0, ENOTCONN, fn, "client is not connected");
     return NULL;
   }
 
