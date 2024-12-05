@@ -203,7 +203,7 @@ Optionally, you can select the database index to use now (or later, after connec
 ```c
   Redis *redis = ...
   
-  // Select the database index 2
+  // (optional) Select the database index 2
   redisxSelectDB(redis, 2); 
 ```
 

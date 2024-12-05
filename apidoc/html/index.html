@@ -237,7 +237,7 @@ Initializing</h3>
 </div><!-- fragment --><p>Optionally, you can select the database index to use now (or later, after connecting), if not the default (index 0):</p>
 <div class="fragment"><div class="line"><a class="code hl_struct" href="structRedis.html">Redis</a> *redis = ...</div>
 <div class="line"> </div>
-<div class="line"><span class="comment">// Select the database index 2</span></div>
+<div class="line"><span class="comment">// (optional) Select the database index 2</span></div>
 <div class="line">redisxSelectDB(redis, 2); </div>
 </div><!-- fragment --><p>Note, that you can switch the database index any time, with the caveat that it's not possible to change it for the subscription client when there are active subscriptions.</p>
 <p><a class="anchor" id="connecting"></a> </p>
