@@ -265,6 +265,12 @@ Disconnecting</h3>
 <div class="fragment"><div class="line"><a class="code hl_struct" href="structRedis.html">Redis</a> *redis = ...</div>
 <div class="line"> </div>
 <div class="line">redisxDisconnect(redis);</div>
+</div><!-- fragment --><p>And then to free up all resources used by the <code><a class="el" href="structRedis.html" title="Structure that represents a Redis database instance, with one or more RedisClient connections.">Redis</a></code> instance, you might also call</p>
+<div class="fragment"><div class="line"><span class="comment">// Destroy the Redis instance and free up resources</span></div>
+<div class="line"><a class="code hl_function" href="redisx-net_8c.html#ac54dd4c46d8615db4da02702c18f062b">redisxDestroy</a>(redis);</div>
+<div class="line"> </div>
+<div class="line"><span class="comment">// Set the destroyed Redis instance pointer to NULL, as best practice.</span></div>
+<div class="line">redis = NULL;</div>
 </div><!-- fragment --><p><a class="anchor" id="connection-hooks"></a> </p>
 <h3><a class="anchor" id="autotoc_md17"></a>
 Connection hooks</h3>

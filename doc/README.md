@@ -244,6 +244,17 @@ When you are done with a specific Redis server, you should disconnect from it:
   redisxDisconnect(redis);
 ```
 
+And then to free up all resources used by the `Redis` instance, you might also call
+
+```c
+  // Destroy the Redis instance and free up resources
+  redisxDestroy(redis);
+  
+  // Set the destroyed Redis instance pointer to NULL, as best practice.
+  redis = NULL;
+```
+
+
 <a name="connection-hooks"></a>
 ### Connection hooks
 
