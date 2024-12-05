@@ -179,17 +179,17 @@ the default 6379), and the database authentication (if any):
   Redis *redis = ...
   
   // (optional) configure a non-standard port number
-  redisxSetPort(&redis, 7089);
+  redisxSetPort(redis, 7089);
   
   // (optional) Configure the database user (since Redis 6.0, using ACL)
-  redisxSetUser(&redis, "johndoe"); 
+  redisxSetUser(redis, "johndoe"); 
   
   // (optional) Configure the database password...
-  redisxSetPassword(&redis, mySecretPasswordString);
+  redisxSetPassword(redis, mySecretPasswordString);
 ```
 
 You might also tweak the send/receive buffer sizes to use for clients, if you find the socket defaults sub-optimal for
-your application:
+your application (note, that this setting is common to all `Redis` instances managed by the library):
 
 ```c
    // (optional) Set the TCP send/rcv buffer sizes to use if not default values.
@@ -217,13 +217,15 @@ subscription client when there are active subscriptions.
 Once configured, you can connect to the server as:
 
 ```c
+   Redis *redis = ...
+
    // Connect to Redis, including a 2nd dedicated client for pipelined requests
-   int status = redisxConnect(&redis, TRUE);
+   int status = redisxConnect(redis, TRUE);
    if (status != X_SUCCESS) {
       // Abort: we could not connect for some reason...
       ...
       // Clean up...
-      redisxDestroy(&redis);
+      redisxDestroy(redis);
       ...
    }
 ```

@@ -220,16 +220,16 @@ Initializing</h3>
 <div class="fragment"><div class="line"><a class="code hl_struct" href="structRedis.html">Redis</a> *redis = ...</div>
 <div class="line"> </div>
 <div class="line"><span class="comment">// (optional) configure a non-standard port number</span></div>
-<div class="line">redisxSetPort(&amp;redis, 7089);</div>
+<div class="line">redisxSetPort(redis, 7089);</div>
 <div class="line"> </div>
 <div class="line"><span class="comment">// (optional) Configure the database user (since Redis 6.0, using ACL)</span></div>
-<div class="line"><a class="code hl_function" href="redisx_8c.html#a3beff3a9e373a0f1de626a8e64da98cf">redisxSetUser</a>(&amp;redis, <span class="stringliteral">&quot;johndoe&quot;</span>); </div>
+<div class="line"><a class="code hl_function" href="redisx_8c.html#a3beff3a9e373a0f1de626a8e64da98cf">redisxSetUser</a>(redis, <span class="stringliteral">&quot;johndoe&quot;</span>); </div>
 <div class="line"> </div>
 <div class="line"><span class="comment">// (optional) Configure the database password...</span></div>
-<div class="line"><a class="code hl_function" href="redisx_8c.html#a0e9eda38aa6f084ac151cbebe2886c2f">redisxSetPassword</a>(&amp;redis, mySecretPasswordString);</div>
+<div class="line"><a class="code hl_function" href="redisx_8c.html#a0e9eda38aa6f084ac151cbebe2886c2f">redisxSetPassword</a>(redis, mySecretPasswordString);</div>
 <div class="ttc" id="aredisx_8c_html_a0e9eda38aa6f084ac151cbebe2886c2f"><div class="ttname"><a href="redisx_8c.html#a0e9eda38aa6f084ac151cbebe2886c2f">redisxSetPassword</a></div><div class="ttdeci">int redisxSetPassword(Redis *redis, const char *passwd)</div><div class="ttdef"><b>Definition</b> redisx.c:141</div></div>
 <div class="ttc" id="aredisx_8c_html_a3beff3a9e373a0f1de626a8e64da98cf"><div class="ttname"><a href="redisx_8c.html#a3beff3a9e373a0f1de626a8e64da98cf">redisxSetUser</a></div><div class="ttdeci">int redisxSetUser(Redis *redis, const char *username)</div><div class="ttdef"><b>Definition</b> redisx.c:113</div></div>
-</div><!-- fragment --><p>You might also tweak the send/receive buffer sizes to use for clients, if you find the socket defaults sub-optimal for your application:</p>
+</div><!-- fragment --><p>You might also tweak the send/receive buffer sizes to use for clients, if you find the socket defaults sub-optimal for your application (note, that this setting is common to all <code><a class="el" href="structRedis.html" title="Structure that represents a Redis database instance, with one or more RedisClient connections.">Redis</a></code> instances managed by the library):</p>
 <div class="fragment"><div class="line"><span class="comment">// (optional) Set the TCP send/rcv buffer sizes to use if not default values.</span></div>
 <div class="line"><span class="comment">//            This setting applies to all new connections after...</span></div>
 <div class="line"><a class="code hl_function" href="redisx-net_8c.html#a83fce113d042490e77efdc574e64d76f">redisxSetTcpBuf</a>(65536);</div>
@@ -244,13 +244,15 @@ Initializing</h3>
 <h3><a class="anchor" id="autotoc_md15"></a>
 Connecting</h3>
 <p>Once configured, you can connect to the server as:</p>
-<div class="fragment"><div class="line"><span class="comment">// Connect to Redis, including a 2nd dedicated client for pipelined requests</span></div>
-<div class="line"><span class="keywordtype">int</span> status = <a class="code hl_function" href="redisx-net_8c.html#ad71822356ffd40ed4b1c71d065f48809">redisxConnect</a>(&amp;redis, TRUE);</div>
+<div class="fragment"><div class="line"><a class="code hl_struct" href="structRedis.html">Redis</a> *redis = ...</div>
+<div class="line"> </div>
+<div class="line"><span class="comment">// Connect to Redis, including a 2nd dedicated client for pipelined requests</span></div>
+<div class="line">int status = <a class="code hl_function" href="redisx-net_8c.html#ad71822356ffd40ed4b1c71d065f48809">redisxConnect</a>(redis, TRUE);</div>
 <div class="line"><span class="keywordflow">if</span> (status != X_SUCCESS) {</div>
 <div class="line">   <span class="comment">// Abort: we could not connect for some reason...</span></div>
 <div class="line">   ...</div>
 <div class="line">   <span class="comment">// Clean up...</span></div>
-<div class="line">   <a class="code hl_function" href="redisx-net_8c.html#ac54dd4c46d8615db4da02702c18f062b">redisxDestroy</a>(&amp;redis);</div>
+<div class="line">   <a class="code hl_function" href="redisx-net_8c.html#ac54dd4c46d8615db4da02702c18f062b">redisxDestroy</a>(redis);</div>
 <div class="line">   ...</div>
 <div class="line">}</div>
 <div class="ttc" id="aredisx-net_8c_html_ac54dd4c46d8615db4da02702c18f062b"><div class="ttname"><a href="redisx-net_8c.html#ac54dd4c46d8615db4da02702c18f062b">redisxDestroy</a></div><div class="ttdeci">void redisxDestroy(Redis *redis)</div><div class="ttdef"><b>Definition</b> redisx-net.c:680</div></div>
@@ -567,10 +569,10 @@ Execution blocks</h3>
 <div class="line"><span class="comment">// Inspect the RESP, etc...</span></div>
 <div class="line">... </div>
 <div class="ttc" id="aredisx-client_8c_html_a19d2fb18f2f939edfdc412d064741f9f"><div class="ttname"><a href="redisx-client_8c.html#a19d2fb18f2f939edfdc412d064741f9f">redisxGetLockedConnectedClient</a></div><div class="ttdeci">RedisClient * redisxGetLockedConnectedClient(Redis *redis, enum redisx_channel channel)</div><div class="ttdef"><b>Definition</b> redisx-client.c:309</div></div>
-<div class="ttc" id="aredisx-client_8c_html_a3e49508e4e4fcc283832226fd1bffd85"><div class="ttname"><a href="redisx-client_8c.html#a3e49508e4e4fcc283832226fd1bffd85">redisxStartBlockAsync</a></div><div class="ttdeci">int redisxStartBlockAsync(RedisClient *cl)</div><div class="ttdef"><b>Definition</b> redisx-client.c:444</div></div>
-<div class="ttc" id="aredisx-client_8c_html_a6fed65f9413569c771d5165a0194477a"><div class="ttname"><a href="redisx-client_8c.html#a6fed65f9413569c771d5165a0194477a">redisxExecBlockAsync</a></div><div class="ttdeci">RESP * redisxExecBlockAsync(RedisClient *cl)</div><div class="ttdef"><b>Definition</b> redisx-client.c:492</div></div>
-<div class="ttc" id="aredisx-client_8c_html_a87efe53c80fcff3fcf189362cbc602f7"><div class="ttname"><a href="redisx-client_8c.html#a87efe53c80fcff3fcf189362cbc602f7">redisxUnlockClient</a></div><div class="ttdeci">int redisxUnlockClient(RedisClient *cl)</div><div class="ttdef"><b>Definition</b> redisx-client.c:386</div></div>
-<div class="ttc" id="aredisx-client_8c_html_afc7b28288c07baf0b3c8fdc9d8ddf263"><div class="ttname"><a href="redisx-client_8c.html#afc7b28288c07baf0b3c8fdc9d8ddf263">redisxSendRequestAsync</a></div><div class="ttdeci">int redisxSendRequestAsync(RedisClient *cl, const char *command, const char *arg1, const char *arg2, const char *arg3)</div><div class="ttdef"><b>Definition</b> redisx-client.c:538</div></div>
+<div class="ttc" id="aredisx-client_8c_html_a3e49508e4e4fcc283832226fd1bffd85"><div class="ttname"><a href="redisx-client_8c.html#a3e49508e4e4fcc283832226fd1bffd85">redisxStartBlockAsync</a></div><div class="ttdeci">int redisxStartBlockAsync(RedisClient *cl)</div><div class="ttdef"><b>Definition</b> redisx-client.c:452</div></div>
+<div class="ttc" id="aredisx-client_8c_html_a6fed65f9413569c771d5165a0194477a"><div class="ttname"><a href="redisx-client_8c.html#a6fed65f9413569c771d5165a0194477a">redisxExecBlockAsync</a></div><div class="ttdeci">RESP * redisxExecBlockAsync(RedisClient *cl)</div><div class="ttdef"><b>Definition</b> redisx-client.c:503</div></div>
+<div class="ttc" id="aredisx-client_8c_html_a87efe53c80fcff3fcf189362cbc602f7"><div class="ttname"><a href="redisx-client_8c.html#a87efe53c80fcff3fcf189362cbc602f7">redisxUnlockClient</a></div><div class="ttdeci">int redisxUnlockClient(RedisClient *cl)</div><div class="ttdef"><b>Definition</b> redisx-client.c:391</div></div>
+<div class="ttc" id="aredisx-client_8c_html_afc7b28288c07baf0b3c8fdc9d8ddf263"><div class="ttname"><a href="redisx-client_8c.html#afc7b28288c07baf0b3c8fdc9d8ddf263">redisxSendRequestAsync</a></div><div class="ttdeci">int redisxSendRequestAsync(RedisClient *cl, const char *command, const char *arg1, const char *arg2, const char *arg3)</div><div class="ttdef"><b>Definition</b> redisx-client.c:554</div></div>
 <div class="ttc" id="aredisx_8h_html_a5349b7340813fbd1e32d04ed650bc3d9a65b4f2926885665960480d008ab2a456"><div class="ttname"><a href="redisx_8h.html#a5349b7340813fbd1e32d04ed650bc3d9a65b4f2926885665960480d008ab2a456">REDISX_INTERACTIVE_CHANNEL</a></div><div class="ttdeci">@ REDISX_INTERACTIVE_CHANNEL</div><div class="ttdoc">Redis channel number for interactive queries.</div><div class="ttdef"><b>Definition</b> redisx.h:108</div></div>
 <div class="ttc" id="astructRedisClient_html"><div class="ttname"><a href="structRedisClient.html">RedisClient</a></div><div class="ttdoc">Structure that represents a single Redis client connection instance.</div><div class="ttdef"><b>Definition</b> redisx.h:145</div></div>
 </div><!-- fragment --><p>If at any point things don't go according to plan in the middle of the block, you can call <code>redisAbortBlockAsync()</code> to abort and discard all prior commands submitted in the execution block already. It is important to remember that every time you call <code><a class="el" href="redisx-client_8c.html#a3e49508e4e4fcc283832226fd1bffd85">redisxStartBlockAsync()</a></code>, you must call either <code><a class="el" href="redisx-client_8c.html#a6fed65f9413569c771d5165a0194477a">redisxExecBlockAsync()</a></code> to execute it or else <code><a class="el" href="redisx-client_8c.html#ab98b0e71d2d0941920e3097a66eae7b8">redisxAbortBlockAsync()</a></code> to discard it. Failure to do so, will effectively end you up with a hung <a class="el" href="structRedis.html" title="Structure that represents a Redis database instance, with one or more RedisClient connections.">Redis</a> client.</p>
@@ -654,7 +656,7 @@ Asynchronous client processing</h3>
 <div class="line">  <a class="code hl_function" href="redisx_8c.html#aa4e23a7454f7055711915ec430599011">redisxDestroyRESP</a>(reply);</div>
 <div class="line">}</div>
 <div class="line">...</div>
-<div class="ttc" id="aredisx-client_8c_html_abc855133c2af4f5d929a05292aa634d1"><div class="ttname"><a href="redisx-client_8c.html#abc855133c2af4f5d929a05292aa634d1">redisxReadReplyAsync</a></div><div class="ttdeci">RESP * redisxReadReplyAsync(RedisClient *cl)</div><div class="ttdef"><b>Definition</b> redisx-client.c:659</div></div>
+<div class="ttc" id="aredisx-client_8c_html_abc855133c2af4f5d929a05292aa634d1"><div class="ttname"><a href="redisx-client_8c.html#abc855133c2af4f5d929a05292aa634d1">redisxReadReplyAsync</a></div><div class="ttdeci">RESP * redisxReadReplyAsync(RedisClient *cl)</div><div class="ttdef"><b>Definition</b> redisx-client.c:680</div></div>
 <div class="ttc" id="aredisx_8c_html_a2d3ffb89129ab04483e3966835a5ff71"><div class="ttname"><a href="redisx_8c.html#a2d3ffb89129ab04483e3966835a5ff71">redisxCheckRESP</a></div><div class="ttdeci">int redisxCheckRESP(const RESP *resp, char expectedType, int expectedSize)</div><div class="ttdef"><b>Definition</b> redisx.c:419</div></div>
 </div><!-- fragment --><p>For the best performance, you may want to leave the processing of the replies until after you unlock the client. I.e., you only block other threads from accessing the client while you send off the requests and collect the corresponding responses. You can then analyze the responses at your leisure outside of the mutexed section.</p>
 <p>In some cases you may be OK with just firing off some <a class="el" href="structRedis.html" title="Structure that represents a Redis database instance, with one or more RedisClient connections.">Redis</a> commands, without necessarily caring about responses. Rather than ignoring the replies with <code><a class="el" href="redisx-client_8c.html#ac0f30d62044638a2ead07583ad723fdf">redisxIgnoreReplyAsync()</a></code> you might call <code><a class="el" href="redisx-client_8c.html#a44c5d0bd24f5a4f2f131218f14c9c599">redisxSkipReplyAsync()</a></code> instead <b>before</b> <code><a class="el" href="redisx-client_8c.html#afc7b28288c07baf0b3c8fdc9d8ddf263">redisxSendRequestAsync()</a></code> to instruct <a class="el" href="structRedis.html" title="Structure that represents a Redis database instance, with one or more RedisClient connections.">Redis</a> to not even bother about sending a response to your request (it saves time and network bandwidth!):</p>
@@ -670,7 +672,7 @@ Asynchronous client processing</h3>
 <div class="line">   <span class="comment">// Ooops, the request did not go through...</span></div>
 <div class="line">   ...</div>
 <div class="line">}</div>
-<div class="ttc" id="aredisx-client_8c_html_a44c5d0bd24f5a4f2f131218f14c9c599"><div class="ttname"><a href="redisx-client_8c.html#a44c5d0bd24f5a4f2f131218f14c9c599">redisxSkipReplyAsync</a></div><div class="ttdeci">int redisxSkipReplyAsync(RedisClient *cl)</div><div class="ttdef"><b>Definition</b> redisx-client.c:413</div></div>
+<div class="ttc" id="aredisx-client_8c_html_a44c5d0bd24f5a4f2f131218f14c9c599"><div class="ttname"><a href="redisx-client_8c.html#a44c5d0bd24f5a4f2f131218f14c9c599">redisxSkipReplyAsync</a></div><div class="ttdeci">int redisxSkipReplyAsync(RedisClient *cl)</div><div class="ttdef"><b>Definition</b> redisx-client.c:419</div></div>
 </div><!-- fragment --><p>Of course you can build up arbitrarily complex set of queries and deal with a set of responses in different ways. Do what works best for your application.</p>
 <p><a class="anchor" id="pipelined-transactions"></a> </p>
 <h3><a class="anchor" id="autotoc_md38"></a>

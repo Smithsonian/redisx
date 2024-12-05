@@ -444,7 +444,7 @@ Abort an atomic transaction block\&. It sends \fCDISCARD\fP\&.
 .PP
 \fBReturns\fP
 .RS 4
-X_SUCCESS (0) if successful, or X_NULL if the client is NULL, or else X_NO_SERVICE if not connected ot the client or if send() failed\&.
+X_SUCCESS (0) if successful, or X_NULL if the client is NULL, or X_NO_SERVICE if not connected ot the client or if send() failed, or X_NO_INIT if the client was not initialized\&.
 .RE
 .PP
 \fBSee also\fP
@@ -454,7 +454,7 @@ X_SUCCESS (0) if successful, or X_NULL if the client is NULL, or else X_NO_SERVI
 .PP
 
 .PP
-References \fBredisxIgnoreReplyAsync()\fP, \fBTRUE\fP, \fBx_error()\fP, \fBX_NULL\fP, and \fBX_SUCCESS\fP\&.
+References \fBredisxIgnoreReplyAsync()\fP, \fBTRUE\fP, \fBx_error()\fP, \fBX_NO_INIT\fP, \fBX_NULL\fP, and \fBX_SUCCESS\fP\&.
 .SS "int redisxAddConnectHook (\fBRedis\fP * redis, void(*)(\fBRedis\fP *) setupCall)"
 Adds a connect call hook, provided it is not already part of the setup routine\&.
 .PP
@@ -1146,7 +1146,7 @@ Get exclusive write access to the specified \fBRedis\fP channel\&.
 .PP
 \fBReturns\fP
 .RS 4
-X_SUCCESS if the exclusive lock for the channel was successfully obtained X_FAILURE if pthread_mutex_lock() returned an error X_NULL if the client is NULL\&.
+X_SUCCESS if the exclusive lock for the channel was successfully obtained, or X_FAILURE if pthread_mutex_lock() returned an error, or X_NULL if the client is NULL, or X_NO_INIT if the client was not initialized\&.
 .RE
 .PP
 \fBSee also\fP
@@ -1158,7 +1158,7 @@ X_SUCCESS if the exclusive lock for the channel was successfully obtained X_FAIL
 .PP
 
 .PP
-References \fBx_error()\fP, \fBX_FAILURE\fP, \fBX_NULL\fP, and \fBX_SUCCESS\fP\&.
+References \fBx_error()\fP, \fBX_FAILURE\fP, \fBX_NO_INIT\fP, \fBX_NULL\fP, and \fBX_SUCCESS\fP\&.
 .SS "int redisxLockConnected (\fBRedisClient\fP * cl)"
 Lock a channel, but only if it has been enabled for communication\&.
 .PP
@@ -1169,7 +1169,7 @@ Lock a channel, but only if it has been enabled for communication\&.
 .PP
 \fBReturns\fP
 .RS 4
-X_SUCCESS (0) if an excusive lock to the channel has been granted\&. X_FAILURE if pthread_mutex_lock() returned an error X_NULL if the client is NULL REDIS_INVALID_CHANNEL if the channel is not enabled/connected\&.
+X_SUCCESS (0) if an excusive lock to the channel has been granted, or X_FAILURE if pthread_mutex_lock() returned an error, or X_NULL if the client is NULL, or X_NO_INIT if the client was not initialized\&.
 .RE
 .PP
 \fBSee also\fP
@@ -1183,7 +1183,7 @@ X_SUCCESS (0) if an excusive lock to the channel has been granted\&. X_FAILURE i
 .PP
 
 .PP
-References \fBredisxLockClient()\fP, \fBredisxUnlockClient()\fP, \fBx_error()\fP, \fBX_NO_SERVICE\fP, and \fBX_SUCCESS\fP\&.
+References \fBredisxLockClient()\fP, \fBredisxUnlockClient()\fP, \fBx_error()\fP, \fBX_NO_INIT\fP, \fBX_NO_SERVICE\fP, and \fBX_SUCCESS\fP\&.
 .SS "int redisxMultiSet (\fBRedis\fP * redis, const char * table, const \fBRedisEntry\fP * entries, int n, \fBboolean\fP confirm)"
 Sets multiple key/value pairs in a given hash table\&.
 .PP
@@ -1597,12 +1597,12 @@ Send a \fBRedis\fP request with an arbitrary number of arguments\&.
 .PP
 \fBReturns\fP
 .RS 4
-X_SUCCESS (0) on success or X_NULL if the client is NULL, or else X_NO_SERVICE if not connected to the client or if send() failed\&. 
+X_SUCCESS (0) on success or X_NULL if the client is NULL, or X_NO_SERVICE if not connected to the client or if send() failed, or X_NO_INIT if the client was not initialized\&. 
 .RE
 .PP
 
 .PP
-References \fBFALSE\fP, \fBREDISX_CMDBUF_SIZE\fP, \fBTRUE\fP, \fBx_error()\fP, \fBX_NULL\fP, and \fBX_SUCCESS\fP\&.
+References \fBFALSE\fP, \fBREDISX_CMDBUF_SIZE\fP, \fBTRUE\fP, \fBx_error()\fP, \fBX_NO_INIT\fP, \fBX_NO_SERVICE\fP, \fBX_NULL\fP, and \fBX_SUCCESS\fP\&.
 .SS "int redisxSendRequestAsync (\fBRedisClient\fP * cl, const char * command, const char * arg1, const char * arg2, const char * arg3)"
 Send a command (with up to 3 arguments) to the \fBRedis\fP server\&. The caller must have an exclusive lock on the client for this version\&. The arguments supplied will be used up to the first non-NULL value\&.
 .PP
@@ -1836,12 +1836,12 @@ Sends \fCCLIENT REPLY SKIP\fP
 .PP
 \fBReturns\fP
 .RS 4
-X_SUCCESS (0) on success or X_NULL if the client is NULL, or else X_NO_SERVICE if not connected to the \fBRedis\fP server on the requested channel, or if send() failed\&. 
+X_SUCCESS (0) on success or X_NULL if the client is NULL, or else X_NO_SERVICE if not connected to the \fBRedis\fP server on the requested channel, or if send() failed, or else X_NO_INIT if the client was not initialized\&. 
 .RE
 .PP
 
 .PP
-References \fBTRUE\fP, \fBx_error()\fP, \fBX_NULL\fP, and \fBX_SUCCESS\fP\&.
+References \fBTRUE\fP, \fBx_error()\fP, \fBX_NO_INIT\fP, \fBX_NULL\fP, and \fBX_SUCCESS\fP\&.
 .SS "int redisxStartBlockAsync (\fBRedisClient\fP * cl)"
 Starts an atomic \fBRedis\fP transaction block, by sending \fCMULTI\fP on the specified client connection\&. \fBRedis\fP transaction blocks behave just like scripts (in fact they are effectively improptu scripts themselves)\&. As such the rules of \fBRedis\fP scripting apply, such as you cannot call LUA from within a transaction block (which is a real pity\&.\&.\&.)
 .PP
@@ -1854,7 +1854,7 @@ Once you start a transaction block you may ignore all acknowledgedments such as 
 .PP
 \fBReturns\fP
 .RS 4
-X_SUCCESS (0) if successful, or X_NULL if the \fBRedis\fP client is NULL, or X_NO_SERVICE if not connected to the client server or if send() failed\&.
+X_SUCCESS (0) if successful, or X_NULL if the \fBRedis\fP client is NULL, or X_NO_SERVICE if not connected to the client server or if send() failed, or X_NO_INIT if the client was not initialized\&.
 .RE
 .PP
 \fBSee also\fP
@@ -1866,7 +1866,7 @@ X_SUCCESS (0) if successful, or X_NULL if the \fBRedis\fP client is NULL, or X_N
 .PP
 
 .PP
-References \fBTRUE\fP, \fBx_error()\fP, \fBX_NULL\fP, and \fBX_SUCCESS\fP\&.
+References \fBTRUE\fP, \fBx_error()\fP, \fBX_NO_INIT\fP, \fBX_NULL\fP, and \fBX_SUCCESS\fP\&.
 .SS "int redisxSubscribe (\fBRedis\fP * redis, const char * pattern)"
 Subscribe to a specific \fBRedis\fP channel\&. The call will also start the subscription listener thread to processing incoming subscription messages\&. Subscribing only enabled the delivery of the messages to this client without any actions on these messages\&. In order to process the messages for your subscriptons, you will also want to call \fBredisxAddSubscriber()\fP to add your custom processor function(s)\&.
 .PP
@@ -1908,7 +1908,7 @@ Relinquish exclusive write access to the specified \fBRedis\fP channel
 .PP
 \fBReturns\fP
 .RS 4
-X_SUCCESS if the exclusive lock for the channel was successfully obtained X_FAILURE if pthread_mutex_lock() returned an error X_NULL if the client is NULL
+X_SUCCESS if the exclusive lock for the channel was successfully obtained, or X_FAILURE if pthread_mutex_lock() returned an error, or X_NULL if the client is NULL, or X_NO_INIT if the client was not initialized\&.
 .RE
 .PP
 \fBSee also\fP
@@ -1920,7 +1920,7 @@ X_SUCCESS if the exclusive lock for the channel was successfully obtained X_FAIL
 .PP
 
 .PP
-References \fBx_error()\fP, \fBX_FAILURE\fP, \fBX_NULL\fP, and \fBX_SUCCESS\fP\&.
+References \fBx_error()\fP, \fBX_FAILURE\fP, \fBX_NO_INIT\fP, \fBX_NULL\fP, and \fBX_SUCCESS\fP\&.
 .SS "int redisxUnsubscribe (\fBRedis\fP * redis, const char * pattern)"
 Unsubscribe from one or all \fBRedis\fP PUB/SUB channel(s)\&. If there are no active subscriptions when \fBRedis\fP confirms the unsubscrive command, the subscription listener thread will also conclude automatically\&. Unsubscribing will stop delivery of mesasages for the affected channels but any associated processing callbacks remain registered, until redisxRemovesubscribers() is called to deactive them as appropriate\&.
 .PP
