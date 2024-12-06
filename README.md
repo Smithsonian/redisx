@@ -205,6 +205,17 @@ the default 6379), and the database authentication (if any):
   redisxSetPassword(redis, mySecretPasswordString);
 ```
 
+You can also set the RESP protocol to use (provided your server is compatible with Redis 6 or later):
+
+```c
+  // (optional) Use RESP3 (provided the server supports it)
+  redisxSetProtocol(redis, REDISX_RESP3);
+```
+
+The above call will use the `HELLO` command (since Redis 6) upon connecting. If you do not set the protocol, `HELLO` 
+will not be used, and RESP2 will be assumed -- which is best for older servers. (Note, that you can always check the 
+actual protocol used after connecting, using `redisxGetProtocol()`).
+
 You might also tweak the send/receive buffer sizes to use for clients, if you find the socket defaults sub-optimal for
 your application (note, that this setting is common to all `Redis` instances managed by the library):
 
@@ -307,9 +318,9 @@ The same goes for disconnect hooks, using `redisxAddDisconnectHook()` instead.
   - [RESP data type](#resp-data-type)
 
 Redis queries are sent as strings, according the the specification of the Redis protocol. All responses sent back by 
-the server using the RESP protocol. Specifically, Redis uses version 2.0 of the RESP protocol (a.k.a. RESP2) by 
-default, with optional support for the newer RESP3 introduced in Redis version 6.0. The __RedisX__ library currently
-processes the standard RESP2 replies only. RESP3 support to the library may be added in the future (stay tuned...)
+the server using the RESP protocol. Specifically, Redis uses version 2 of the RESP protocol (a.k.a. RESP2) by 
+default, with optional support for the newer RESP3 introduced in Redis version 6.0. The __RedisX__ library provides
+support for both RESP2 and RESP3.
 
 
 <a name="interactive-transactions"></a>
@@ -378,9 +389,19 @@ whose contents are:
  | `RESP_ARRAY`            |   `*`    | number of `RESP *` pointers   | `(RESP **)`           |
  | `RESP_INT`              |   `:`    | integer return value          | `(void)`              |
  | `RESP_SIMPLE_STRING`    |   `+`    | string length                 | `(char *)`            |
- | `RESP_ERROR`            |   `-`    | string length                 | `(char *)`            |
+ | `RESP_ERROR`            |   `-`    | total string length           | `(char *)`            |
  | `RESP_BULK_STRING`      |   `$`    | string length or -1 if `NULL` | `(char *)`            |
-
+ | `RESP3_NULL`            |   `_`    | 0                             | `(void)`              |
+ | `RESP3_BOOLEAN`         |   `#`    | 1 if _true_, 0 if _false_     | `(void)`              |
+ | `RESP3_DOUBLE`          |   `,`    | _unused_                      | `(double *)`          |
+ | `RESP3_BIG_NUMBER`      |   `(`    | string representation length  | `(char *)`            |
+ | `RESP3_BLOB_ERROR`      |   `!`    | total string length           | `(char *)`            | 
+ | `RESP3_VERBATIM_TEXT`   |   `=`    | text length (incl. type)      | `(char *)`            |
+ | `RESP3_SET`             |   `~`    | number of `RESP *` pointers   | `(RESP *)`            |
+ | `RESP3_MAP`             |   `%`    | number of key / value pairs   | `(RedisMapEntry *)`   |
+ | `RESP3_ATTRIBUTE`       |   `|`    | number of key / value pairs   | `(RedisMapEntry *)`   |
+ | `RESP3_PUSH`            |   `>`    | number of `RESP *` pointers   | `(RESP **)`           | 
+ 
 
 Each `RESP` has a type (e.g. `RESP_SIMPLE_STRING`), an integer value `n`, and a `value` pointer
 to further data. If the type is `RESP_INT`, then `n` represents the actual return value (and the `value` pointer is
@@ -388,9 +409,16 @@ not used). For string type values `n` is the number of characters in the string 
 while for `RESP_ARRAY` types the `value` is a pointer to an embedded `RESP` array and `n` is the number of elements 
 in that.
 
-You may check the integrity of a `RESP` using `redisxCheckRESP()`. Since `RESP` data is dynamically allocated, the 
-user is responsible for discarding them once they are no longer needed, e.g. by calling `redisxDestroyRESP()`. The
-two steps may be combined to automatically discard invalid or unexpected `RESP` data in a single step by calling
+To help with deciding what cast to use for a given `value` field of the RESP data structure, we provide the 
+convenience methods `redisxIsScalarType()` when cast is `(void)` or else `(double *)`), `redisxIsArrayType()` if the 
+cast is `(RESP **)`, `redisxIsStringTupe()` if the cast should be `(char *)`, and `redisxIsMapType()` if the cast
+should be to `(RedisMapEntry *)`.
+
+You can check that two `RESP` data structures are equivalent with `redisxIsEqualRESP(RESP *a, RESP *b)`.
+
+You may also check the integrity of a `RESP` using `redisxCheckRESP()`. Since `RESP` data is dynamically allocated, 
+the user is responsible for discarding them once they are no longer needed, e.g. by calling `redisxDestroyRESP()`. 
+The two steps may be combined to automatically discard invalid or unexpected `RESP` data in a single step by calling
 `redisxCheckDestroyRESP()`.
 
 ```c
@@ -1045,7 +1073,6 @@ Some obvious ways the library could evolve and grow in the not too distant futur
 
  - Automated regression testing and coverage tracking.
  - Keep track of subscription patterns, and automatically resubscribe to them on reconnecting.
- - Support for the [RESP3](https://github.com/antirez/RESP3/blob/master/spec.md) standard and Redis `HELLO`.
  - Support for [Redis Sentinel](https://redis.io/docs/latest/develop/reference/sentinel-clients/) clients, for 
    high-availability server configurations.
  - TLS support (perhaps...)

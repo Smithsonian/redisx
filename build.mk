@@ -46,7 +46,7 @@ clean: clean-local
 
 # Remove intermediate files (general)
 .PHONY: distclean
-distclean: distclean-local
+distclean: clean distclean-local
 
 # Static code analysis using 'cppcheck'
 .PHONY: analyze

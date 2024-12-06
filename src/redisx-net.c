@@ -521,13 +521,13 @@ int rConnectClient(Redis *redis, enum redisx_channel channel) {
 
   struct sockaddr_in serverAddress;
   struct utsname u;
-  const RedisPrivate *p;
+  RedisPrivate *p;
   RedisClient *cl;
   ClientPrivate *cp;
 
   const char *channelID;
   char host[200], *id;
-  int status;
+  int status = X_SUCCESS;
   int sock;
 
   cl = redisxGetClient(redis, channel);
@@ -557,13 +557,34 @@ int rConnectClient(Redis *redis, enum redisx_channel channel) {
   cp->socket = sock;
   cp->isEnabled = TRUE;
 
-  if(p->password) {
-    status = rAuthAsync(cl);
-    if(status) {
-      rCloseClientAsync(cl);
-      redisxUnlockClient(cl);
-      return status;
+  if(p->hello) {
+    char proto[20];
+    RESP *reply;
+
+    // Try HELLO and see what we get back...
+    sprintf(proto, "%d", (int) p->protocol);
+
+    reply = redisxRequest(redis, "HELLO", proto, p->password, NULL, &status);
+    if(redisxCheckRESP(reply, RESP3_MAP, 0)) {
+      // OK, it looks like HELLO worked...
+      RedisMapEntry *e = redisxGetKeywordEntry(reply, "proto");
+      if(e && e->value->type == RESP_INT) p->protocol = e->value->n;
     }
+    else p->hello = FALSE;
+
+    redisxDestroyRESP(reply);
+  }
+
+  if(p->hello) {
+    // No HELLO, go the old way...
+    p->protocol = REDISX_RESP2;
+    if(p->password) status = rAuthAsync(cl);
+  }
+
+  if(status) {
+    rCloseClientAsync(cl);
+    redisxUnlockClient(cl);
+    return status;
   }
 
   // Set the client name in Redis.
@@ -657,6 +678,7 @@ Redis *redisxInit(const char *server) {
 
   p->addr = inet_addr((char *) ipAddress);
   p->port = REDISX_TCP_PORT;
+  p->protocol = REDISX_RESP2;     // Default
 
   l = (ServerLink *) calloc(1, sizeof(ServerLink));
   x_check_alloc(l);

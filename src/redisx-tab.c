@@ -73,7 +73,13 @@ RedisEntry *redisxGetTable(Redis *redis, const char *table, int *n) {
     return x_trace_null(fn, NULL);
   }
 
-  *n = redisxCheckDestroyRESP(reply, RESP_ARRAY, 0);
+  // Cast RESP2 array respone to RESP3 map also...
+  if(reply && reply->type == RESP_ARRAY) {
+    reply->type = RESP3_MAP;
+    reply->n >>= 1;
+  }
+
+  *n = redisxCheckDestroyRESP(reply, RESP3_MAP, 0);
   if(*n) {
     return x_trace_null(fn, NULL);
   }
@@ -81,6 +87,7 @@ RedisEntry *redisxGetTable(Redis *redis, const char *table, int *n) {
   *n = reply->n / 2;
 
   if(*n > 0) {
+    RedisMapEntry *dict = (RedisMapEntry *) reply->value;
     entries = (RedisEntry *) calloc(*n, sizeof(RedisEntry));
 
     if(entries == NULL) {
@@ -90,21 +97,19 @@ RedisEntry *redisxGetTable(Redis *redis, const char *table, int *n) {
       int i;
 
       for(i=0; i<reply->n; i+=2) {
-        RedisEntry *e = &entries[i>>1];
-        RESP **component = (RESP **) reply->value;
+        RedisEntry *e = &entries[i];
+        RedisMapEntry *component = &dict[i];
+        e->key = component->key->value;
+        e->value = component->value->value;
 
-        e->key = (char *) component[i]->value;
-        e->value = (char *) component[i+1]->value;
-        e->length = component[i+1]->n;
-
-        // Dereference the values from the RESP
-        component[i]->value = NULL;
-        component[i+1]->value = NULL;
+        // Dereference the key/value so we don't destroy them with the reply.
+        component->key->value = NULL;
+        component->value->value = NULL;
       }
     }
   }
 
-  // Free the Reply container, but not the strings inside, which are returned.
+  // Free the reply container, but not the strings inside, which are returned.
   redisxDestroyRESP(reply);
   return entries;
 }
@@ -339,7 +344,7 @@ int redisxMultiSetAsync(RedisClient *cl, const char *table, const RedisEntry *en
     return x_trace(fn, NULL, X_FAILURE);
   }
 
-  req[0] = "HMSET";
+  req[0] = "HMSET"; // TODO, as of Redis 4.0.0, just use HSET...
   req[1] = (char *) table;
 
   for(i=0; i<n; i++) {

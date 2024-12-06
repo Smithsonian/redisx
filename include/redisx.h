@@ -90,6 +90,19 @@
 #define RESP_ERROR              '-'     ///< \hideinitializer RESP error message type
 #define RESP_BULK_STRING        '$'     ///< \hideinitializer RESP bulk string type
 
+// RESP3 types
+#define RESP3_NULL              '_'     ///< \hideinitializer RESP3 null value
+#define RESP3_DOUBLE            ','     ///< \hideinitializer RESP3 floating-point value
+#define RESP3_BOOLEAN           '#'     ///< \hideinitializer RESP3 boolean value
+#define RESP3_BLOB_ERROR        '!'     ///< \hideinitializer RESP3 blob error
+#define RESP3_VERBATIM_STRING   '='     ///< \hideinitializer RESP3 verbatim string (with type)
+#define RESP3_BIG_NUMBER        '('     ///< \hideinitializer RESP3 big integer / decimal
+#define RESP3_MAP               '%'     ///< \hideinitializer RESP3 dictionary of key / value
+#define RESP3_SET               '~'     ///< \hideinitializer RESP3 unordered set of elements
+#define RESP3_ATTRIBUTE         '|'     ///< \hideinitializer RESP3 dictionary of attributes (metadata)
+#define RESP3_PUSH              '>'     ///< \hideinitializer RESP3 dictionary of attributes (metadata)
+#define RESP3_SNIPPET           ';'     ///< \hideinitializer RESP3 dictionary of attributes (metadata)
+
 #define REDIS_INVALID_CHANNEL       (-101)  ///< \hideinitializer There is no such channel in the Redis instance.
 #define REDIS_NULL                  (-102)  ///< \hideinitializer Redis returned NULL
 #define REDIS_ERROR                 (-103)  ///< \hideinitializer Redis returned an error
@@ -112,11 +125,29 @@ enum redisx_channel {
 
 #define REDISX_CHANNELS     (REDISX_SUBSCRIPTION_CHANNEL + 1)  ///< \hideinitializer The number of channels a Redis instance has.
 
+/**
+ * The RESP protocol to use for a Redis instance. Redis originally used RESP2, but later releases added
+ * support for RESP3.
+ *
+ */
+enum redisx_protocol {
+  REDISX_RESP2 = 2,                   ///< \hideinitializer RESP2 protocol
+  REDISX_RESP3                        ///< \hideinitializer RESP3 protocol (since Redis version 6.0.0)
+};
 
 /**
  * \brief Structure that represents a Redis response (RESP format).
  *
+ * REFERENCES:
+ * <ol>
+ * <li>https://github.com/redis/redis-specifications/tree/master/protocol</li>
+ * </ol>
+ *
  * \sa redisxDestroyRESP()
+ * \sa redisxIsScalarType()
+ * \sa redisxIsStringType()
+ * \sa redisxIsArrayType()
+ * \sa redisxIsMapType()
  */
 typedef struct RESP {
   char type;                    ///< RESP type RESP_ARRAY, RESP_INT ...
@@ -125,6 +156,19 @@ typedef struct RESP {
   void *value;                  ///< Pointer to text (char *) content or to an array of components
                                 ///< (RESP**)...
 } RESP;
+
+/**
+ * Structure that represents a key/value mapping in RESP3.
+ *
+ * @sa redisxIsMapType()
+ * @sa RESP3_MAP
+ * @sa RESP3_ATTRIBUTE
+ *
+ */
+typedef struct {
+  RESP *key;                    ///< The keyword component
+  RESP *value;                  ///< The associated value component
+} RedisMapEntry;
 
 
 /**
@@ -228,6 +272,8 @@ int redisxSetPort(Redis *redis, int port);
 int redisxSetUser(Redis *redis, const char *username);
 int redisxSetPassword(Redis *redis, const char *passwd);
 int redisxSelectDB(Redis *redis, int idx);
+int redisxSetProtocol(Redis *redis, enum redisx_protocol protocol);
+enum redisx_protocol redisxGetProtocol(const Redis *redis);
 
 Redis *redisxInit(const char *server);
 void redisxDestroy(Redis *redis);
@@ -286,6 +332,15 @@ int redisxGetTime(Redis *redis, struct timespec *t);
 int redisxCheckRESP(const RESP *resp, char expectedType, int expectedSize);
 int redisxCheckDestroyRESP(RESP *resp, char expectedType, int expectedSize);
 void redisxDestroyRESP(RESP *resp);
+boolean redisxIsScalarType(const RESP *r);
+boolean redisxIsStringType(const RESP *r);
+boolean redisxIsArrayType(const RESP *r);
+boolean redisxIsMapType(const RESP *r);
+boolean redisxIsEqualRESP(const RESP *a, const RESP *b);
+int redisxSplitText(RESP *resp, char **text);
+
+RedisMapEntry *redisxGetMapEntry(const RESP *map, const RESP *key);
+RedisMapEntry *redisxGetKeywordEntry(const RESP *map, const char *key);
 
 // Locks for async calls
 int redisxLockClient(RedisClient *cl);

@@ -57,8 +57,10 @@ typedef struct {
   uint32_t addr;                ///< The 32-bit inet address
   int port;                     ///< port number (usually 6379)
   int dbIndex;                  ///< the zero-based database index
-  char *username;               ///< REdis user name (if any)
+  char *username;               ///< Redis user name (if any)
   char *password;               ///< Redis password (if any)
+  int protocol;                 ///< RESP version to use
+  boolean hello;                ///< whether to use HELLO (introduced in Redis 6.0.0 only)
 
   RedisClient *clients;
 
@@ -92,6 +94,9 @@ void rConfigUnlock(Redis *redis);
 int rConnectClient(Redis *redis, enum redisx_channel channel);
 void rCloseClient(RedisClient *cl);
 boolean rIsLowLatency(const ClientPrivate *cp);
+
+// in resp.c ------------------------------>
+int redisxAppendRESP(RESP *resp, RESP *part);
 
 /// \endcond
 

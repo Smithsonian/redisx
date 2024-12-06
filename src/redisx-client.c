@@ -12,6 +12,7 @@
 #include <string.h>
 #include <errno.h>
 #include <limits.h>
+#include <ctype.h>
 #if __Lynx__
 #  include <socket.h>
 #else
@@ -668,6 +669,46 @@ int redisxIgnoreReplyAsync(RedisClient *cl) {
   return X_SUCCESS;
 }
 
+static int rTypeIsParametrized(char type) {
+  switch(type) {
+    case RESP_INT:
+    case RESP_BULK_STRING:
+    case RESP_ARRAY:
+    case RESP3_SET:
+    case RESP3_PUSH:
+    case RESP3_MAP:
+    case RESP3_ATTRIBUTE:
+    case RESP3_BLOB_ERROR:
+    case RESP3_VERBATIM_STRING:
+    case RESP3_SNIPPET:
+      return TRUE;
+    default:
+      return FALSE;
+  }
+}
+
+static void rPushMessage(RedisClient *cl, RESP *resp) {
+  int i;
+  RESP **array;
+
+  if(resp->n < 0) return;
+
+  array = (RESP **) calloc(resp->n, sizeof(RESP *));
+  if(!array) fprintf(stderr, "WARNING! Redis-X : not enough memory for push message (%d elements). Skipping.\n", resp->n);
+
+  for(i = 0; i < resp->n; i++) {
+    RESP *r = redisxReadReplyAsync(cl);
+    if(array) array[i] = r;
+    else redisxDestroyRESP(r);
+  }
+
+  resp->value = array;
+
+  // TODO push to consumer.
+
+  redisxDestroyRESP(resp);
+}
+
 /**
  * Reads a response from Redis and returns it.
  *
@@ -702,61 +743,145 @@ RESP *redisxReadReplyAsync(RedisClient *cl) {
     return NULL;
   }
 
-  size = rReadToken(cp, buf, REDIS_SIMPLE_STRING_SIZE + 1);
-  if(size < 0) {
-    // Either read/recv had an error, or we got garbage...
-    if(cp->isEnabled) x_trace_null(fn, NULL);
-    cp->isEnabled = FALSE;  // Disable this client so we don't attempt to read from it again...
-    return NULL;
-  }
-
-  resp = (RESP *) calloc(1, sizeof(RESP));
-  x_check_alloc(resp);
-  resp->type = buf[0];
-
-  // Get the integer / size value...
-  if(resp->type == RESP_ARRAY || resp->type == RESP_INT || resp->type == RESP_BULK_STRING) {
-    char *tail;
-    errno = 0;
-    resp->n = (int) strtol(&buf[1], &tail, 10);
-    if(errno) {
-      fprintf(stderr, "WARNING! Redis-X : unparseable dimension '%s'\n", &buf[1]);
-      status = X_PARSE_ERROR;
+  for(;;) {
+    size = rReadToken(cp, buf, REDIS_SIMPLE_STRING_SIZE + 1);
+    if(size < 0) {
+      // Either read/recv had an error, or we got garbage...
+      if(cp->isEnabled) x_trace_null(fn, NULL);
+      cp->isEnabled = FALSE;  // Disable this client so we don't attempt to read from it again...
+      return NULL;
     }
+
+    resp = (RESP *) calloc(1, sizeof(RESP));
+    x_check_alloc(resp);
+    resp->type = buf[0];
+
+    // Parametrized type.
+    if(rTypeIsParametrized(resp->type)) {
+
+      if(buf[1] == '?') {
+        // Streaming RESP in parts...
+        for(;;) {
+          RESP *r = redisxReadReplyAsync(cl);
+          if(r->type != RESP3_SNIPPET) {
+            int type = r->type;
+            redisxDestroyRESP(r);
+            fprintf(stderr, "WARNING! expected type '%c', got type '%c'.", resp->type, type);
+            return resp;
+          }
+
+          if(r->n == 0) {
+            if(resp->type == RESP3_PUSH) break;
+            return resp;
+          }
+
+          r->type = resp->type;
+          redisxAppendRESP(resp, r);
+        }
+      }
+      else {
+        // Get the integer / size value...
+        char *tail;
+        errno = 0;
+        resp->n = (int) strtol(&buf[1], &tail, 10);
+        if(errno) {
+          fprintf(stderr, "WARNING! Redis-X : unparseable dimension '%s'\n", &buf[1]);
+          status = X_PARSE_ERROR;
+        }
+      }
+    }
+
+    // Deal with push messages...
+    if(resp->type == RESP3_PUSH) rPushMessage(cl, resp);
+    else break;
   }
+
 
   // Now get the body of the response...
   if(!status) switch(resp->type) {
 
+    case RESP3_NULL:
+      resp->n = 0;
+      break;
+
+    case RESP3_BOOLEAN: {
+      resp->n = 1;
+      switch(tolower(buf[1])) {
+        case 't': resp->n = TRUE; break;
+        case 'f': resp->n = FALSE; break;
+        default:
+          fprintf(stderr, "WARNING! Redis-X : invalid boolean value '%c'\n", buf[1]);
+          status = X_PARSE_ERROR;
+      }
+      break;
+    }
+
+    case RESP3_DOUBLE: {
+      // TODO inf / -inf?
+      double *dval = (double *) calloc(1, sizeof(double));
+      x_check_alloc(dval);
+
+      *dval = xParseDouble(&buf[1], NULL);
+      if(errno) {
+        fprintf(stderr, "WARNING! Redis-X : invalid double value '%s'\n", &buf[1]);
+        status = X_PARSE_ERROR;
+      }
+      resp->value = dval;
+      break;
+    }
+
+    case RESP3_SET:
+    case RESP3_PUSH:
     case RESP_ARRAY: {
       RESP **component;
       int i;
 
       if(resp->n <= 0) break;
 
-      resp->value = (RESP **) malloc(resp->n * sizeof(RESP *));
-      if(resp->value == NULL) {
+      component = (RESP **) malloc(resp->n * sizeof(RESP *));
+      if(component == NULL) {
         status = x_error(X_FAILURE, errno, fn, "malloc() error (%d RESP)", resp->n);
         // We should get the data from the input even if we have nowhere to store...
       }
 
-      component = (RESP **) resp->value;
 
       for(i=0; i<resp->n; i++) {
-        RESP* r = redisxReadReplyAsync(cl);     // Always read RESP even if we don't have storage for it...
-        if(resp->value) component[i] = r;
+        RESP *r = redisxReadReplyAsync(cl);     // Always read RESP even if we don't have storage for it...
+        if(component) component[i] = r;
+        else redisxDestroyRESP(r);
       }
 
       // Consistency check. Discard response if incomplete (because of read errors...)
-      if(resp->value) for(i = 0; i < resp->n; i++) if(component[i] == NULL) {
+      if(component) for(i = 0; i < resp->n; i++) if(component[i] == NULL || component[i]->type != RESP3_NULL) {
         fprintf(stderr, "WARNING! Redis-X : incomplete array received (index %d of %d).\n", (i+1), resp->n);
         if(!status) status = REDIS_INCOMPLETE_TRANSFER;
         break;
       }
 
+      resp->value = component;
+
       break;
     }
 
+    case RESP3_MAP:
+    case RESP3_ATTRIBUTE: {
+      RedisMapEntry *component;
+      int i;
+      if(resp->n <= 0) break;
+
+      component = (RedisMapEntry *) calloc(resp->n, sizeof(RedisMapEntry));
+      x_check_alloc(component);
+
+      for(i=0; i<resp->n; i++) {
+        RedisMapEntry *e = &component[i];
+        e->key = redisxReadReplyAsync(cl);
+        e->value = redisxReadReplyAsync(cl);
+      }
+      break;
+    }
+
+    case RESP3_BLOB_ERROR:
+    case RESP3_VERBATIM_STRING:
     case RESP_BULK_STRING:
       if(resp->n < 0) break;                          // no string token following!
 
@@ -781,6 +906,7 @@ RESP *redisxReadReplyAsync(RedisClient *cl) {
 
     case RESP_SIMPLE_STRING:
     case RESP_ERROR:
+    case RESP3_BIG_NUMBER:
       resp->value = malloc(size);
 
       if(resp->value == NULL) {
