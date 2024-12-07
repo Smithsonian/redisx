@@ -50,6 +50,9 @@ typedef struct {
   int next;                     ///< Index of next unconsumed byte in buffer.
   int socket;                   ///< Changing the socket should require both locks!
   int pendingRequests;          ///< Number of request sent and not yet answered...
+  RESP *attributes;             ///< Attributes from the last packet received.
+  RedisPushProcessor pushConsumer; ///< User-defined function to consume RESP3 push messages.
+  void *pushArg;                ///< User-defined argument to pass along with push messages.
 } ClientPrivate;
 
 
@@ -82,7 +85,6 @@ typedef struct {
 
   pthread_mutex_t subscriberLock;
   MessageConsumer *subscriberList;
-
 } RedisPrivate;
 
 

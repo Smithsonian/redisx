@@ -58,6 +58,77 @@ void redisxDestroyRESP(RESP *resp) {
   free(resp);
 }
 
+/**
+ * Creates an independent deep copy of the RESP, which shares no references with the original.
+ *
+ * @param resp    The original RESP data structure (it may be NULL).
+ * @return        A copy of the original, with no shared references.
+ */
+RESP *redisxCopyOfRESP(const RESP *resp) {
+  RESP *copy;
+
+  if(!resp) return NULL;
+
+  copy = (RESP *) calloc(1, sizeof(RESP));
+  copy->type = resp->type;
+  copy->n = resp->n;
+  if(resp->value == NULL) return copy;
+
+  switch(resp->type) {
+    case RESP_ARRAY:
+    case RESP3_SET:
+    case RESP3_PUSH: {
+      RESP **from = (RESP **) resp->value;
+      RESP **to = (RESP **) calloc(resp->n, sizeof(RESP *));
+      int i;
+
+      x_check_alloc(copy->value);
+
+      for(i = 0; i < resp->n; i++) to[i] = redisxCopyOfRESP(from[i]);
+      copy->value = to;
+      break;
+    }
+
+    case RESP3_MAP:
+    case RESP3_ATTRIBUTE: {
+      RedisMapEntry **from = (RedisMapEntry **) resp->value;
+      RedisMapEntry **to = (RedisMapEntry **) calloc(resp->n, sizeof(RedisMapEntry *));
+      int i;
+
+      x_check_alloc(copy->value);
+
+      for(i = 0; i < resp->n; i++) {
+        to[i]->key = redisxCopyOfRESP(from[i]->key);
+        to[i]->value = redisxCopyOfRESP(from[i]->value);
+      }
+      copy->value = to;
+      break;
+    }
+
+    case RESP_SIMPLE_STRING:
+    case RESP_ERROR:
+    case RESP_BULK_STRING:
+    case RESP3_BLOB_ERROR:
+    case RESP3_VERBATIM_STRING:
+    case RESP3_BIG_NUMBER:
+      copy->value = (char *) malloc(resp->n);
+      x_check_alloc(copy->value);
+      memcpy(copy->value, resp->value, resp->n);
+      break;
+
+    case RESP3_DOUBLE:
+      copy->value = (double *) malloc(sizeof(double));
+      x_check_alloc(copy->value);
+      memcpy(copy->value, resp->value, sizeof(double));
+      break;
+
+    case RESP_INT:
+    case RESP3_NULL:
+      break;
+  }
+
+  return copy;
+}
 
 /**
  * Checks a Redis RESP for NULL values or unexpected values.
@@ -79,7 +150,7 @@ int redisxCheckRESP(const RESP *resp, char expectedType, int expectedSize) {
   static const char *fn = "redisxCheckRESP";
 
   if(resp == NULL) return x_error(X_NULL, EINVAL, fn, "RESP is NULL");
-  if(resp->type != RESP_INT) {
+  if(resp->type != RESP_INT && resp->type != RESP3_NULL) {
     if(resp->n < 0) return x_error(X_FAILURE, EBADMSG, fn, "RESP error code: %d", resp->n);
     if(resp->value == NULL) if(resp->n) return x_error(REDIS_NULL, ENOMSG, fn, "RESP with NULL value, n=%d", resp->n);
   }
@@ -186,15 +257,15 @@ int redisxSplitText(RESP *resp, char **text) {
 boolean redisxIsScalarType(const RESP *r) {
   if(!r) return FALSE;
 
-    switch(r->type) {
-      case RESP_INT:
-      case RESP3_BOOLEAN:
-      case RESP3_DOUBLE:
-      case RESP3_NULL:
-        return TRUE;
-    }
+  switch(r->type) {
+    case RESP_INT:
+    case RESP3_BOOLEAN:
+    case RESP3_DOUBLE:
+    case RESP3_NULL:
+      return TRUE;
+  }
 
-    return FALSE;
+  return FALSE;
 }
 
 /**

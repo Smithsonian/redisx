@@ -476,15 +476,27 @@ boolean redisxHasPipeline(Redis *redis) {
 }
 
 /**
- * Sets the function processing valid pipeline responses.
+ * Sets the function processing valid pipeline responses. The implementation should follow a
+ * simple set of rules:
+ *
+ * <ul>
+ * <li>the implementation should not destroy the RESP data. The RESP will be destroyed automatically
+ * after the call returns. However, the call may retain any data from the RESP itself, provided
+ * the data is de-referenced from the RESP before return.<li>
+ * <li>The implementation should not block (aside from maybe a quick mutex unlock) and return quickly,
+ * so as to not block the client for long periods</li>
+ * <li>If extensive processing or blocking calls are required to process the message, it is best to
+ * simply place a copy of the RESP on a queue and then return quickly, and then process the message
+ * asynchronously in a background thread.</li>
+ * </ul>
  *
  * \param redis             Pointer to a Redis instance.
- * \param f    T            he function that processes a single argument of type RESP pointer.
+ * \param f                 The function that processes a single argument of type RESP pointer.
  *
  * \return      X_SUCCESS (0)   if successful, or
  *              X_NULL          if the Redis instance is NULL.
  */
-int redisxSetPipelineConsumer(Redis *redis, void (*f)(RESP *)) {
+int redisxSetPipelineConsumer(Redis *redis, RedisPipelineProcessor f) {
   RedisPrivate *p;
 
   if(redis == NULL) return x_error(X_NULL, EINVAL, "redisxSetPipelineConsumer", "redis is NULL");
@@ -496,7 +508,6 @@ int redisxSetPipelineConsumer(Redis *redis, void (*f)(RESP *)) {
 
   return X_SUCCESS;
 }
-
 
 /**
  * Returns the result of a Redis command with up to 3 regularly terminated string arguments. This is not the highest

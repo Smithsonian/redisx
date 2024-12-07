@@ -101,7 +101,7 @@
 #define RESP3_SET               '~'     ///< \hideinitializer RESP3 unordered set of elements
 #define RESP3_ATTRIBUTE         '|'     ///< \hideinitializer RESP3 dictionary of attributes (metadata)
 #define RESP3_PUSH              '>'     ///< \hideinitializer RESP3 dictionary of attributes (metadata)
-#define RESP3_SNIPPET           ';'     ///< \hideinitializer RESP3 dictionary of attributes (metadata)
+#define RESP3_CONTINUED         ';'     ///< \hideinitializer RESP3 dictionary of attributes (metadata)
 
 #define REDIS_INVALID_CHANNEL       (-101)  ///< \hideinitializer There is no such channel in the Redis instance.
 #define REDIS_NULL                  (-102)  ///< \hideinitializer Redis returned NULL
@@ -251,7 +251,6 @@ typedef struct Redis {
  */
 typedef void (*RedisSubscriberCall)(const char *pattern, const char *channel, const char *msg, long length);
 
-
 /**
  * User-specified callback function for handling RedisX errors.
  *
@@ -260,6 +259,52 @@ typedef void (*RedisSubscriberCall)(const char *pattern, const char *channel, co
  * @param op        the name/ID of the operation where the error occurred.
  */
 typedef void (*RedisErrorHandler)(Redis *redis, enum redisx_channel channel, const char *op);
+
+
+/**
+ * A user-defined function for consuming responses from a Redis pipeline connection. The implementation
+ * should follow a set of simple rules:
+ *
+ * <ul>
+ * <li>the implementation should not destroy the RESP data. The RESP will be destroyed automatically
+ * after the call returns. However, the call may retain any data from the RESP itself, provided
+ * the data is de-referenced from the RESP before return.<li>
+ * <li>The implementation should not block (aside from maybe a quick mutex unlock) and return quickly,
+ * so as to not block the client for long periods</li>
+ * <li>If extensive processing or blocking calls are required to process the message, it is best to
+ * simply place a copy of the RESP on a queue and then return quickly, and then process the message
+ * asynchronously in a background thread.</li>
+ * </ul>
+ *
+ * @param response     A response received from the pipeline client.
+ *
+ * @sa redisxSetPipelineConsumer()
+ */
+typedef void (*RedisPipelineProcessor)(RESP *response);
+
+/**
+ * A user-defined function for consuming push messages from a Redis client. The implementation
+ * should follow a set of simple rules:
+ *
+ * <ul>
+ * <li>the implementation should not destroy the RESP data. The RESP will be destroyed automatically
+ * after the call returns. However, the call may retain any data from the RESP itself, provided
+ * that such data is de-referenced from the RESP before the return.<li>
+ * <li>The implementation should not block (aside from maybe a quick mutex unlock) and return quickly,
+ * so as to not block the client for long periods</li>
+ * <li>If extensive processing or blocking calls are required to process the message, it is best to
+ * simply place a copy of the RESP on a queue and then return quickly, and then process the message
+ * asynchronously in a background thread.</li>
+ * </ul>
+ *
+ * @param message     The RESP3 message that was pushed by the client
+ * @param ptr         Additional data passed along.
+ *
+ * @sa redisxSetPushProcessor()
+ */
+typedef void (*RedisPushProcessor)(RESP *message, void *ptr);
+
+
 
 void redisxSetVerbose(boolean value);
 boolean redisxIsVerbose();
@@ -311,7 +356,8 @@ int redisxGetScanCount(Redis *redis);
 void redisxDestroyEntries(RedisEntry *entries, int count);
 void redisxDestroyKeys(char **keys, int count);
 
-int redisxSetPipelineConsumer(Redis *redis, void (*f)(RESP *));
+int redisxSetPipelineConsumer(Redis *redis, RedisPipelineProcessor f);
+int redisxSetPushProcessor(RedisClient *cl, RedisPushProcessor func, void *arg);
 
 int redisxPublish(Redis *redis, const char *channel, const char *message, int length);
 int redisxNotify(Redis *redis, const char *channel, const char *message);
@@ -329,6 +375,7 @@ int redisxLoadScript(Redis *redis, const char *script, char **sha1);
 
 int redisxGetTime(Redis *redis, struct timespec *t);
 
+RESP *redisxCopyOfRESP(const RESP *resp);
 int redisxCheckRESP(const RESP *resp, char expectedType, int expectedSize);
 int redisxCheckDestroyRESP(RESP *resp, char expectedType, int expectedSize);
 void redisxDestroyRESP(RESP *resp);

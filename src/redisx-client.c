@@ -680,16 +680,56 @@ static int rTypeIsParametrized(char type) {
     case RESP3_ATTRIBUTE:
     case RESP3_BLOB_ERROR:
     case RESP3_VERBATIM_STRING:
-    case RESP3_SNIPPET:
+    case RESP3_CONTINUED:
       return TRUE;
     default:
       return FALSE;
   }
 }
 
-static void rPushMessage(RedisClient *cl, RESP *resp) {
+/**
+ * Sets a user-defined function to process push messages for a specific Redis client. The function's
+ * implementation must follow a simple set of rules:
+ *
+ * <ul>
+ * <li>the implementation should not destroy the RESP data. The RESP will be destroyed automatically
+ * after the call returns. However, the call may retain any data from the RESP itself, provided
+ * the data is de-referenced from the RESP before return.<li>
+ * <li>The call will have exclusive access to the client. As such it should not try to obtain a
+ * lock or release the lock itself.</li>
+ * <li>The implementation should not block (aside from maybe a quick mutex unlock) and return quickly,
+ * so as to not block the client for long periods</li>
+ * <li>If extensive processing or blocking calls are required to process the message, it is best to
+ * simply place a copy of the RESP on a queue and then return quickly, and then process the message
+ * asynchronously in a background thread.</li>
+ * </ul>
+ *
+ * @param cl      Redis client instance
+ * @param func    Function to use for processing push messages from the client, or NULL to ignore
+ *                push messages.
+ * @param arg     (optional) User-defined pointer argument to pass along to the processing function.
+ * @return        X_SUCCESS (0) if successful, or else X_NULL (errno set to EINVAL) if the client
+ *                argument is NULL.
+ */
+int redisxSetPushProcessor(RedisClient *cl, RedisPushProcessor func, void *arg) {
+  ClientPrivate *cp;
+
+  if(!cl) return x_error(X_NULL, EINVAL, "redisxSetPushProcessor", "input client is NULL");
+
+  redisxLockClient(cl);
+  cp = cl->priv;
+  cp->pushConsumer = func;
+  cp->pushArg = arg;
+  redisxUnlockClient(cl);
+
+  return X_SUCCESS;
+}
+
+static void rPushMessageAsync(RedisClient *cl, RESP *resp) {
   int i;
+  ClientPrivate *cp = (ClientPrivate *) cl->priv;
   RESP **array;
+
 
   if(resp->n < 0) return;
 
@@ -704,9 +744,41 @@ static void rPushMessage(RedisClient *cl, RESP *resp) {
 
   resp->value = array;
 
-  // TODO push to consumer.
+  if(cp->pushConsumer) cp->pushConsumer(resp, cp->pushArg);
 
   redisxDestroyRESP(resp);
+}
+
+/**
+ * Returns the attributes (if any) that were last sent along a response to the client.
+ * The caller should destroy the attributes with redisxDestroyRESP() after it is done
+ * inspecting them.
+ *
+ * @param cl    The Redis client instance
+ * @return      The attributes last received (possibly NULL).
+ *
+ * @sa redisxDEstroyRESP()
+ */
+RESP *redisxGetAttributes(RedisClient *cl) {
+  const ClientPrivate *cp;
+  RESP *copy;
+
+  if(!cl) {
+    x_error(0, EINVAL, "redisxGetAttributes", "client is NULL");
+    return NULL;
+  }
+
+  redisxLockClient(cl);
+  cp = (ClientPrivate *) cl->priv;
+  copy = redisxCopyOfRESP(cp->attributes);
+  redisxUnlockClient(cl);
+
+  return copy;
+}
+
+static void rSetAttributeAsync(ClientPrivate *cp, RESP *resp) {
+  redisxDestroyRESP(cp->attributes);
+  cp->attributes = resp;
 }
 
 /**
@@ -763,7 +835,7 @@ RESP *redisxReadReplyAsync(RedisClient *cl) {
         // Streaming RESP in parts...
         for(;;) {
           RESP *r = redisxReadReplyAsync(cl);
-          if(r->type != RESP3_SNIPPET) {
+          if(r->type != RESP3_CONTINUED) {
             int type = r->type;
             redisxDestroyRESP(r);
             fprintf(stderr, "WARNING! expected type '%c', got type '%c'.", resp->type, type);
@@ -771,7 +843,7 @@ RESP *redisxReadReplyAsync(RedisClient *cl) {
           }
 
           if(r->n == 0) {
-            if(resp->type == RESP3_PUSH) break;
+            if(resp->type == RESP3_PUSH || resp->type == RESP3_ATTRIBUTE) break;
             return resp;
           }
 
@@ -791,8 +863,9 @@ RESP *redisxReadReplyAsync(RedisClient *cl) {
       }
     }
 
-    // Deal with push messages...
-    if(resp->type == RESP3_PUSH) rPushMessage(cl, resp);
+    // Deal with push messages and attributes...
+    if(resp->type == RESP3_PUSH) rPushMessageAsync(cl, resp);
+    else if(resp->type == RESP3_ATTRIBUTE) rSetAttributeAsync(cp, resp);
     else break;
   }
 
