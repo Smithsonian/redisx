@@ -751,30 +751,37 @@ static void rPushMessageAsync(RedisClient *cl, RESP *resp) {
 
 /**
  * Returns the attributes (if any) that were last sent along a response to the client.
- * The caller should destroy the attributes with redisxDestroyRESP() after it is done
- * inspecting them.
+ * This version should be called only if the caller has an eclusive lock on the client's
+ * mutex. Otherwise use redisxGetAsstributes() instead. There are a few rules the
+ * caller should follow:
+ *
+ * <ul>
+ * <li>The caller should not block the client for long and return quickly. If it has
+ * blocking calls, or requires extensive processing, it should make a copy of the
+ * RESP first, and release the lock immediately after.<</li>
+ * <li>The caller must not attempt to call free() on the returned RESP</li>
+ * </ul>
+ *
  *
  * @param cl    The Redis client instance
  * @return      The attributes last received (possibly NULL).
  *
- * @sa redisxDEstroyRESP()
+ * @sa redisxGetAttributes()
+ * @sa redisxReadReplyAsync()
+ * @sa redisxLockClient()
+ *
  */
-RESP *redisxGetAttributes(RedisClient *cl) {
+const RESP *redisxGetAttributesAsync(const RedisClient *cl) {
   const ClientPrivate *cp;
-  RESP *copy;
-
   if(!cl) {
-    x_error(0, EINVAL, "redisxGetAttributes", "client is NULL");
+    x_error(0, EINVAL, "redisxGetAttributesAsync", "client is NULL");
     return NULL;
   }
 
-  redisxLockClient(cl);
   cp = (ClientPrivate *) cl->priv;
-  copy = redisxCopyOfRESP(cp->attributes);
-  redisxUnlockClient(cl);
-
-  return copy;
+  return cp->attributes;
 }
+
 
 static void rSetAttributeAsync(ClientPrivate *cp, RESP *resp) {
   redisxDestroyRESP(cp->attributes);

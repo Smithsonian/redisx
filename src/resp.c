@@ -52,6 +52,8 @@ void redisxDestroyRESP(RESP *resp) {
       }
       break;
     }
+    default:
+      ;
   }
 
   if(resp->value != NULL) free(resp->value);
@@ -122,9 +124,8 @@ RESP *redisxCopyOfRESP(const RESP *resp) {
       memcpy(copy->value, resp->value, sizeof(double));
       break;
 
-    case RESP_INT:
-    case RESP3_NULL:
-      break;
+    default:
+      ;
   }
 
   return copy;
@@ -211,8 +212,6 @@ int redisxSplitText(RESP *resp, char **text) {
   str = (char *) resp->value;
 
   switch(resp->type) {
-
-
     case RESP3_VERBATIM_STRING:
       if(resp->n < 4)
         return x_error(X_PARSE_ERROR, ERANGE, fn, "value '%s' is too short (%d bytes) for verbatim string type", str, resp->n);
@@ -229,14 +228,14 @@ int redisxSplitText(RESP *resp, char **text) {
         if(text) *text = &str[offset];
         return resp->n - offset - 1;
       }
-      else {
-        if(text) *text = NULL;
-        return 0;
-      }
-    }
-  }
 
-  return x_error(REDIS_UNEXPECTED_RESP, EINVAL, fn, "RESP type '%c' does not have a two-component string value", resp->type);
+      if(text) *text = NULL;
+      return 0;
+    }
+
+    default:
+      return x_error(REDIS_UNEXPECTED_RESP, EINVAL, fn, "RESP type '%c' does not have a two-component string value", resp->type);
+  }
 }
 
 /**
@@ -263,9 +262,11 @@ boolean redisxIsScalarType(const RESP *r) {
     case RESP3_DOUBLE:
     case RESP3_NULL:
       return TRUE;
+
+    default:
+      return FALSE;
   }
 
-  return FALSE;
 }
 
 /**
@@ -295,9 +296,10 @@ boolean redisxIsStringType(const RESP *r) {
     case RESP3_VERBATIM_STRING:
     case RESP3_BIG_NUMBER:
       return TRUE;
-  }
 
-  return FALSE;
+    default:
+      return FALSE;
+  }
 }
 
 /**
@@ -322,9 +324,10 @@ boolean redisxIsArrayType(const RESP *r) {
     case RESP3_SET:
     case RESP3_PUSH:
       return TRUE;
-  }
 
-  return FALSE;
+    default:
+      return FALSE;
+  }
 }
 
 /**
@@ -347,9 +350,10 @@ boolean redisxIsMapType(const RESP *r) {
     case RESP3_MAP:
     case RESP3_ATTRIBUTE:
       return TRUE;
-  }
 
-  return FALSE;
+    default:
+      return FALSE;
+  }
 }
 
 

@@ -83,25 +83,33 @@
 #define REDISX_VERSION_STRING str_2(REDISX_MAJOR_VERSION) "." str_2(REDISX_MINOR_VERSION) \
                                   "." str_2(REDISX_PATCHLEVEL) REDISX_RELEASE_STRING
 
-// These are the first character ID's for the standard RESP interface implemented by Redis.
-#define RESP_ARRAY              '*'     ///< \hideinitializer RESP array type
-#define RESP_INT                ':'     ///< \hideinitializer RESP integer type
-#define RESP_SIMPLE_STRING      '+'     ///< \hideinitializer RESP simple string type
-#define RESP_ERROR              '-'     ///< \hideinitializer RESP error message type
-#define RESP_BULK_STRING        '$'     ///< \hideinitializer RESP bulk string type
+/**
+ * Enumeration of RESP component types. These are the first character IDs for the standard RESP interface
+ * implemented by Redis.
+ *
+ */
+enum resp_type {
+  // RESP2 types:
+  RESP_ARRAY            = '*',    ///< \hideinitializer RESP array type
+  RESP_INT              = ':',    ///< \hideinitializer RESP integer type
+  RESP_SIMPLE_STRING    = '+',    ///< \hideinitializer RESP simple string type
+  RESP_ERROR            = '-',    ///< \hideinitializer RESP error message type
+  RESP_BULK_STRING      = '$',    ///< \hideinitializer RESP bulk string type
 
-// RESP3 types
-#define RESP3_NULL              '_'     ///< \hideinitializer RESP3 null value
-#define RESP3_DOUBLE            ','     ///< \hideinitializer RESP3 floating-point value
-#define RESP3_BOOLEAN           '#'     ///< \hideinitializer RESP3 boolean value
-#define RESP3_BLOB_ERROR        '!'     ///< \hideinitializer RESP3 blob error
-#define RESP3_VERBATIM_STRING   '='     ///< \hideinitializer RESP3 verbatim string (with type)
-#define RESP3_BIG_NUMBER        '('     ///< \hideinitializer RESP3 big integer / decimal
-#define RESP3_MAP               '%'     ///< \hideinitializer RESP3 dictionary of key / value
-#define RESP3_SET               '~'     ///< \hideinitializer RESP3 unordered set of elements
-#define RESP3_ATTRIBUTE         '|'     ///< \hideinitializer RESP3 dictionary of attributes (metadata)
-#define RESP3_PUSH              '>'     ///< \hideinitializer RESP3 dictionary of attributes (metadata)
-#define RESP3_CONTINUED         ';'     ///< \hideinitializer RESP3 dictionary of attributes (metadata)
+  // RESP3 types:
+  RESP3_NULL            = '_',    ///< \hideinitializer RESP3 null value
+  RESP3_DOUBLE          = ',',    ///< \hideinitializer RESP3 floating-point value
+  RESP3_BOOLEAN         = '#',    ///< \hideinitializer RESP3 boolean value
+  RESP3_BLOB_ERROR      = '!',    ///< \hideinitializer RESP3 blob error
+  RESP3_VERBATIM_STRING = '=',    ///< \hideinitializer RESP3 verbatim string (with type)
+  RESP3_BIG_NUMBER      = '(',    ///< \hideinitializer RESP3 big integer / decimal
+  RESP3_MAP             = '%',    ///< \hideinitializer RESP3 dictionary of key / value
+  RESP3_SET             = '~',    ///< \hideinitializer RESP3 unordered set of elements
+  RESP3_ATTRIBUTE       = '|',    ///< \hideinitializer RESP3 dictionary of attributes (metadata)
+  RESP3_PUSH            = '>',    ///< \hideinitializer RESP3 dictionary of attributes (metadata)
+  RESP3_CONTINUED       = ';'     ///< \hideinitializer RESP3 dictionary of attributes (metadata)
+};
+
 
 #define REDIS_INVALID_CHANNEL       (-101)  ///< \hideinitializer There is no such channel in the Redis instance.
 #define REDIS_NULL                  (-102)  ///< \hideinitializer Redis returned NULL
@@ -150,7 +158,7 @@ enum redisx_protocol {
  * \sa redisxIsMapType()
  */
 typedef struct RESP {
-  char type;                    ///< RESP type RESP_ARRAY, RESP_INT ...
+  enum resp_type type;          ///< RESP type RESP_ARRAY, RESP_INT ...
   int n;                        ///< Either the integer value of a RESP_INT response, or the
                                 ///< dimension of the value field.
   void *value;                  ///< Pointer to text (char *) content or to an array of components
@@ -400,9 +408,11 @@ int redisxSendArrayRequestAsync(RedisClient *cl, char *args[], int length[], int
 int redisxSetValueAsync(RedisClient *cl, const char *table, const char *key, const char *value, boolean confirm);
 int redisxMultiSetAsync(RedisClient *cl, const char *table, const RedisEntry *entries, int n, boolean confirm);
 RESP *redisxReadReplyAsync(RedisClient *cl);
+const RESP *redisxGetAttributesAsync(const RedisClient *cl);
 int redisxIgnoreReplyAsync(RedisClient *cl);
 int redisxSkipReplyAsync(RedisClient *cl);
 int redisxPublishAsync(Redis *redis, const char *channel, const char *data, int length);
+
 
 // Error generation with stderr message...
 int redisxError(const char *func, int errorCode);
