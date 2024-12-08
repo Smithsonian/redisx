@@ -159,10 +159,11 @@ enum redisx_protocol {
  */
 typedef struct RESP {
   enum resp_type type;          ///< RESP type RESP_ARRAY, RESP_INT ...
-  int n;                        ///< Either the integer value of a RESP_INT response, or the
+  int n;                        ///< Either the integer value of a RESP_INT or a RESP3_BOOLEAN response, or the
                                 ///< dimension of the value field.
   void *value;                  ///< Pointer to text (char *) content or to an array of components
-                                ///< (RESP**)...
+                                ///< (RESP**) or (RedisMapEntry *), or else a pointer to a `double`, depending
+                                ///< on `type`.
 } RESP;
 
 /**
@@ -186,7 +187,7 @@ typedef struct {
 typedef struct RedisEntry {
   char *key;                    ///< The Redis key or field name
   char *value;                  ///< The string value stored for that field.
-  int length;                  ///< Bytes in value.
+  int length;                   ///< Bytes in value.
 } RedisEntry;
 
 

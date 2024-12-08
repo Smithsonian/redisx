@@ -601,12 +601,23 @@ int redisxSendArrayRequestAsync(RedisClient *cl, char *args[], int lengths[], in
   // Send the number of string elements in the command...
   L = sprintf(buf, "*%d\r\n", n);
 
+
+  xvprintf("Redis-X> request[%d]", n);
+  for(i = 0; i < n; i++) {
+    if(args[i]) xvprintf(" %s", args[i]);
+    if(i == 4) {
+      xvprintf("...");
+    }
+  }
+  xvprintf("\n");
+
   for(i = 0; i < n; i++) {
     int l, L1;
 
     if(!args[i]) l = 0; // Check for potential NULL parameters...
     else if(!lengths) l = (int) strlen(args[i]);
     else l = lengths[i] > 0 ? lengths[i] : (int) strlen(args[i]);
+
 
     L += sprintf(buf + L, "$%d\r\n", l);
 
@@ -876,7 +887,6 @@ RESP *redisxReadReplyAsync(RedisClient *cl) {
     else break;
   }
 
-
   // Now get the body of the response...
   if(!status) switch(resp->type) {
 
@@ -932,7 +942,7 @@ RESP *redisxReadReplyAsync(RedisClient *cl) {
       }
 
       // Consistency check. Discard response if incomplete (because of read errors...)
-      if(component) for(i = 0; i < resp->n; i++) if(component[i] == NULL || component[i]->type != RESP3_NULL) {
+      if(component) for(i = 0; i < resp->n; i++) if(component[i] == NULL || component[i]->type == RESP3_NULL) {
         fprintf(stderr, "WARNING! Redis-X : incomplete array received (index %d of %d).\n", (i+1), resp->n);
         if(!status) status = REDIS_INCOMPLETE_TRANSFER;
         break;
@@ -945,18 +955,21 @@ RESP *redisxReadReplyAsync(RedisClient *cl) {
 
     case RESP3_MAP:
     case RESP3_ATTRIBUTE: {
-      RedisMapEntry *component;
+      RedisMapEntry *dict;
       int i;
+
       if(resp->n <= 0) break;
 
-      component = (RedisMapEntry *) calloc(resp->n, sizeof(RedisMapEntry));
-      x_check_alloc(component);
+      dict = (RedisMapEntry *) calloc(resp->n, sizeof(RedisMapEntry));
+      x_check_alloc(dict);
 
       for(i=0; i<resp->n; i++) {
-        RedisMapEntry *e = &component[i];
+        RedisMapEntry *e = &dict[i];
         e->key = redisxReadReplyAsync(cl);
         e->value = redisxReadReplyAsync(cl);
       }
+      resp->value = dict;
+
       break;
     }
 

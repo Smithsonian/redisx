@@ -573,7 +573,6 @@ int rConnectClient(Redis *redis, enum redisx_channel channel) {
   if(p->hello) {
     char proto[20];
     char *args[6];
-    RESP *reply;
     int k = 0;
 
     args[k++] = "HELLO";
@@ -584,21 +583,30 @@ int rConnectClient(Redis *redis, enum redisx_channel channel) {
 
     if(p->password) {
       args[k++] = "AUTH";
+      args[k++] = p->username ? p->username : "default";
       args[k++] = p->password;
     }
 
     args[k++] = "SETNAME";
     args[k++] = id;
 
-    reply = redisxArrayRequest(redis, args, NULL, k, &status);
-    if(redisxCheckRESP(reply, RESP3_MAP, 0)) {
-      // OK, it looks like HELLO worked...
-      RedisMapEntry *e = redisxGetKeywordEntry(reply, "proto");
-      if(e && e->value->type == RESP_INT) p->protocol = e->value->n;
-    }
-    else p->hello = FALSE;
+    p->hello = FALSE;
 
-    redisxDestroyRESP(reply);
+    status = redisxSendArrayRequestAsync(cl, args, NULL, k);
+    if(status == X_SUCCESS) {
+      RESP *reply = redisxReadReplyAsync(cl);
+      status = redisxCheckRESP(reply, RESP3_MAP, 0);
+      if(status == X_SUCCESS) {
+        RedisMapEntry *e = redisxGetKeywordEntry(reply, "proto");
+        if(e && e->value->type == RESP_INT) {
+          p->protocol = e->value->n;
+          xvprintf("Confirmed protocol %d\n", p->protocol);
+        }
+        p->hello = TRUE;
+      }
+      else xvprintf("! Redis-X: HELLO failed: %s\n", redisxErrorDescription(status));
+      redisxDestroyRESP(reply);
+    }
   }
 
   if(!p->hello) {

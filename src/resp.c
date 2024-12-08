@@ -34,7 +34,7 @@
 void redisxDestroyRESP(RESP *resp) {
   if(resp == NULL) return;
 
-  switch(resp->type) {
+  if(resp->value) switch(resp->type) {
     case RESP_ARRAY:
     case RESP3_SET:
     case RESP3_PUSH: {
@@ -151,6 +151,9 @@ int redisxCheckRESP(const RESP *resp, enum resp_type expectedType, int expectedS
   static const char *fn = "redisxCheckRESP";
 
   if(resp == NULL) return x_error(X_NULL, EINVAL, fn, "RESP is NULL");
+  if(resp->type == RESP3_BOOLEAN) {
+    if(resp->n != (expectedSize ? 1 : 0)) return x_error(X_FAILURE, EBADMSG, fn, "unexpected boolean value: expected %d, got %d", (expectedSize ? 1 : 0), resp->n);
+  }
   if(resp->type != RESP_INT && resp->type != RESP3_NULL) {
     if(resp->n < 0) return x_error(X_FAILURE, EBADMSG, fn, "RESP error code: %d", resp->n);
     if(resp->value == NULL) if(resp->n) return x_error(REDIS_NULL, ENOMSG, fn, "RESP with NULL value, n=%d", resp->n);

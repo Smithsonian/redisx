@@ -139,9 +139,7 @@ int redisxSetValue(Redis *redis, const char *table, const char *key, const char 
   if(redis == NULL) return x_error(X_NULL, EINVAL, fn, "redis is NULL");
 
   prop_error(fn, redisxLockConnected(redis->interactive));
-
   status = redisxSetValueAsync(redis->interactive, table, key, value, confirm);
-
   redisxUnlockClient(redis->interactive);
 
   prop_error(fn, status);

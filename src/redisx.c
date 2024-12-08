@@ -601,8 +601,6 @@ RESP *redisxArrayRequest(Redis *redis, char *args[], int lengths[], int n, int *
   }
   else *status = X_SUCCESS;
 
-  xvprintf("Redis-X> request %s... [%d].\n", args[0], n);
-
   cl = redis->interactive;
   *status = redisxLockConnected(cl);
   if(*status) return x_trace_null(fn, NULL);
