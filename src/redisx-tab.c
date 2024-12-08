@@ -136,11 +136,6 @@ int redisxSetValue(Redis *redis, const char *table, const char *key, const char 
   prop_error(fn, redisxLockConnected(redis->interactive));
 
   status = redisxSetValueAsync(redis->interactive, table, key, value, confirm);
-  if(status == X_SUCCESS && confirm) {
-    RESP *reply = redisxReadReplyAsync(redis->interactive);
-    status = redisxCheckRESP(reply, RESP_INT, -1);
-    redisxDestroyRESP(reply);
-  }
 
   redisxUnlockClient(redis->interactive);
 
