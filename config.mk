@@ -27,7 +27,7 @@ CC ?= gcc
 CPPFLAGS += -I$(INC)
 
 # Base compiler options (if not defined externally...)
-CFLAGS ?= -Os -Wall -std=c99
+CFLAGS ?= -g -Os -Wall -std=c99
 
 # Extra warnings (not supported on all compilers)
 #CFLAGS += -Wextra
@@ -37,9 +37,10 @@ CFLAGS ?= -Os -Wall -std=c99
 
 # cppcheck options for 'check' target
 CHECKOPTS ?= --enable=performance,warning,portability,style --language=c \
-            --error-exitcode=1 --std=c99 $(CHECKEXTRA)
+            --error-exitcode=1 --std=c99 
 
-CHECKOPTS += --template='{file}({line}): {severity} ({id}): {message}' --inline-suppr
+# Add-on ccpcheck options
+CHECKOPTS += --inline-suppr $(CHECKEXTRA)
 
 # Exhaustive checking for newer cppcheck
 #CHECKOPTS += --check-level=exhaustive

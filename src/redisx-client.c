@@ -12,6 +12,7 @@
 #include <string.h>
 #include <errno.h>
 #include <limits.h>
+#include <ctype.h>
 #if __Lynx__
 #  include <socket.h>
 #else
@@ -600,12 +601,23 @@ int redisxSendArrayRequestAsync(RedisClient *cl, char *args[], int lengths[], in
   // Send the number of string elements in the command...
   L = sprintf(buf, "*%d\r\n", n);
 
+
+  xvprintf("Redis-X> request[%d]", n);
+  for(i = 0; i < n; i++) {
+    if(args[i]) xvprintf(" %s", args[i]);
+    if(i == 4) {
+      xvprintf("...");
+    }
+  }
+  xvprintf("\n");
+
   for(i = 0; i < n; i++) {
     int l, L1;
 
     if(!args[i]) l = 0; // Check for potential NULL parameters...
     else if(!lengths) l = (int) strlen(args[i]);
     else l = lengths[i] > 0 ? lengths[i] : (int) strlen(args[i]);
+
 
     L += sprintf(buf + L, "$%d\r\n", l);
 
@@ -668,6 +680,151 @@ int redisxIgnoreReplyAsync(RedisClient *cl) {
   return X_SUCCESS;
 }
 
+static int rTypeIsParametrized(char type) {
+  switch(type) {
+    case RESP_INT:
+    case RESP_BULK_STRING:
+    case RESP_ARRAY:
+    case RESP3_SET:
+    case RESP3_PUSH:
+    case RESP3_MAP:
+    case RESP3_ATTRIBUTE:
+    case RESP3_BLOB_ERROR:
+    case RESP3_VERBATIM_STRING:
+    case RESP3_CONTINUED:
+      return TRUE;
+    default:
+      return FALSE;
+  }
+}
+
+/**
+ * Sets a user-defined function to process push messages for a specific Redis client. The function's
+ * implementation must follow a simple set of rules:
+ *
+ * <ul>
+ * <li>the implementation should not destroy the RESP data. The RESP will be destroyed automatically
+ * after the call returns. However, the call may retain any data from the RESP itself, provided
+ * the data is de-referenced from the RESP before return.<li>
+ * <li>The call will have exclusive access to the client. As such it should not try to obtain a
+ * lock or release the lock itself.</li>
+ * <li>The implementation should not block (aside from maybe a quick mutex unlock) and return quickly,
+ * so as to not block the client for long periods</li>
+ * <li>If extensive processing or blocking calls are required to process the message, it is best to
+ * simply place a copy of the RESP on a queue and then return quickly, and then process the message
+ * asynchronously in a background thread.</li>
+ * </ul>
+ *
+ * @param cl      Redis client instance
+ * @param func    Function to use for processing push messages from the client, or NULL to ignore
+ *                push messages.
+ * @param arg     (optional) User-defined pointer argument to pass along to the processing function.
+ * @return        X_SUCCESS (0) if successful, or else X_NULL (errno set to EINVAL) if the client
+ *                argument is NULL.
+ */
+int redisxSetPushProcessor(RedisClient *cl, RedisPushProcessor func, void *arg) {
+  static const char *fn = "redisxSetPushProcessor";
+
+  ClientPrivate *cp;
+
+  if(!cl) return x_error(X_NULL, EINVAL, fn, "input client is NULL");
+
+  prop_error(fn, redisxLockClient(cl));
+  cp = cl->priv;
+  cp->pushConsumer = func;
+  cp->pushArg = arg;
+  redisxUnlockClient(cl);
+
+  return X_SUCCESS;
+}
+
+static void rPushMessageAsync(RedisClient *cl, RESP *resp) {
+  int i;
+  ClientPrivate *cp = (ClientPrivate *) cl->priv;
+  RESP **array;
+
+  if(resp->n < 0) return;
+
+  array = (RESP **) calloc(resp->n, sizeof(RESP *));
+  if(!array) fprintf(stderr, "WARNING! Redis-X : not enough memory for push message (%d elements). Skipping.\n", resp->n);
+
+  for(i = 0; i < resp->n; i++) {
+    RESP *r = redisxReadReplyAsync(cl);
+    if(array) array[i] = r;
+    else redisxDestroyRESP(r);
+  }
+
+  resp->value = array;
+
+  if(cp->pushConsumer) cp->pushConsumer(resp, cp->pushArg);
+
+  redisxDestroyRESP(resp);
+}
+
+/**
+ * Returns the attributes (if any) that were last sent along a response to the client.
+ * This function should be called only if the caller has an exclusive lock on the client's
+ * mutex. Also, there are a few rules the caller should follow:
+ *
+ * <ul>
+ * <li>The caller should not block the client for long and return quickly. If it has
+ * blocking calls, or requires extensive processing, it should make a copy of the
+ * RESP first, and release the lock immediately after.</li>
+ * <li>The caller must not attempt to call free() on the returned RESP</li>
+ * </ul>
+ *
+ * Normally the user would typically call this function right after a redisxReadReplyAsync()
+ * call, for which atributes are expected. The caller might also want to call
+ * redisxClearAttributeAsync() before attempting to read the response to ensure that
+ * the attributes returned are for the same reply from the server.
+ *
+ * @param cl    The Redis client instance
+ * @return      The attributes last received (possibly NULL).
+ *
+ * @sa redisxClearAttributesAsync()
+ * @sa redisxReadReplyAsync()
+ * @sa redisxLockClient()
+ *
+ */
+const RESP *redisxGetAttributesAsync(const RedisClient *cl) {
+  const ClientPrivate *cp;
+  if(!cl) {
+    x_error(0, EINVAL, "redisxGetAttributesAsync", "client is NULL");
+    return NULL;
+  }
+
+  cp = (ClientPrivate *) cl->priv;
+  return cp->attributes;
+}
+
+static void rSetAttributeAsync(ClientPrivate *cp, RESP *resp) {
+  redisxDestroyRESP(cp->attributes);
+  cp->attributes = resp;
+}
+
+/**
+ * Clears the attributes for the specified client. The caller should have an exclusive lock
+ * on the client's mutex prior to making this call.
+ *
+ * Typically a user migh call this function prior to calling redisxReadReplyAsync() on the
+ * same client, to ensure that any attributes that are available after the read will be the
+ * ones that were sent with the last response from the server.
+ *
+ * @param cl    The Redis client instance
+ * @return      X_SUCCESS (0) if successful, or else X_NULL if the client is NULL.
+ *
+ * @sa redisxGetAttributesAsync()
+ * @sa redisxReadReplyAsync()
+ * @sa redisxLockClient()
+ *
+ */
+int redisxClearAttributesAsync(RedisClient *cl) {
+  if(!cl) return x_error(X_NULL, EINVAL, "redisxClearAttributes", "client is NULL");
+
+  rSetAttributeAsync((ClientPrivate *) cl->priv, NULL);
+  return X_SUCCESS;
+}
+
 /**
  * Reads a response from Redis and returns it.
  *
@@ -702,62 +859,152 @@ RESP *redisxReadReplyAsync(RedisClient *cl) {
     return NULL;
   }
 
-  size = rReadToken(cp, buf, REDIS_SIMPLE_STRING_SIZE + 1);
-  if(size < 0) {
-    // Either read/recv had an error, or we got garbage...
-    if(cp->isEnabled) x_trace_null(fn, NULL);
-    cp->isEnabled = FALSE;  // Disable this client so we don't attempt to read from it again...
-    return NULL;
-  }
-
-  resp = (RESP *) calloc(1, sizeof(RESP));
-  x_check_alloc(resp);
-  resp->type = buf[0];
-
-  // Get the integer / size value...
-  if(resp->type == RESP_ARRAY || resp->type == RESP_INT || resp->type == RESP_BULK_STRING) {
-    char *tail;
-    errno = 0;
-    resp->n = (int) strtol(&buf[1], &tail, 10);
-    if(errno) {
-      fprintf(stderr, "WARNING! Redis-X : unparseable dimension '%s'\n", &buf[1]);
-      status = X_PARSE_ERROR;
+  for(;;) {
+    size = rReadToken(cp, buf, REDIS_SIMPLE_STRING_SIZE + 1);
+    if(size < 0) {
+      // Either read/recv had an error, or we got garbage...
+      if(cp->isEnabled) x_trace_null(fn, NULL);
+      cp->isEnabled = FALSE;  // Disable this client so we don't attempt to read from it again...
+      return NULL;
     }
+
+    resp = (RESP *) calloc(1, sizeof(RESP));
+    x_check_alloc(resp);
+    resp->type = buf[0];
+
+    // Parametrized type.
+    if(rTypeIsParametrized(resp->type)) {
+
+      if(buf[1] == '?') {
+        // Streaming RESP in parts...
+        for(;;) {
+          RESP *r = redisxReadReplyAsync(cl);
+          if(r->type != RESP3_CONTINUED) {
+            int type = r->type;
+            redisxDestroyRESP(r);
+            fprintf(stderr, "WARNIG! Redis-X: expected type '%c', got type '%c'.", resp->type, type);
+            return resp;
+          }
+
+          if(r->n == 0) {
+            if(resp->type == RESP3_PUSH || resp->type == RESP3_ATTRIBUTE) break;
+            if(redisxHasComponents(resp)) break;
+            return resp; // We are done, return the result.
+          }
+
+          r->type = resp->type;
+          redisxAppendRESP(resp, r);
+        }
+      }
+      else {
+        // Get the integer / size value...
+        char *tail;
+        errno = 0;
+        resp->n = (int) strtol(&buf[1], &tail, 10);
+        if(errno) {
+          fprintf(stderr, "WARNING! Redis-X : unparseable dimension '%s'\n", &buf[1]);
+          status = X_PARSE_ERROR;
+        }
+      }
+    }
+
+    // Deal with push messages and attributes...
+    if(resp->type == RESP3_PUSH) rPushMessageAsync(cl, resp);
+    else if(resp->type == RESP3_ATTRIBUTE) rSetAttributeAsync(cp, resp);
+    else break;
   }
 
   // Now get the body of the response...
   if(!status) switch(resp->type) {
 
-    case RESP_ARRAY: {
+    case RESP3_NULL:
+      resp->n = 0;
+      break;
+
+    case RESP_INT:          // Nothing left to do for INT type response.
+      break;
+
+    case RESP3_BOOLEAN: {
+      switch(tolower(buf[1])) {
+        case 't': resp->n = TRUE; break;
+        case 'f': resp->n = FALSE; break;
+        default:
+          resp->n = -1;
+          fprintf(stderr, "WARNING! Redis-X : invalid boolean value '%c'\n", buf[1]);
+          status = X_PARSE_ERROR;
+      }
+      break;
+    }
+
+    case RESP3_DOUBLE: {
+      double *dval = (double *) calloc(1, sizeof(double));
+      x_check_alloc(dval);
+
+      *dval = xParseDouble(&buf[1], NULL);
+      if(errno) {
+        fprintf(stderr, "WARNING! Redis-X : invalid double value '%s'\n", &buf[1]);
+        status = X_PARSE_ERROR;
+      }
+      resp->value = dval;
+      break;
+    }
+
+    case RESP_ARRAY:
+    case RESP3_SET:
+    case RESP3_PUSH: {
       RESP **component;
       int i;
 
       if(resp->n <= 0) break;
 
-      resp->value = (RESP **) malloc(resp->n * sizeof(RESP *));
-      if(resp->value == NULL) {
+      component = (RESP **) malloc(resp->n * sizeof(RESP *));
+      if(component == NULL) {
         status = x_error(X_FAILURE, errno, fn, "malloc() error (%d RESP)", resp->n);
         // We should get the data from the input even if we have nowhere to store...
       }
 
-      component = (RESP **) resp->value;
 
       for(i=0; i<resp->n; i++) {
-        RESP* r = redisxReadReplyAsync(cl);     // Always read RESP even if we don't have storage for it...
-        if(resp->value) component[i] = r;
+        RESP *r = redisxReadReplyAsync(cl);     // Always read RESP even if we don't have storage for it...
+        if(component) component[i] = r;
+        else redisxDestroyRESP(r);
       }
 
       // Consistency check. Discard response if incomplete (because of read errors...)
-      if(resp->value) for(i = 0; i < resp->n; i++) if(component[i] == NULL) {
+      if(component) for(i = 0; i < resp->n; i++) if(component[i] == NULL || component[i]->type == RESP3_NULL) {
         fprintf(stderr, "WARNING! Redis-X : incomplete array received (index %d of %d).\n", (i+1), resp->n);
         if(!status) status = REDIS_INCOMPLETE_TRANSFER;
         break;
       }
 
+      resp->value = component;
+
+      break;
+    }
+
+    case RESP3_MAP:
+    case RESP3_ATTRIBUTE: {
+      RedisMapEntry *dict;
+      int i;
+
+      if(resp->n <= 0) break;
+
+      dict = (RedisMapEntry *) calloc(resp->n, sizeof(RedisMapEntry));
+      x_check_alloc(dict);
+
+      for(i=0; i<resp->n; i++) {
+        RedisMapEntry *e = &dict[i];
+        e->key = redisxReadReplyAsync(cl);
+        e->value = redisxReadReplyAsync(cl);
+      }
+      resp->value = dict;
+
       break;
     }
 
     case RESP_BULK_STRING:
+    case RESP3_BLOB_ERROR:
+    case RESP3_VERBATIM_STRING:
       if(resp->n < 0) break;                          // no string token following!
 
       resp->value = malloc(resp->n + 2);              // <string>\r\n
@@ -781,6 +1028,7 @@ RESP *redisxReadReplyAsync(RedisClient *cl) {
 
     case RESP_SIMPLE_STRING:
     case RESP_ERROR:
+    case RESP3_BIG_NUMBER:
       resp->value = malloc(size);
 
       if(resp->value == NULL) {
@@ -793,9 +1041,6 @@ RESP *redisxReadReplyAsync(RedisClient *cl) {
       resp->n = size-1;
       ((char *)resp->value)[resp->n] = '\0';
 
-      break;
-
-    case RESP_INT:          // Nothing left to do for INT type response.
       break;
 
     default:

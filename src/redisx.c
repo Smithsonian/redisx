@@ -153,6 +153,58 @@ int redisxSetPassword(Redis *redis, const char *passwd) {
   return X_SUCCESS;
 }
 
+
+/**
+ * Sets the RESP prorocol version to use with the given Redis server instance. You must set the protocol
+ * prior to connecting to Redis. The protocol is set with the HELLO command, which was introduced in
+ * Redis 6.0.0 only. For older Redis server instances, the protocol will default to RESP2.
+ * Calling this function will enable using HELLO to handshake with the server.
+ *
+ * @param redis       The Redis server instance
+ * @param protocol    REDISX_RESP2 or REDISX_RESP3.
+ * @return            X_SUCCESS (0) if successful, or X_NULL if the redis argument in NULL, X_NO_INIT
+ *                    if the redis instance was not initialized, or X_ALREADY_OPEN if the server was
+ *                    already connected.
+ *
+ * @sa redisxGetProtocol()
+ */
+int redisxSetProtocol(Redis *redis, enum redisx_protocol protocol) {
+  static const char *fn = "redisxSetProtocol";
+
+  RedisPrivate *p;
+  if(!redis) return x_error(X_NULL, EINVAL, fn, "redis is NULL");
+  if(!redis->priv) return x_error(X_NO_INIT, EINVAL, fn, "redis is not initialized");
+  if(redisxIsConnected(redis)) return x_error(X_ALREADY_OPEN, EALREADY, fn, "already connected");
+
+  p = (RedisPrivate *) redis->priv;
+  p->hello = TRUE;
+  p->protocol = protocol;
+
+  return X_SUCCESS;
+}
+
+/**
+ * Returns the actual protocol used with the Redis server. If HELLO was used during connection it will
+ * be the protocol that was confirmed in the response of HELLO (and which hopefully matches the
+ * protocol requested). Otherwise, RedisX will default to RESP2.
+ *
+ * @param redis     The Redis server instance
+ * @return          REDISX_RESP2 or REDISX_RESP3, or else an error code, such as X_NULL if the
+ *                  argument is NULL, or X_NO_INIT if the Redis server instance was not initialized.
+ *
+ * @sa redisxSetProtocol()
+ */
+enum redisx_protocol redisxGetProtocol(const Redis *redis) {
+  static const char *fn = "redisxGetProtocol";
+  const RedisPrivate *p;
+
+  if(!redis) return x_error(X_NULL, EINVAL, fn, "redis is NULL");
+  if(!redis->priv) return x_error(X_NO_INIT, EINVAL, fn, "redis is not initialized");
+
+  p = (RedisPrivate *) redis->priv;
+  return p->protocol;
+}
+
 /**
  * Sets the user-specific error handler to call if a socket level trasmit error occurs.
  * It replaces any prior handlers set earlier.
@@ -382,74 +434,6 @@ int redisxSelectDB(Redis *redis, int idx) {
   return status;
 }
 
-/**
- * Frees up the resources used by a RESP structure that was dynamically allocated.
- * The call will segfault if the same RESP is destroyed twice or if the argument
- * is a static allocation.
- *
- * \param resp      Pointer to the RESP structure to be destroyed, which may be NULL (no action taken).
- */
-void redisxDestroyRESP(RESP *resp) {
-  if(resp == NULL) return;
-  if(resp->type == RESP_ARRAY) while(--resp->n >= 0) {
-    RESP **component = (RESP **) resp->value;
-    redisxDestroyRESP(component[resp->n]);
-  }
-  if(resp->value != NULL) free(resp->value);
-  free(resp);
-}
-
-
-/**
- * Checks a Redis RESP for NULL values or unexpected values.
- *
- * \param resp              Pointer to the RESP structure from Redis.
- * \param expectedType      The RESP type expected (e.g. RESP_ARRAY) or 0 if not checking type.
- * \param expectedSize      The expected size of the RESP (array or bytes) or <=0 to skip checking
- *
- * \return      X_SUCCESS (0)                   if the RESP passes the tests, or
- *              X_NULL                          if the RESP is NULL (garbled response).
- *              REDIS_NULL                      if Redis returned (nil),
- *              REDIS_UNEXPECTED_TYPE           if got a reply of a different type than expected
- *              REDIS_UNEXPECTED_ARRAY_SIZE     if got a reply of different size than expected.
- *
- *              or the error returned in resp->n.
- *
- */
-int redisxCheckRESP(const RESP *resp, char expectedType, int expectedSize) {
-  static const char *fn = "redisxCheckRESP";
-
-  if(resp == NULL) return x_error(X_NULL, EINVAL, fn, "RESP is NULL");
-  if(resp->type != RESP_INT) {
-    if(resp->n < 0) return x_error(X_FAILURE, EBADMSG, fn, "RESP error code: %d", resp->n);
-    if(resp->value == NULL) if(resp->n) return x_error(REDIS_NULL, ENOMSG, fn, "RESP with NULL value, n=%d", resp->n);
-  }
-  if(expectedType) if(resp->type != expectedType)
-    return x_error(REDIS_UNEXPECTED_RESP, ENOMSG, fn, "unexpected RESP type: expected '%c', got '%c'", expectedType, resp->type);
-  if(expectedSize > 0) if(resp->n != expectedSize)
-    return x_error(REDIS_UNEXPECTED_RESP, ENOMSG, fn, "unexpected RESP size: expected %d, got %d", expectedSize, resp->n);
-  return X_SUCCESS;
-}
-
-/**
- * Like redisxCheckRESP(), but it also destroys the RESP in case of an error.
- *
- * \param resp              Pointer to the RESP structure from Redis.
- * \param expectedType      The RESP type expected (e.g. RESP_ARRAY) or 0 if not checking type.
- * \param expectedSize      The expected size of the RESP (array or bytes) or <=0 to skip checking
- *
- * \return      The return value of redisxCheckRESP().
- *
- * \sa redisxCheckRESP()
- *
- */
-int redisxCheckDestroyRESP(RESP *resp, char expectedType, int expectedSize) {
-  int status = redisxCheckRESP(resp, expectedType, expectedSize);
-  if(status) redisxDestroyRESP(resp);
-  prop_error("redisxCheckDestroyRESP", status);
-  return status;
-}
-
 
 /**
  * Prints a descriptive error message to stderr, and returns the error code.
@@ -492,15 +476,27 @@ boolean redisxHasPipeline(Redis *redis) {
 }
 
 /**
- * Sets the function processing valid pipeline responses.
+ * Sets the function processing valid pipeline responses. The implementation should follow a
+ * simple set of rules:
+ *
+ * <ul>
+ * <li>the implementation should not destroy the RESP data. The RESP will be destroyed automatically
+ * after the call returns. However, the call may retain any data from the RESP itself, provided
+ * the data is de-referenced from the RESP before return.<li>
+ * <li>The implementation should not block (aside from maybe a quick mutex unlock) and return quickly,
+ * so as to not block the client for long periods</li>
+ * <li>If extensive processing or blocking calls are required to process the message, it is best to
+ * simply place a copy of the RESP on a queue and then return quickly, and then process the message
+ * asynchronously in a background thread.</li>
+ * </ul>
  *
  * \param redis             Pointer to a Redis instance.
- * \param f    T            he function that processes a single argument of type RESP pointer.
+ * \param f                 The function that processes a single argument of type RESP pointer.
  *
  * \return      X_SUCCESS (0)   if successful, or
  *              X_NULL          if the Redis instance is NULL.
  */
-int redisxSetPipelineConsumer(Redis *redis, void (*f)(RESP *)) {
+int redisxSetPipelineConsumer(Redis *redis, RedisPipelineProcessor f) {
   RedisPrivate *p;
 
   if(redis == NULL) return x_error(X_NULL, EINVAL, "redisxSetPipelineConsumer", "redis is NULL");
@@ -512,7 +508,6 @@ int redisxSetPipelineConsumer(Redis *redis, void (*f)(RESP *)) {
 
   return X_SUCCESS;
 }
-
 
 /**
  * Returns the result of a Redis command with up to 3 regularly terminated string arguments. This is not the highest
@@ -605,8 +600,6 @@ RESP *redisxArrayRequest(Redis *redis, char *args[], int lengths[], int n, int *
     return NULL;
   }
   else *status = X_SUCCESS;
-
-  xvprintf("Redis-X> request %s... [%d].\n", args[0], n);
 
   cl = redis->interactive;
   *status = redisxLockConnected(cl);
