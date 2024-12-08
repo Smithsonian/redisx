@@ -723,11 +723,13 @@ static int rTypeIsParametrized(char type) {
  *                argument is NULL.
  */
 int redisxSetPushProcessor(RedisClient *cl, RedisPushProcessor func, void *arg) {
+  static const char *fn = "redisxSetPushProcessor";
+
   ClientPrivate *cp;
 
-  if(!cl) return x_error(X_NULL, EINVAL, "redisxSetPushProcessor", "input client is NULL");
+  if(!cl) return x_error(X_NULL, EINVAL, fn, "input client is NULL");
 
-  redisxLockClient(cl);
+  prop_error(fn, redisxLockClient(cl));
   cp = cl->priv;
   cp->pushConsumer = func;
   cp->pushArg = arg;
@@ -740,7 +742,6 @@ static void rPushMessageAsync(RedisClient *cl, RESP *resp) {
   int i;
   ClientPrivate *cp = (ClientPrivate *) cl->priv;
   RESP **array;
-
 
   if(resp->n < 0) return;
 
@@ -907,7 +908,6 @@ RESP *redisxReadReplyAsync(RedisClient *cl) {
     }
 
     case RESP3_DOUBLE: {
-      // TODO inf / -inf?
       double *dval = (double *) calloc(1, sizeof(double));
       x_check_alloc(dval);
 
