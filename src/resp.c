@@ -359,6 +359,24 @@ boolean redisxIsMapType(const RESP *r) {
   }
 }
 
+/**
+ * Checks if a RESP has subcomponents, such as arrays or maps (dictionaries).
+ *
+ * @param r   Pointer to a RESP data structure
+ * @return    TRUE (1) if the data has sub-components, or else FALSE (0).
+ *
+ * @sa redisxIsArrayType()
+ * @sa redisxIsMapType()
+ * @sa RESP3_MAP
+ * @sa RESP3_ATTRIBUTE
+ *
+ */
+boolean redisxHasComponents(const RESP *r) {
+  if(!r) return FALSE;
+
+  return r->n > 0 && (redisxIsArrayType(r) || redisxIsMapType(r));
+}
+
 
 /**
  * Appends a part to an existing RESP of the same type, before discarding the part.
@@ -394,7 +412,7 @@ int redisxAppendRESP(RESP *resp, RESP *part) {
     eSize = 1;
 
   old = resp->value;
-  extend = (char *) realloc(resp->value, resp->n + part->n);
+  extend = (char *) realloc(resp->value, (resp->n + part->n) * eSize);
   if(!extend) {
     free(old);
     return x_error(X_FAILURE, errno, fn, "alloc RESP array (%d components)", resp->n + part->n);

@@ -392,6 +392,7 @@ boolean redisxIsScalarType(const RESP *r);
 boolean redisxIsStringType(const RESP *r);
 boolean redisxIsArrayType(const RESP *r);
 boolean redisxIsMapType(const RESP *r);
+boolean redisxHasComponents(const RESP *r);
 boolean redisxIsEqualRESP(const RESP *a, const RESP *b);
 int redisxSplitText(RESP *resp, char **text);
 
@@ -409,6 +410,7 @@ int redisxSendArrayRequestAsync(RedisClient *cl, char *args[], int length[], int
 int redisxSetValueAsync(RedisClient *cl, const char *table, const char *key, const char *value, boolean confirm);
 int redisxMultiSetAsync(RedisClient *cl, const char *table, const RedisEntry *entries, int n, boolean confirm);
 RESP *redisxReadReplyAsync(RedisClient *cl);
+int redisxClearAttributesAsync(RedisClient *cl);
 const RESP *redisxGetAttributesAsync(const RedisClient *cl);
 int redisxIgnoreReplyAsync(RedisClient *cl);
 int redisxSkipReplyAsync(RedisClient *cl);

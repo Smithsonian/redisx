@@ -763,22 +763,25 @@ static void rPushMessageAsync(RedisClient *cl, RESP *resp) {
 
 /**
  * Returns the attributes (if any) that were last sent along a response to the client.
- * This version should be called only if the caller has an eclusive lock on the client's
- * mutex. Otherwise use redisxGetAsstributes() instead. There are a few rules the
- * caller should follow:
+ * This function should be called only if the caller has an exclusive lock on the client's
+ * mutex. Also, there are a few rules the caller should follow:
  *
  * <ul>
  * <li>The caller should not block the client for long and return quickly. If it has
  * blocking calls, or requires extensive processing, it should make a copy of the
- * RESP first, and release the lock immediately after.<</li>
+ * RESP first, and release the lock immediately after.</li>
  * <li>The caller must not attempt to call free() on the returned RESP</li>
  * </ul>
  *
+ * Normally the user would typically call this function right after a redisxReadReplyAsync()
+ * call, for which atributes are expected. The caller might also want to call
+ * redisxClearAttributeAsync() before attempting to read the response to ensure that
+ * the attributes returned are for the same reply from the server.
  *
  * @param cl    The Redis client instance
  * @return      The attributes last received (possibly NULL).
  *
- * @sa redisxGetAttributes()
+ * @sa redisxClearAttributesAsync()
  * @sa redisxReadReplyAsync()
  * @sa redisxLockClient()
  *
@@ -794,10 +797,32 @@ const RESP *redisxGetAttributesAsync(const RedisClient *cl) {
   return cp->attributes;
 }
 
-
 static void rSetAttributeAsync(ClientPrivate *cp, RESP *resp) {
   redisxDestroyRESP(cp->attributes);
   cp->attributes = resp;
+}
+
+/**
+ * Clears the attributes for the specified client. The caller should have an exclusive lock
+ * on the client's mutex prior to making this call.
+ *
+ * Typically a user migh call this function prior to calling redisxReadReplyAsync() on the
+ * same client, to ensure that any attributes that are available after the read will be the
+ * ones that were sent with the last response from the server.
+ *
+ * @param cl    The Redis client instance
+ * @return      X_SUCCESS (0) if successful, or else X_NULL if the client is NULL.
+ *
+ * @sa redisxGetAttributesAsync()
+ * @sa redisxReadReplyAsync()
+ * @sa redisxLockClient()
+ *
+ */
+int redisxClearAttributesAsync(RedisClient *cl) {
+  if(!cl) return x_error(X_NULL, EINVAL, "redisxClearAttributes", "client is NULL");
+
+  rSetAttributeAsync((ClientPrivate *) cl->priv, NULL);
+  return X_SUCCESS;
 }
 
 /**
@@ -857,13 +882,14 @@ RESP *redisxReadReplyAsync(RedisClient *cl) {
           if(r->type != RESP3_CONTINUED) {
             int type = r->type;
             redisxDestroyRESP(r);
-            fprintf(stderr, "WARNING! expected type '%c', got type '%c'.", resp->type, type);
+            fprintf(stderr, "WARNIG! Redis-X: expected type '%c', got type '%c'.", resp->type, type);
             return resp;
           }
 
           if(r->n == 0) {
             if(resp->type == RESP3_PUSH || resp->type == RESP3_ATTRIBUTE) break;
-            return resp;
+            if(redisxHasComponents(resp)) break;
+            return resp; // We are done, return the result.
           }
 
           r->type = resp->type;
@@ -896,11 +922,11 @@ RESP *redisxReadReplyAsync(RedisClient *cl) {
       break;
 
     case RESP3_BOOLEAN: {
-      resp->n = 1;
       switch(tolower(buf[1])) {
         case 't': resp->n = TRUE; break;
         case 'f': resp->n = FALSE; break;
         default:
+          resp->n = -1;
           fprintf(stderr, "WARNING! Redis-X : invalid boolean value '%c'\n", buf[1]);
           status = X_PARSE_ERROR;
       }
