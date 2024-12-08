@@ -552,41 +552,6 @@ int rConnectClient(Redis *redis, enum redisx_channel channel) {
 
   xvprintf("Redis-X> client %d assigned socket fd %d.\n", channel, sock);
 
-  redisxLockClient(cl);
-
-  cp->socket = sock;
-  cp->isEnabled = TRUE;
-
-  if(p->hello) {
-    char proto[20];
-    RESP *reply;
-
-    // Try HELLO and see what we get back...
-    sprintf(proto, "%d", (int) p->protocol);
-
-    reply = redisxRequest(redis, "HELLO", proto, p->password, NULL, &status);
-    if(redisxCheckRESP(reply, RESP3_MAP, 0)) {
-      // OK, it looks like HELLO worked...
-      RedisMapEntry *e = redisxGetKeywordEntry(reply, "proto");
-      if(e && e->value->type == RESP_INT) p->protocol = e->value->n;
-    }
-    else p->hello = FALSE;
-
-    redisxDestroyRESP(reply);
-  }
-
-  if(p->hello) {
-    // No HELLO, go the old way...
-    p->protocol = REDISX_RESP2;
-    if(p->password) status = rAuthAsync(cl);
-  }
-
-  if(status) {
-    rCloseClientAsync(cl);
-    redisxUnlockClient(cl);
-    return status;
-  }
-
   // Set the client name in Redis.
   uname(&u);
   strncpy(host, u.nodename, sizeof(host) - 1);
@@ -598,11 +563,54 @@ int rConnectClient(Redis *redis, enum redisx_channel channel) {
     case REDISX_SUBSCRIPTION_CHANNEL: channelID = "subscription"; break;
     default: channelID = "unknown";
   }
-
   sprintf(id, "%s:pid-%d:%s", host, (int) getppid(), channelID);
 
-  status = redisxSkipReplyAsync(cl);
-  if(!status) status = redisxSendRequestAsync(cl, "CLIENT", "SETNAME", id, NULL);
+  redisxLockClient(cl);
+
+  cp->socket = sock;
+  cp->isEnabled = TRUE;
+
+  if(p->hello) {
+    char proto[20];
+    char *args[6];
+    RESP *reply;
+    int k = 0;
+
+    args[k++] = "HELLO";
+
+    // Try HELLO and see what we get back...
+    sprintf(proto, "%d", (int) p->protocol);
+    args[k++] = proto;
+
+    if(p->password) {
+      args[k++] = "AUTH";
+      args[k++] = p->password;
+    }
+
+    args[k++] = "SETNAME";
+    args[k++] = id;
+
+    reply = redisxArrayRequest(redis, args, NULL, k, &status);
+    if(redisxCheckRESP(reply, RESP3_MAP, 0)) {
+      // OK, it looks like HELLO worked...
+      RedisMapEntry *e = redisxGetKeywordEntry(reply, "proto");
+      if(e && e->value->type == RESP_INT) p->protocol = e->value->n;
+    }
+    else p->hello = FALSE;
+
+    redisxDestroyRESP(reply);
+  }
+
+  if(!p->hello) {
+    status = X_SUCCESS;
+
+    // No HELLO, go the old way...
+    p->protocol = REDISX_RESP2;
+    if(p->password) status = rAuthAsync(cl);
+
+    if(!status) status = redisxSkipReplyAsync(cl);
+    if(!status) status = redisxSendRequestAsync(cl, "CLIENT", "SETNAME", id, NULL);
+  }
 
   free(id);
 
