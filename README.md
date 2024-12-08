@@ -399,7 +399,7 @@ whose contents are:
  | `RESP3_VERBATIM_TEXT`   |   `=`    | text length (incl. type)      | `(char *)`            |
  | `RESP3_SET`             |   `~`    | number of `RESP *` pointers   | `(RESP *)`            |
  | `RESP3_MAP`             |   `%`    | number of key / value pairs   | `(RedisMapEntry *)`   |
- | `RESP3_ATTRIBUTE`       |   `|`    | number of key / value pairs   | `(RedisMapEntry *)`   |
+ | `RESP3_ATTRIBUTE`       |   `\|`   | number of key / value pairs   | `(RedisMapEntry *)`   |
  | `RESP3_PUSH`            |   `>`    | number of `RESP *` pointers   | `(RESP **)`           | 
  
 
