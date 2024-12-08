@@ -3,6 +3,9 @@
  *
  * @date Created  on Dec 6, 2024
  * @author Attila Kovacs
+ *
+ *  A set of utilities for handling RESP responses from a Redis / Valkey server.
+ *
  */
 
 // We'll use gcc major version as a proxy for the glibc library to decide which feature macro to use.
@@ -517,4 +520,194 @@ RedisMapEntry *redisxGetKeywordEntry(const RESP *map, const char *key) {
   return NULL;
 }
 
+static XType resp2xType(enum resp_type type) {
+  switch(type) {
+    case RESP3_NULL:
+      return X_UNKNOWN;
+    case RESP3_BOOLEAN:
+      return X_BOOLEAN;
+    case RESP_INT:
+      return X_LONG;
+    case RESP3_DOUBLE:
+      return X_DOUBLE;
+    case RESP_SIMPLE_STRING:
+    case RESP_BULK_STRING:
+    case RESP_ERROR:
+    case RESP3_BLOB_ERROR:
+    case RESP3_VERBATIM_STRING:
+    case RESP3_BIG_NUMBER:
+      return X_STRING;
+    case RESP_ARRAY:
+    case RESP3_SET:
+    case RESP3_PUSH:
+      return X_FIELD;
+    case RESP3_MAP:
+    case RESP3_ATTRIBUTE:
+      return X_STRUCT;
+  }
+
+  return X_UNKNOWN;
+}
+
+
+static XField *respArrayToXField(const char *name, const RESP **component, int n) {
+  static const char *fn = "respArrayToXField";
+
+  XField *f;
+  enum resp_type type = RESP3_NULL;
+  int i;
+
+  if(n < 0) return NULL;
+
+  for(i = 0; i < n; i++) {
+    if(i == 0) type = component[i]->type;
+    else if(component[i]->type != type) break;
+  }
+
+  if(i < n) {
+    // --------------------------------------------------------
+    // Heterogeneous array...
+
+    XField *array;
+
+    f = xCreate1DFieldArray(name, n);
+
+    if(!f->value) return x_trace_null(fn, "field array");
+
+    array = (XField *) f->value;
+
+    for(i = 0; i < n; i++) {
+      XField *e = resp2XField(array[i].name, component[i]);
+      if(e) {
+        array[i] = *e;
+        free(e);
+      }
+    }
+  }
+
+  else {
+    // --------------------------------------------------------
+    // Homogeneous array...
+
+    XType eType = resp2xType(type);
+    char *array;
+    size_t eSize;
+
+    if(eType == X_UNKNOWN) return NULL;
+
+    eSize = xElementSizeOf(eType);
+    array = (char *) calloc(1, n * eSize);
+
+    f = xCreate1DField(name, eType, n, array);
+    f->flags = type;
+    if(!array) return x_trace_null(fn, "field array");
+
+    for(i = 0; i < n; i++) {
+      XField *e = resp2XField("<element>", component[i]);
+      if(e) {
+        memcpy(&array[i * eSize], e, sizeof(XField));
+        free(e);
+      }
+    }
+  }
+
+  return f;
+}
+
+
+static XField *respMap2XField(const char *name, const RedisMapEntry *map, int n) {
+  XStructure *s = xCreateStruct();
+  XField *f;
+
+  while(--n >= 0) {
+    const RedisMapEntry *e = &map[n];
+    XField *fi = NULL;
+    if(redisxIsStringType(e->key)) {
+      fi = resp2XField((char *) e->key->value, e->value->value);
+      fi->next = s->firstField;
+      s->firstField = fi;
+    }
+    else {
+      xvprintf("WARNING! cannot convert RESP map entry with non-string key");
+      errno = ENOSYS;
+    }
+  }
+
+  f = xCreateScalarField(name, X_STRUCT, s);
+  return f;
+}
+
+/**
+ * Converts a RESP to the xchange representation as an appropriate XField.
+ *
+ * <ul>
+ * <li>RESP3_NULL values are converted to NULL.</li>
+ * <li>Scalar values are converted to an XField with the equivalent type.</li>
+ * <li>Homogenerous arrays are converted to a field with a 1D array of corresponding xchange type.</li>
+ * <li>Heterogeneous arrays are converted to a field with a 1D array of X_FIELD type (containing an array of fields).</li>
+ * <li>Maps with string keywords are converted to an X_STRUCT.</li>
+ * <li>Maps with non-string keywords cannot be converted and will be ignored. However, `errno` is set to ENOSYS
+ * to indicate the failure, and warnings are printed to the standard error, provided redisxSetVerbose() was
+ * used to enable verbose output.</li>
+ * </ul>
+ *
+ * @param name
+ * @param resp
+ * @return
+ */
+XField *resp2XField(const char *name, const RESP *resp) {
+  static const char *fn = "resp2XField";
+
+  errno = 0;
+
+  if(!resp) {
+    x_error(0, EINVAL, fn, "input RESP is NULL");
+    return NULL;
+  }
+
+  switch(resp->type) {
+    case RESP3_NULL:
+      return NULL;
+
+    case RESP3_BOOLEAN:
+      return xCreateBooleanField(name, resp->n);
+
+    case RESP_INT:
+      return xCreateIntField(name, resp->n);
+
+    case RESP3_DOUBLE:
+      return xCreateDoubleField(name, *(double *) resp->value);
+
+    case RESP_SIMPLE_STRING:
+    case RESP_BULK_STRING:
+    case RESP_ERROR:
+    case RESP3_BLOB_ERROR:
+    case RESP3_VERBATIM_STRING:
+    case RESP3_BIG_NUMBER: {
+      XField *f = xCreateStringField(name, (char *) resp->value);
+      f->flags = resp->type;
+      return f;
+    }
+
+    case RESP_ARRAY:
+    case RESP3_SET:
+    case RESP3_PUSH: {
+      XField *f = respArrayToXField(name, (const RESP **) resp->value, resp->n);
+      if(!f) return x_trace_null(fn, NULL);
+      f->flags = resp->type;
+      return f;
+    }
+
+    case RESP3_MAP:
+    case RESP3_ATTRIBUTE: {
+      XField *f = respMap2XField(name, (const RedisMapEntry *) resp->value, resp->n);
+      if(!f) return x_trace_null(fn, NULL);
+      f->flags = resp->type;
+      return f;
+    }
+
+  }
+
+  return NULL;
+}
 

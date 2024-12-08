@@ -921,6 +921,9 @@ RESP *redisxReadReplyAsync(RedisClient *cl) {
       resp->n = 0;
       break;
 
+    case RESP_INT:          // Nothing left to do for INT type response.
+      break;
+
     case RESP3_BOOLEAN: {
       switch(tolower(buf[1])) {
         case 't': resp->n = TRUE; break;
@@ -946,9 +949,9 @@ RESP *redisxReadReplyAsync(RedisClient *cl) {
       break;
     }
 
+    case RESP_ARRAY:
     case RESP3_SET:
-    case RESP3_PUSH:
-    case RESP_ARRAY: {
+    case RESP3_PUSH: {
       RESP **component;
       int i;
 
@@ -999,9 +1002,9 @@ RESP *redisxReadReplyAsync(RedisClient *cl) {
       break;
     }
 
+    case RESP_BULK_STRING:
     case RESP3_BLOB_ERROR:
     case RESP3_VERBATIM_STRING:
-    case RESP_BULK_STRING:
       if(resp->n < 0) break;                          // no string token following!
 
       resp->value = malloc(resp->n + 2);              // <string>\r\n
@@ -1038,9 +1041,6 @@ RESP *redisxReadReplyAsync(RedisClient *cl) {
       resp->n = size-1;
       ((char *)resp->value)[resp->n] = '\0';
 
-      break;
-
-    case RESP_INT:          // Nothing left to do for INT type response.
       break;
 
     default:

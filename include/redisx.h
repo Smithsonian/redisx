@@ -17,22 +17,22 @@
 // Configuration constants ------------------------------------------------------->
 #ifndef REDISX_TCP_PORT
 /// Default TCP/IP port on which Redis server listens to clients.
-#  define REDISX_TCP_PORT                  6379
+#  define REDISX_TCP_PORT                 6379
 #endif
 
 #ifndef REDISX_TCP_BUF_SIZE
 /// (bytes) Default TCP buffer size (send/recv) for Redis clients. Values &lt;= 0 will use system default.
-#  define REDISX_TCP_BUF_SIZE                   0
+#  define REDISX_TCP_BUF_SIZE             0
 #endif
 
 #ifndef REDISX_CMDBUF_SIZE
 /// (bytes) Size of many internal arrays, and the max. send chunk size. At least ~16 bytes...
-#  define REDISX_CMDBUF_SIZE               8192
+#  define REDISX_CMDBUF_SIZE              8192
 #endif
 
 #ifndef REDISX_RCVBUF_SIZE
 /// (bytes) Redis receive buffer size (at most that much is read from the socket in a single call).
-#  define REDISX_RCVBUF_SIZE            8192
+#  define REDISX_RCVBUF_SIZE              8192
 #endif
 
 #ifndef REDISX_SET_LISTENER_PRIORITY
@@ -55,7 +55,7 @@
 #define REDISX_MINOR_VERSION  9
 
 /// Integer sub version of the release
-#define REDISX_PATCHLEVEL     1
+#define REDISX_PATCHLEVEL     2
 
 /// Additional release information in version, e.g. "-1", or "-rc1".
 #define REDISX_RELEASE_STRING "-devel"
@@ -107,9 +107,9 @@ enum resp_type {
   RESP3_SET             = '~',    ///< \hideinitializer RESP3 unordered set of elements
   RESP3_ATTRIBUTE       = '|',    ///< \hideinitializer RESP3 dictionary of attributes (metadata)
   RESP3_PUSH            = '>',    ///< \hideinitializer RESP3 dictionary of attributes (metadata)
-  RESP3_CONTINUED       = ';'     ///< \hideinitializer RESP3 dictionary of attributes (metadata)
 };
 
+#define RESP3_CONTINUED   ';'     ///< \hideinitializer RESP3 dictionary of attributes (metadata)
 
 #define REDIS_INVALID_CHANNEL       (-101)  ///< \hideinitializer There is no such channel in the Redis instance.
 #define REDIS_NULL                  (-102)  ///< \hideinitializer Redis returned NULL
@@ -158,7 +158,7 @@ enum redisx_protocol {
  * \sa redisxIsMapType()
  */
 typedef struct RESP {
-  enum resp_type type;          ///< RESP type RESP_ARRAY, RESP_INT ...
+  enum resp_type type;          ///< RESP type; RESP_ARRAY, RESP_INT ...
   int n;                        ///< Either the integer value of a RESP_INT or a RESP3_BOOLEAN response, or the
                                 ///< dimension of the value field.
   void *value;                  ///< Pointer to text (char *) content or to an array of components
@@ -395,6 +395,7 @@ boolean redisxIsMapType(const RESP *r);
 boolean redisxHasComponents(const RESP *r);
 boolean redisxIsEqualRESP(const RESP *a, const RESP *b);
 int redisxSplitText(RESP *resp, char **text);
+XField *resp2XField(const char *name, const RESP *resp);
 
 RedisMapEntry *redisxGetMapEntry(const RESP *map, const RESP *key);
 RedisMapEntry *redisxGetKeywordEntry(const RESP *map, const char *key);
