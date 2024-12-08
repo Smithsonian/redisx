@@ -127,9 +127,9 @@ static void rConfigSocket(int socket, boolean lowLatency) {
 #endif
 
 #if !(__Lynx__ && __powerpc__)
-    // Send packets immediately even if small...
-    if(lowLatency) if(setsockopt(socket, IPPROTO_TCP, TCP_NODELAY, & enable, sizeof(int)))
-      xvprintf("WARNING! Redis-X: socket tcpnodelay not enabled: %s", strerror(errno));
+  // Send packets immediately even if small...
+  if(lowLatency) if(setsockopt(socket, IPPROTO_TCP, TCP_NODELAY, & enable, sizeof(int)))
+    xvprintf("WARNING! Redis-X: socket tcpnodelay not enabled: %s", strerror(errno));
 #endif
 
   // Check connection to remote every once in a while to detect if it's down...
@@ -502,6 +502,48 @@ boolean rIsLowLatency(const ClientPrivate *cp) {
   return cp->idx != REDISX_PIPELINE_CHANNEL;
 }
 
+static int rHelloAsync(RedisClient *cl, char *clientID) {
+  ClientPrivate *cp = (ClientPrivate *) cl->priv;
+  RedisPrivate *p = (RedisPrivate *) cp->redis->priv;
+  RESP *reply;
+  char proto[20];
+  char *args[6];
+  int status, k = 0;
+
+  args[k++] = "HELLO";
+
+  // Try HELLO and see what we get back...
+  sprintf(proto, "%d", (int) p->protocol);
+  args[k++] = proto;
+
+  if(p->password) {
+    args[k++] = "AUTH";
+    args[k++] = p->username ? p->username : "default";
+    args[k++] = p->password;
+  }
+
+  args[k++] = "SETNAME";
+  args[k++] = clientID;
+
+  status = redisxSendArrayRequestAsync(cl, args, NULL, k);
+  if(status != X_SUCCESS) return status;
+
+  reply = redisxReadReplyAsync(cl);
+  status = redisxCheckRESP(reply, RESP3_MAP, 0);
+  if(status == X_SUCCESS) {
+    RedisMapEntry *e = redisxGetKeywordEntry(reply, "proto");
+    if(e && e->value->type == RESP_INT) {
+      p->protocol = e->value->n;
+      xvprintf("Confirmed protocol %d\n", p->protocol);
+    }
+  }
+  else xvprintf("! Redis-X: HELLO failed: %s\n", redisxErrorDescription(status));
+  redisxDestroyRESP(reply);
+
+  return status;
+}
+
+
 /**
  * Connects the specified Redis client to the Redis server.
  *
@@ -570,47 +612,11 @@ int rConnectClient(Redis *redis, enum redisx_channel channel) {
   cp->socket = sock;
   cp->isEnabled = TRUE;
 
-  if(p->hello) {
-    char proto[20];
-    char *args[6];
-    int k = 0;
+  if(p->hello) status = rHelloAsync(cl, id);
 
-    args[k++] = "HELLO";
-
-    // Try HELLO and see what we get back...
-    sprintf(proto, "%d", (int) p->protocol);
-    args[k++] = proto;
-
-    if(p->password) {
-      args[k++] = "AUTH";
-      args[k++] = p->username ? p->username : "default";
-      args[k++] = p->password;
-    }
-
-    args[k++] = "SETNAME";
-    args[k++] = id;
-
-    p->hello = FALSE;
-
-    status = redisxSendArrayRequestAsync(cl, args, NULL, k);
-    if(status == X_SUCCESS) {
-      RESP *reply = redisxReadReplyAsync(cl);
-      status = redisxCheckRESP(reply, RESP3_MAP, 0);
-      if(status == X_SUCCESS) {
-        RedisMapEntry *e = redisxGetKeywordEntry(reply, "proto");
-        if(e && e->value->type == RESP_INT) {
-          p->protocol = e->value->n;
-          xvprintf("Confirmed protocol %d\n", p->protocol);
-        }
-        p->hello = TRUE;
-      }
-      else xvprintf("! Redis-X: HELLO failed: %s\n", redisxErrorDescription(status));
-      redisxDestroyRESP(reply);
-    }
-  }
-
-  if(!p->hello) {
+  if(status != X_SUCCESS) {
     status = X_SUCCESS;
+    p->hello = FALSE;
 
     // No HELLO, go the old way...
     p->protocol = REDISX_RESP2;
