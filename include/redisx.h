@@ -384,8 +384,8 @@ int redisxLoadScript(Redis *redis, const char *script, char **sha1);
 int redisxGetTime(Redis *redis, struct timespec *t);
 
 RESP *redisxCopyOfRESP(const RESP *resp);
-int redisxCheckRESP(const RESP *resp, char expectedType, int expectedSize);
-int redisxCheckDestroyRESP(RESP *resp, char expectedType, int expectedSize);
+int redisxCheckRESP(const RESP *resp, enum resp_type expectedType, int expectedSize);
+int redisxCheckDestroyRESP(RESP *resp, enum resp_type, int expectedSize);
 void redisxDestroyRESP(RESP *resp);
 boolean redisxIsScalarType(const RESP *r);
 boolean redisxIsStringType(const RESP *r);

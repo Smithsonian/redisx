@@ -147,7 +147,7 @@ RESP *redisxCopyOfRESP(const RESP *resp) {
  *              or the error returned in resp->n.
  *
  */
-int redisxCheckRESP(const RESP *resp, char expectedType, int expectedSize) {
+int redisxCheckRESP(const RESP *resp, enum resp_type expectedType, int expectedSize) {
   static const char *fn = "redisxCheckRESP";
 
   if(resp == NULL) return x_error(X_NULL, EINVAL, fn, "RESP is NULL");
@@ -174,7 +174,7 @@ int redisxCheckRESP(const RESP *resp, char expectedType, int expectedSize) {
  * \sa redisxCheckRESP()
  *
  */
-int redisxCheckDestroyRESP(RESP *resp, char expectedType, int expectedSize) {
+int redisxCheckDestroyRESP(RESP *resp, enum resp_type expectedType, int expectedSize) {
   int status = redisxCheckRESP(resp, expectedType, expectedSize);
   if(status) redisxDestroyRESP(resp);
   prop_error("redisxCheckDestroyRESP", status);
