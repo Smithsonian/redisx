@@ -33,7 +33,7 @@ int main() {
 
   resp = redisxGetHelloData(redis);
   json = resp2json("server_properties", resp);
-  printf("%s\n", json ? json : "<null>");
+  printf("%s", json ? json : "<null>");
   redisxDestroyRESP(resp);
 
   if(redisxGetProtocol(redis) != REDISX_RESP3) {

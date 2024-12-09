@@ -579,7 +579,7 @@ static XField *respArrayToXField(const char *name, const RESP **component, int n
 
     XField *array;
 
-    f = xCreateHeterogeneous1DField(name, n);
+    f = xCreateMixed1DField(name, n);
 
     if(!f->value) return x_trace_null(fn, "field array");
 
@@ -602,7 +602,7 @@ static XField *respArrayToXField(const char *name, const RESP **component, int n
     char *array;
     size_t eSize;
 
-    if(eType == X_UNKNOWN) return xCreateHeterogeneous1DField(name, 0);
+    if(eType == X_UNKNOWN) return xCreateMixed1DField(name, 0);
 
     eSize = xElementSizeOf(eType);
     array = (char *) calloc(1, n * eSize);
