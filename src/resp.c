@@ -625,10 +625,12 @@ static XField *respArrayToXField(const char *name, const RESP **component, int n
 
 
 static XField *respMap2XField(const char *name, const RedisMapEntry *map, int n) {
-  XStructure *s = xCreateStruct();
+  XStructure *s = xCreateStruct(), *nonstring = NULL;
+  int nNonString = 0;
 
   while(--n >= 0) {
     const RedisMapEntry *e = &map[n];
+
     if(redisxIsStringType(e->key)) {
       XField *fi = redisxRESP2XField((char *) e->key->value, e->value);
       if(fi) {
@@ -637,10 +639,20 @@ static XField *respMap2XField(const char *name, const RedisMapEntry *map, int n)
       }
     }
     else {
-      xvprintf("WARNING! cannot convert RESP map entry with non-string key");
-      errno = ENOSYS;
+      // Non string keyed entries will be added under a '.non-string-keys' sub-structure
+      // as indexed fields.
+      char idx[20];
+      XStructure *sub = xCreateStruct();
+      xSetField(sub, redisxRESP2XField("value", e->value));
+      xSetField(sub, redisxRESP2XField("key", e->key));
+      sprintf(idx, ".%d", ++nNonString);
+      if(!nonstring)
+        nonstring = xCreateStruct();
+      xSetSubstruct(nonstring, xStringCopyOf(idx), sub);
     }
   }
+
+  if(nonstring) xSetSubstruct(s, ".non-string-keys", nonstring);
 
   return xCreateScalarField(name, X_STRUCT, s);
 }
@@ -656,9 +668,8 @@ static XField *respMap2XField(const char *name, const RedisMapEntry *map, int n)
  * <li>Homogenerous arrays are converted to a field with a 1D array of corresponding xchange type.</li>
  * <li>Heterogeneous arrays are converted to a field with a 1D array of X_FIELD type (containing an array of fields).</li>
  * <li>Maps with string keywords are converted to an X_STRUCT.</li>
- * <li>Maps with non-string keywords cannot be converted and will be ignored. However, `errno` is set to ENOSYS
- * to indicate the failure, and warnings are printed to the standard error, provided redisxSetVerbose() was
- * used to enable verbose output.</li>
+ * <li>Maps with non-string keywords are added under a sub-structure named '.non-string-keys' as indexed structures
+ * with separate 'key' and 'value' fields.
  * </ul>
  *
  * @param name    The name to assign to the field

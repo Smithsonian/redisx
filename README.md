@@ -503,18 +503,17 @@ Before destroying a RESP structure, the caller may want to dereference values wi
     stringValue = (char *) r->value;
     r->value = NULL;
      
-    redisxDestroyRESP(r);     // The 'stringValue' is still a valid pointer after! 
+    redisxDestroyRESP(r);     // 'stringValue' is still a valid pointer after! 
   }
 ```
 
-Note, that you can convert a RESP to an `XField`, and/or to JSON representation using the `redisxRESP2XField()` and
-`redisxRESP2JSON()` functions, e.g.:
-
+Note, that you can usually convert a RESP to an `XField`, and/or to JSON representation using the 
+`redisxRESP2XField()` and `redisxRESP2JSON()` functions, e.g.:
 
 ```c
  Redis redis = ...
  
- // Obtain a copy of the response received from HELLO upcon connecting...
+ // Obtain a copy of the response received from HELLO upon connecting...
  RESP *resp = redisxGetHelloData(redis);
  
  // Print the response from HELLO to the standard output in JSON format
@@ -523,6 +522,10 @@ Note, that you can convert a RESP to an `XField`, and/or to JSON representation 
  // Destroy our copy of the RESP
  redisxDestroyRESP(resp);
 ```c
+
+All RESP can be represented in JSON format. This is trivial for map entries, which have strings as their keywords -- 
+which is the case for all RESP sent by Redis. And, it is also possible for map entries with non-string keys, albeit 
+via a more tedious (and less standard) JSON representation, stored under the `.non-string-keys` keyword.
 
 
 -----------------------------------------------------------------------------
