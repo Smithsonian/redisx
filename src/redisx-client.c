@@ -21,11 +21,6 @@
 
 #include "redisx-priv.h"
 
-#ifndef REDIS_TIMEOUT_SECONDS
-/// (seconds) Abort with an error if cannot send before this timeout (<=0 for not timeout)
-#endif
-#  define REDIS_TIMEOUT_SECONDS           3
-
 #ifndef REDIS_SIMPLE_STRING_SIZE
 /// (bytes) Only store up to this many characters from Redis confirms and errors.
 #  define REDIS_SIMPLE_STRING_SIZE      256
@@ -44,6 +39,24 @@
 #define trprintf if(debugTraffic) printf  ///< Use for debugging Redis bound traffic
 
 int debugTraffic = FALSE;    ///< Whether to print excerpts of all traffic to/from the Redis server.
+
+/// \endcond
+
+/// \cond PROTECTED
+
+/**
+ * Checks that a redis instance is valid.
+ *
+ * @param cl      The Redis client instance
+ * @return        X_SUCCESS (0) if the client is valid, or X_NULL if the argument is NULL,
+ *                or else X_NO_INIT if the redis instance is not initialized.
+ */
+int rCheckClient(const RedisClient *cl) {
+  static const char *fn = "rCheckRedis";
+  if(!cl) return x_error(X_NULL, EINVAL, fn, "Redis client is NULL");
+  if(!cl->priv) return x_error(X_NO_INIT, EAGAIN, fn, "Redis client is not initialized");
+  return X_SUCCESS;
+}
 
 /// \endcond
 
@@ -282,10 +295,7 @@ static int rSendBytesAsync(ClientPrivate *cp, const char *buf, int length, boole
 RedisClient *redisxGetClient(Redis *redis, enum redisx_channel channel) {
   RedisPrivate *p;
 
-  if(redis == NULL) {
-    x_error(0, EINVAL, "redisxGetClient", "redis is NULL");
-    return NULL;
-  }
+  if(redisxCheckValid(redis) != X_SUCCESS) return x_trace_null("redisxGetClient", NULL);
 
   p = (RedisPrivate *) redis->priv;
   if(channel < 0 || channel >= REDISX_CHANNELS) return NULL;
@@ -308,12 +318,8 @@ RedisClient *redisxGetClient(Redis *redis, enum redisx_channel channel) {
  * @sa redisxLockConnected()
  */
 RedisClient *redisxGetLockedConnectedClient(Redis *redis, enum redisx_channel channel) {
-  static const char *fn = "redisxGetLockedConnectedClient";
-
   RedisClient *cl = redisxGetClient(redis, channel);
-  if(!cl) return x_trace_null(fn, NULL);
-
-  if(redisxLockConnected(cl) != X_SUCCESS) return x_trace_null(fn, NULL);
+  if(redisxLockConnected(cl) != X_SUCCESS) return x_trace_null("redisxGetLockedConnectedClient", NULL);
   return cl;
 }
 
@@ -335,7 +341,8 @@ int redisxLockClient(RedisClient *cl) {
   ClientPrivate *cp;
   int status;
 
-  if(cl == NULL) return x_error(X_NULL, EINVAL, fn, "client is NULL");
+  prop_error(fn, rCheckClient(cl));
+
   cp = (ClientPrivate *) cl->priv;
   if(cp == NULL) return x_error(X_NO_INIT, EINVAL, fn, "client is not initialized");
 
@@ -394,7 +401,8 @@ int redisxUnlockClient(RedisClient *cl) {
   ClientPrivate *cp;
   int status;
 
-  if(cl == NULL) return x_error(X_NULL, EINVAL, fn, "client is NULL");
+  prop_error(fn, rCheckClient(cl));
+
   cp = (ClientPrivate *) cl->priv;
   if(cp == NULL) return x_error(X_NO_INIT, EINVAL, fn, "client is not initialized");
 
@@ -421,7 +429,8 @@ int redisxSkipReplyAsync(RedisClient *cl) {
   static const char *fn = "redisSkipReplyAsync";
   static const char cmd[] = "*3\r\n$6\r\nCLIENT\r\n$5\r\nREPLY\r\n$4\r\nSKIP\r\n";
 
-  if(cl == NULL) return x_error(X_NULL, EINVAL, fn, "client is NULL");
+  prop_error(fn, rCheckClient(cl));
+
   if(cl->priv == NULL) return x_error(X_NO_INIT, EINVAL, fn, "client is not initialized");
 
   prop_error(fn, rSendBytesAsync((ClientPrivate *) cl->priv, cmd, sizeof(cmd) - 1, TRUE));
@@ -454,7 +463,8 @@ int redisxStartBlockAsync(RedisClient *cl) {
   static const char *fn = "redisxStartBlockAsync";
   static const char cmd[] = "*1\r\n$5\r\nMULTI\r\n";
 
-  if(cl == NULL) return x_error(X_NULL, EINVAL, fn, "client is NULL");
+  prop_error(fn, rCheckClient(cl));
+
   if(cl->priv == NULL) return x_error(X_NO_INIT, EINVAL, fn, "client is not initialized");
 
   prop_error(fn, rSendBytesAsync((ClientPrivate *) cl->priv, cmd, sizeof(cmd) - 1, TRUE));
@@ -478,7 +488,8 @@ int redisxAbortBlockAsync(RedisClient *cl) {
   static const char *fn = "redisxAbortBlockAsync";
   static const char cmd[] = "*1\r\n$7\r\nDISCARD\r\n";
 
-  if(cl == NULL) return x_error(X_NULL, EINVAL, fn, "client is NULL");
+  prop_error(fn, rCheckClient(cl));
+
   if(cl->priv == NULL) return x_error(X_NO_INIT, EINVAL, fn, "client is not initialized");
 
   prop_error(fn, rSendBytesAsync((ClientPrivate *) cl->priv, cmd, sizeof(cmd) - 1, TRUE));
@@ -507,10 +518,7 @@ RESP *redisxExecBlockAsync(RedisClient *cl) {
 
   int status;
 
-  if(cl == NULL) {
-    x_error(0, EINVAL, fn, "client is NULL");
-    return NULL;
-  }
+  if(rCheckClient(cl) != X_SUCCESS) return x_trace_null(fn, NULL);
 
   if(cl->priv == NULL) {
     x_error(0, EINVAL, fn, "client is not initialized");
@@ -558,7 +566,8 @@ int redisxSendRequestAsync(RedisClient *cl, const char *command, const char *arg
   const char *args[] = { command, arg1, arg2, arg3 };
   int n;
 
-  if(cl == NULL) return x_error(X_NULL, EINVAL, fn, "client is NULL");
+  prop_error(fn, rCheckClient(cl));
+
   if(command == NULL) return x_error(X_NAME_INVALID, EINVAL, fn, "command is NULL");
 
   // Count the non-null arguments...
@@ -592,7 +601,7 @@ int redisxSendArrayRequestAsync(RedisClient *cl, char *args[], int lengths[], in
   int i, L;
   ClientPrivate *cp;
 
-  if(cl == NULL) return x_error(X_NULL, EINVAL, fn, "client is NULL");
+  prop_error(fn, rCheckClient(cl));
 
   cp = (ClientPrivate *) cl->priv;
   if(cp == NULL) return x_error(X_NO_INIT, EINVAL, fn, "client is not initialized");
@@ -672,7 +681,7 @@ int redisxIgnoreReplyAsync(RedisClient *cl) {
   static const char *fn = "redisxIgnoreReplyAsync";
   RESP *resp;
 
-  if(cl == NULL) return x_error(X_NULL, EINVAL, fn, "client is NULL");
+  prop_error(fn, rCheckClient(cl));
 
   resp = redisxReadReplyAsync(cl);
   if(resp == NULL) return x_trace(fn, NULL, REDIS_NULL);
@@ -698,49 +707,12 @@ static int rTypeIsParametrized(char type) {
   }
 }
 
-/**
- * Sets a user-defined function to process push messages for a specific Redis client. The function's
- * implementation must follow a simple set of rules:
- *
- * <ul>
- * <li>the implementation should not destroy the RESP data. The RESP will be destroyed automatically
- * after the call returns. However, the call may retain any data from the RESP itself, provided
- * the data is de-referenced from the RESP before return.<li>
- * <li>The call will have exclusive access to the client. As such it should not try to obtain a
- * lock or release the lock itself.</li>
- * <li>The implementation should not block (aside from maybe a quick mutex unlock) and return quickly,
- * so as to not block the client for long periods</li>
- * <li>If extensive processing or blocking calls are required to process the message, it is best to
- * simply place a copy of the RESP on a queue and then return quickly, and then process the message
- * asynchronously in a background thread.</li>
- * </ul>
- *
- * @param cl      Redis client instance
- * @param func    Function to use for processing push messages from the client, or NULL to ignore
- *                push messages.
- * @param arg     (optional) User-defined pointer argument to pass along to the processing function.
- * @return        X_SUCCESS (0) if successful, or else X_NULL (errno set to EINVAL) if the client
- *                argument is NULL.
- */
-int redisxSetPushProcessor(RedisClient *cl, RedisPushProcessor func, void *arg) {
-  static const char *fn = "redisxSetPushProcessor";
 
-  ClientPrivate *cp;
-
-  if(!cl) return x_error(X_NULL, EINVAL, fn, "input client is NULL");
-
-  prop_error(fn, redisxLockClient(cl));
-  cp = cl->priv;
-  cp->pushConsumer = func;
-  cp->pushArg = arg;
-  redisxUnlockClient(cl);
-
-  return X_SUCCESS;
-}
 
 static void rPushMessageAsync(RedisClient *cl, RESP *resp) {
   int i;
   ClientPrivate *cp = (ClientPrivate *) cl->priv;
+  RedisPrivate *p = (RedisPrivate *) cp->redis->priv;
   RESP **array;
 
   if(resp->n < 0) return;
@@ -756,7 +728,7 @@ static void rPushMessageAsync(RedisClient *cl, RESP *resp) {
 
   resp->value = array;
 
-  if(cp->pushConsumer) cp->pushConsumer(resp, cp->pushArg);
+  if(p->pushConsumer) p->pushConsumer(cl, resp, p->pushArg);
 
   redisxDestroyRESP(resp);
 }
@@ -819,7 +791,7 @@ static void rSetAttributeAsync(ClientPrivate *cp, RESP *resp) {
  *
  */
 int redisxClearAttributesAsync(RedisClient *cl) {
-  if(!cl) return x_error(X_NULL, EINVAL, "redisxClearAttributes", "client is NULL");
+  prop_error("redisxClearAttributesAsync", rCheckClient(cl));
 
   rSetAttributeAsync((ClientPrivate *) cl->priv, NULL);
   return X_SUCCESS;
@@ -843,10 +815,7 @@ RESP *redisxReadReplyAsync(RedisClient *cl) {
   int size = 0;
   int status = X_SUCCESS;
 
-  if(cl == NULL) {
-    x_error(0, EINVAL, fn, "client is NULL");
-    return NULL;
-  }
+  if(rCheckClient(cl) != X_SUCCESS) return x_trace_null(fn, NULL);
 
   cp = cl->priv;
 
@@ -1080,8 +1049,6 @@ int redisxResetClient(RedisClient *cl) {
   static const char *fn = "redisxResetClient";
 
   int status;
-
-  if(cl == NULL) return x_error(X_NULL, EINVAL, fn, "client is NULL");
 
   prop_error(fn, redisxLockConnected(cl));
 

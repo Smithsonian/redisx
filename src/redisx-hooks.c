@@ -37,7 +37,8 @@ int redisxAddConnectHook(Redis *redis, void (*setupCall)(Redis *)) {
   static const char *fn = "redisxAddConnectHook";
   RedisPrivate *p;
 
-  if(redis == NULL) return x_error(X_NULL, EINVAL, fn, "redis is NULL");
+  prop_error(fn, redisxCheckValid(redis));
+
   if(setupCall == NULL) return x_error(X_NULL, EINVAL, fn, "setupCall is NULL");
 
   xvprintf("Redis-X> Adding a connect callback.\n");
@@ -76,7 +77,8 @@ int redisxRemoveConnectHook(Redis *redis, void (*setupCall)(Redis *)) {
   RedisPrivate *p;
   Hook *c, *last = NULL;
 
-  if(redis == NULL) x_error(X_NULL, EINVAL, fn, "redis is NULL");
+  prop_error(fn, redisxCheckValid(redis));
+
   if(setupCall == NULL) x_error(X_NULL, EINVAL, fn, "setupCall is NULL");
 
   xvprintf("Redis-X> Removing a connect callback.\n");
@@ -112,7 +114,7 @@ void redisxClearConnectHooks(Redis *redis) {
   RedisPrivate *p;
   Hook *c;
 
-  if(redis == NULL) return;
+  if(redisxCheckValid(redis) != X_SUCCESS) return;
 
   xvprintf("Redis-X> Clearing all connect callbacks.\n");
 
@@ -147,7 +149,8 @@ int redisxAddDisconnectHook(Redis *redis, void (*cleanupCall)(Redis *)) {
 
   RedisPrivate *p;
 
-  if(redis == NULL) return x_error(X_NULL, EINVAL, fn, "redis is NULL");
+  prop_error(fn, redisxCheckValid(redis));
+
   if(cleanupCall == NULL) return x_error(X_NULL, EINVAL, fn, "cleanupCall is NULL");
 
   xvprintf("Redis-X> Adding a disconnect callback.\n");
@@ -186,7 +189,8 @@ int redisxRemoveDisconnectHook(Redis *redis, void (*cleanupCall)(Redis *)) {
   RedisPrivate *p;
   Hook *c, *last = NULL;
 
-  if(redis == NULL) return x_error(X_NULL, EINVAL, fn, "redis is NULL");
+  prop_error(fn, redisxCheckValid(redis));
+
   if(cleanupCall == NULL) return x_error(X_NULL, EINVAL, fn, "cleanupCall is NULL");
 
   xvprintf("Redis-X> Removing a disconnect callback.\n");
@@ -222,7 +226,7 @@ void redisxClearDisconnectHooks(Redis *redis) {
   RedisPrivate *p;
   Hook *c;
 
-  if(redis == NULL) return;
+  if(redisxCheckValid(redis) != X_SUCCESS) return;
 
   xvprintf("Redis-X> Clearing all disconnect callbacks.\n");
 

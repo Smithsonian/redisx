@@ -25,7 +25,10 @@
 #include <errno.h>
 #include <math.h>
 
+
 #include "redisx-priv.h"
+#include <xjson.h>
+
 
 /**
  * Frees up the resources used by a RESP structure that was dynamically allocated.
@@ -75,8 +78,11 @@ RESP *redisxCopyOfRESP(const RESP *resp) {
   if(!resp) return NULL;
 
   copy = (RESP *) calloc(1, sizeof(RESP));
+  x_check_alloc(copy);
+
   copy->type = resp->type;
   copy->n = resp->n;
+
   if(resp->value == NULL) return copy;
 
   switch(resp->type) {
@@ -87,7 +93,7 @@ RESP *redisxCopyOfRESP(const RESP *resp) {
       RESP **to = (RESP **) calloc(resp->n, sizeof(RESP *));
       int i;
 
-      x_check_alloc(copy->value);
+      x_check_alloc(to);
 
       for(i = 0; i < resp->n; i++) to[i] = redisxCopyOfRESP(from[i]);
       copy->value = to;
@@ -96,15 +102,15 @@ RESP *redisxCopyOfRESP(const RESP *resp) {
 
     case RESP3_MAP:
     case RESP3_ATTRIBUTE: {
-      RedisMapEntry **from = (RedisMapEntry **) resp->value;
-      RedisMapEntry **to = (RedisMapEntry **) calloc(resp->n, sizeof(RedisMapEntry *));
+      const RedisMapEntry *from = (RedisMapEntry *) resp->value;
+      RedisMapEntry *to = (RedisMapEntry *) calloc(resp->n, sizeof(RedisMapEntry));
       int i;
 
-      x_check_alloc(copy->value);
+      x_check_alloc(to);
 
       for(i = 0; i < resp->n; i++) {
-        to[i]->key = redisxCopyOfRESP(from[i]->key);
-        to[i]->value = redisxCopyOfRESP(from[i]->value);
+        to[i].key = redisxCopyOfRESP(from[i].key);
+        to[i].value = redisxCopyOfRESP(from[i].value);
       }
       copy->value = to;
       break;
@@ -115,11 +121,14 @@ RESP *redisxCopyOfRESP(const RESP *resp) {
     case RESP_BULK_STRING:
     case RESP3_BLOB_ERROR:
     case RESP3_VERBATIM_STRING:
-    case RESP3_BIG_NUMBER:
-      copy->value = (char *) malloc(resp->n);
-      x_check_alloc(copy->value);
-      memcpy(copy->value, resp->value, resp->n);
+    case RESP3_BIG_NUMBER: {
+      char *str = (char *) malloc(resp->n + 1);
+      x_check_alloc(str);
+      memcpy(str, resp->value, resp->n);
+      str[resp->n] = '\0';
+      copy->value = str;
       break;
+    }
 
     case RESP3_DOUBLE:
       copy->value = (double *) malloc(sizeof(double));
@@ -570,7 +579,7 @@ static XField *respArrayToXField(const char *name, const RESP **component, int n
 
     XField *array;
 
-    f = xCreate1DFieldArray(name, n);
+    f = xCreateHeterogeneous1DField(name, n);
 
     if(!f->value) return x_trace_null(fn, "field array");
 
@@ -593,7 +602,7 @@ static XField *respArrayToXField(const char *name, const RESP **component, int n
     char *array;
     size_t eSize;
 
-    if(eType == X_UNKNOWN) return NULL;
+    if(eType == X_UNKNOWN) return xCreateHeterogeneous1DField(name, 0);
 
     eSize = xElementSizeOf(eType);
     array = (char *) calloc(1, n * eSize);
@@ -617,15 +626,15 @@ static XField *respArrayToXField(const char *name, const RESP **component, int n
 
 static XField *respMap2XField(const char *name, const RedisMapEntry *map, int n) {
   XStructure *s = xCreateStruct();
-  XField *f;
 
   while(--n >= 0) {
     const RedisMapEntry *e = &map[n];
-    XField *fi = NULL;
     if(redisxIsStringType(e->key)) {
-      fi = resp2XField((char *) e->key->value, e->value->value);
-      fi->next = s->firstField;
-      s->firstField = fi;
+      XField *fi = resp2XField((char *) e->key->value, e->value);
+      if(fi) {
+        fi->next = s->firstField;
+        s->firstField = fi;
+      }
     }
     else {
       xvprintf("WARNING! cannot convert RESP map entry with non-string key");
@@ -633,9 +642,10 @@ static XField *respMap2XField(const char *name, const RedisMapEntry *map, int n)
     }
   }
 
-  f = xCreateScalarField(name, X_STRUCT, s);
-  return f;
+  return xCreateScalarField(name, X_STRUCT, s);
 }
+
+
 
 /**
  * Converts a RESP to the xchange representation as an appropriate XField.
@@ -651,23 +661,21 @@ static XField *respMap2XField(const char *name, const RedisMapEntry *map, int n)
  * used to enable verbose output.</li>
  * </ul>
  *
- * @param name
- * @param resp
- * @return
+ * @param name    The name to assign to the field
+ * @param resp    The RESP data to convert
+ * @return        An XField with the data from the RESP, or NULL if there was an error (errno will be
+ *                set to indicate the type of error).
+ *
+ * @sa resp2json()
  */
 XField *resp2XField(const char *name, const RESP *resp) {
   static const char *fn = "resp2XField";
 
   errno = 0;
 
-  if(!resp) {
-    x_error(0, EINVAL, fn, "input RESP is NULL");
-    return NULL;
-  }
-
   switch(resp->type) {
     case RESP3_NULL:
-      return NULL;
+      return xCreateStringField(name, NULL);
 
     case RESP3_BOOLEAN:
       return xCreateBooleanField(name, resp->n);
@@ -684,7 +692,7 @@ XField *resp2XField(const char *name, const RESP *resp) {
     case RESP3_BLOB_ERROR:
     case RESP3_VERBATIM_STRING:
     case RESP3_BIG_NUMBER: {
-      XField *f = xCreateStringField(name, (char *) resp->value);
+      XField *f = xCreateStringField(name, xStringCopyOf((char *) resp->value));
       f->flags = resp->type;
       return f;
     }
@@ -710,4 +718,19 @@ XField *resp2XField(const char *name, const RESP *resp) {
 
   return NULL;
 }
+
+/**
+ * Converts a RESP to the xchange representation as an appropriate XField.
+ *
+ * @param name    The name to assign to the field
+ * @param resp    The RESP data to convert
+ * @return        An XField with the data from the RESP, or NULL if there was an error (errno will be
+ *                set to indicate the type of error).
+ *
+ * @sa resp2XField()
+ */
+char *resp2json(const char *name, const RESP *resp) {
+  return xjsonFieldToString(resp2XField(name, resp));
+}
+
 

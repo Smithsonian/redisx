@@ -46,13 +46,13 @@ RedisEntry *redisxGetTable(Redis *redis, const char *table, int *n) {
   RedisEntry *entries = NULL;
   RESP *reply;
 
-  if(n == NULL) {
-    x_error(0, EINVAL, fn, "parameter 'n' is NULL");
-    return NULL;
+  if(redisxCheckValid(redis) != X_SUCCESS) {
+    if(n) *n = redisxCheckValid(redis);
+    return x_trace_null(fn, NULL);
   }
 
-  if(redis == NULL) {
-    *n = x_error(X_NULL, EINVAL, fn, "redis is NULL");
+  if(n == NULL) {
+    x_error(0, EINVAL, fn, "parameter 'n' is NULL");
     return NULL;
   }
 
@@ -136,9 +136,9 @@ int redisxSetValue(Redis *redis, const char *table, const char *key, const char 
 
   int status = X_SUCCESS;
 
-  if(redis == NULL) return x_error(X_NULL, EINVAL, fn, "redis is NULL");
-
+  prop_error(fn, redisxCheckValid(redis));
   prop_error(fn, redisxLockConnected(redis->interactive));
+
   status = redisxSetValueAsync(redis->interactive, table, key, value, confirm);
   redisxUnlockClient(redis->interactive);
 
@@ -215,12 +215,11 @@ RESP *redisxGetValue(Redis *redis, const char *table, const char *key, int *stat
   static const char *fn = "redisxGetValue";
 
   RESP *reply;
-  int s;
+  int s = X_SUCCESS;
 
-  if(redis == NULL) {
-    x_error(X_NULL, EINVAL, fn, "redis is NULL");
+  if(redisxCheckValid(redis) != X_SUCCESS) {
     if(status) *status = X_NULL;
-    return NULL;
+    return x_trace_null(fn, NULL);
   }
 
   if(table && !table[0]) {
@@ -277,10 +276,9 @@ char *redisxGetStringValue(Redis *redis, const char *table, const char *key, int
   char *str = NULL;
   int status;
 
-  if(redis == NULL) {
-    x_error(0, EINVAL, fn, "redis is NULL");
+  if(redisxCheckValid(redis) != X_SUCCESS) {
     if(len) *len = X_NULL;
-    return NULL;
+    return x_trace_null(fn, NULL);
   }
 
   reply = redisxGetValue(redis, table, key, len);
@@ -379,7 +377,8 @@ int redisxMultiSet(Redis *redis, const char *table, const RedisEntry *entries, i
   static const char *fn = "redisxMultiSet";
   int status;
 
-  if(redis == NULL) return x_error(X_NULL, EINVAL, fn, "redis is NULL");
+  prop_error(fn, redisxCheckValid(redis));
+
   if(table == NULL) return x_error(X_GROUP_INVALID, EINVAL, fn, "table parameter is NULL");
   if(!table[0]) return x_error(X_GROUP_INVALID, EINVAL, fn, "table parameter is empty");
   if(entries == NULL) return x_error(X_NULL, EINVAL, fn, "'entries' parameter is NULL");
@@ -422,13 +421,13 @@ char **redisxGetKeys(Redis *redis, const char *table, int *n) {
   RESP *reply;
   char **names = NULL;
 
-  if(n == NULL) {
-    x_error(X_NULL, EINVAL, fn, "parameter 'n' is NULL");
-    return NULL;
+  if(redisxCheckValid(redis) != X_SUCCESS) {
+    if(n) *n = redisxCheckValid(redis);
+    return x_trace_null(fn, NULL);
   }
 
-  if(redis == NULL) {
-    *n = x_error(X_NULL, EINVAL, fn, "redis is NULL");
+  if(n == NULL) {
+    x_error(X_NULL, EINVAL, fn, "parameter 'n' is NULL");
     return NULL;
   }
 
@@ -488,7 +487,7 @@ char **redisxGetKeys(Redis *redis, const char *table, int *n) {
 int redisxSetScanCount(Redis *redis, int count) {
   RedisPrivate *p;
 
-  if(redis == NULL) return x_error(X_NULL, EINVAL, "redisxSetScanCount", "redis is NULL");
+  prop_error("redisxSetScanCount", redisxCheckValid(redis));
 
   p = (RedisPrivate *) redis->priv;
   rConfigLock(redis);
@@ -511,7 +510,7 @@ int redisxSetScanCount(Redis *redis, int count) {
 int redisxGetScanCount(Redis *redis) {
   const RedisPrivate *p;
 
-  if(redis == NULL) return x_error(-1, EINVAL, "redisxSetScanCount", "redis is NULL");
+  prop_error("redisxGetScanCount", redisxCheckValid(redis));
 
   p = (RedisPrivate *) redis->priv;
   return p->scanCount;
@@ -558,20 +557,18 @@ char **redisxScanKeys(Redis *redis, const char *pattern, int *n, int *status) {
   char countArg[20];
   int args = 0, i, j, capacity = SCAN_INITIAL_STORE_CAPACITY;
 
-  if(status == NULL) {
-    x_error(0, EINVAL, fn, "'status' parameter is NULL");
-    return NULL;
+  if(redisxCheckValid(redis) != X_SUCCESS) {
+    if(status) *status = redisxCheckValid(redis);
   }
 
   if(n == NULL) {
     x_error(X_NULL, EINVAL, fn, "parameter 'n' is NULL");
-    *status = X_NULL;
+    if(status) *status = X_NULL;
     return NULL;
   }
 
-  if(redis == NULL) {
-    x_error(X_NULL, EINVAL, fn, "redis is NULL");
-    *status = X_NULL;
+  if(status == NULL) {
+    x_error(0, EINVAL, fn, "'status' parameter is NULL");
     return NULL;
   }
 
@@ -732,20 +729,18 @@ RedisEntry *redisxScanTable(Redis *redis, const char *table, const char *pattern
   char **pCursor;
   int args= 0, i, j, capacity = SCAN_INITIAL_STORE_CAPACITY;
 
-  if(status == NULL) {
-    x_error(0, EINVAL, fn, "'status' parameter is NULL");
-    return NULL;
+  if(redisxCheckValid(redis) != X_SUCCESS) {
+    if(status) *status = redisxCheckValid(redis);
   }
 
   if(n == NULL) {
     x_error(X_NULL, EINVAL, fn, "parameter 'n' is NULL");
-    *status = X_NULL;
+    if(status) *status = X_NULL;
     return NULL;
   }
 
-  if(redis == NULL) {
-    x_error(X_NULL, EINVAL, fn, "redis is NULL");
-    *status = X_NULL;
+  if(status == NULL) {
+    x_error(0, EINVAL, fn, "'status' parameter is NULL");
     return NULL;
   }
 

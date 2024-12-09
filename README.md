@@ -214,12 +214,16 @@ You can also set the RESP protocol to use (provided your server is compatible wi
 
 The above call will use the `HELLO` command (since Redis 6) upon connecting. If you do not set the protocol, `HELLO` 
 will not be used, and RESP2 will be assumed -- which is best for older servers. (Note, that you can always check the 
-actual protocol used after connecting, using `redisxGetProtocol()`).
+actual protocol used after connecting, using `redisxGetProtocol()`). Note, that after connecting, you may retrieve 
+the set of server properties sent in response to `HELLO` using `redisxGetHelloData()`.
 
-You might also tweak the send/receive buffer sizes to use for clients, if you find the socket defaults sub-optimal for
-your application (note, that this setting is common to all `Redis` instances managed by the library):
+You might also tweak the socket options used for clients, if you find the socket defaults sub-optimal for your 
+application (note, that this setting is common to all `Redis` instances managed by the library):
 
 ```c
+   // (optional) Set 1000 ms socket read/write timeout for future connections.
+   redisxSetSocketTimeout(redis, 1000);
+
    // (optional) Set the TCP send/rcv buffer sizes to use if not default values.
    //            This setting applies to all new connections after...
    redisxSetTcpBuf(65536);
@@ -315,7 +319,9 @@ The same goes for disconnect hooks, using `redisxAddDisconnectHook()` instead.
 ## Simple Redis queries
 
  - [Interactive transactions](#interactive-transactions)
-  - [RESP data type](#resp-data-type)
+ - [Push notifications](#push-notifications)
+ - [RESP data type](#resp-data-type)
+
 
 Redis queries are sent as strings, according the the specification of the Redis protocol. All responses sent back by 
 the server using the RESP protocol. Specifically, Redis uses version 2 of the RESP protocol (a.k.a. RESP2) by 
@@ -365,6 +371,46 @@ individual parameters are not 0-terminated strings.
 
 In interactive mode, each request is sent to the Redis server, and the response is collected before the call returns 
 with that response (or `NULL` if there was an error).
+
+<a name="push-notifications"></a>
+### Push notifications
+
+Redis 6 introduced out-of-band push notifications along with RESP3. It allows the server to send messages to any 
+connected client that are not in response to a query. For example, Redis 6 allows `CLIENT TRACKING` to use such push 
+notifications (e.g. `INVALIDATE foo`), to notify connected clients when a watched variable has been updated from
+somewhere else. 
+
+__RedisX__ allows you to specify a custom callback `RedisPushProcessor` function to handle such push notifications,
+e.g.:
+
+```c
+  void my_push_processor(RESP *message, void *ptr) {
+    char *owner = (char *) ptr;  // Additional argument we need, in this case a string.
+    printf("[%s] Got push message: type %c, n = %d.\n", owner, message->type, message->n);
+  }
+```
+
+Then you can activate the processing of push notifications with `redisxSetPushProcessor()`. You can specify the 
+optional additional data that you want to pass along to the push processor function -- just make sure that the data 
+has a sufficient scope / lifetime such that it is valid at all times while push messages are being processed. E.g.
+
+```c
+  static owner = "my process"; // The long life data we want to pass to my_push_processor...
+  
+  // Use my_push_processor and pass along the owner as a parameter
+  redisxSetPushProcessor(redis, my_push_processor, owner);
+```
+
+There are some things to look out for in your `RedisPushProcessor` implementation:
+
+- The call should not block (except perhaps for a quick mutex lock) and should return quickly. If blocking calls, or
+  extensive processing is required, you should place a copy of the PUSH notification onto a queue and let an 
+  asynchronous thread take it from there.
+- The call should not attempt to alter or destroy the push message. If needed it can copy parts or the whole.
+- You should not attempt to lock or release clients from the call. If you need access to a client, it's best to put a 
+  copy of the RESP notification onto a queue and let an asynchronous thread deal with it.
+- You should
+
 
 <a name="resp-data-type"></a>
 ### RESP data type
@@ -460,6 +506,8 @@ Before destroying a RESP structure, the caller may want to dereference values wi
     redisxDestroyRESP(r);     // The 'stringValue' is still a valid pointer after! 
   }
 ```
+
+
 
 
 -----------------------------------------------------------------------------
@@ -818,7 +866,9 @@ Stay tuned.
 ## Advanced queries and pipelining
 
  - [Asynchronous client processing](#asynchronous-client-processing)
+ - [Bundled Attributes](#attributes)
  - [Pipelined transactions](#pipelined-transactions)
+
 
 <a name="asynchronous-client-processing"></a>
 ### Asynchronous client processing
@@ -899,6 +949,37 @@ __before__ `redisxSendRequestAsync()` to instruct Redis to not even bother about
 
 Of course you can build up arbitrarily complex set of queries and deal with a set of responses in different ways. Do 
 what works best for your application.
+
+
+<a name="attributes"></a>
+### Bundled Attributes
+
+As of Redis 6, the server might send ancillary data along with replies, if the RESP3 protocol is used. These are 
+collected together with the expected responses. However, these optional attributes are not returned to the user 
+automatically. Instead, the user may retrieve attributes directly after getting a response from 
+`redisxReadReplyAsync()` using `redisxGetAttributesAsync()`. And, attributes that were received previously can be
+discarded with `redisxClearAttributesAsync()`. For example,
+
+```c
+  RedisClient *cl = ...	 // The client we use for our transactions
+  
+  if(redisxLockEnabled(cl) == X_SUCCESS) {
+    ...
+    
+    // Clear any prior attributes we may have previously received for the client...
+    redisxClearAttributesAsync(cl);
+    
+    // Read a response for a request we sent earlier...
+    RESP *reply = redisxReadReplyAsync(cl);
+    
+    // Retrieve the attributes (if any) that were sent with the response.
+    RESP *attributes = redisxGetAttributes(cl);
+    
+    ...
+    
+    redisxUnlockClient(cl);
+  }
+```
 
 
 <a name="pipelined-transactions"></a>

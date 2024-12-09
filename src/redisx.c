@@ -62,6 +62,21 @@ void rConfigUnlock(Redis *redis) {
 
 /// \endcond
 
+
+/**
+ * Checks that a redis instance is valid.
+ *
+ * @param redis   The Redis instance
+ * @return        X_SUCCESS (0) if the instance is valid, or X_NULL if the argument is NULL,
+ *                or else X_NO_INIT if the redis instance is not initialized.
+ */
+int redisxCheckValid(const Redis *redis) {
+  static const char *fn = "rCheckRedis";
+  if(!redis) return x_error(X_NULL, EINVAL, fn, "Redis instamce is NULL");
+  if(!redis->priv) return x_error(X_NO_INIT, EAGAIN, fn, "Redis instance is not initialized");
+  return X_SUCCESS;
+}
+
 /**
  * Enable or disable verbose reporting of all Redis operations (and possibly some details of them).
  * Reporting is done on the standard output (stdout). It may be useful when debugging programs
@@ -115,7 +130,7 @@ int redisxSetUser(Redis *redis, const char *username) {
 
   RedisPrivate *p;
 
-  if(!redis) return x_error(X_NULL, EINVAL, fn, "redis is NULL");
+  prop_error(fn, redisxCheckValid(redis));
   if(redisxIsConnected(redis)) return x_error(X_ALREADY_OPEN, EALREADY, fn, "already connected");
 
   p = (RedisPrivate *) redis->priv;
@@ -143,7 +158,7 @@ int redisxSetPassword(Redis *redis, const char *passwd) {
 
   RedisPrivate *p;
 
-  if(!redis) return x_error(X_NULL, EINVAL, fn, "redis is NULL");
+  prop_error(fn, redisxCheckValid(redis));
   if(redisxIsConnected(redis)) return x_error(X_ALREADY_OPEN, EALREADY, fn, "already connected");
 
   p = (RedisPrivate *) redis->priv;
@@ -155,26 +170,25 @@ int redisxSetPassword(Redis *redis, const char *passwd) {
 
 
 /**
- * Sets the RESP prorocol version to use with the given Redis server instance. You must set the protocol
- * prior to connecting to Redis. The protocol is set with the HELLO command, which was introduced in
- * Redis 6.0.0 only. For older Redis server instances, the protocol will default to RESP2.
- * Calling this function will enable using HELLO to handshake with the server.
+ * Sets the RESP prorocol version to use for future client connections. The protocol is set with the
+ * HELLO command, which was introduced in Redis 6.0.0 only. For older Redis server instances, the
+ * protocol will default to RESP2. Calling this function will enable using HELLO to handshake with
+ * the server.
  *
  * @param redis       The Redis server instance
  * @param protocol    REDISX_RESP2 or REDISX_RESP3.
  * @return            X_SUCCESS (0) if successful, or X_NULL if the redis argument in NULL, X_NO_INIT
- *                    if the redis instance was not initialized, or X_ALREADY_OPEN if the server was
- *                    already connected.
+ *                    if the redis instance was not initialized.
  *
  * @sa redisxGetProtocol()
+ * @sa redisxGetHelloReply()
  */
 int redisxSetProtocol(Redis *redis, enum redisx_protocol protocol) {
   static const char *fn = "redisxSetProtocol";
 
   RedisPrivate *p;
-  if(!redis) return x_error(X_NULL, EINVAL, fn, "redis is NULL");
-  if(!redis->priv) return x_error(X_NO_INIT, EINVAL, fn, "redis is not initialized");
-  if(redisxIsConnected(redis)) return x_error(X_ALREADY_OPEN, EALREADY, fn, "already connected");
+
+  prop_error(fn, redisxCheckValid(redis));
 
   p = (RedisPrivate *) redis->priv;
   p->hello = TRUE;
@@ -198,8 +212,7 @@ enum redisx_protocol redisxGetProtocol(const Redis *redis) {
   static const char *fn = "redisxGetProtocol";
   const RedisPrivate *p;
 
-  if(!redis) return x_error(X_NULL, EINVAL, fn, "redis is NULL");
-  if(!redis->priv) return x_error(X_NO_INIT, EINVAL, fn, "redis is not initialized");
+  prop_error(fn, redisxCheckValid(redis));
 
   p = (RedisPrivate *) redis->priv;
   return p->protocol;
@@ -226,7 +239,7 @@ enum redisx_protocol redisxGetProtocol(const Redis *redis) {
 int redisxSetTransmitErrorHandler(Redis *redis, RedisErrorHandler f) {
   RedisPrivate *p;
 
-  if(!redis) return x_error(X_NULL, EINVAL, "redisxSetTransmitErrorHandler", "redis is NULL");
+  prop_error("redisxSetTransmitErrorHandler", redisxCheckValid(redis));
 
   rConfigLock(redis);
   p = (RedisPrivate *) redis->priv;
@@ -252,7 +265,7 @@ int redisxGetTime(Redis *redis, struct timespec *t) {
   int status = X_SUCCESS;
   char *tail;
 
-  if(!redis) return x_error(X_NULL, EINVAL, fn, "redis is NULL");
+  prop_error(fn, redisxCheckValid(redis));
   if(!t) return x_error(X_NULL, EINVAL, fn, "output timespec is NULL");
 
   memset(t, 0, sizeof(*t));
@@ -313,7 +326,7 @@ int redisxPing(Redis *redis, const char *message) {
   int status = X_SUCCESS;
   RESP *reply;
 
-  if(!redis) return x_error(X_NULL, EINVAL, fn, "redis is NULL");
+  prop_error(fn, redisxCheckValid(redis));
 
   reply = redisxRequest(redis, "PING", message, NULL, NULL, &status);
 
@@ -396,7 +409,7 @@ int redisxSelectDB(Redis *redis, int idx) {
   enum redisx_channel c;
   int status = X_SUCCESS;
 
-  if(!redis) return x_error(X_NULL, EINVAL, fn, "redis is NULL");
+  prop_error(fn, redisxCheckValid(redis));
 
   p = (RedisPrivate *) redis->priv;
   if(p->dbIndex == idx) return X_SUCCESS;
@@ -470,9 +483,16 @@ int redisxError(const char *func, int errorCode) {
 boolean redisxHasPipeline(Redis *redis) {
   const ClientPrivate *pp;
 
-  if(redis == NULL) return FALSE;
+  boolean isEnabled;
+
+  if(redisxCheckValid(redis) != X_SUCCESS) return FALSE;
+
+  prop_error("redisxHasPipeline", redisxLockClient(redis->pipeline));
   pp = (ClientPrivate *) redis->pipeline->priv;
-  return pp->isEnabled;
+  isEnabled = pp->isEnabled;
+  redisxUnlockClient(redis->pipeline);
+
+  return isEnabled;
 }
 
 /**
@@ -499,7 +519,7 @@ boolean redisxHasPipeline(Redis *redis) {
 int redisxSetPipelineConsumer(Redis *redis, RedisPipelineProcessor f) {
   RedisPrivate *p;
 
-  if(redis == NULL) return x_error(X_NULL, EINVAL, "redisxSetPipelineConsumer", "redis is NULL");
+  prop_error("redisxSetPipelineConsumer", redisxCheckValid(redis));
 
   p = (RedisPrivate *) redis->priv;
   rConfigLock(redis);
@@ -539,10 +559,10 @@ RESP *redisxRequest(Redis *redis, const char *command, const char *arg1, const c
 
   RESP *reply;
   const char *args[] = { command, arg1, arg2, arg3 };
-  int n, s;
+  int n, s = X_SUCCESS;
 
 
-  if(redis == NULL) x_error(X_NULL, EINVAL, fn, "redis is NULL");
+  if(redisxCheckValid(redis) != X_SUCCESS) return x_trace_null(fn, NULL);
 
   if(command == NULL) n = 0;
   else if(arg1 == NULL) n = 1;
@@ -594,8 +614,10 @@ RESP *redisxArrayRequest(Redis *redis, char *args[], int lengths[], int n, int *
   RedisClient *cl;
 
 
-  if(redis == NULL || args == NULL || n < 1 || status == NULL) {
-    x_error(0, EINVAL, fn, "invalid parameter: redis=%p, args=%p, n=%d, status=%p", redis, args, n, status);
+  if(redisxCheckValid(redis) != X_SUCCESS) return x_trace_null(fn, NULL);
+
+  if(args == NULL || n < 1 || status == NULL) {
+    x_error(0, EINVAL, fn, "invalid parameter: args=%p, n=%d, status=%p", args, n, status);
     if(status) *status = X_NULL;
     return NULL;
   }
@@ -604,6 +626,8 @@ RESP *redisxArrayRequest(Redis *redis, char *args[], int lengths[], int n, int *
   cl = redis->interactive;
   *status = redisxLockConnected(cl);
   if(*status) return x_trace_null(fn, NULL);
+
+  redisxClearAttributesAsync(cl);
 
   *status = redisxSendArrayRequestAsync(cl, args, lengths, n);
   if(!(*status)) reply = redisxReadReplyAsync(cl);
@@ -614,6 +638,71 @@ RESP *redisxArrayRequest(Redis *redis, char *args[], int lengths[], int n, int *
   return reply;
 }
 
+
+/**
+ * Sets a user-defined function to process push messages for a specific Redis instance. The function's
+ * implementation must follow a simple set of rules:
+ *
+ * <ul>
+ * <li>the implementation should not destroy the RESP data. The RESP will be destroyed automatically
+ * after the call returns. However, the call may retain any data from the RESP itself, provided
+ * the data is de-referenced from the RESP before return.<li>
+ * <li>The call will have exclusive access to the client. As such it should not try to obtain a
+ * lock or release the lock itself.</li>
+ * <li>The implementation should not block (aside from maybe a quick mutex unlock) and return quickly,
+ * so as to not block the client for long periods</li>
+ * <li>If extensive processing or blocking calls are required to process the message, it is best to
+ * simply place a copy of the RESP on a queue and then return quickly, and then process the message
+ * asynchronously in a background thread.</li>
+ * <li>The client on which the push is originated will be locked, thus the implementation should
+ * avoid getting explusive access to the client</li>
+ * </ul>
+ *
+ * @param redis   Redis instance
+ * @param func    Function to use for processing push messages from the given Redis instance, or NULL
+ *                to ignore push messages.
+ * @param arg     (optional) User-defined pointer argument to pass along to the processing function.
+ * @return        X_SUCCESS (0) if successful, or else X_NULL (errno set to EINVAL) if the client
+ *                argument is NULL, or X_NO_INIT (errno set to EAGAIN) if redis is uninitialized.
+ */
+int redisxSetPushProcessor(Redis *redis, RedisPushProcessor func, void *arg) {
+  static const char *fn = "redisxSetPushProcessor";
+
+  RedisPrivate *p;
+
+  prop_error(fn, redisxCheckValid(redis));
+
+  rConfigLock(redis);
+  p = redis->priv;
+  p->pushConsumer = func;
+  p->pushArg = arg;
+  rConfigUnlock(redis);
+
+  return X_SUCCESS;
+}
+
+/**
+ * Returns a copy of the RESP map that the Redis server has sent us as a response to HELLO on the
+ * last client connection, or NULL if HELLO was not used or available.
+ *
+ * @param redis   The redis instance
+ * @return        A copy of the response sent by HELLO on the last client connection, or NULL.
+ *
+ * @sa redisxSetProtocol()
+ */
+RESP *redisxGetHelloData(Redis *redis) {
+  const RedisPrivate *p;
+  RESP *data;
+
+  if(redisxCheckValid(redis) != X_SUCCESS) return x_trace_null("redisxGetHelloData", NULL);
+
+  rConfigLock(redis);
+  p = (RedisPrivate *) redis->priv;
+  data = redisxCopyOfRESP(p->helloData);
+  rConfigUnlock(redis);
+
+  return data;
+}
 
 /**
  * Returns a string description for one of the RM error codes.

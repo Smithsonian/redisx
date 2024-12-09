@@ -89,7 +89,8 @@ int redisxPublishAsync(Redis *redis, const char *channel, const char *data, int 
   char *args[3];
   int L[3] = {0};
 
-  if(redis == NULL) return x_error(X_NULL,EINVAL, fn, "redis is NULL");
+  prop_error(fn, redisxCheckValid(redis));
+
   if(channel == NULL) return x_error(X_NULL,EINVAL, fn, "channel parameter is NULL");
   if(*channel == '\0') return x_error(X_NULL,EINVAL, fn, "channel parameter is empty");
 
@@ -133,8 +134,7 @@ int redisxPublish(Redis *redis, const char *channel, const char *data, int lengt
 
   int status = 0;
 
-  if(redis == NULL) return x_error(X_NULL,EINVAL, fn, "redis is NULL");
-
+  prop_error(fn, redisxCheckValid(redis));
   prop_error(fn, redisxLockConnected(redis->interactive));
 
   // Now send the message
@@ -201,7 +201,7 @@ int redisxAddSubscriber(Redis *redis, const char *channelStem, RedisSubscriberCa
   MessageConsumer *c;
   RedisPrivate *p;
 
-  if(redis == NULL) return x_error(X_NULL, EINVAL, fn, "redis is NULL");
+  prop_error(fn, redisxCheckValid(redis));
 
   p = (RedisPrivate *) redis->priv;
 
@@ -261,7 +261,8 @@ int redisxRemoveSubscribers(Redis *redis, RedisSubscriberCall f) {
   MessageConsumer *c, *last = NULL;
   int removed = 0;
 
-  if(redis == NULL) return x_error(X_NULL, EINVAL, fn, "redis is NULL");
+  prop_error(fn, redisxCheckValid(redis));
+
   if(!f) return x_error(X_NULL, EINVAL, fn, "subscriber function parameter is NULL");
 
   p = (RedisPrivate *) redis->priv;
@@ -306,7 +307,7 @@ int redisxClearSubscribers(Redis *redis) {
   MessageConsumer *c;
   int n = 0;
 
-  if(redis == NULL) return x_error(X_NULL, EINVAL, "redisxClearSubscrivers", "redis is NULL");
+  prop_error("redisxClearSubscribers", redisxCheckValid(redis));
 
   p = (RedisPrivate *) redis->priv;
 
@@ -370,7 +371,8 @@ int redisxSubscribe(Redis *redis, const char *pattern) {
   const ClientPrivate *cp;
   int status = 0;
 
-  if(redis == NULL) return x_error(X_NULL, EINVAL, fn, "redis is NULL");
+  prop_error(fn, redisxCheckValid(redis));
+
   if(pattern == NULL) return x_error(X_NULL, EINVAL, fn, "pattern parameter is NULL");
 
   // connect subscription client as needed.
@@ -419,8 +421,7 @@ int redisxUnsubscribe(Redis *redis, const char *pattern) {
 
   int status;
 
-  if(redis == NULL) return x_error(X_NULL, EINVAL, fn, "redis is NULL");
-
+  prop_error(fn, redisxCheckValid(redis));
   prop_error(fn, redisxLockConnected(redis->subscription));
 
   if(pattern) {
@@ -456,7 +457,7 @@ static int rEndSubscriptionAsync(Redis *redis) {
   RedisPrivate *p;
   int status;
 
-  if(redis == NULL) return x_error(X_NULL, EINVAL, fn, "redis is NULL");
+  prop_error(fn, redisxCheckValid(redis));
 
   xvprintf("Redis-X> End all subscriptions, and quit listener.\n");
 
@@ -487,7 +488,7 @@ int redisxEndSubscription(Redis *redis) {
 
   int status;
 
-  if(redis == NULL) return x_error(X_NULL, EINVAL, fn, "redis is NULL");
+  prop_error(fn, redisxCheckValid(redis));
 
   rConfigLock(redis);
   status = rEndSubscriptionAsync(redis);
@@ -505,7 +506,7 @@ static void rNotifyConsumers(Redis *redis, char *pattern, char *channel, char *m
 
   xdprintf("NOTIFY: %s | %s\n", channel, msg);
 
-  if(!redis) return;
+  if(redisxCheckValid(redis) != X_SUCCESS) return;
 
   p = (RedisPrivate *) redis->priv;
 
@@ -564,10 +565,7 @@ void *RedisSubscriptionListener(void *pRedis) {
 
   xvprintf("Redis-X> Started processing subsciptions...\n");
 
-  if(redis == NULL) {
-    x_error(0, EINVAL, "RedisSubscriptionListener", "redis is NULL");
-    return NULL;
-  }
+  if(redisxCheckValid(redis) != X_SUCCESS) return x_trace_null("RedisSubscriptionListener", NULL);
 
   p = (RedisPrivate *) redis->priv;
   cl = redis->subscription;

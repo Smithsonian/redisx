@@ -46,6 +46,11 @@
 #  define REDISX_LISTENER_REL_PRIORITY    (0.5)
 #endif
 
+#ifndef REDISX_DEFAULT_TIMEOUT_MILLIS
+/// [ms] Default socket read/write timeout for Redis clients
+#  define REDISX_DEFAULT_TIMEOUT_MILLIS           3000
+#endif
+
 // Various exposed constants ----------------------------------------------------->
 
 /// API major version
@@ -304,14 +309,23 @@ typedef void (*RedisPipelineProcessor)(RESP *response);
  * <li>If extensive processing or blocking calls are required to process the message, it is best to
  * simply place a copy of the RESP on a queue and then return quickly, and then process the message
  * asynchronously in a background thread.</li>
+ * <li>The client on which the push notification originated will be locked when this function is
+ * called, waiting for a response to an earlier query. Thus the implementation should not attempt to
+ * lock the client again or release the lock. It may send asynchronous requests on the client, e.g. via
+ * redisxSendRequestAsync(), but it should not try to read a response (given that the client is
+ * blocked for another read operation). If more flexible client access is needed, the implementation
+ * should make a copy of the RESP and place it on a queue for asynchronous processing by another thread.
+ * </li>
  * </ul>
  *
+ * @param cl          The Redis client that sent the push. The client is locked for exlusive
+ *                    access when this function is called.
  * @param message     The RESP3 message that was pushed by the client
  * @param ptr         Additional data passed along.
  *
  * @sa redisxSetPushProcessor()
  */
-typedef void (*RedisPushProcessor)(RESP *message, void *ptr);
+typedef void (*RedisPushProcessor)(RedisClient *cl, RESP *message, void *ptr);
 
 
 
@@ -328,8 +342,10 @@ int redisxSetPassword(Redis *redis, const char *passwd);
 int redisxSelectDB(Redis *redis, int idx);
 int redisxSetProtocol(Redis *redis, enum redisx_protocol protocol);
 enum redisx_protocol redisxGetProtocol(const Redis *redis);
+RESP *redisxGetHelloData(Redis *redis);
 
 Redis *redisxInit(const char *server);
+int redisxCheckValid(const Redis *redis);
 void redisxDestroy(Redis *redis);
 int redisxConnect(Redis *redis, boolean usePipeline);
 void redisxDisconnect(Redis *redis);
@@ -366,7 +382,7 @@ void redisxDestroyEntries(RedisEntry *entries, int count);
 void redisxDestroyKeys(char **keys, int count);
 
 int redisxSetPipelineConsumer(Redis *redis, RedisPipelineProcessor f);
-int redisxSetPushProcessor(RedisClient *cl, RedisPushProcessor func, void *arg);
+int redisxSetPushProcessor(Redis *redis, RedisPushProcessor func, void *arg);
 
 int redisxPublish(Redis *redis, const char *channel, const char *message, int length);
 int redisxNotify(Redis *redis, const char *channel, const char *message);
@@ -396,6 +412,7 @@ boolean redisxHasComponents(const RESP *r);
 boolean redisxIsEqualRESP(const RESP *a, const RESP *b);
 int redisxSplitText(RESP *resp, char **text);
 XField *resp2XField(const char *name, const RESP *resp);
+char *resp2json(const char *name, const RESP *resp);
 
 RedisMapEntry *redisxGetMapEntry(const RESP *map, const RESP *key);
 RedisMapEntry *redisxGetKeywordEntry(const RESP *map, const char *key);

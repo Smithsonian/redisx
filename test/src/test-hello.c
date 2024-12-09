@@ -16,6 +16,8 @@ int main() {
 
   Redis *redis = redisxInit("localhost");
   RedisEntry *e;
+  RESP *resp;
+  char *json;
   int n = -1;
 
   xSetDebug(TRUE);
@@ -28,6 +30,11 @@ int main() {
     perror("ERROR! connect");
     return 1;
   }
+
+  resp = redisxGetHelloData(redis);
+  json = resp2json("server_properties", resp);
+  printf("%s\n", json ? json : "<null>");
+  redisxDestroyRESP(resp);
 
   if(redisxGetProtocol(redis) != REDISX_RESP3) {
     fprintf(stderr, "ERROR! verify RESP3 protocol\n");

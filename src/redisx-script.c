@@ -33,9 +33,10 @@
 int redisxLoadScript(Redis *redis, const char *script, char **sha1) {
   static const char *fn = "redisxLoadScript";
   RESP *reply;
-  int status;
+  int status = X_SUCCESS;
 
-  if(redis == NULL) return x_error(X_NULL, EINVAL, fn, "redis is NULL");
+  prop_error(fn, redisxCheckValid(redis));
+
   if(script == NULL) return x_error(X_NULL, EINVAL, fn, "input script is NULL");
   if(*script == '\0') return x_error(X_NULL, EINVAL, fn, "input script is empty");
 
@@ -81,8 +82,9 @@ int redisxRunScriptAsync(RedisClient *cl, const char *sha1, const char **keys, c
   int i = 0, k, nkeys = 0, nparams = 0, nargs;
   char sn[20], **args;
 
-  if(cl == NULL) return x_error(X_NULL, EINVAL, fn, "client is NULL");
-   if(sha1 == NULL) return x_error(X_NULL, EINVAL, fn, "input script SHA1 sum is NULL");
+  prop_error(fn, rCheckClient(cl));
+
+  if(sha1 == NULL) return x_error(X_NULL, EINVAL, fn, "input script SHA1 sum is NULL");
 
   if(keys) while(keys[nkeys]) nkeys++;
   if(params) while(params[nparams]) nparams++;
@@ -128,7 +130,12 @@ RESP *redisxRunScript(Redis *redis, const char *sha1, const char **keys, const c
 
   RESP *reply = NULL;
 
-  if(redis == NULL || sha1 == NULL) return NULL;
+  if(redisxCheckValid(redis) != X_SUCCESS) return x_trace_null(fn, NULL);
+
+  if(sha1 == NULL) {
+    x_error(0, EINVAL, fn, "sha1 parameter is NULL");
+    return NULL;
+  }
 
   if(redisxLockConnected(redis->interactive) != X_SUCCESS) return x_trace_null(fn, NULL);
 
