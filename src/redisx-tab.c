@@ -46,11 +46,6 @@ RedisEntry *redisxGetTable(Redis *redis, const char *table, int *n) {
   RedisEntry *entries = NULL;
   RESP *reply;
 
-  if(redisxCheckValid(redis) != X_SUCCESS) {
-    if(n) *n = redisxCheckValid(redis);
-    return x_trace_null(fn, NULL);
-  }
-
   if(n == NULL) {
     x_error(0, EINVAL, fn, "parameter 'n' is NULL");
     return NULL;
@@ -217,11 +212,6 @@ RESP *redisxGetValue(Redis *redis, const char *table, const char *key, int *stat
   RESP *reply;
   int s = X_SUCCESS;
 
-  if(redisxCheckValid(redis) != X_SUCCESS) {
-    if(status) *status = X_NULL;
-    return x_trace_null(fn, NULL);
-  }
-
   if(table && !table[0]) {
     x_error(X_GROUP_INVALID, EINVAL, fn, "'table' parameter is empty");
     if(status) *status = X_GROUP_INVALID;
@@ -270,19 +260,11 @@ RESP *redisxGetValue(Redis *redis, const char *table, const char *key, int *stat
  * \sa redisxGetValue()
  */
 char *redisxGetStringValue(Redis *redis, const char *table, const char *key, int *len) {
-  static const char *fn = "redisxGetStringValue";
-
   RESP *reply;
   char *str = NULL;
   int status;
 
-  if(redisxCheckValid(redis) != X_SUCCESS) {
-    if(len) *len = X_NULL;
-    return x_trace_null(fn, NULL);
-  }
-
   reply = redisxGetValue(redis, table, key, len);
-
   status = redisxCheckRESP(reply, RESP_BULK_STRING, 0);
 
   if(status == X_SUCCESS) {
@@ -294,7 +276,7 @@ char *redisxGetStringValue(Redis *redis, const char *table, const char *key, int
 
   redisxDestroyRESP(reply);
 
-  if(status) x_trace_null(fn, NULL);
+  if(status) x_trace_null("redisxGetStringValue", NULL);
 
   return str;
 }
@@ -421,11 +403,6 @@ char **redisxGetKeys(Redis *redis, const char *table, int *n) {
   RESP *reply;
   char **names = NULL;
 
-  if(redisxCheckValid(redis) != X_SUCCESS) {
-    if(n) *n = redisxCheckValid(redis);
-    return x_trace_null(fn, NULL);
-  }
-
   if(n == NULL) {
     x_error(X_NULL, EINVAL, fn, "parameter 'n' is NULL");
     return NULL;
@@ -487,10 +464,8 @@ char **redisxGetKeys(Redis *redis, const char *table, int *n) {
 int redisxSetScanCount(Redis *redis, int count) {
   RedisPrivate *p;
 
-  prop_error("redisxSetScanCount", redisxCheckValid(redis));
-
+  prop_error("redisxSetScanCount", rConfigLock(redis));
   p = (RedisPrivate *) redis->priv;
-  rConfigLock(redis);
   p->scanCount = count;
   rConfigUnlock(redis);
 
@@ -501,7 +476,8 @@ int redisxSetScanCount(Redis *redis, int count) {
  * Returns the COUNT parameter currently set to be used with Redis SCAN-type commands
  *
  * @param redis     Pointer to a Redis instance.
- * @return          The current COUNT to use for SCAN-type commands or <0 to use default.
+ * @return          The current COUNT to use for SCAN-type commands, or &lt;0 in case
+ *                  of an error.
  *
  * @sa redisxGetScanCount()
  * @sa redisxScanKeys()
@@ -509,11 +485,14 @@ int redisxSetScanCount(Redis *redis, int count) {
  */
 int redisxGetScanCount(Redis *redis) {
   const RedisPrivate *p;
+  int count;
 
-  prop_error("redisxGetScanCount", redisxCheckValid(redis));
-
+  prop_error("redisxGetScanCount", rConfigLock(redis));
   p = (RedisPrivate *) redis->priv;
-  return p->scanCount;
+  count = p->scanCount;
+  rConfigUnlock(redis);
+
+  return count;
 }
 
 static int compare_strings(const void *a, const void *b) {
@@ -556,10 +535,6 @@ char **redisxScanKeys(Redis *redis, const char *pattern, int *n, int *status) {
   char **names = NULL;
   char countArg[20];
   int args = 0, i, j, capacity = SCAN_INITIAL_STORE_CAPACITY;
-
-  if(redisxCheckValid(redis) != X_SUCCESS) {
-    if(status) *status = redisxCheckValid(redis);
-  }
 
   if(n == NULL) {
     x_error(X_NULL, EINVAL, fn, "parameter 'n' is NULL");
@@ -654,12 +629,12 @@ char **redisxScanKeys(Redis *redis, const char *pattern, int *n, int *status) {
 
   } while (strcmp(*pCursor, SCAN_INITIAL_CURSOR));  // Done when cursor is back to 0...
 
-  // Check for errors
-  if(*status) x_trace(fn, NULL, *status);
-
   // Clean up.
   redisxDestroyRESP(reply);
   free(*pCursor);
+
+  // Check for errors
+  if(*status) x_trace(fn, NULL, *status);
 
   if(!names) return NULL;
 
@@ -728,10 +703,6 @@ RedisEntry *redisxScanTable(Redis *redis, const char *table, const char *pattern
   char *cmd[7] = {NULL}, countArg[20];
   char **pCursor;
   int args= 0, i, j, capacity = SCAN_INITIAL_STORE_CAPACITY;
-
-  if(redisxCheckValid(redis) != X_SUCCESS) {
-    if(status) *status = redisxCheckValid(redis);
-  }
 
   if(n == NULL) {
     x_error(X_NULL, EINVAL, fn, "parameter 'n' is NULL");
@@ -851,12 +822,12 @@ RedisEntry *redisxScanTable(Redis *redis, const char *table, const char *pattern
 
   } while(strcmp(*pCursor, SCAN_INITIAL_CURSOR));  // Done when cursor is back to 0...
 
-  // Check for errors
-  if(*status) x_trace(fn, NULL, *status);
-
   // Clean up.
   redisxDestroyRESP(reply);
   free(*pCursor);
+
+  // Check for errors
+  if(*status) x_trace(fn, NULL, *status);
 
   if(!entries) return NULL;
 
@@ -940,12 +911,12 @@ int redisxDeleteEntries(Redis *redis, const char *pattern) {
   char **keys;
   int i, n = 0, status;
 
-  if(!redis) return x_error(X_NULL, EINVAL, fn, "redis is NULL");
   if(!pattern) return x_error(X_NULL, EINVAL, fn, "'pattern' is NULL");
   if(!pattern[0]) return x_error(X_NULL, EINVAL, fn, "'pattern' is empty");
 
   keys = redisxScanKeys(redis, pattern, &n, &status);
-  if(status) return status;
+  prop_error(fn, status);
+
   if(!keys) return x_trace(fn, NULL, X_NULL);
 
   for(i = 0; i < n ; i++) {

@@ -35,8 +35,6 @@ int redisxLoadScript(Redis *redis, const char *script, char **sha1) {
   RESP *reply;
   int status = X_SUCCESS;
 
-  prop_error(fn, redisxCheckValid(redis));
-
   if(script == NULL) return x_error(X_NULL, EINVAL, fn, "input script is NULL");
   if(*script == '\0') return x_error(X_NULL, EINVAL, fn, "input script is empty");
 

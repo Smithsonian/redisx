@@ -341,7 +341,7 @@ int redisxSetUser(Redis *redis, const char *username);
 int redisxSetPassword(Redis *redis, const char *passwd);
 int redisxSelectDB(Redis *redis, int idx);
 int redisxSetProtocol(Redis *redis, enum redisx_protocol protocol);
-enum redisx_protocol redisxGetProtocol(const Redis *redis);
+enum redisx_protocol redisxGetProtocol(Redis *redis);
 RESP *redisxGetHelloData(Redis *redis);
 
 Redis *redisxInit(const char *server);

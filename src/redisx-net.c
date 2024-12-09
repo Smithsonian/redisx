@@ -388,12 +388,9 @@ int redisxReconnect(Redis *redis, boolean usePipeline) {
 
   int status;
 
-  prop_error(fn, redisxCheckValid(redis));
-
-  rConfigLock(redis);
+  prop_error(fn, rConfigLock(redis));
   status = rReconnectAsync(redis, usePipeline);
   rConfigUnlock(redis);
-
   prop_error(fn, status);
 
   return X_SUCCESS;
@@ -775,9 +772,7 @@ void redisxSetTcpBuf(int size) {
 int redisxSetPort(Redis *redis, int port) {
   RedisPrivate *p;
 
-  prop_error("redisxSetPort", redisxCheckValid(redis));
-
-  rConfigLock(redis);
+  prop_error("redisxSetPort", rConfigLock(redis));
   p = (RedisPrivate *) redis->priv;
   p->port = port;
   rConfigUnlock(redis);
@@ -799,9 +794,7 @@ int redisxSetPort(Redis *redis, int port) {
 int redisxSetSocketTimeout(Redis *redis, int timeoutMillis) {
   RedisPrivate *p;
 
-  prop_error("redisxSetPort", redisxCheckValid(redis));
-
-  rConfigLock(redis);
+  prop_error("redisxSetPort", rConfigLock(redis));
   p = (RedisPrivate *) redis->priv;
   p->timeoutMillis = timeoutMillis;
   rConfigUnlock(redis);
@@ -834,14 +827,9 @@ int redisxConnect(Redis *redis, boolean usePipeline) {
   static const char *fn = "redisxConnect";
   int status;
 
-  prop_error(fn, redisxCheckValid(redis));
-
-  rConfigLock(redis);
-
+  prop_error(fn, rConfigLock(redis));
   status = rConnectAsync(redis, usePipeline);
-
   rConfigUnlock(redis);
-
   prop_error(fn, status);
 
   return X_SUCCESS;
@@ -859,7 +847,6 @@ boolean redisxIsConnected(Redis *redis) {
   const ClientPrivate *ip;
 
   if(redisxCheckValid(redis) != X_SUCCESS) return FALSE;
-
   ip = (ClientPrivate *) redis->interactive->priv;
   return ip->isEnabled;
 }

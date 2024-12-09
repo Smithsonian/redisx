@@ -93,8 +93,8 @@ typedef struct {
 
 
 // in redisx-sub.c ------------------------>
-void rConfigLock(Redis *redis);
-void rConfigUnlock(Redis *redis);
+int rConfigLock(Redis *redis);
+int rConfigUnlock(Redis *redis);
 
 // in redisx-net.c ------------------------>
 int rConnectClient(Redis *redis, enum redisx_channel channel);

@@ -36,32 +36,6 @@ extern int debugTraffic;            ///< Whether to print excerpts of all traffi
 
 /// \endcond
 
-/// \cond PROTECTED
-
-/**
- * Waits to get exlusive access to configuring the properties of a Redis instance.
- *
- * \param redis         Pointer to a Redis instance.
- *
- */
-void rConfigLock(Redis *redis) {
-  RedisPrivate *p = (RedisPrivate *) redis->priv;
-  pthread_mutex_lock(&p->configLock);
-}
-
-/**
- * Relinquish exlusive access to configuring the properties of a Redis instance.
- *
- * \param redis         Pointer to a Redis instance.
- *
- */
-void rConfigUnlock(Redis *redis) {
-  RedisPrivate *p = (RedisPrivate *) redis->priv;
-  pthread_mutex_unlock(&p->configLock);
-}
-
-/// \endcond
-
 
 /**
  * Checks that a redis instance is valid.
@@ -76,6 +50,36 @@ int redisxCheckValid(const Redis *redis) {
   if(!redis->priv) return x_error(X_NO_INIT, EAGAIN, fn, "Redis instance is not initialized");
   return X_SUCCESS;
 }
+
+/// \cond PROTECTED
+
+/**
+ * Waits to get exlusive access to configuring the properties of a Redis instance.
+ *
+ * \param redis         Pointer to a Redis instance.
+ *
+ */
+int rConfigLock(Redis *redis) {
+  prop_error("rConfigLock", redisxCheckValid(redis));
+  RedisPrivate *p = (RedisPrivate *) redis->priv;
+  pthread_mutex_lock(&p->configLock);
+  return X_SUCCESS;
+}
+
+/**
+ * Relinquish exlusive access to configuring the properties of a Redis instance.
+ *
+ * \param redis         Pointer to a Redis instance.
+ *
+ */
+int rConfigUnlock(Redis *redis) {
+  prop_error("rConfigUnlock", redisxCheckValid(redis));
+  RedisPrivate *p = (RedisPrivate *) redis->priv;
+  pthread_mutex_unlock(&p->configLock);
+  return X_SUCCESS;
+}
+
+/// \endcond
 
 /**
  * Enable or disable verbose reporting of all Redis operations (and possibly some details of them).
@@ -128,16 +132,18 @@ void redisxDebugTraffic(boolean value) {
 int redisxSetUser(Redis *redis, const char *username) {
   static const char *fn = "redisxSetUser";
 
-  RedisPrivate *p;
+  int status = X_SUCCESS;
 
-  prop_error(fn, redisxCheckValid(redis));
-  if(redisxIsConnected(redis)) return x_error(X_ALREADY_OPEN, EALREADY, fn, "already connected");
+  prop_error(fn, rConfigLock(redis));
+  if(redisxIsConnected(redis)) status = x_error(X_ALREADY_OPEN, EALREADY, fn, "already connected");
+  else {
+    RedisPrivate *p = (RedisPrivate *) redis->priv;
+    if(p->username) free(p->username);
+    p->username = xStringCopyOf(username);
+  }
+  rConfigUnlock(redis);
 
-  p = (RedisPrivate *) redis->priv;
-  if(p->username) free(p->username);
-  p->username = xStringCopyOf(username);
-
-  return X_SUCCESS;
+  return status;
 }
 
 /**
@@ -156,16 +162,18 @@ int redisxSetUser(Redis *redis, const char *username) {
 int redisxSetPassword(Redis *redis, const char *passwd) {
   static const char *fn = "redisxSetPassword";
 
-  RedisPrivate *p;
+  int status = X_SUCCESS;
 
-  prop_error(fn, redisxCheckValid(redis));
-  if(redisxIsConnected(redis)) return x_error(X_ALREADY_OPEN, EALREADY, fn, "already connected");
+  prop_error(fn, rConfigLock(redis));
+  if(redisxIsConnected(redis)) status = x_error(X_ALREADY_OPEN, EALREADY, fn, "already connected");
+  else {
+    RedisPrivate *p = (RedisPrivate *) redis->priv;
+    if(p->password) free(p->password);
+    p->password = xStringCopyOf(passwd);
+  }
+  rConfigUnlock(redis);
 
-  p = (RedisPrivate *) redis->priv;
-  if(p->password) free(p->password);
-  p->password = xStringCopyOf(passwd);
-
-  return X_SUCCESS;
+  return status;
 }
 
 
@@ -188,11 +196,11 @@ int redisxSetProtocol(Redis *redis, enum redisx_protocol protocol) {
 
   RedisPrivate *p;
 
-  prop_error(fn, redisxCheckValid(redis));
-
+  prop_error(fn, rConfigLock(redis));
   p = (RedisPrivate *) redis->priv;
   p->hello = TRUE;
   p->protocol = protocol;
+  rConfigUnlock(redis);
 
   return X_SUCCESS;
 }
@@ -208,14 +216,18 @@ int redisxSetProtocol(Redis *redis, enum redisx_protocol protocol) {
  *
  * @sa redisxSetProtocol()
  */
-enum redisx_protocol redisxGetProtocol(const Redis *redis) {
+enum redisx_protocol redisxGetProtocol(Redis *redis) {
   static const char *fn = "redisxGetProtocol";
+
   const RedisPrivate *p;
+  int protocol;
 
-  prop_error(fn, redisxCheckValid(redis));
-
+  prop_error(fn, rConfigLock(redis));
   p = (RedisPrivate *) redis->priv;
-  return p->protocol;
+  protocol = p->protocol;
+  rConfigUnlock(redis);
+
+  return protocol;
 }
 
 /**
@@ -237,11 +249,11 @@ enum redisx_protocol redisxGetProtocol(const Redis *redis) {
  *                  Redis instance is NULL.
  */
 int redisxSetTransmitErrorHandler(Redis *redis, RedisErrorHandler f) {
+  static const char *fn = "redisxSetTransmitErrorHandler";
+
   RedisPrivate *p;
 
-  prop_error("redisxSetTransmitErrorHandler", redisxCheckValid(redis));
-
-  rConfigLock(redis);
+  prop_error(fn, rConfigLock(redis));
   p = (RedisPrivate *) redis->priv;
   p->transmitErrorFunc = f;
   rConfigUnlock(redis);
@@ -254,7 +266,7 @@ int redisxSetTransmitErrorHandler(Redis *redis, RedisErrorHandler f) {
  * Returns the current time on the Redis server instance.
  *
  * @param redis     Pointer to a Redis instance.
- * @param[out] t         Pointer to a timespec structure in which to return the server time.
+ * @param[out] t    Pointer to a timespec structure in which to return the server time.
  * @return          X_SUCCESS (0) if successful, or X_NULL if either argument is NULL, or X_PARSE_ERROR
  *                  if could not parse the response, or another error returned by redisxCheckRESP().
  */
@@ -265,7 +277,6 @@ int redisxGetTime(Redis *redis, struct timespec *t) {
   int status = X_SUCCESS;
   char *tail;
 
-  prop_error(fn, redisxCheckValid(redis));
   if(!t) return x_error(X_NULL, EINVAL, fn, "output timespec is NULL");
 
   memset(t, 0, sizeof(*t));
@@ -326,8 +337,6 @@ int redisxPing(Redis *redis, const char *message) {
   int status = X_SUCCESS;
   RESP *reply;
 
-  prop_error(fn, redisxCheckValid(redis));
-
   reply = redisxRequest(redis, "PING", message, NULL, NULL, &status);
 
   if(!status) {
@@ -362,9 +371,7 @@ static int redisxSelectDBAsync(RedisClient *cl, int idx, boolean confirm) {
 
   char sval[20];
 
-  if(!confirm) {
-    prop_error(fn, redisxSkipReplyAsync(cl));
-  }
+  if(!confirm) prop_error(fn, redisxSkipReplyAsync(cl));
 
   sprintf(sval, "%d", idx);
   prop_error(fn, redisxSendRequestAsync(cl, "SELECT", sval, NULL, NULL));
@@ -405,16 +412,16 @@ static void rAffirmDB(Redis *redis) {
 int redisxSelectDB(Redis *redis, int idx) {
   static const char *fn = "redisxSelectDB";
 
-  RedisPrivate *p;
+  const RedisPrivate *p;
   enum redisx_channel c;
-  int status = X_SUCCESS;
+  int dbIdx, status = X_SUCCESS;
 
-  prop_error(fn, redisxCheckValid(redis));
-
+  prop_error(fn, rConfigLock(redis));
   p = (RedisPrivate *) redis->priv;
-  if(p->dbIndex == idx) return X_SUCCESS;
+  dbIdx = p->dbIndex;
+  rConfigUnlock(redis);
 
-  p->dbIndex = idx;
+  if(dbIdx == idx) return X_SUCCESS;
 
   if(idx) redisxAddConnectHook(redis, rAffirmDB);
   else redisxRemoveConnectHook(redis, rAffirmDB);
@@ -481,13 +488,14 @@ int redisxError(const char *func, int errorCode) {
  * \return      TRUE (1) if the pipeline client is enabled on the Redis intance, or FALSE (0) otherwise.
  */
 boolean redisxHasPipeline(Redis *redis) {
+  static const char *fn = "redisxHasPipeline";
+
   const ClientPrivate *pp;
 
   boolean isEnabled;
 
-  if(redisxCheckValid(redis) != X_SUCCESS) return FALSE;
-
-  prop_error("redisxHasPipeline", redisxLockClient(redis->pipeline));
+  prop_error(fn, redisxCheckValid(redis));
+  prop_error(fn, redisxLockClient(redis->pipeline));
   pp = (ClientPrivate *) redis->pipeline->priv;
   isEnabled = pp->isEnabled;
   redisxUnlockClient(redis->pipeline);
@@ -519,10 +527,8 @@ boolean redisxHasPipeline(Redis *redis) {
 int redisxSetPipelineConsumer(Redis *redis, RedisPipelineProcessor f) {
   RedisPrivate *p;
 
-  prop_error("redisxSetPipelineConsumer", redisxCheckValid(redis));
-
+  prop_error("redisxSetPipelineConsumer", rConfigLock(redis));
   p = (RedisPrivate *) redis->priv;
-  rConfigLock(redis);
   p->pipelineConsumerFunc = f;
   rConfigUnlock(redis);
 
@@ -555,14 +561,9 @@ int redisxSetPipelineConsumer(Redis *redis, RedisPipelineProcessor f) {
  * @sa redisxReadReplyAsync()
  */
 RESP *redisxRequest(Redis *redis, const char *command, const char *arg1, const char *arg2, const char *arg3, int *status) {
-  static const char *fn = "redisxRequest";
-
   RESP *reply;
   const char *args[] = { command, arg1, arg2, arg3 };
   int n, s = X_SUCCESS;
-
-
-  if(redisxCheckValid(redis) != X_SUCCESS) return x_trace_null(fn, NULL);
 
   if(command == NULL) n = 0;
   else if(arg1 == NULL) n = 1;
@@ -573,7 +574,7 @@ RESP *redisxRequest(Redis *redis, const char *command, const char *arg1, const c
   reply = redisxArrayRequest(redis, (char **) args, NULL, n, &s);
 
   if(status) *status = s;
-  if(s) x_trace_null(fn, NULL);
+  if(s) x_trace_null("redisxRequest", NULL);
 
   return reply;
 }
@@ -612,7 +613,6 @@ RESP *redisxArrayRequest(Redis *redis, char *args[], int lengths[], int n, int *
   static const char *fn = "redisxArrayRequest";
   RESP *reply = NULL;
   RedisClient *cl;
-
 
   if(redisxCheckValid(redis) != X_SUCCESS) return x_trace_null(fn, NULL);
 
@@ -670,9 +670,7 @@ int redisxSetPushProcessor(Redis *redis, RedisPushProcessor func, void *arg) {
 
   RedisPrivate *p;
 
-  prop_error(fn, redisxCheckValid(redis));
-
-  rConfigLock(redis);
+  prop_error(fn, rConfigLock(redis));
   p = redis->priv;
   p->pushConsumer = func;
   p->pushArg = arg;
@@ -694,9 +692,8 @@ RESP *redisxGetHelloData(Redis *redis) {
   const RedisPrivate *p;
   RESP *data;
 
-  if(redisxCheckValid(redis) != X_SUCCESS) return x_trace_null("redisxGetHelloData", NULL);
-
-  rConfigLock(redis);
+  int status = rConfigLock(redis);
+  if(status) return x_trace_null("redisxGetHelloData", NULL);
   p = (RedisPrivate *) redis->priv;
   data = redisxCopyOfRESP(p->helloData);
   rConfigUnlock(redis);

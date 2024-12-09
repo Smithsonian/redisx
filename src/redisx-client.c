@@ -289,19 +289,25 @@ static int rSendBytesAsync(ClientPrivate *cp, const char *buf, int length, boole
  * \param redis         Pointer to a Redis instance.
  * \param channel       REDISX_INTERACTIVE_CHANNEL, REDISX_PIPELINE_CHANNEL, or REDISX_SUBSCRIPTION_CHANNEL
  *
- * \return      Pointer to the matching Redis client, or NULL if the channel argument is invalid.
+ * \return      Pointer to the matching Redis client, or NULL if redis is null (EINVAL) or not initialized
+ *              (EAGAIN) or if the channel argument is invalid (ECHRNG).
  *
+ * @sa redisxGetLockedConnectedClient()
  */
 RedisClient *redisxGetClient(Redis *redis, enum redisx_channel channel) {
+  static const char *fn = "redisxGetClient";
+
   RedisPrivate *p;
 
-  if(redisxCheckValid(redis) != X_SUCCESS) return x_trace_null("redisxGetClient", NULL);
+  if(redisxCheckValid(redis) != X_SUCCESS) return x_trace_null(fn, NULL);
 
   p = (RedisPrivate *) redis->priv;
-  if(channel < 0 || channel >= REDISX_CHANNELS) return NULL;
+  if(channel < 0 || channel >= REDISX_CHANNELS) {
+    x_error(0, ECHRNG, fn, "channel %d is our of range", channel);
+    return NULL;
+  }
   return &p->clients[channel];
 }
-
 
 /**
  * Returns the redis client for a given connection type in a Redis instance, with the exclusive access lock
