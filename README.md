@@ -507,7 +507,22 @@ Before destroying a RESP structure, the caller may want to dereference values wi
   }
 ```
 
+Note, that you can convert a RESP to an `XField`, and/or to JSON representation using the `redisxRESP2XField()` and
+`redisxRESP2JSON()` functions, e.g.:
 
+
+```c
+ Redis redis = ...
+ 
+ // Obtain a copy of the response received from HELLO upcon connecting...
+ RESP *resp = redisxGetHelloData(redis);
+ 
+ // Print the response from HELLO to the standard output in JSON format
+ printf("%s", redisxRESP2JSON("hello_response", resp));
+ 
+ // Destroy our copy of the RESP
+ redisxDestroyRESP(resp);
+```c
 
 
 -----------------------------------------------------------------------------

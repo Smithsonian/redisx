@@ -586,7 +586,7 @@ static XField *respArrayToXField(const char *name, const RESP **component, int n
     array = (XField *) f->value;
 
     for(i = 0; i < n; i++) {
-      XField *e = resp2XField(array[i].name, component[i]);
+      XField *e = redisxRESP2XField(array[i].name, component[i]);
       if(e) {
         array[i] = *e;
         free(e);
@@ -612,7 +612,7 @@ static XField *respArrayToXField(const char *name, const RESP **component, int n
     if(!array) return x_trace_null(fn, "field array");
 
     for(i = 0; i < n; i++) {
-      XField *e = resp2XField("<element>", component[i]);
+      XField *e = redisxRESP2XField("<element>", component[i]);
       if(e) {
         memcpy(&array[i * eSize], e, sizeof(XField));
         free(e);
@@ -630,7 +630,7 @@ static XField *respMap2XField(const char *name, const RedisMapEntry *map, int n)
   while(--n >= 0) {
     const RedisMapEntry *e = &map[n];
     if(redisxIsStringType(e->key)) {
-      XField *fi = resp2XField((char *) e->key->value, e->value);
+      XField *fi = redisxRESP2XField((char *) e->key->value, e->value);
       if(fi) {
         fi->next = s->firstField;
         s->firstField = fi;
@@ -668,7 +668,7 @@ static XField *respMap2XField(const char *name, const RedisMapEntry *map, int n)
  *
  * @sa resp2json()
  */
-XField *resp2XField(const char *name, const RESP *resp) {
+XField *redisxRESP2XField(const char *name, const RESP *resp) {
   static const char *fn = "resp2XField";
 
   errno = 0;
@@ -729,8 +729,8 @@ XField *resp2XField(const char *name, const RESP *resp) {
  *
  * @sa resp2XField()
  */
-char *resp2json(const char *name, const RESP *resp) {
-  return xjsonFieldToString(resp2XField(name, resp));
+char *redisxRESP2JSON(const char *name, const RESP *resp) {
+  return xjsonFieldToString(redisxRESP2XField(name, resp));
 }
 
 

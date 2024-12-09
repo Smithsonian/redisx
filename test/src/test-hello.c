@@ -32,7 +32,7 @@ int main() {
   }
 
   resp = redisxGetHelloData(redis);
-  json = resp2json("server_properties", resp);
+  json = redisxRESP2JSON("server_properties", resp);
   printf("%s", json ? json : "<null>");
   redisxDestroyRESP(resp);
 

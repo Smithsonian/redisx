@@ -411,8 +411,8 @@ boolean redisxIsMapType(const RESP *r);
 boolean redisxHasComponents(const RESP *r);
 boolean redisxIsEqualRESP(const RESP *a, const RESP *b);
 int redisxSplitText(RESP *resp, char **text);
-XField *resp2XField(const char *name, const RESP *resp);
-char *resp2json(const char *name, const RESP *resp);
+XField *redisxRESP2XField(const char *name, const RESP *resp);
+char *redisxRESP2JSON(const char *name, const RESP *resp);
 
 RedisMapEntry *redisxGetMapEntry(const RESP *map, const RESP *key);
 RedisMapEntry *redisxGetKeywordEntry(const RESP *map, const char *key);
