@@ -51,11 +51,6 @@ RedisEntry *redisxGetTable(Redis *redis, const char *table, int *n) {
     return NULL;
   }
 
-  if(redis == NULL) {
-    *n = x_error(X_NULL, EINVAL, fn, "redis is NULL");
-    return NULL;
-  }
-
   if(table == NULL) {
     *n = x_error(X_GROUP_INVALID, EINVAL, fn, "table parameter is NULL");
     return NULL;
@@ -73,7 +68,13 @@ RedisEntry *redisxGetTable(Redis *redis, const char *table, int *n) {
     return x_trace_null(fn, NULL);
   }
 
-  *n = redisxCheckDestroyRESP(reply, RESP_ARRAY, 0);
+  // Cast RESP2 array respone to RESP3 map also...
+  if(reply && reply->type == RESP_ARRAY) {
+    reply->type = RESP3_MAP;
+    reply->n >>= 1;
+  }
+
+  *n = redisxCheckDestroyRESP(reply, RESP3_MAP, 0);
   if(*n) {
     return x_trace_null(fn, NULL);
   }
@@ -81,6 +82,7 @@ RedisEntry *redisxGetTable(Redis *redis, const char *table, int *n) {
   *n = reply->n / 2;
 
   if(*n > 0) {
+    RedisMapEntry *dict = (RedisMapEntry *) reply->value;
     entries = (RedisEntry *) calloc(*n, sizeof(RedisEntry));
 
     if(entries == NULL) {
@@ -90,21 +92,19 @@ RedisEntry *redisxGetTable(Redis *redis, const char *table, int *n) {
       int i;
 
       for(i=0; i<reply->n; i+=2) {
-        RedisEntry *e = &entries[i>>1];
-        RESP **component = (RESP **) reply->value;
+        RedisEntry *e = &entries[i];
+        RedisMapEntry *component = &dict[i];
+        e->key = component->key->value;
+        e->value = component->value->value;
 
-        e->key = (char *) component[i]->value;
-        e->value = (char *) component[i+1]->value;
-        e->length = component[i+1]->n;
-
-        // Dereference the values from the RESP
-        component[i]->value = NULL;
-        component[i+1]->value = NULL;
+        // Dereference the key/value so we don't destroy them with the reply.
+        component->key->value = NULL;
+        component->value->value = NULL;
       }
     }
   }
 
-  // Free the Reply container, but not the strings inside, which are returned.
+  // Free the reply container, but not the strings inside, which are returned.
   redisxDestroyRESP(reply);
   return entries;
 }
@@ -131,12 +131,10 @@ int redisxSetValue(Redis *redis, const char *table, const char *key, const char 
 
   int status = X_SUCCESS;
 
-  if(redis == NULL) return x_error(X_NULL, EINVAL, fn, "redis is NULL");
-
+  prop_error(fn, redisxCheckValid(redis));
   prop_error(fn, redisxLockConnected(redis->interactive));
 
   status = redisxSetValueAsync(redis->interactive, table, key, value, confirm);
-
   redisxUnlockClient(redis->interactive);
 
   prop_error(fn, status);
@@ -212,13 +210,7 @@ RESP *redisxGetValue(Redis *redis, const char *table, const char *key, int *stat
   static const char *fn = "redisxGetValue";
 
   RESP *reply;
-  int s;
-
-  if(redis == NULL) {
-    x_error(X_NULL, EINVAL, fn, "redis is NULL");
-    if(status) *status = X_NULL;
-    return NULL;
-  }
+  int s = X_SUCCESS;
 
   if(table && !table[0]) {
     x_error(X_GROUP_INVALID, EINVAL, fn, "'table' parameter is empty");
@@ -268,20 +260,11 @@ RESP *redisxGetValue(Redis *redis, const char *table, const char *key, int *stat
  * \sa redisxGetValue()
  */
 char *redisxGetStringValue(Redis *redis, const char *table, const char *key, int *len) {
-  static const char *fn = "redisxGetStringValue";
-
   RESP *reply;
   char *str = NULL;
   int status;
 
-  if(redis == NULL) {
-    x_error(0, EINVAL, fn, "redis is NULL");
-    if(len) *len = X_NULL;
-    return NULL;
-  }
-
   reply = redisxGetValue(redis, table, key, len);
-
   status = redisxCheckRESP(reply, RESP_BULK_STRING, 0);
 
   if(status == X_SUCCESS) {
@@ -293,7 +276,7 @@ char *redisxGetStringValue(Redis *redis, const char *table, const char *key, int
 
   redisxDestroyRESP(reply);
 
-  if(status) x_trace_null(fn, NULL);
+  if(status) x_trace_null("redisxGetStringValue", NULL);
 
   return str;
 }
@@ -339,7 +322,7 @@ int redisxMultiSetAsync(RedisClient *cl, const char *table, const RedisEntry *en
     return x_trace(fn, NULL, X_FAILURE);
   }
 
-  req[0] = "HMSET";
+  req[0] = "HMSET"; // TODO, as of Redis 4.0.0, just use HSET...
   req[1] = (char *) table;
 
   for(i=0; i<n; i++) {
@@ -376,7 +359,8 @@ int redisxMultiSet(Redis *redis, const char *table, const RedisEntry *entries, i
   static const char *fn = "redisxMultiSet";
   int status;
 
-  if(redis == NULL) return x_error(X_NULL, EINVAL, fn, "redis is NULL");
+  prop_error(fn, redisxCheckValid(redis));
+
   if(table == NULL) return x_error(X_GROUP_INVALID, EINVAL, fn, "table parameter is NULL");
   if(!table[0]) return x_error(X_GROUP_INVALID, EINVAL, fn, "table parameter is empty");
   if(entries == NULL) return x_error(X_NULL, EINVAL, fn, "'entries' parameter is NULL");
@@ -421,11 +405,6 @@ char **redisxGetKeys(Redis *redis, const char *table, int *n) {
 
   if(n == NULL) {
     x_error(X_NULL, EINVAL, fn, "parameter 'n' is NULL");
-    return NULL;
-  }
-
-  if(redis == NULL) {
-    *n = x_error(X_NULL, EINVAL, fn, "redis is NULL");
     return NULL;
   }
 
@@ -485,10 +464,8 @@ char **redisxGetKeys(Redis *redis, const char *table, int *n) {
 int redisxSetScanCount(Redis *redis, int count) {
   RedisPrivate *p;
 
-  if(redis == NULL) return x_error(X_NULL, EINVAL, "redisxSetScanCount", "redis is NULL");
-
+  prop_error("redisxSetScanCount", rConfigLock(redis));
   p = (RedisPrivate *) redis->priv;
-  rConfigLock(redis);
   p->scanCount = count;
   rConfigUnlock(redis);
 
@@ -499,7 +476,8 @@ int redisxSetScanCount(Redis *redis, int count) {
  * Returns the COUNT parameter currently set to be used with Redis SCAN-type commands
  *
  * @param redis     Pointer to a Redis instance.
- * @return          The current COUNT to use for SCAN-type commands or <0 to use default.
+ * @return          The current COUNT to use for SCAN-type commands, or &lt;0 in case
+ *                  of an error.
  *
  * @sa redisxGetScanCount()
  * @sa redisxScanKeys()
@@ -507,11 +485,14 @@ int redisxSetScanCount(Redis *redis, int count) {
  */
 int redisxGetScanCount(Redis *redis) {
   const RedisPrivate *p;
+  int count;
 
-  if(redis == NULL) return x_error(-1, EINVAL, "redisxSetScanCount", "redis is NULL");
-
+  prop_error("redisxGetScanCount", rConfigLock(redis));
   p = (RedisPrivate *) redis->priv;
-  return p->scanCount;
+  count = p->scanCount;
+  rConfigUnlock(redis);
+
+  return count;
 }
 
 static int compare_strings(const void *a, const void *b) {
@@ -555,20 +536,14 @@ char **redisxScanKeys(Redis *redis, const char *pattern, int *n, int *status) {
   char countArg[20];
   int args = 0, i, j, capacity = SCAN_INITIAL_STORE_CAPACITY;
 
-  if(status == NULL) {
-    x_error(0, EINVAL, fn, "'status' parameter is NULL");
-    return NULL;
-  }
-
   if(n == NULL) {
     x_error(X_NULL, EINVAL, fn, "parameter 'n' is NULL");
-    *status = X_NULL;
+    if(status) *status = X_NULL;
     return NULL;
   }
 
-  if(redis == NULL) {
-    x_error(X_NULL, EINVAL, fn, "redis is NULL");
-    *status = X_NULL;
+  if(status == NULL) {
+    x_error(0, EINVAL, fn, "'status' parameter is NULL");
     return NULL;
   }
 
@@ -654,12 +629,12 @@ char **redisxScanKeys(Redis *redis, const char *pattern, int *n, int *status) {
 
   } while (strcmp(*pCursor, SCAN_INITIAL_CURSOR));  // Done when cursor is back to 0...
 
-  // Check for errors
-  if(*status) x_trace(fn, NULL, *status);
-
   // Clean up.
   redisxDestroyRESP(reply);
   free(*pCursor);
+
+  // Check for errors
+  if(*status) x_trace(fn, NULL, *status);
 
   if(!names) return NULL;
 
@@ -729,20 +704,14 @@ RedisEntry *redisxScanTable(Redis *redis, const char *table, const char *pattern
   char **pCursor;
   int args= 0, i, j, capacity = SCAN_INITIAL_STORE_CAPACITY;
 
-  if(status == NULL) {
-    x_error(0, EINVAL, fn, "'status' parameter is NULL");
-    return NULL;
-  }
-
   if(n == NULL) {
     x_error(X_NULL, EINVAL, fn, "parameter 'n' is NULL");
-    *status = X_NULL;
+    if(status) *status = X_NULL;
     return NULL;
   }
 
-  if(redis == NULL) {
-    x_error(X_NULL, EINVAL, fn, "redis is NULL");
-    *status = X_NULL;
+  if(status == NULL) {
+    x_error(0, EINVAL, fn, "'status' parameter is NULL");
     return NULL;
   }
 
@@ -853,12 +822,12 @@ RedisEntry *redisxScanTable(Redis *redis, const char *table, const char *pattern
 
   } while(strcmp(*pCursor, SCAN_INITIAL_CURSOR));  // Done when cursor is back to 0...
 
-  // Check for errors
-  if(*status) x_trace(fn, NULL, *status);
-
   // Clean up.
   redisxDestroyRESP(reply);
   free(*pCursor);
+
+  // Check for errors
+  if(*status) x_trace(fn, NULL, *status);
 
   if(!entries) return NULL;
 
@@ -942,12 +911,12 @@ int redisxDeleteEntries(Redis *redis, const char *pattern) {
   char **keys;
   int i, n = 0, status;
 
-  if(!redis) return x_error(X_NULL, EINVAL, fn, "redis is NULL");
   if(!pattern) return x_error(X_NULL, EINVAL, fn, "'pattern' is NULL");
   if(!pattern[0]) return x_error(X_NULL, EINVAL, fn, "'pattern' is empty");
 
   keys = redisxScanKeys(redis, pattern, &n, &status);
-  if(status) return status;
+  prop_error(fn, status);
+
   if(!keys) return x_trace(fn, NULL, X_NULL);
 
   for(i = 0; i < n ; i++) {

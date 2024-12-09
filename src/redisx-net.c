@@ -14,6 +14,7 @@
 #include <errno.h>
 #include <pthread.h>
 #include <sys/utsname.h>
+#include <sys/time.h>
 #include <arpa/inet.h>
 #include <netinet/tcp.h>
 #if __Lynx__
@@ -87,21 +88,21 @@ static int hostnameToIP(const char *hostName, char *ip) {
 /**
  * Configure the Redis client sockets for optimal performance...
  *
- * \param socket        The socket file descriptor.
- * \param lowLatency    TRUE (non-zero) if socket is to be configured for low latency, or else FALSE (0).
+ * \param socket          The socket file descriptor.
+ * \param timeoutMillis   [ms] Socket read/write timeout, or &lt;0 to no set.
+ * \param lowLatency      TRUE (non-zero) if socket is to be configured for low latency, or else FALSE (0).
  *
  */
-static void rConfigSocket(int socket, boolean lowLatency) {
+static void rConfigSocket(int socket, int timeoutMillis, boolean lowLatency) {
   const boolean enable = TRUE;
 
-#if REDIS_TIMEOUT_SECONDS > 0
-  {
+  if(timeoutMillis > 0) {
     struct linger linger;
     struct timeval timeout;
 
     // Set a time limit for sending.
-    timeout.tv_sec = REDIS_TIMEOUT_SECONDS;
-    timeout.tv_usec = 0;
+    timeout.tv_sec = timeoutMillis / 1000;
+    timeout.tv_usec = 1000 * (timeoutMillis % 1000);
     if(setsockopt(socket, SOL_SOCKET, SO_SNDTIMEO, & timeout, sizeof(struct timeval)))
       xvprintf("WARNING! Redix-X: socket send timeout not set: %s", strerror(errno));
 
@@ -113,7 +114,6 @@ static void rConfigSocket(int socket, boolean lowLatency) {
     if(setsockopt(socket, SOL_SOCKET, SO_LINGER, & linger, sizeof(struct timeval)))
       xvprintf("WARNING! Redis-X: socket linger not set: %s", strerror(errno));
   }
-#endif
 
 #if __linux__
   {
@@ -127,9 +127,9 @@ static void rConfigSocket(int socket, boolean lowLatency) {
 #endif
 
 #if !(__Lynx__ && __powerpc__)
-    // Send packets immediately even if small...
-    if(lowLatency) if(setsockopt(socket, IPPROTO_TCP, TCP_NODELAY, & enable, sizeof(int)))
-      xvprintf("WARNING! Redis-X: socket tcpnodelay not enabled: %s", strerror(errno));
+  // Send packets immediately even if small...
+  if(lowLatency) if(setsockopt(socket, IPPROTO_TCP, TCP_NODELAY, & enable, sizeof(int)))
+    xvprintf("WARNING! Redis-X: socket tcpnodelay not enabled: %s", strerror(errno));
 #endif
 
   // Check connection to remote every once in a while to detect if it's down...
@@ -313,9 +313,10 @@ static void rCloseClientAsync(RedisClient *cl) {
  *
  */
 void rCloseClient(RedisClient *cl) {
-  redisxLockClient(cl);
-  rCloseClientAsync(cl);
-  redisxUnlockClient(cl);
+  if(redisxLockClient(cl) == X_SUCCESS) {
+    rCloseClientAsync(cl);
+    redisxUnlockClient(cl);
+  }
   return;
 }
 
@@ -363,7 +364,7 @@ static int rReconnectAsync(Redis *redis, boolean usePipeline) {
  *
  */
 void redisxDisconnect(Redis *redis) {
-  if(redis == NULL) return;
+  if(redisxCheckValid(redis) != X_SUCCESS) return;
 
   rConfigLock(redis);
   rDisconnectAsync(redis);
@@ -387,12 +388,9 @@ int redisxReconnect(Redis *redis, boolean usePipeline) {
 
   int status;
 
-  if(redis == NULL) return x_error(X_NULL, EINVAL, fn, "redis is NULL");
-
-  rConfigLock(redis);
+  prop_error(fn, rConfigLock(redis));
   status = rReconnectAsync(redis, usePipeline);
   rConfigUnlock(redis);
-
   prop_error(fn, status);
 
   return X_SUCCESS;
@@ -502,6 +500,50 @@ boolean rIsLowLatency(const ClientPrivate *cp) {
   return cp->idx != REDISX_PIPELINE_CHANNEL;
 }
 
+static int rHelloAsync(RedisClient *cl, char *clientID) {
+  ClientPrivate *cp = (ClientPrivate *) cl->priv;
+  RedisPrivate *p = (RedisPrivate *) cp->redis->priv;
+  RESP *reply;
+  char proto[20];
+  char *args[6];
+  int status, k = 0;
+
+  args[k++] = "HELLO";
+
+  // Try HELLO and see what we get back...
+  sprintf(proto, "%d", (int) p->protocol);
+  args[k++] = proto;
+
+  if(p->password) {
+    args[k++] = "AUTH";
+    args[k++] = p->username ? p->username : "default";
+    args[k++] = p->password;
+  }
+
+  args[k++] = "SETNAME";
+  args[k++] = clientID;
+
+  status = redisxSendArrayRequestAsync(cl, args, NULL, k);
+  if(status != X_SUCCESS) return status;
+
+  reply = redisxReadReplyAsync(cl);
+  status = redisxCheckRESP(reply, RESP3_MAP, 0);
+  if(status == X_SUCCESS) {
+    RedisMapEntry *e = redisxGetKeywordEntry(reply, "proto");
+    if(e && e->value->type == RESP_INT) {
+      p->protocol = e->value->n;
+      xvprintf("Confirmed protocol %d\n", p->protocol);
+    }
+
+    redisxDestroyRESP(p->helloData);
+    p->helloData = reply;
+  }
+  else xvprintf("! Redis-X: HELLO failed: %s\n", redisxErrorDescription(status));
+
+  return status;
+}
+
+
 /**
  * Connects the specified Redis client to the Redis server.
  *
@@ -521,13 +563,13 @@ int rConnectClient(Redis *redis, enum redisx_channel channel) {
 
   struct sockaddr_in serverAddress;
   struct utsname u;
-  const RedisPrivate *p;
+  RedisPrivate *p;
   RedisClient *cl;
   ClientPrivate *cp;
 
   const char *channelID;
   char host[200], *id;
-  int status;
+  int status = X_SUCCESS;
   int sock;
 
   cl = redisxGetClient(redis, channel);
@@ -543,7 +585,7 @@ int rConnectClient(Redis *redis, enum redisx_channel channel) {
   if((sock = socket(PF_INET, SOCK_STREAM, IPPROTO_TCP)) < 0)
     return x_error(X_NO_SERVICE, errno, fn, "client %d socket creation failed", channel);
 
-  rConfigSocket(sock, rIsLowLatency(cp));
+  rConfigSocket(sock, p->timeoutMillis, rIsLowLatency(cp));
 
   while(connect(sock, (struct sockaddr *) &serverAddress, sizeof(serverAddress)) != 0) {
     close(sock);
@@ -551,20 +593,6 @@ int rConnectClient(Redis *redis, enum redisx_channel channel) {
   }
 
   xvprintf("Redis-X> client %d assigned socket fd %d.\n", channel, sock);
-
-  redisxLockClient(cl);
-
-  cp->socket = sock;
-  cp->isEnabled = TRUE;
-
-  if(p->password) {
-    status = rAuthAsync(cl);
-    if(status) {
-      rCloseClientAsync(cl);
-      redisxUnlockClient(cl);
-      return status;
-    }
-  }
 
   // Set the client name in Redis.
   uname(&u);
@@ -577,11 +605,26 @@ int rConnectClient(Redis *redis, enum redisx_channel channel) {
     case REDISX_SUBSCRIPTION_CHANNEL: channelID = "subscription"; break;
     default: channelID = "unknown";
   }
-
   sprintf(id, "%s:pid-%d:%s", host, (int) getppid(), channelID);
 
-  status = redisxSkipReplyAsync(cl);
-  if(!status) status = redisxSendRequestAsync(cl, "CLIENT", "SETNAME", id, NULL);
+  redisxLockClient(cl);
+
+  cp->socket = sock;
+  cp->isEnabled = TRUE;
+
+  if(p->hello) status = rHelloAsync(cl, id);
+
+  if(status != X_SUCCESS) {
+    status = X_SUCCESS;
+    p->hello = FALSE;
+
+    // No HELLO, go the old way...
+    p->protocol = REDISX_RESP2;
+    if(p->password) status = rAuthAsync(cl);
+
+    if(!status) status = redisxSkipReplyAsync(cl);
+    if(!status) status = redisxSendRequestAsync(cl, "CLIENT", "SETNAME", id, NULL);
+  }
 
   free(id);
 
@@ -650,13 +693,15 @@ Redis *redisxInit(const char *server) {
   redis->subscription = &p->clients[REDISX_SUBSCRIPTION_CHANNEL];
   redis->id = xStringCopyOf(ipAddress);
 
-  for(i=REDISX_CHANNELS; --i >= 0; ) {
+  for(i = REDISX_CHANNELS; --i >= 0; ) {
     ClientPrivate *cp = (ClientPrivate *) p->clients[i].priv;
     cp->redis = redis;
   }
 
   p->addr = inet_addr((char *) ipAddress);
   p->port = REDISX_TCP_PORT;
+  p->protocol = REDISX_RESP2;     // Default
+  p->timeoutMillis = REDISX_DEFAULT_TIMEOUT_MILLIS;
 
   l = (ServerLink *) calloc(1, sizeof(ServerLink));
   x_check_alloc(l);
@@ -687,7 +732,7 @@ void redisxDestroy(Redis *redis) {
 
   if(redisxIsConnected(redis)) redisxDisconnect(redis);
 
-  for(i=REDISX_CHANNELS; --i >= 0; ) {
+  for(i = REDISX_CHANNELS; --i >= 0; ) {
     ClientPrivate *cp = (ClientPrivate *) p->clients[i].priv;
     pthread_mutex_destroy(&cp->readLock);
     pthread_mutex_destroy(&cp->writeLock);
@@ -719,15 +764,40 @@ void redisxSetTcpBuf(int size) {
  * @param redis   Pointer to a Redis instance.
  * @param port    The TCP port number to use.
  *
+ * @return                X_SUCCESS (0) if successful, or else X_NULL if the redis instance is NULL,
+ *                        or X_N_INIT if the redis instance is not initialized.
+ *
  * @sa redisxConnect();
  */
 int redisxSetPort(Redis *redis, int port) {
   RedisPrivate *p;
 
-  if(redis == NULL) return x_error(X_NULL, EINVAL, "redisxSetPort", "redis is NULL");
-
+  prop_error("redisxSetPort", rConfigLock(redis));
   p = (RedisPrivate *) redis->priv;
   p->port = port;
+  rConfigUnlock(redis);
+
+  return X_SUCCESS;
+}
+
+
+/**
+ * Sets a socket timeout for future client connections on a Redis instance. If not set (or set to zero
+ * or a negative value), then the timeout will not be configured for sockets, and the system default
+ * timeout values will apply.
+ *
+ * @param redis           The Redis instance
+ * @param timeoutMillis   [ms] The desired socket read/write timeout, or &lt;0 for socket default.
+ * @return                X_SUCCESS (0) if successful, or else X_NULL if the redis instance is NULL,
+ *                        or X_N_INIT if the redis instance is not initialized.
+ */
+int redisxSetSocketTimeout(Redis *redis, int timeoutMillis) {
+  RedisPrivate *p;
+
+  prop_error("redisxSetPort", rConfigLock(redis));
+  p = (RedisPrivate *) redis->priv;
+  p->timeoutMillis = timeoutMillis;
+  rConfigUnlock(redis);
 
   return X_SUCCESS;
 }
@@ -757,14 +827,9 @@ int redisxConnect(Redis *redis, boolean usePipeline) {
   static const char *fn = "redisxConnect";
   int status;
 
-  if(redis == NULL) return x_error(X_NULL, EINVAL, fn, "redis is NULL");
-
-  rConfigLock(redis);
-
+  prop_error(fn, rConfigLock(redis));
   status = rConnectAsync(redis, usePipeline);
-
   rConfigUnlock(redis);
-
   prop_error(fn, status);
 
   return X_SUCCESS;
@@ -781,8 +846,7 @@ int redisxConnect(Redis *redis, boolean usePipeline) {
 boolean redisxIsConnected(Redis *redis) {
   const ClientPrivate *ip;
 
-  if(redis == NULL) return FALSE;
-
+  if(redisxCheckValid(redis) != X_SUCCESS) return FALSE;
   ip = (ClientPrivate *) redis->interactive->priv;
   return ip->isEnabled;
 }
@@ -810,10 +874,7 @@ void *RedisPipelineListener(void *pRedis) {
 
   xvprintf("Redis-X> Started processing pipelined responses...\n");
 
-  if(redis == NULL) {
-    x_error(0, EINVAL, "RedisPipelineListener", "redis is NULL");
-    return NULL;
-  }
+  if(redisxCheckValid(redis) != X_SUCCESS) return x_trace_null("RedisPipelineListener", NULL);
 
   p = (RedisPrivate *) redis->priv;
   cl = redis->pipeline;

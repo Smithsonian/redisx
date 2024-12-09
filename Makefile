@@ -69,7 +69,7 @@ clean:
 
 # Remove all generated files
 .PHONY: distclean
-distclean: clean
+distclean:
 	rm -f Doxyfile.local $(LIB)/libredisx.so* $(LIB)/libredisx.a
 
 
@@ -77,7 +77,7 @@ distclean: clean
 # The nitty-gritty stuff below
 # ----------------------------------------------------------------------------
 
-SOURCES = $(SRC)/redisx.c $(SRC)/redisx-net.c $(SRC)/redisx-hooks.c $(SRC)/redisx-client.c \
+SOURCES = $(SRC)/redisx.c $(SRC)/resp.c $(SRC)/redisx-net.c $(SRC)/redisx-hooks.c $(SRC)/redisx-client.c \
           $(SRC)/redisx-tab.c $(SRC)/redisx-sub.c $(SRC)/redisx-script.c
 
 # Generate a list of object (obj/*.o) files from the input sources
