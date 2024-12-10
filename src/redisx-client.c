@@ -759,6 +759,7 @@ static void rPushMessageAsync(RedisClient *cl, RESP *resp) {
  * @param cl    The Redis client instance
  * @return      The attributes last received (possibly NULL).
  *
+ * @sa redisxGetAttributes()
  * @sa redisxClearAttributesAsync()
  * @sa redisxReadReplyAsync()
  * @sa redisxLockClient()

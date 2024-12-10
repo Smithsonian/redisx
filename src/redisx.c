@@ -640,6 +640,32 @@ RESP *redisxArrayRequest(Redis *redis, char *args[], int lengths[], int n, int *
 
 
 /**
+ * Returns a copy of the attributes sent along with the last interative request. The user should
+ * destroy the returned RESP after using it by calling redisxDestroyRESP().
+ *
+ * @param redis     Pointer to a Redis instance.
+ * @return          The attributes (if any) that were sent along with the last response on the
+ *                  interactive client.
+ *
+ * @sa redisxGetAttributeAsync()
+ * @sa redisxRequest()
+ * @sa redisxArrayRequest()
+ * @sa redisxDestroyRESP()
+ */
+RESP *redisxGetAttributes(Redis *redis) {
+  static const char *fn = "redisxGetAttributes";
+  RESP *attr;
+
+  if(redisxCheckValid(redis) != X_SUCCESS) return x_trace_null(fn, NULL);
+  if(redisxLockConnected(redis->interactive) != X_SUCCESS) return x_trace_null(fn, NULL);
+
+  attr = redisxCopyOfRESP(redisxGetAttributesAsync(redis->interactive));
+  redisxUnlockClient(redis->interactive);
+
+  return attr;
+}
+
+/**
  * Sets a user-defined function to process push messages for a specific Redis instance. The function's
  * implementation must follow a simple set of rules:
  *
