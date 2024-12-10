@@ -49,7 +49,7 @@ var NAVTREE =
         [ "Getting and setting keyed values", "index.html#autotoc_md26", null ],
         [ "Listing and Scanning", "index.html#autotoc_md27", null ]
       ] ],
-      [ "Publish/subscribe (PUB/SUB) support", "index.html#autotoc_md29", [
+      [ "Publish / subscribe (PUB/SUB) support", "index.html#autotoc_md29", [
         [ "Broadcasting messages", "index.html#autotoc_md30", null ],
         [ "Subscriptions", "index.html#autotoc_md31", null ]
       ] ],

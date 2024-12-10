@@ -18,7 +18,7 @@ Last Updated: 10 December 2024
  - [Managing Redis server connections](#managing-redis-server-connections)
  - [Simple Redis queries](#simple-redis-queries)
  - [Accessing key / value data](#accessing-key-value-data)
- - [Publish/subscribe (PUB/SUB) support](#publish-subscribe-support)
+ - [Publish / subscribe (PUB/SUB) support](#publish-subscribe-support)
  - [Atomic execution blocks and LUA scripts](#atomic-transaction-blocks-and-lua-scripts)
  - [Advanced queries and pipelining](#advanced-queries)
  - [Error handling](#error-handling)
@@ -687,7 +687,7 @@ Finally, you may use `redisxSetScanCount()` to tune just how many results should
 -----------------------------------------------------------------------------
 
 <a name="publish-subscribe-support"></a>
-## Publish/subscribe (PUB/SUB) support
+## Publish / subscribe (PUB/SUB) support
  
  - [Broadcasting messages](#broadcasting-messages)
  - [Subscriptions](#subscriptions)

@@ -8,7 +8,7 @@ var searchData=
   ['prerequisites_5',['Prerequisites',['../index.html#autotoc_md7',1,'']]],
   ['priv_6',['priv',['../../../xchange/apidoc/html/structXLookupTable.html#a8b6505c37d4ff95854b8b00527e4d9fa',1,'XLookupTable']]],
   ['processing_7',['Asynchronous client processing',['../index.html#autotoc_md39',1,'']]],
-  ['pub_20sub_20support_8',['Publish/subscribe (PUB/SUB) support',['../index.html#autotoc_md29',1,'']]],
-  ['publish_20subscribe_20pub_20sub_20support_9',['Publish/subscribe (PUB/SUB) support',['../index.html#autotoc_md29',1,'']]],
+  ['pub_20sub_20support_8',['Publish / subscribe (PUB/SUB) support',['../index.html#autotoc_md29',1,'']]],
+  ['publish_20subscribe_20pub_20sub_20support_9',['Publish / subscribe (PUB/SUB) support',['../index.html#autotoc_md29',1,'']]],
   ['push_20notifications_10',['Push notifications',['../index.html#autotoc_md22',1,'']]]
 ];
