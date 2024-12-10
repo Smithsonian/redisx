@@ -487,6 +487,13 @@
       <arglist>(RedisClient *cl)</arglist>
     </member>
     <member kind="function">
+      <type>RESP *</type>
+      <name>redisxGetAttributes</name>
+      <anchorfile>redisx_8h.html</anchorfile>
+      <anchor>a48b6b8949276f59cd2f13d6b13384996</anchor>
+      <arglist>(Redis *redis)</arglist>
+    </member>
+    <member kind="function">
       <type>const RESP *</type>
       <name>redisxGetAttributesAsync</name>
       <anchorfile>redisx_8h.html</anchorfile>
@@ -1440,6 +1447,13 @@
     </member>
     <member kind="function">
       <type>RESP *</type>
+      <name>redisxGetAttributes</name>
+      <anchorfile>redisx_8c.html</anchorfile>
+      <anchor>a48b6b8949276f59cd2f13d6b13384996</anchor>
+      <arglist>(Redis *redis)</arglist>
+    </member>
+    <member kind="function">
+      <type>RESP *</type>
       <name>redisxGetHelloData</name>
       <anchorfile>redisx_8c.html</anchorfile>
       <anchor>a89fd65118ba731931fe281c83f6fa8ba</anchor>
@@ -1802,6 +1816,7 @@
     <docanchor file="index.html">connection-hooks</docanchor>
     <docanchor file="index.html">simple-redis-queries</docanchor>
     <docanchor file="index.html">interactive-transactions</docanchor>
+    <docanchor file="index.html">attributes</docanchor>
     <docanchor file="index.html">push-notifications</docanchor>
     <docanchor file="index.html">resp-data-type</docanchor>
     <docanchor file="index.html">accessing-key-value-data</docanchor>
@@ -1816,7 +1831,7 @@
     <docanchor file="index.html">custom-functions</docanchor>
     <docanchor file="index.html">advanced-queries</docanchor>
     <docanchor file="index.html">asynchronous-client-processing</docanchor>
-    <docanchor file="index.html">attributes</docanchor>
+    <docanchor file="index.html">async-attributes</docanchor>
     <docanchor file="index.html">pipelined-transactions</docanchor>
     <docanchor file="index.html">error-handling</docanchor>
     <docanchor file="index.html">debug-support</docanchor>

@@ -216,6 +216,9 @@ include/redisx.h
 .RI "\fBRESP\fP * \fBredisxExecBlockAsync\fP (\fBRedisClient\fP *cl)"
 .br
 .ti -1c
+.RI "\fBRESP\fP * \fBredisxGetAttributes\fP (\fBRedis\fP *redis)"
+.br
+.ti -1c
 .RI "const \fBRESP\fP * \fBredisxGetAttributesAsync\fP (const \fBRedisClient\fP *cl)"
 .br
 .ti -1c
@@ -1085,6 +1088,33 @@ The array \fBRESP\fP returned by EXEC, or NULL if there was an error\&.
 
 .PP
 References \fBredisxDestroyRESP()\fP, \fBredisxReadReplyAsync()\fP, \fBredisxSkipReplyAsync()\fP, \fBRESP_ARRAY\fP, \fBRESP_ERROR\fP, \fBTRUE\fP, \fBRESP::type\fP, \fBx_error()\fP, \fBX_SUCCESS\fP, and \fBx_trace_null()\fP\&.
+.SS "\fBRESP\fP * redisxGetAttributes (\fBRedis\fP * redis)"
+Returns a copy of the attributes sent along with the last interative request\&. The user should destroy the returned \fBRESP\fP after using it by calling \fBredisxDestroyRESP()\fP\&.
+.PP
+\fBParameters\fP
+.RS 4
+\fIredis\fP Pointer to a \fBRedis\fP instance\&. 
+.RE
+.PP
+\fBReturns\fP
+.RS 4
+The attributes (if any) that were sent along with the last response on the interactive client\&.
+.RE
+.PP
+\fBSee also\fP
+.RS 4
+redisxGetAttributeAsync() 
+.PP
+\fBredisxRequest()\fP 
+.PP
+\fBredisxArrayRequest()\fP 
+.PP
+\fBredisxDestroyRESP()\fP 
+.RE
+.PP
+
+.PP
+References \fBRedis::interactive\fP, \fBredisxCheckValid()\fP, \fBredisxGetAttributesAsync()\fP, \fBredisxUnlockClient()\fP, \fBX_SUCCESS\fP, and \fBx_trace_null()\fP\&.
 .SS "const \fBRESP\fP * redisxGetAttributesAsync (const \fBRedisClient\fP * cl)"
 Returns the attributes (if any) that were last sent along a response to the client\&. This function should be called only if the caller has an exclusive lock on the client's mutex\&. Also, there are a few rules the caller should follow:
 .PP
@@ -1109,6 +1139,8 @@ The attributes last received (possibly NULL)\&.
 .PP
 \fBSee also\fP
 .RS 4
+\fBredisxGetAttributes()\fP 
+.PP
 \fBredisxClearAttributesAsync()\fP 
 .PP
 \fBredisxReadReplyAsync()\fP 

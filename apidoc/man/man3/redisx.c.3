@@ -26,6 +26,9 @@ src/redisx.c \- A \fBRedis\fP client library that compiles on older and newer pl
 .RI "const char * \fBredisxErrorDescription\fP (int code)"
 .br
 .ti -1c
+.RI "\fBRESP\fP * \fBredisxGetAttributes\fP (\fBRedis\fP *redis)"
+.br
+.ti -1c
 .RI "\fBRESP\fP * \fBredisxGetHelloData\fP (\fBRedis\fP *redis)"
 .br
 .ti -1c
@@ -202,6 +205,33 @@ A constant string with the error description\&.
 
 .PP
 References \fBREDIS_ERROR\fP, \fBREDIS_INCOMPLETE_TRANSFER\fP, \fBREDIS_INVALID_CHANNEL\fP, \fBREDIS_NULL\fP, \fBREDIS_UNEXPECTED_ARRAY_SIZE\fP, \fBREDIS_UNEXPECTED_RESP\fP, and \fBxErrorDescription()\fP\&.
+.SS "\fBRESP\fP * redisxGetAttributes (\fBRedis\fP * redis)"
+Returns a copy of the attributes sent along with the last interative request\&. The user should destroy the returned \fBRESP\fP after using it by calling \fBredisxDestroyRESP()\fP\&.
+.PP
+\fBParameters\fP
+.RS 4
+\fIredis\fP Pointer to a \fBRedis\fP instance\&. 
+.RE
+.PP
+\fBReturns\fP
+.RS 4
+The attributes (if any) that were sent along with the last response on the interactive client\&.
+.RE
+.PP
+\fBSee also\fP
+.RS 4
+redisxGetAttributeAsync() 
+.PP
+\fBredisxRequest()\fP 
+.PP
+\fBredisxArrayRequest()\fP 
+.PP
+\fBredisxDestroyRESP()\fP 
+.RE
+.PP
+
+.PP
+References \fBRedis::interactive\fP, \fBredisxCheckValid()\fP, \fBredisxGetAttributesAsync()\fP, \fBredisxUnlockClient()\fP, \fBX_SUCCESS\fP, and \fBx_trace_null()\fP\&.
 .SS "\fBRESP\fP * redisxGetHelloData (\fBRedis\fP * redis)"
 Returns a copy of the \fBRESP\fP map that the \fBRedis\fP server has sent us as a response to HELLO on the last client connection, or NULL if HELLO was not used or available\&.
 .PP

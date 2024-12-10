@@ -136,7 +136,7 @@ you can simply link your program using the  `-lredisx -lxchange` flags. Your `Ma
 
 ```make
 myprog: ...
-	cc -o $@ $^ $(LDFLAGS) -lredisx -lxchange 
+	$(CC) -o $@ $^ $(LDFLAGS) -lredisx -lxchange 
 ```
 
 (Or, you might simply add `-lredisx -lxchange` to `LDFLAGS` and use a more standard recipe.) And, in if you installed 
@@ -304,6 +304,7 @@ The same goes for disconnect hooks, using `redisxAddDisconnectHook()` instead.
 ## Simple Redis queries
 
  - [Interactive transactions](#interactive-transactions)
+ - [Bundled Attributes](#attributes)
  - [Push notifications](#push-notifications)
  - [RESP data type](#resp-data-type)
 
@@ -356,6 +357,28 @@ individual parameters are not 0-terminated strings.
 
 In interactive mode, each request is sent to the Redis server, and the response is collected before the call returns 
 with that response (or `NULL` if there was an error).
+
+<a name="attributes"></a>
+### Bundled Attributes
+
+Redis 6 introduced the possibility of sending optional attributes along with responses, using the RESP3 protocol. 
+These attributes are not included in the responses sent to users, in accordance with RESP3 protocol. Rather, they are 
+made available to users on demand, when needed, after the response to a request is received. You may retrieve the 
+attributes to interactive requests _after_ the `redisxRequest()` or `redisxArrayRequest()` queries, using 
+`redisxGetAttributes()`, e.g.:
+
+```c
+  ...
+  
+  // Some interactive request
+  RESP *reply = redisxRequest(redis, ...);
+  
+  // Get the attributes (if any) that were bundled with the response...
+  RESP *attributes = redisxGetAttributes(redis);
+  
+  ...
+```
+
 
 <a name="push-notifications"></a>
 ### Push notifications
@@ -874,7 +897,7 @@ Stay tuned.
 ## Advanced queries and pipelining
 
  - [Asynchronous client processing](#asynchronous-client-processing)
- - [Bundled Attributes](#attributes)
+ - [Bundled Attributes](#async-attributes)
  - [Pipelined transactions](#pipelined-transactions)
 
 
@@ -959,7 +982,7 @@ Of course you can build up arbitrarily complex set of queries and deal with a se
 what works best for your application.
 
 
-<a name="attributes"></a>
+<a name="async-attributes"></a>
 ### Bundled Attributes
 
 As of Redis 6, the server might send ancillary data along with replies, if the RESP3 protocol is used. These are 

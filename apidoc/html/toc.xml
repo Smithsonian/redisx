@@ -13,30 +13,31 @@
     </topic>
     <topic label="Simple Redis queries" href="index.html#autotoc_md19">
       <topic label="Interactive transactions" href="index.html#autotoc_md20"/>
-      <topic label="Push notifications" href="index.html#autotoc_md21"/>
-      <topic label="RESP data type" href="index.html#autotoc_md22"/>
+      <topic label="Bundled Attributes" href="index.html#autotoc_md21"/>
+      <topic label="Push notifications" href="index.html#autotoc_md22"/>
+      <topic label="RESP data type" href="index.html#autotoc_md23"/>
     </topic>
-    <topic label="Accessing key / value data" href="index.html#autotoc_md24">
-      <topic label="Getting and setting keyed values" href="index.html#autotoc_md25"/>
-      <topic label="Listing and Scanning" href="index.html#autotoc_md26"/>
+    <topic label="Accessing key / value data" href="index.html#autotoc_md25">
+      <topic label="Getting and setting keyed values" href="index.html#autotoc_md26"/>
+      <topic label="Listing and Scanning" href="index.html#autotoc_md27"/>
     </topic>
-    <topic label="Publish/subscribe (PUB/SUB) support" href="index.html#autotoc_md28">
-      <topic label="Broadcasting messages" href="index.html#autotoc_md29"/>
-      <topic label="Subscriptions" href="index.html#autotoc_md30"/>
+    <topic label="Publish/subscribe (PUB/SUB) support" href="index.html#autotoc_md29">
+      <topic label="Broadcasting messages" href="index.html#autotoc_md30"/>
+      <topic label="Subscriptions" href="index.html#autotoc_md31"/>
     </topic>
-    <topic label="Atomic execution blocks and LUA scripts" href="index.html#autotoc_md32">
-      <topic label="Execution blocks" href="index.html#autotoc_md33"/>
-      <topic label="LUA script loading and execution" href="index.html#autotoc_md34"/>
-      <topic label="Custom Redis functions" href="index.html#autotoc_md35"/>
+    <topic label="Atomic execution blocks and LUA scripts" href="index.html#autotoc_md33">
+      <topic label="Execution blocks" href="index.html#autotoc_md34"/>
+      <topic label="LUA script loading and execution" href="index.html#autotoc_md35"/>
+      <topic label="Custom Redis functions" href="index.html#autotoc_md36"/>
     </topic>
-    <topic label="Advanced queries and pipelining" href="index.html#autotoc_md37">
-      <topic label="Asynchronous client processing" href="index.html#autotoc_md38"/>
-      <topic label="Bundled Attributes" href="index.html#autotoc_md39"/>
-      <topic label="Pipelined transactions" href="index.html#autotoc_md40"/>
+    <topic label="Advanced queries and pipelining" href="index.html#autotoc_md38">
+      <topic label="Asynchronous client processing" href="index.html#autotoc_md39"/>
+      <topic label="Bundled Attributes" href="index.html#autotoc_md40"/>
+      <topic label="Pipelined transactions" href="index.html#autotoc_md41"/>
     </topic>
-    <topic label="Error handling" href="index.html#autotoc_md42"/>
-    <topic label="Debug support" href="index.html#autotoc_md44"/>
-    <topic label="Future plans" href="index.html#autotoc_md46"/>
+    <topic label="Error handling" href="index.html#autotoc_md43"/>
+    <topic label="Debug support" href="index.html#autotoc_md45"/>
+    <topic label="Future plans" href="index.html#autotoc_md47"/>
   </topic>
   <topic label="Changelog" href="md_CHANGELOG.html">
     <topic label="[Unreleased]" href="md_CHANGELOG.html#autotoc_md1"/>
@@ -171,6 +172,7 @@
           <topic label="redisxError" href="redisx_8h.html#ae722b046fa70a55db725341ef8ee56dc"/>
           <topic label="redisxErrorDescription" href="redisx_8h.html#a38f3de77ad5a48d37b302bce2e3cd25b"/>
           <topic label="redisxExecBlockAsync" href="redisx_8h.html#a6fed65f9413569c771d5165a0194477a"/>
+          <topic label="redisxGetAttributes" href="redisx_8h.html#a48b6b8949276f59cd2f13d6b13384996"/>
           <topic label="redisxGetAttributesAsync" href="redisx_8h.html#a6c9d4ce9babbcaac35e45f536d47858d"/>
           <topic label="redisxGetClient" href="redisx_8h.html#a14907be8fba6a13505a352673cea5895"/>
           <topic label="redisxGetHelloData" href="redisx_8h.html#a89fd65118ba731931fe281c83f6fa8ba"/>
@@ -318,6 +320,7 @@
           <topic label="redisxDebugTraffic" href="redisx_8c.html#a7cde25fca6ae274d8d0a66d5c8b63ff5"/>
           <topic label="redisxError" href="redisx_8c.html#ae722b046fa70a55db725341ef8ee56dc"/>
           <topic label="redisxErrorDescription" href="redisx_8c.html#a38f3de77ad5a48d37b302bce2e3cd25b"/>
+          <topic label="redisxGetAttributes" href="redisx_8c.html#a48b6b8949276f59cd2f13d6b13384996"/>
           <topic label="redisxGetHelloData" href="redisx_8c.html#a89fd65118ba731931fe281c83f6fa8ba"/>
           <topic label="redisxGetProtocol" href="redisx_8c.html#af756044530dd5b424ec64e89e22eb0a0"/>
           <topic label="redisxGetTime" href="redisx_8c.html#a5dbdb6bef9c8ac3a4a8e901abe505d30"/>
