@@ -365,7 +365,7 @@ Push notifications</h3>
 <div class="line"> </div>
 <div class="line"><span class="comment">// Use my_push_processor and pass along the owner as a parameter</span></div>
 <div class="line"><a class="code hl_function" href="redisx_8c.html#a2caca9bc8a09225edb88699fdda10602">redisxSetPushProcessor</a>(redis, my_push_processor, owner);</div>
-<div class="ttc" id="aredisx_8c_html_a2caca9bc8a09225edb88699fdda10602"><div class="ttname"><a href="redisx_8c.html#a2caca9bc8a09225edb88699fdda10602">redisxSetPushProcessor</a></div><div class="ttdeci">int redisxSetPushProcessor(Redis *redis, RedisPushProcessor func, void *arg)</div><div class="ttdef"><b>Definition</b> redisx.c:695</div></div>
+<div class="ttc" id="aredisx_8c_html_a2caca9bc8a09225edb88699fdda10602"><div class="ttname"><a href="redisx_8c.html#a2caca9bc8a09225edb88699fdda10602">redisxSetPushProcessor</a></div><div class="ttdeci">int redisxSetPushProcessor(Redis *redis, RedisPushProcessor func, void *arg)</div><div class="ttdef"><b>Definition</b> redisx.c:694</div></div>
 </div><!-- fragment --><p>There are some things to look out for in your <code>RedisPushProcessor</code> implementation:</p>
 <ul>
 <li>The call should not block (except perhaps for a quick mutex lock) and should return quickly. If blocking calls, or extensive processing is required, you should place a copy of the PUSH notification onto a queue and let an asynchronous thread take it from there.</li>
@@ -476,7 +476,7 @@ RESP data type</h3>
 <div class="line"> </div>
 <div class="line"><span class="comment">// Clean up</span></div>
 <div class="line">redisxDestroyRESP(resp);</div>
-<div class="ttc" id="aredisx_8c_html_a89fd65118ba731931fe281c83f6fa8ba"><div class="ttname"><a href="redisx_8c.html#a89fd65118ba731931fe281c83f6fa8ba">redisxGetHelloData</a></div><div class="ttdeci">RESP * redisxGetHelloData(Redis *redis)</div><div class="ttdef"><b>Definition</b> redisx.c:718</div></div>
+<div class="ttc" id="aredisx_8c_html_a89fd65118ba731931fe281c83f6fa8ba"><div class="ttname"><a href="redisx_8c.html#a89fd65118ba731931fe281c83f6fa8ba">redisxGetHelloData</a></div><div class="ttdeci">RESP * redisxGetHelloData(Redis *redis)</div><div class="ttdef"><b>Definition</b> redisx.c:717</div></div>
 <div class="ttc" id="aresp_8c_html_a7f4e74ee03cebf38eb9c1fb873784a35"><div class="ttname"><a href="resp_8c.html#a7f4e74ee03cebf38eb9c1fb873784a35">redisxRESP2JSON</a></div><div class="ttdeci">char * redisxRESP2JSON(const char *name, const RESP *resp)</div><div class="ttdef"><b>Definition</b> resp.c:751</div></div>
 </div><!-- fragment --><p>All <a class="el" href="structRESP.html" title="Structure that represents a Redis response (RESP format).">RESP</a> can be represented in JSON format. This is trivial for map entries, which have strings as their keywords &ndash; which is the case for all <a class="el" href="structRESP.html" title="Structure that represents a Redis response (RESP format).">RESP</a> sent by <a class="el" href="structRedis.html" title="Structure that represents a Redis database instance, with one or more RedisClient connections.">Redis</a>. And, it is also possible for map entries with non-string keys, albeit via a more tedious (and less standard) JSON representation, stored under the <code>.non-string-keys</code> keyword.</p>
 <hr  />
