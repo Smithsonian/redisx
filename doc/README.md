@@ -1,6 +1,6 @@
 <img src="/redisx/resources/CfA-logo.png" alt="CfA logo" width="400" height="67" align="right">
 <br clear="all">
-A simple, light-weight C/C++ Redis client library.
+A free, simple, and light-weight C/C++ Redis / Valkey client library.
 
  - [API documentation](https://smithsonian.github.io/redisx/apidoc/html/files.html)
  - [Project page](https://smithsonian.github.io/redisx) on github.io
