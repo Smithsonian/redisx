@@ -78,7 +78,11 @@ Table access functions for the RedisX library\&. These functions can be used bot
 .SH "Function Documentation"
 .PP 
 .SS "void redisxDestroyEntries (\fBRedisEntry\fP * entries, int count)"
-Destroy a \fBRedisEntry\fP array, such as returned e\&.g\&. by \fBredisxScanTable()\fP
+Destroy a \fBRedisEntry\fP array with dynamically allocate keys/values, such as returned e\&.g\&. by \fBredisxScanTable()\fP\&.
+.PP
+IMPORTANT:
+.PP
+You should not use this function to destroy \fBRedisEntry\fP[] arrays, which contain static string references (keys or values)\&. If the table contains only static references you can simply call free() on the table\&. Otherwise, you will have to first free only the dynamically sized string fields within before calling free() on the table itself\&.
 .PP
 \fBParameters\fP
 .RS 4
@@ -154,7 +158,7 @@ Returns the COUNT parameter currently set to be used with \fBRedis\fP SCAN-type 
 .PP
 \fBReturns\fP
 .RS 4
-The current COUNT to use for SCAN-type commands or <0 to use default\&.
+The current COUNT to use for SCAN-type commands, or <0 in case of an error\&.
 .RE
 .PP
 \fBSee also\fP
@@ -167,8 +171,6 @@ The current COUNT to use for SCAN-type commands or <0 to use default\&.
 .RE
 .PP
 
-.PP
-References \fBx_error()\fP\&.
 .SS "char * redisxGetStringValue (\fBRedis\fP * redis, const char * table, const char * key, int * len)"
 Retrieve a variable from \fBRedis\fP as a string (or byte array), through the interactive connection\&. This is not the highest throughput mode (that would be sending asynchronous pipeline request, and then asynchronously collecting the results such as with \fBredisxSendRequestAsync()\fP / \fBredisxReadReplyAsync()\fP), because it requires separate network roundtrips for each and every request\&. But, it is simple and perfectly good method when one needs to retrieve only a few (<1000) variables per second\&.\&.\&.
 .PP
@@ -197,7 +199,7 @@ A freshly allocated \fBRESP\fP array containing the \fBRedis\fP response, or NUL
 .PP
 
 .PP
-References \fBRESP::n\fP, \fBredisxCheckRESP()\fP, \fBredisxDestroyRESP()\fP, \fBredisxGetValue()\fP, \fBRESP_BULK_STRING\fP, \fBRESP::value\fP, \fBx_error()\fP, \fBX_NULL\fP, \fBX_SUCCESS\fP, and \fBx_trace_null()\fP\&.
+References \fBRESP::n\fP, \fBredisxCheckRESP()\fP, \fBredisxDestroyRESP()\fP, \fBredisxGetValue()\fP, \fBRESP_BULK_STRING\fP, \fBRESP::value\fP, \fBX_SUCCESS\fP, and \fBx_trace_null()\fP\&.
 .SS "\fBRedisEntry\fP * redisxGetTable (\fBRedis\fP * redis, const char * table, int * n)"
 Returns all the key/value pairs stored in a given hash table
 .PP
@@ -226,7 +228,7 @@ redisxDEstroyEntries()
 .PP
 
 .PP
-References \fBRedisEntry::key\fP, \fBRedisEntry::length\fP, \fBRESP::n\fP, \fBredisxCheckDestroyRESP()\fP, \fBredisxDestroyRESP()\fP, \fBredisxRequest()\fP, \fBRESP_ARRAY\fP, \fBRESP::value\fP, \fBRedisEntry::value\fP, \fBx_error()\fP, \fBX_GROUP_INVALID\fP, \fBX_NULL\fP, and \fBx_trace_null()\fP\&.
+References \fBRedisMapEntry::key\fP, \fBRedisEntry::key\fP, \fBRESP::n\fP, \fBredisxCheckDestroyRESP()\fP, \fBredisxDestroyRESP()\fP, \fBredisxRequest()\fP, \fBRESP3_MAP\fP, \fBRESP_ARRAY\fP, \fBRESP::type\fP, \fBRESP::value\fP, \fBRedisMapEntry::value\fP, \fBRedisEntry::value\fP, \fBx_error()\fP, \fBX_GROUP_INVALID\fP, and \fBx_trace_null()\fP\&.
 .SS "\fBRESP\fP * redisxGetValue (\fBRedis\fP * redis, const char * table, const char * key, int * status)"
 Retrieve a variable from \fBRedis\fP (as an undigested \fBRESP\fP), through the interactive connection\&. This is not the highest throughput mode (that would be sending asynchronous pipeline request, and then asynchronously collecting the results such as with \fBredisxSendRequestAsync()\fP / \fBredisxReadReplyAsync()\fP), because it requires separate network roundtrips for each and every request\&. But, it is simple and perfectly good method when one needs to retrieve only a few (<1000) variables per second\&.\&.\&.
 .PP
@@ -245,7 +247,7 @@ The call effectively implements a \fBRedis\fP GET (if the table argument is NULL
 .PP
 \fBReturns\fP
 .RS 4
-A freshly allocated \fBRESP\fP array containing the \fBRedis\fP response, or NULL if no valid response could be obtained\&.
+A freshly allocated \fBRESP\fP containing the \fBRedis\fP response, or NULL if no valid response could be obtained\&. Values are returned as RESP_BULK_STRING (count = 1), or else type RESP_ERROR or RESP_NULL if \fBRedis\fP responded with an error or null, respectively\&.
 .RE
 .PP
 \fBSee also\fP
@@ -255,7 +257,7 @@ A freshly allocated \fBRESP\fP array containing the \fBRedis\fP response, or NUL
 .PP
 
 .PP
-References \fBredisxRequest()\fP, \fBx_error()\fP, \fBX_GROUP_INVALID\fP, \fBX_NAME_INVALID\fP, \fBX_NULL\fP, and \fBx_trace_null()\fP\&.
+References \fBredisxRequest()\fP, \fBx_error()\fP, \fBX_GROUP_INVALID\fP, \fBX_NAME_INVALID\fP, \fBX_SUCCESS\fP, and \fBx_trace_null()\fP\&.
 .SS "int redisxMultiSet (\fBRedis\fP * redis, const char * table, const \fBRedisEntry\fP * entries, int n, \fBboolean\fP confirm)"
 Sets multiple key/value pairs in a given hash table\&.
 .PP
@@ -279,7 +281,7 @@ X_SUCCESS (0) on success or an error code (<0) from \fBredisx\&.h\fP / \fBxchang
 .PP
 
 .PP
-References \fBRedis::interactive\fP, \fBREDIS_ERROR\fP, \fBredisxCheckRESP()\fP, \fBredisxDestroyRESP()\fP, \fBredisxLockConnected()\fP, \fBredisxMultiSetAsync()\fP, \fBredisxReadReplyAsync()\fP, \fBRESP_SIMPLE_STRING\fP, \fBRESP::value\fP, \fBx_error()\fP, \fBX_GROUP_INVALID\fP, \fBX_NULL\fP, \fBX_SIZE_INVALID\fP, and \fBX_SUCCESS\fP\&.
+References \fBRedis::interactive\fP, \fBREDIS_ERROR\fP, \fBredisxCheckRESP()\fP, \fBredisxCheckValid()\fP, \fBredisxDestroyRESP()\fP, \fBredisxLockConnected()\fP, \fBredisxMultiSetAsync()\fP, \fBredisxReadReplyAsync()\fP, \fBredisxUnlockClient()\fP, \fBRESP_SIMPLE_STRING\fP, \fBRESP::value\fP, \fBx_error()\fP, \fBX_GROUP_INVALID\fP, \fBX_NULL\fP, \fBX_SIZE_INVALID\fP, and \fBX_SUCCESS\fP\&.
 .SS "int redisxMultiSetAsync (\fBRedisClient\fP * cl, const char * table, const \fBRedisEntry\fP * entries, int n, \fBboolean\fP confirm)"
 Sets multiple key/value pairs in a given hash table\&. This function should be called with exclusive access to the client\&.
 .PP
@@ -347,7 +349,7 @@ An array with pointers to key names from this table or NULL\&.
 .PP
 
 .PP
-References \fBRESP::n\fP, \fBredisxArrayRequest()\fP, \fBredisxCheckRESP()\fP, \fBredisxDestroyRESP()\fP, \fBredisxGetScanCount()\fP, \fBRESP_ARRAY\fP, \fBRESP_BULK_STRING\fP, \fBSCAN_INITIAL_STORE_CAPACITY\fP, \fBRESP::value\fP, \fBx_error()\fP, \fBX_NULL\fP, \fBX_SUCCESS\fP, \fBx_trace()\fP, \fBxdprintf\fP, \fBxStringCopyOf()\fP, and \fBxvprintf\fP\&.
+References \fBRESP::n\fP, \fBredisxArrayRequest()\fP, \fBredisxCheckRESP()\fP, \fBredisxDestroyRESP()\fP, \fBredisxGetScanCount()\fP, \fBRESP_ARRAY\fP, \fBRESP_BULK_STRING\fP, \fBSCAN_INITIAL_STORE_CAPACITY\fP, \fBRESP::value\fP, \fBx_error()\fP, \fBX_NULL\fP, \fBX_SUCCESS\fP, \fBx_trace()\fP, \fBxStringCopyOf()\fP, and \fBxvprintf\fP\&.
 .SS "\fBRedisEntry\fP * redisxScanTable (\fBRedis\fP * redis, const char * table, const char * pattern, int * n, int * status)"
 Returns an alphabetical list of the \fBRedis\fP hash table data using the \fBRedis\fP HSCAN command\&. Because it uses the scan command, it is guaranteed to not hog the database for excessive periods, and hence it is preferable to \fBredisxGetTable()\fP\&.
 .PP
@@ -386,7 +388,7 @@ A \fBRedisEntry\fP[] array or NULL\&.
 .PP
 
 .PP
-References \fBRedisEntry::key\fP, \fBRedisEntry::length\fP, \fBRESP::n\fP, \fBredisxArrayRequest()\fP, \fBredisxCheckRESP()\fP, \fBredisxDestroyRESP()\fP, \fBredisxGetScanCount()\fP, \fBRESP_ARRAY\fP, \fBRESP_BULK_STRING\fP, \fBSCAN_INITIAL_STORE_CAPACITY\fP, \fBRESP::value\fP, \fBRedisEntry::value\fP, \fBx_error()\fP, \fBX_GROUP_INVALID\fP, \fBX_NULL\fP, \fBX_SUCCESS\fP, \fBx_trace()\fP, \fBxdprintf\fP, \fBxStringCopyOf()\fP, and \fBxvprintf\fP\&.
+References \fBRedisEntry::key\fP, \fBRedisEntry::length\fP, \fBRESP::n\fP, \fBredisxArrayRequest()\fP, \fBredisxCheckRESP()\fP, \fBredisxDestroyRESP()\fP, \fBredisxGetScanCount()\fP, \fBRESP_ARRAY\fP, \fBRESP_BULK_STRING\fP, \fBSCAN_INITIAL_STORE_CAPACITY\fP, \fBRESP::value\fP, \fBRedisEntry::value\fP, \fBx_error()\fP, \fBX_GROUP_INVALID\fP, \fBX_NULL\fP, \fBX_SUCCESS\fP, \fBx_trace()\fP, \fBxStringCopyOf()\fP, and \fBxvprintf\fP\&.
 .SS "int redisxSetScanCount (\fBRedis\fP * redis, int count)"
 Sets the COUNT parameter to use with \fBRedis\fP SCAN type commands\&. COUNT specifies how much work \fBRedis\fP should do in a single scan iteration\&. 0 (or negative) values can be used to scan with defaults (without the COUNT option), which is usually equivalent to COUNT=10\&. When scanning large datasets, it may take many scan calls to go through all the data\&. When networking has limited bandwidth, or large latencies it may be desirable to do more work per call on the server side to reduce traffic\&. However, the cost of larger COUNT values is that it may increase server latencies for other queries\&.
 .PP
@@ -408,7 +410,7 @@ Sets the COUNT parameter to use with \fBRedis\fP SCAN type commands\&. COUNT spe
 .PP
 
 .PP
-References \fBx_error()\fP, \fBX_NULL\fP, and \fBX_SUCCESS\fP\&.
+References \fBX_SUCCESS\fP\&.
 .SS "int redisxSetValue (\fBRedis\fP * redis, const char * table, const char * key, const char * value, \fBboolean\fP confirm)"
 Sets a global or hashtable value on \fBRedis\fP\&.
 .PP
@@ -432,7 +434,7 @@ X_SUCCESS if the variable was succesfully set, or: X_NO_INIT X_NAME_INVALID X_NU
 .PP
 
 .PP
-References \fBRedis::interactive\fP, \fBredisxCheckRESP()\fP, \fBredisxDestroyRESP()\fP, \fBredisxLockConnected()\fP, \fBredisxReadReplyAsync()\fP, \fBredisxSetValueAsync()\fP, \fBredisxUnlockClient()\fP, \fBRESP_INT\fP, \fBx_error()\fP, \fBX_NULL\fP, and \fBX_SUCCESS\fP\&.
+References \fBRedis::interactive\fP, \fBredisxCheckValid()\fP, \fBredisxLockConnected()\fP, \fBredisxSetValueAsync()\fP, \fBredisxUnlockClient()\fP, and \fBX_SUCCESS\fP\&.
 .SS "int redisxSetValueAsync (\fBRedisClient\fP * cl, const char * table, const char * key, const char * value, \fBboolean\fP confirm)"
 Sends a request for setting a table value, using the \fBRedis\fP 'SET' or 'HSET' command\&.
 .PP

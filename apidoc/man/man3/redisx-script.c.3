@@ -84,7 +84,7 @@ The response received from the script or the EVALSHA request, or NULL if there w
 .PP
 
 .PP
-References \fBRedis::interactive\fP, \fBredisxLockConnected()\fP, \fBredisxReadReplyAsync()\fP, \fBredisxRunScriptAsync()\fP, \fBredisxUnlockClient()\fP, \fBX_SUCCESS\fP, and \fBx_trace_null()\fP\&.
+References \fBRedis::interactive\fP, \fBredisxCheckValid()\fP, \fBredisxLockConnected()\fP, \fBredisxReadReplyAsync()\fP, \fBredisxRunScriptAsync()\fP, \fBredisxUnlockClient()\fP, \fBx_error()\fP, \fBX_SUCCESS\fP, and \fBx_trace_null()\fP\&.
 .SS "int redisxRunScriptAsync (\fBRedisClient\fP * cl, const char * sha1, const char ** keys, const char ** params)"
 Send a request to runs a LUA script that has been loaded into the \fBRedis\fP database\&. This function should be called with the connected client's mutex locked\&. The call returns as soon as the request has been sent, without waiting for a response to come back\&.
 .PP

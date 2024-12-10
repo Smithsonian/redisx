@@ -35,8 +35,9 @@ var menudata={children:[
 {text:"File List",url:"files.html"},
 {text:"Globals",url:"globals.html",children:[
 {text:"All",url:"globals.html",children:[
-{text:"r",url:"globals.html#index_r"},
-{text:"s",url:"globals.html#index_s"}]},
+{text:"_",url:"globals.html#index__5F"},
+{text:"r",url:"globals_r.html#index_r"},
+{text:"s",url:"globals_s.html#index_s"}]},
 {text:"Functions",url:"globals_func.html",children:[
 {text:"r",url:"globals_func.html#index_r"}]},
 {text:"Typedefs",url:"globals_type.html"},

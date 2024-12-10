@@ -1,7 +1,11 @@
 var searchData=
 [
-  ['data_0',['Accessing key / value data',['../index.html#autotoc_md23',1,'']]],
-  ['data_20type_1',['RESP data type',['../index.html#autotoc_md21',1,'']]],
-  ['debug_20support_2',['Debug support',['../index.html#autotoc_md42',1,'']]],
-  ['disconnecting_3',['Disconnecting',['../index.html#autotoc_md16',1,'']]]
+  ['changelog_0',['Changelog',['../../../xchange/apidoc/html/md_CHANGELOG.html',1,'']]],
+  ['client_20processing_1',['Asynchronous client processing',['../index.html#autotoc_md38',1,'']]],
+  ['connecting_2',['Connecting',['../index.html#autotoc_md15',1,'']]],
+  ['connection_20hooks_3',['Connection hooks',['../index.html#autotoc_md17',1,'']]],
+  ['connections_4',['Managing Redis server connections',['../index.html#autotoc_md13',1,'']]],
+  ['contents_5',['Table of Contents',['../index.html#autotoc_md3',1,'']]],
+  ['contributing_20to_20redisx_6',['Contributing to RedisX',['../../../xchange/apidoc/html/md_CONTRIBUTING.html',1,'']]],
+  ['custom_20redis_20functions_7',['Custom Redis functions',['../index.html#autotoc_md35',1,'']]]
 ];

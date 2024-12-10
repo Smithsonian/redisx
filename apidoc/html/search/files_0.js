@@ -7,5 +7,6 @@ var searchData=
   ['redisx_2dsub_2ec_4',['redisx-sub.c',['../redisx-sub_8c.html',1,'']]],
   ['redisx_2dtab_2ec_5',['redisx-tab.c',['../redisx-tab_8c.html',1,'']]],
   ['redisx_2ec_6',['redisx.c',['../redisx_8c.html',1,'']]],
-  ['redisx_2eh_7',['redisx.h',['../redisx_8h.html',1,'']]]
+  ['redisx_2eh_7',['redisx.h',['../redisx_8h.html',1,'']]],
+  ['resp_2ec_8',['resp.c',['../resp_8c.html',1,'']]]
 ];

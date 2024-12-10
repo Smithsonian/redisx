@@ -8,5 +8,6 @@ var redisx_net_8c =
     [ "redisxIsConnected", "redisx-net_8c.html#a94326ebfa5868579c8448cdbb941b3da", null ],
     [ "redisxReconnect", "redisx-net_8c.html#a55a2efad7c8d8f840f4144a217f58965", null ],
     [ "redisxSetPort", "redisx-net_8c.html#a37f39ede48014a2463e4c72bf6eb5a3e", null ],
+    [ "redisxSetSocketTimeout", "redisx-net_8c.html#aff6b1f622037a4331c1dab1219b79012", null ],
     [ "redisxSetTcpBuf", "redisx-net_8c.html#a83fce113d042490e77efdc574e64d76f", null ]
 ];

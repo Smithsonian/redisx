@@ -1,5 +1,4 @@
 var searchData=
 [
-  ['handling_0',['Error handling',['../index.html#autotoc_md40',1,'']]],
-  ['hooks_1',['Connection hooks',['../index.html#autotoc_md17',1,'']]]
+  ['getting_20and_20setting_20keyed_20values_0',['Getting and setting keyed values',['../index.html#autotoc_md25',1,'']]]
 ];

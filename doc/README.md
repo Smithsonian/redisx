@@ -83,13 +83,15 @@ prior to invoking `make`. The following build variables can be configured:
 
  - `CPPFLAGS`: C preprocessor flags, such as externally defined compiler constants.
  
- - `CFLAGS`: Flags to pass onto the C compiler (default: `-Os -Wall -std=c99`). Note, `-Iinclude` will be added 
+ - `CFLAGS`: Flags to pass onto the C compiler (default: `-g -Os -Wall`). Note, `-Iinclude` will be added 
    automatically.
    
+ - `CSTANDARD`: Optionally, specify the C standard to compile for, e.g. `c99` to compile for the C99 standard. If
+   defined then `-std=$(CSTANDARD)` is added to `CFLAGS` automatically.
+   
+ - `WEXTRA`: If set to 1, `-Wextra` is added to `CFLAGS` automatically.
+   
  - `LDFLAGS`: Extra linker flags (default is _not set_). Note, `-lm -lxchange` will be added automatically.
-
- - `BUILD_MODE`: You can set it to `debug` to enable debugging features: it will initialize the global `xDebug` 
-   variable to `TRUE` and add `-g` to `CFLAGS`.
 
  - `CHECKEXTRA`: Extra options to pass to `cppcheck` for the `make check` target
  
@@ -188,10 +190,25 @@ the default 6379), and the database authentication (if any):
   redisxSetPassword(redis, mySecretPasswordString);
 ```
 
-You might also tweak the send/receive buffer sizes to use for clients, if you find the socket defaults sub-optimal for
-your application (note, that this setting is common to all `Redis` instances managed by the library):
+You can also set the RESP protocol to use (provided your server is compatible with Redis 6 or later):
 
 ```c
+  // (optional) Use RESP3 (provided the server supports it)
+  redisxSetProtocol(redis, REDISX_RESP3);
+```
+
+The above call will use the `HELLO` command (since Redis 6) upon connecting. If you do not set the protocol, `HELLO` 
+will not be used, and RESP2 will be assumed -- which is best for older servers. (Note, that you can always check the 
+actual protocol used after connecting, using `redisxGetProtocol()`). Note, that after connecting, you may retrieve 
+the set of server properties sent in response to `HELLO` using `redisxGetHelloData()`.
+
+You might also tweak the socket options used for clients, if you find the socket defaults sub-optimal for your 
+application (note, that this setting is common to all `Redis` instances managed by the library):
+
+```c
+   // (optional) Set 1000 ms socket read/write timeout for future connections.
+   redisxSetSocketTimeout(redis, 1000);
+
    // (optional) Set the TCP send/rcv buffer sizes to use if not default values.
    //            This setting applies to all new connections after...
    redisxSetTcpBuf(65536);
@@ -287,12 +304,14 @@ The same goes for disconnect hooks, using `redisxAddDisconnectHook()` instead.
 ## Simple Redis queries
 
  - [Interactive transactions](#interactive-transactions)
-  - [RESP data type](#resp-data-type)
+ - [Push notifications](#push-notifications)
+ - [RESP data type](#resp-data-type)
+
 
 Redis queries are sent as strings, according the the specification of the Redis protocol. All responses sent back by 
-the server using the RESP protocol. Specifically, Redis uses version 2.0 of the RESP protocol (a.k.a. RESP2) by 
-default, with optional support for the newer RESP3 introduced in Redis version 6.0. The __RedisX__ library currently
-processes the standard RESP2 replies only. RESP3 support to the library may be added in the future (stay tuned...)
+the server using the RESP protocol. Specifically, Redis uses version 2 of the RESP protocol (a.k.a. RESP2) by 
+default, with optional support for the newer RESP3 introduced in Redis version 6.0. The __RedisX__ library provides
+support for both RESP2 and RESP3.
 
 
 <a name="interactive-transactions"></a>
@@ -338,6 +357,46 @@ individual parameters are not 0-terminated strings.
 In interactive mode, each request is sent to the Redis server, and the response is collected before the call returns 
 with that response (or `NULL` if there was an error).
 
+<a name="push-notifications"></a>
+### Push notifications
+
+Redis 6 introduced out-of-band push notifications along with RESP3. It allows the server to send messages to any 
+connected client that are not in response to a query. For example, Redis 6 allows `CLIENT TRACKING` to use such push 
+notifications (e.g. `INVALIDATE foo`), to notify connected clients when a watched variable has been updated from
+somewhere else. 
+
+__RedisX__ allows you to specify a custom callback `RedisPushProcessor` function to handle such push notifications,
+e.g.:
+
+```c
+  void my_push_processor(RESP *message, void *ptr) {
+    char *owner = (char *) ptr;  // Additional argument we need, in this case a string.
+    printf("[%s] Got push message: type %c, n = %d.\n", owner, message->type, message->n);
+  }
+```
+
+Then you can activate the processing of push notifications with `redisxSetPushProcessor()`. You can specify the 
+optional additional data that you want to pass along to the push processor function -- just make sure that the data 
+has a sufficient scope / lifetime such that it is valid at all times while push messages are being processed. E.g.
+
+```c
+  static owner = "my process"; // The long life data we want to pass to my_push_processor...
+  
+  // Use my_push_processor and pass along the owner as a parameter
+  redisxSetPushProcessor(redis, my_push_processor, owner);
+```
+
+There are some things to look out for in your `RedisPushProcessor` implementation:
+
+- The call should not block (except perhaps for a quick mutex lock) and should return quickly. If blocking calls, or
+  extensive processing is required, you should place a copy of the PUSH notification onto a queue and let an 
+  asynchronous thread take it from there.
+- The call should not attempt to alter or destroy the push message. If needed it can copy parts or the whole.
+- You should not attempt to lock or release clients from the call. If you need access to a client, it's best to put a 
+  copy of the RESP notification onto a queue and let an asynchronous thread deal with it.
+- You should
+
+
 <a name="resp-data-type"></a>
 ### RESP data type
   
@@ -361,9 +420,19 @@ whose contents are:
  | `RESP_ARRAY`            |   `*`    | number of `RESP *` pointers   | `(RESP **)`           |
  | `RESP_INT`              |   `:`    | integer return value          | `(void)`              |
  | `RESP_SIMPLE_STRING`    |   `+`    | string length                 | `(char *)`            |
- | `RESP_ERROR`            |   `-`    | string length                 | `(char *)`            |
+ | `RESP_ERROR`            |   `-`    | total string length           | `(char *)`            |
  | `RESP_BULK_STRING`      |   `$`    | string length or -1 if `NULL` | `(char *)`            |
-
+ | `RESP3_NULL`            |   `_`    | 0                             | `(void)`              |
+ | `RESP3_BOOLEAN`         |   `#`    | 1 if _true_, 0 if _false_     | `(void)`              |
+ | `RESP3_DOUBLE`          |   `,`    | _unused_                      | `(double *)`          |
+ | `RESP3_BIG_NUMBER`      |   `(`    | string representation length  | `(char *)`            |
+ | `RESP3_BLOB_ERROR`      |   `!`    | total string length           | `(char *)`            | 
+ | `RESP3_VERBATIM_TEXT`   |   `=`    | text length (incl. type)      | `(char *)`            |
+ | `RESP3_SET`             |   `~`    | number of `RESP *` pointers   | `(RESP *)`            |
+ | `RESP3_MAP`             |   `%`    | number of key / value pairs   | `(RedisMapEntry *)`   |
+ | `RESP3_ATTRIBUTE`       |   `\|`   | number of key / value pairs   | `(RedisMapEntry *)`   |
+ | `RESP3_PUSH`            |   `>`    | number of `RESP *` pointers   | `(RESP **)`           | 
+ 
 
 Each `RESP` has a type (e.g. `RESP_SIMPLE_STRING`), an integer value `n`, and a `value` pointer
 to further data. If the type is `RESP_INT`, then `n` represents the actual return value (and the `value` pointer is
@@ -371,9 +440,15 @@ not used). For string type values `n` is the number of characters in the string 
 while for `RESP_ARRAY` types the `value` is a pointer to an embedded `RESP` array and `n` is the number of elements 
 in that.
 
-You may check the integrity of a `RESP` using `redisxCheckRESP()`. Since `RESP` data is dynamically allocated, the 
-user is responsible for discarding them once they are no longer needed, e.g. by calling `redisxDestroyRESP()`. The
-two steps may be combined to automatically discard invalid or unexpected `RESP` data in a single step by calling
+To help with deciding what cast to use for a given `value` field of the RESP data structure, we provide the 
+convenience methods `redisxIsScalarType()`, `redisxIsStringType()`, `redisxIsArrayType()`, and `redisxIsMapType()`
+functions.
+
+You can check that two `RESP` data structures are equivalent with `redisxIsEqualRESP(RESP *a, RESP *b)`.
+
+You may also check the integrity of a `RESP` using `redisxCheckRESP()`. Since `RESP` data is dynamically allocated, 
+the user is responsible for discarding them once they are no longer needed, e.g. by calling `redisxDestroyRESP()`. 
+The two steps may be combined to automatically discard invalid or unexpected `RESP` data in a single step by calling
 `redisxCheckDestroyRESP()`.
 
 ```c
@@ -412,9 +487,35 @@ Before destroying a RESP structure, the caller may want to dereference values wi
     stringValue = (char *) r->value;
     r->value = NULL;
      
-    redisxDestroyRESP(r);     // The 'stringValue' is still a valid pointer after! 
+    redisxDestroyRESP(r);     // 'stringValue' is still a valid pointer after! 
   }
 ```
+
+Note, that you can usually convert a RESP to an `XField`, and/or to JSON representation using the 
+`redisxRESP2XField()` and `redisxRESP2JSON()` functions, e.g.:
+
+```c
+ Redis redis = ...
+ 
+ // Obtain a copy of the response received from HELLO upon connecting...
+ RESP *resp = redisxGetHelloData(redis);
+ 
+ // Print the response from HELLO to the standard output in JSON format
+ char *json = redisxRESP2JSON("hello_response", resp);
+ if(json != NULL) {
+   printf("%s", json);
+   free(json);
+ }
+   
+ ...
+ 
+ // Clean up
+ redisxDestroyRESP(resp);
+```c
+
+All RESP can be represented in JSON format. This is trivial for map entries, which have strings as their keywords -- 
+which is the case for all RESP sent by Redis. And, it is also possible for map entries with non-string keys, albeit 
+via a more tedious (and less standard) JSON representation, stored under the `.non-string-keys` keyword.
 
 
 -----------------------------------------------------------------------------
@@ -773,7 +874,9 @@ Stay tuned.
 ## Advanced queries and pipelining
 
  - [Asynchronous client processing](#asynchronous-client-processing)
+ - [Bundled Attributes](#attributes)
  - [Pipelined transactions](#pipelined-transactions)
+
 
 <a name="asynchronous-client-processing"></a>
 ### Asynchronous client processing
@@ -854,6 +957,37 @@ __before__ `redisxSendRequestAsync()` to instruct Redis to not even bother about
 
 Of course you can build up arbitrarily complex set of queries and deal with a set of responses in different ways. Do 
 what works best for your application.
+
+
+<a name="attributes"></a>
+### Bundled Attributes
+
+As of Redis 6, the server might send ancillary data along with replies, if the RESP3 protocol is used. These are 
+collected together with the expected responses. However, these optional attributes are not returned to the user 
+automatically. Instead, the user may retrieve attributes directly after getting a response from 
+`redisxReadReplyAsync()` using `redisxGetAttributesAsync()`. And, attributes that were received previously can be
+discarded with `redisxClearAttributesAsync()`. For example,
+
+```c
+  RedisClient *cl = ...	 // The client we use for our transactions
+  
+  if(redisxLockEnabled(cl) == X_SUCCESS) {
+    ...
+    
+    // Clear any prior attributes we may have previously received for the client...
+    redisxClearAttributesAsync(cl);
+    
+    // Read a response for a request we sent earlier...
+    RESP *reply = redisxReadReplyAsync(cl);
+    
+    // Retrieve the attributes (if any) that were sent with the response.
+    RESP *attributes = redisxGetAttributes(cl);
+    
+    ...
+    
+    redisxUnlockClient(cl);
+  }
+```
 
 
 <a name="pipelined-transactions"></a>
@@ -1028,7 +1162,6 @@ Some obvious ways the library could evolve and grow in the not too distant futur
 
  - Automated regression testing and coverage tracking.
  - Keep track of subscription patterns, and automatically resubscribe to them on reconnecting.
- - Support for the [RESP3](https://github.com/antirez/RESP3/blob/master/spec.md) standard and Redis `HELLO`.
  - Support for [Redis Sentinel](https://redis.io/docs/latest/develop/reference/sentinel-clients/) clients, for 
    high-availability server configurations.
  - TLS support (perhaps...)

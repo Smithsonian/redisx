@@ -75,7 +75,7 @@ Add a targeted subscriber processing function to the list of functions that proc
 .PP
 
 .PP
-References \fBx_error()\fP, \fBX_NULL\fP, \fBX_SUCCESS\fP, \fBx_warn()\fP, \fBxStringCopyOf()\fP, and \fBxvprintf\fP\&.
+References \fBX_SUCCESS\fP, \fBx_warn()\fP, \fBxStringCopyOf()\fP, and \fBxvprintf\fP\&.
 .SS "int redisxClearSubscribers (\fBRedis\fP * redis)"
 Stops the custom consumption of PUB/SUB messages from \fBRedis\fP\&.
 .PP
@@ -91,7 +91,7 @@ X_SUCCESS (0) if successful, or X_NULL if the redis instance is NULL\&.
 .PP
 
 .PP
-References \fBx_error()\fP, \fBX_NULL\fP, and \fBxvprintf\fP\&.
+References \fBxvprintf\fP\&.
 .SS "int redisxEndSubscription (\fBRedis\fP * redis)"
 Unsubscribes from all channels, stops the subscription listener thread, and closes the subscription client connection\&.
 .PP
@@ -112,7 +112,7 @@ X_SUCCESS (0) if successful or else an error code (<0)\&.
 .PP
 
 .PP
-References \fBx_error()\fP, \fBX_NULL\fP, and \fBX_SUCCESS\fP\&.
+References \fBX_SUCCESS\fP\&.
 .SS "int redisxNotify (\fBRedis\fP * redis, const char * channel, const char * message)"
 Sends a regular string terminated \fBRedis\fP PUB/SUB message on the specified channel\&. Same as \fBredisxPublish()\fP with the length argument set to the length of the string message\&. \fBRedis\fP must be connected before attempting to send messages\&.
 .PP
@@ -172,7 +172,7 @@ X_SUCCESS if the message was successfullt sent\&. X_NO_INIT if the \fBRedis\fP l
 .PP
 
 .PP
-References \fBRedis::id\fP, \fBRedis::interactive\fP, \fBredisxLockConnected()\fP, \fBredisxPublishAsync()\fP, \fBredisxUnlockClient()\fP, \fBx_error()\fP, \fBX_NULL\fP, \fBX_SUCCESS\fP, and \fBxvprintf\fP\&.
+References \fBRedis::id\fP, \fBRedis::interactive\fP, \fBredisxCheckValid()\fP, \fBredisxLockConnected()\fP, \fBredisxPublishAsync()\fP, \fBredisxUnlockClient()\fP, \fBX_SUCCESS\fP, and \fBxvprintf\fP\&.
 .SS "int redisxPublishAsync (\fBRedis\fP * redis, const char * channel, const char * data, int length)"
 Sends a \fBRedis\fP notification asynchronously using the \fBRedis\fP 'PUBLISH' command\&. The caller should have an exclusive lock on the interactive \fBRedis\fP channel before calling this\&.
 .PP
@@ -201,7 +201,7 @@ X_SUCCESS (0) if successful, or else X_NULL if the redis instance is NULL X_NAME
 .PP
 
 .PP
-References \fBRedis::interactive\fP, \fBredisxSendArrayRequestAsync()\fP, \fBredisxSkipReplyAsync()\fP, \fBx_error()\fP, \fBX_NULL\fP, and \fBX_SUCCESS\fP\&.
+References \fBRedis::interactive\fP, \fBredisxCheckValid()\fP, \fBredisxSendArrayRequestAsync()\fP, \fBredisxSkipReplyAsync()\fP, \fBx_error()\fP, \fBX_NULL\fP, and \fBX_SUCCESS\fP\&.
 .SS "int redisxRemoveSubscribers (\fBRedis\fP * redis, \fBRedisSubscriberCall\fP f)"
 Removes all instances of a subscribe consumer function from the current list of consumers\&. This calls only deactivates the specified processing callback function(s), without stopping the delivery of associated messages\&. To stop \fBRedis\fP sending messages that are no longer being processed, you should also call \fBredisxUnsubscribe()\fP as appropriate\&.
 .PP
@@ -259,7 +259,7 @@ X_SUCCESS if successfully subscribed to the \fBRedis\fP distribution channel\&. 
 .PP
 
 .PP
-References \fBredisxLockConnected()\fP, \fBredisxSendRequestAsync()\fP, \fBredisxUnlockClient()\fP, \fBRedis::subscription\fP, \fBx_error()\fP, \fBX_NULL\fP, and \fBX_SUCCESS\fP\&.
+References \fBredisxIsGlobPattern()\fP, \fBredisxLockConnected()\fP, \fBredisxSendRequestAsync()\fP, \fBredisxUnlockClient()\fP, \fBRedis::subscription\fP, \fBx_error()\fP, \fBX_NULL\fP, and \fBX_SUCCESS\fP\&.
 .SS "int redisxUnsubscribe (\fBRedis\fP * redis, const char * pattern)"
 Unsubscribe from one or all \fBRedis\fP PUB/SUB channel(s)\&. If there are no active subscriptions when \fBRedis\fP confirms the unsubscrive command, the subscription listener thread will also conclude automatically\&. Unsubscribing will stop delivery of mesasages for the affected channels but any associated processing callbacks remain registered, until redisxRemovesubscribers() is called to deactive them as appropriate\&.
 .PP
@@ -286,7 +286,7 @@ redisxEndSubscribe()
 .PP
 
 .PP
-References \fBredisxLockConnected()\fP, \fBredisxSendRequestAsync()\fP, \fBredisxUnlockClient()\fP, \fBRedis::subscription\fP, \fBx_error()\fP, \fBX_NULL\fP, and \fBX_SUCCESS\fP\&.
+References \fBredisxCheckValid()\fP, \fBredisxIsGlobPattern()\fP, \fBredisxLockConnected()\fP, \fBredisxSendRequestAsync()\fP, \fBredisxUnlockClient()\fP, \fBRedis::subscription\fP, and \fBX_SUCCESS\fP\&.
 .SH "Author"
 .PP 
 Generated automatically by Doxygen for RedisX from the source code\&.

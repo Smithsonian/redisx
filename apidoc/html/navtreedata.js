@@ -41,28 +41,30 @@ var NAVTREE =
       ] ],
       [ "Simple Redis queries", "index.html#autotoc_md19", [
         [ "Interactive transactions", "index.html#autotoc_md20", null ],
-        [ "RESP data type", "index.html#autotoc_md21", null ]
+        [ "Push notifications", "index.html#autotoc_md21", null ],
+        [ "RESP data type", "index.html#autotoc_md22", null ]
       ] ],
-      [ "Accessing key / value data", "index.html#autotoc_md23", [
-        [ "Getting and setting keyed values", "index.html#autotoc_md24", null ],
-        [ "Listing and Scanning", "index.html#autotoc_md25", null ]
+      [ "Accessing key / value data", "index.html#autotoc_md24", [
+        [ "Getting and setting keyed values", "index.html#autotoc_md25", null ],
+        [ "Listing and Scanning", "index.html#autotoc_md26", null ]
       ] ],
-      [ "Publish/subscribe (PUB/SUB) support", "index.html#autotoc_md27", [
-        [ "Broadcasting messages", "index.html#autotoc_md28", null ],
-        [ "Subscriptions", "index.html#autotoc_md29", null ]
+      [ "Publish/subscribe (PUB/SUB) support", "index.html#autotoc_md28", [
+        [ "Broadcasting messages", "index.html#autotoc_md29", null ],
+        [ "Subscriptions", "index.html#autotoc_md30", null ]
       ] ],
-      [ "Atomic execution blocks and LUA scripts", "index.html#autotoc_md31", [
-        [ "Execution blocks", "index.html#autotoc_md32", null ],
-        [ "LUA script loading and execution", "index.html#autotoc_md33", null ],
-        [ "Custom Redis functions", "index.html#autotoc_md34", null ]
+      [ "Atomic execution blocks and LUA scripts", "index.html#autotoc_md32", [
+        [ "Execution blocks", "index.html#autotoc_md33", null ],
+        [ "LUA script loading and execution", "index.html#autotoc_md34", null ],
+        [ "Custom Redis functions", "index.html#autotoc_md35", null ]
       ] ],
-      [ "Advanced queries and pipelining", "index.html#autotoc_md36", [
-        [ "Asynchronous client processing", "index.html#autotoc_md37", null ],
-        [ "Pipelined transactions", "index.html#autotoc_md38", null ]
+      [ "Advanced queries and pipelining", "index.html#autotoc_md37", [
+        [ "Asynchronous client processing", "index.html#autotoc_md38", null ],
+        [ "Bundled Attributes", "index.html#autotoc_md39", null ],
+        [ "Pipelined transactions", "index.html#autotoc_md40", null ]
       ] ],
-      [ "Error handling", "index.html#autotoc_md40", null ],
-      [ "Debug support", "index.html#autotoc_md42", null ],
-      [ "Future plans", "index.html#autotoc_md44", null ],
+      [ "Error handling", "index.html#autotoc_md42", null ],
+      [ "Debug support", "index.html#autotoc_md44", null ],
+      [ "Future plans", "index.html#autotoc_md46", null ],
       [ "[Unreleased]", "../../xchange/apidoc/html/md_CHANGELOG.html#autotoc_md1", null ]
     ] ],
     [ "Contributing to RedisX", "../../xchange/apidoc/html/md_CONTRIBUTING.html", null ],
@@ -77,7 +79,7 @@ var NAVTREE =
     [ "Files", "files.html", [
       [ "File List", "files.html", "files_dup" ],
       [ "Globals", "globals.html", [
-        [ "All", "globals.html", null ],
+        [ "All", "globals.html", "globals_dup" ],
         [ "Functions", "globals_func.html", null ],
         [ "Typedefs", "globals_type.html", null ],
         [ "Enumerations", "globals_enum.html", null ],
@@ -90,7 +92,8 @@ var NAVTREE =
 
 var NAVTREEINDEX =
 [
-"annotated.html"
+"annotated.html",
+"redisx_8h.html#af093c487ee72ade826ce894f59691475"
 ];
 
 var SYNCONMSG = 'click to disable panel synchronisation';

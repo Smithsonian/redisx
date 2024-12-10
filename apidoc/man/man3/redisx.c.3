@@ -14,16 +14,10 @@ src/redisx.c \- A \fBRedis\fP client library that compiles on older and newer pl
 .RI "\fBRESP\fP * \fBredisxArrayRequest\fP (\fBRedis\fP *redis, char *args[], int lengths[], int n, int *status)"
 .br
 .ti -1c
-.RI "int \fBredisxCheckDestroyRESP\fP (\fBRESP\fP *resp, char expectedType, int expectedSize)"
-.br
-.ti -1c
-.RI "int \fBredisxCheckRESP\fP (const \fBRESP\fP *resp, char expectedType, int expectedSize)"
+.RI "int \fBredisxCheckValid\fP (const \fBRedis\fP *redis)"
 .br
 .ti -1c
 .RI "void \fBredisxDebugTraffic\fP (\fBboolean\fP value)"
-.br
-.ti -1c
-.RI "void \fBredisxDestroyRESP\fP (\fBRESP\fP *resp)"
 .br
 .ti -1c
 .RI "int \fBredisxError\fP (const char *func, int errorCode)"
@@ -32,10 +26,19 @@ src/redisx.c \- A \fBRedis\fP client library that compiles on older and newer pl
 .RI "const char * \fBredisxErrorDescription\fP (int code)"
 .br
 .ti -1c
+.RI "\fBRESP\fP * \fBredisxGetHelloData\fP (\fBRedis\fP *redis)"
+.br
+.ti -1c
+.RI "enum \fBredisx_protocol\fP \fBredisxGetProtocol\fP (\fBRedis\fP *redis)"
+.br
+.ti -1c
 .RI "int \fBredisxGetTime\fP (\fBRedis\fP *redis, struct timespec *t)"
 .br
 .ti -1c
 .RI "\fBboolean\fP \fBredisxHasPipeline\fP (\fBRedis\fP *redis)"
+.br
+.ti -1c
+.RI "int \fBredisxIsGlobPattern\fP (const char *str)"
 .br
 .ti -1c
 .RI "\fBboolean\fP \fBredisxIsVerbose\fP ()"
@@ -53,7 +56,13 @@ src/redisx.c \- A \fBRedis\fP client library that compiles on older and newer pl
 .RI "int \fBredisxSetPassword\fP (\fBRedis\fP *redis, const char *passwd)"
 .br
 .ti -1c
-.RI "int \fBredisxSetPipelineConsumer\fP (\fBRedis\fP *redis, void(*f)(\fBRESP\fP *))"
+.RI "int \fBredisxSetPipelineConsumer\fP (\fBRedis\fP *redis, \fBRedisPipelineProcessor\fP f)"
+.br
+.ti -1c
+.RI "int \fBredisxSetProtocol\fP (\fBRedis\fP *redis, enum \fBredisx_protocol\fP protocol)"
+.br
+.ti -1c
+.RI "int \fBredisxSetPushProcessor\fP (\fBRedis\fP *redis, \fBRedisPushProcessor\fP func, void *arg)"
 .br
 .ti -1c
 .RI "int \fBredisxSetTransmitErrorHandler\fP (\fBRedis\fP *redis, \fBRedisErrorHandler\fP f)"
@@ -126,52 +135,23 @@ A freshly allocated \fBRESP\fP array containing the \fBRedis\fP response, or NUL
 .PP
 
 .PP
-References \fBRedis::interactive\fP, \fBredisxLockConnected()\fP, \fBredisxReadReplyAsync()\fP, \fBredisxSendArrayRequestAsync()\fP, \fBredisxUnlockClient()\fP, \fBx_error()\fP, \fBX_NULL\fP, \fBX_SUCCESS\fP, \fBx_trace_null()\fP, and \fBxvprintf\fP\&.
-.SS "int redisxCheckDestroyRESP (\fBRESP\fP * resp, char expectedType, int expectedSize)"
-Like \fBredisxCheckRESP()\fP, but it also destroys the \fBRESP\fP in case of an error\&.
+References \fBRedis::interactive\fP, \fBredisxCheckValid()\fP, \fBredisxClearAttributesAsync()\fP, \fBredisxLockConnected()\fP, \fBredisxReadReplyAsync()\fP, \fBredisxSendArrayRequestAsync()\fP, \fBredisxUnlockClient()\fP, \fBx_error()\fP, \fBX_NULL\fP, \fBX_SUCCESS\fP, and \fBx_trace_null()\fP\&.
+.SS "int redisxCheckValid (const \fBRedis\fP * redis)"
+Checks that a redis instance is valid\&.
 .PP
 \fBParameters\fP
 .RS 4
-\fIresp\fP Pointer to the \fBRESP\fP structure from \fBRedis\fP\&. 
-.br
-\fIexpectedType\fP The \fBRESP\fP type expected (e\&.g\&. RESP_ARRAY) or 0 if not checking type\&. 
-.br
-\fIexpectedSize\fP The expected size of the \fBRESP\fP (array or bytes) or <=0 to skip checking
+\fIredis\fP The \fBRedis\fP instance 
 .RE
 .PP
 \fBReturns\fP
 .RS 4
-The return value of \fBredisxCheckRESP()\fP\&.
-.RE
-.PP
-\fBSee also\fP
-.RS 4
-\fBredisxCheckRESP()\fP 
+X_SUCCESS (0) if the instance is valid, or X_NULL if the argument is NULL, or else X_NO_INIT if the redis instance is not initialized\&. 
 .RE
 .PP
 
 .PP
-References \fBredisxCheckRESP()\fP, and \fBredisxDestroyRESP()\fP\&.
-.SS "int redisxCheckRESP (const \fBRESP\fP * resp, char expectedType, int expectedSize)"
-Checks a \fBRedis\fP \fBRESP\fP for NULL values or unexpected values\&.
-.PP
-\fBParameters\fP
-.RS 4
-\fIresp\fP Pointer to the \fBRESP\fP structure from \fBRedis\fP\&. 
-.br
-\fIexpectedType\fP The \fBRESP\fP type expected (e\&.g\&. RESP_ARRAY) or 0 if not checking type\&. 
-.br
-\fIexpectedSize\fP The expected size of the \fBRESP\fP (array or bytes) or <=0 to skip checking
-.RE
-.PP
-\fBReturns\fP
-.RS 4
-X_SUCCESS (0) if the \fBRESP\fP passes the tests, or X_NULL if the \fBRESP\fP is NULL (garbled response)\&. REDIS_NULL if \fBRedis\fP returned (nil), REDIS_UNEXPECTED_TYPE if got a reply of a different type than expected REDIS_UNEXPECTED_ARRAY_SIZE if got a reply of different size than expected\&.
-.RE
-.PP
-or the error returned in resp->n\&. 
-.PP
-References \fBRESP::n\fP, \fBREDIS_NULL\fP, \fBREDIS_UNEXPECTED_RESP\fP, \fBRESP_INT\fP, \fBRESP::type\fP, \fBRESP::value\fP, \fBx_error()\fP, \fBX_FAILURE\fP, \fBX_NULL\fP, and \fBX_SUCCESS\fP\&.
+References \fBx_error()\fP, \fBX_NO_INIT\fP, \fBX_NULL\fP, and \fBX_SUCCESS\fP\&.
 .SS "void redisxDebugTraffic (\fBboolean\fP value)"
 Enable or disable verbose reporting of all \fBRedis\fP bound traffic\&. It may be useful when debugging programs that use the redisx interface\&. Verbose reporting is DISABLED by default\&.
 .PP
@@ -188,17 +168,6 @@ Enable or disable verbose reporting of all \fBRedis\fP bound traffic\&. It may b
 
 .PP
 References \fBFALSE\fP, and \fBTRUE\fP\&.
-.SS "void redisxDestroyRESP (\fBRESP\fP * resp)"
-Frees up the resources used by a \fBRESP\fP structure that was dynamically allocated\&. The call will segfault if the same \fBRESP\fP is destroyed twice or if the argument is a static allocation\&.
-.PP
-\fBParameters\fP
-.RS 4
-\fIresp\fP Pointer to the \fBRESP\fP structure to be destroyed, which may be NULL (no action taken)\&. 
-.RE
-.PP
-
-.PP
-References \fBRESP::n\fP, \fBredisxDestroyRESP()\fP, \fBRESP_ARRAY\fP, \fBRESP::type\fP, and \fBRESP::value\fP\&.
 .SS "int redisxError (const char * func, int errorCode)"
 Prints a descriptive error message to stderr, and returns the error code\&.
 .PP
@@ -233,6 +202,46 @@ A constant string with the error description\&.
 
 .PP
 References \fBREDIS_ERROR\fP, \fBREDIS_INCOMPLETE_TRANSFER\fP, \fBREDIS_INVALID_CHANNEL\fP, \fBREDIS_NULL\fP, \fBREDIS_UNEXPECTED_ARRAY_SIZE\fP, \fBREDIS_UNEXPECTED_RESP\fP, and \fBxErrorDescription()\fP\&.
+.SS "\fBRESP\fP * redisxGetHelloData (\fBRedis\fP * redis)"
+Returns a copy of the \fBRESP\fP map that the \fBRedis\fP server has sent us as a response to HELLO on the last client connection, or NULL if HELLO was not used or available\&.
+.PP
+\fBParameters\fP
+.RS 4
+\fIredis\fP The redis instance 
+.RE
+.PP
+\fBReturns\fP
+.RS 4
+A copy of the response sent by HELLO on the last client connection, or NULL\&.
+.RE
+.PP
+\fBSee also\fP
+.RS 4
+\fBredisxSetProtocol()\fP 
+.RE
+.PP
+
+.PP
+References \fBredisxCopyOfRESP()\fP, and \fBx_trace_null()\fP\&.
+.SS "enum \fBredisx_protocol\fP redisxGetProtocol (\fBRedis\fP * redis)"
+Returns the actual protocol used with the \fBRedis\fP server\&. If HELLO was used during connection it will be the protocol that was confirmed in the response of HELLO (and which hopefully matches the protocol requested)\&. Otherwise, RedisX will default to RESP2\&.
+.PP
+\fBParameters\fP
+.RS 4
+\fIredis\fP The \fBRedis\fP server instance 
+.RE
+.PP
+\fBReturns\fP
+.RS 4
+REDISX_RESP2 or REDISX_RESP3, or else an error code, such as X_NULL if the argument is NULL, or X_NO_INIT if the \fBRedis\fP server instance was not initialized\&.
+.RE
+.PP
+\fBSee also\fP
+.RS 4
+\fBredisxSetProtocol()\fP 
+.RE
+.PP
+
 .SS "int redisxGetTime (\fBRedis\fP * redis, struct timespec * t)"
 Returns the current time on the \fBRedis\fP server instance\&.
 .PP
@@ -266,7 +275,23 @@ TRUE (1) if the pipeline client is enabled on the \fBRedis\fP intance, or FALSE 
 .PP
 
 .PP
-References \fBFALSE\fP, and \fBRedis::pipeline\fP\&.
+References \fBRedis::pipeline\fP, \fBredisxCheckValid()\fP, \fBredisxLockClient()\fP, and \fBredisxUnlockClient()\fP\&.
+.SS "int redisxIsGlobPattern (const char * str)"
+Checks if a given string is a glob-style pattern\&.
+.PP
+\fBParameters\fP
+.RS 4
+\fIstr\fP The string to check\&.
+.RE
+.PP
+\fBReturns\fP
+.RS 4
+TRUE if it is a glob pattern (e\&.g\&. has '*', '?' or '['), otherwise FALSE\&. 
+.RE
+.PP
+
+.PP
+References \fBFALSE\fP, and \fBTRUE\fP\&.
 .SS "\fBboolean\fP redisxIsVerbose ()"
 Checks id verbose reporting is enabled\&.
 .PP
@@ -332,7 +357,7 @@ A freshly allocated \fBRESP\fP array containing the \fBRedis\fP response, or NUL
 .PP
 
 .PP
-References \fBredisxArrayRequest()\fP, \fBx_error()\fP, \fBX_NULL\fP, and \fBx_trace_null()\fP\&.
+References \fBredisxArrayRequest()\fP, \fBX_SUCCESS\fP, and \fBx_trace_null()\fP\&.
 .SS "int redisxSelectDB (\fBRedis\fP * redis, int idx)"
 Switches to another database index on the \fBRedis\fP server\&. Note that you cannot change the database on an active PUB/SUB channel, hence the call will return X_INCOMPLETE if attempted\&. You should instead switch DB when there are no active subscriptions\&.
 .PP
@@ -357,7 +382,7 @@ X_SUCCESS (0) if successful, or X_NULL if the redis argument is NULL, X_INCOMPLE
 .PP
 
 .PP
-References \fBREDIS_INVALID_CHANNEL\fP, \fBREDISX_CHANNELS\fP, \fBREDISX_PIPELINE_CHANNEL\fP, \fBREDISX_SUBSCRIPTION_CHANNEL\fP, \fBredisxAddConnectHook()\fP, \fBredisxGetClient()\fP, \fBredisxIsConnected()\fP, \fBredisxLockConnected()\fP, \fBredisxRemoveConnectHook()\fP, \fBredisxUnlockClient()\fP, \fBx_error()\fP, \fBX_INCOMPLETE\fP, \fBX_NULL\fP, \fBX_SUCCESS\fP, and \fBx_trace()\fP\&.
+References \fBREDIS_INVALID_CHANNEL\fP, \fBREDISX_CHANNELS\fP, \fBREDISX_PIPELINE_CHANNEL\fP, \fBREDISX_SUBSCRIPTION_CHANNEL\fP, \fBredisxAddConnectHook()\fP, \fBredisxGetClient()\fP, \fBredisxIsConnected()\fP, \fBredisxLockConnected()\fP, \fBredisxRemoveConnectHook()\fP, \fBredisxUnlockClient()\fP, \fBX_INCOMPLETE\fP, \fBX_SUCCESS\fP, and \fBx_trace()\fP\&.
 .SS "int redisxSetPassword (\fBRedis\fP * redis, const char * passwd)"
 Sets the password to use for authenticating on the \fBRedis\fP server after connection\&. See the AUTH \fBRedis\fP command for more explanation\&. Naturally, you need to call this prior to connecting your \fBRedis\fP instance to have the desired effect\&.
 .PP
@@ -380,15 +405,26 @@ X_SUCCESS (0) if successful, X_NULL if the redis argument is NULL, or X_ALREADY_
 .PP
 
 .PP
-References \fBredisxIsConnected()\fP, \fBX_ALREADY_OPEN\fP, \fBx_error()\fP, \fBX_NULL\fP, \fBX_SUCCESS\fP, and \fBxStringCopyOf()\fP\&.
-.SS "int redisxSetPipelineConsumer (\fBRedis\fP * redis, void(*)(\fBRESP\fP *) f)"
-Sets the function processing valid pipeline responses\&.
+References \fBredisxIsConnected()\fP, \fBX_ALREADY_OPEN\fP, \fBx_error()\fP, \fBX_SUCCESS\fP, and \fBxStringCopyOf()\fP\&.
+.SS "int redisxSetPipelineConsumer (\fBRedis\fP * redis, \fBRedisPipelineProcessor\fP f)"
+Sets the function processing valid pipeline responses\&. The implementation should follow a simple set of rules:
+.PP
+.PD 0
+.IP "\(bu" 2
+the implementation should not destroy the \fBRESP\fP data\&. The \fBRESP\fP will be destroyed automatically after the call returns\&. However, the call may retain any data from the \fBRESP\fP itself, provided the data is de-referenced from the \fBRESP\fP before return\&.
+.IP "\(bu" 2
+
+.IP "\(bu" 2
+The implementation should not block (aside from maybe a quick mutex unlock) and return quickly, so as to not block the client for long periods 
+.IP "\(bu" 2
+If extensive processing or blocking calls are required to process the message, it is best to simply place a copy of the \fBRESP\fP on a queue and then return quickly, and then process the message asynchronously in a background thread\&. 
+.PP
 .PP
 \fBParameters\fP
 .RS 4
 \fIredis\fP Pointer to a \fBRedis\fP instance\&. 
 .br
-\fIf\fP T he function that processes a single argument of type \fBRESP\fP pointer\&.
+\fIf\fP The function that processes a single argument of type \fBRESP\fP pointer\&.
 .RE
 .PP
 \fBReturns\fP
@@ -398,7 +434,67 @@ X_SUCCESS (0) if successful, or X_NULL if the \fBRedis\fP instance is NULL\&.
 .PP
 
 .PP
-References \fBx_error()\fP, \fBX_NULL\fP, and \fBX_SUCCESS\fP\&.
+References \fBX_SUCCESS\fP\&.
+.SS "int redisxSetProtocol (\fBRedis\fP * redis, enum \fBredisx_protocol\fP protocol)"
+Sets the \fBRESP\fP prorocol version to use for future client connections\&. The protocol is set with the HELLO command, which was introduced in \fBRedis\fP 6\&.0\&.0 only\&. For older \fBRedis\fP server instances, the protocol will default to RESP2\&. Calling this function will enable using HELLO to handshake with the server\&.
+.PP
+\fBParameters\fP
+.RS 4
+\fIredis\fP The \fBRedis\fP server instance 
+.br
+\fIprotocol\fP REDISX_RESP2 or REDISX_RESP3\&. 
+.RE
+.PP
+\fBReturns\fP
+.RS 4
+X_SUCCESS (0) if successful, or X_NULL if the redis argument in NULL, X_NO_INIT if the redis instance was not initialized\&.
+.RE
+.PP
+\fBSee also\fP
+.RS 4
+\fBredisxGetProtocol()\fP 
+.PP
+redisxGetHelloReply() 
+.RE
+.PP
+
+.PP
+References \fBTRUE\fP, and \fBX_SUCCESS\fP\&.
+.SS "int redisxSetPushProcessor (\fBRedis\fP * redis, \fBRedisPushProcessor\fP func, void * arg)"
+Sets a user-defined function to process push messages for a specific \fBRedis\fP instance\&. The function's implementation must follow a simple set of rules:
+.PP
+.PD 0
+.IP "\(bu" 2
+the implementation should not destroy the \fBRESP\fP data\&. The \fBRESP\fP will be destroyed automatically after the call returns\&. However, the call may retain any data from the \fBRESP\fP itself, provided the data is de-referenced from the \fBRESP\fP before return\&.
+.IP "\(bu" 2
+
+.IP "\(bu" 2
+The call will have exclusive access to the client\&. As such it should not try to obtain a lock or release the lock itself\&. 
+.IP "\(bu" 2
+The implementation should not block (aside from maybe a quick mutex unlock) and return quickly, so as to not block the client for long periods 
+.IP "\(bu" 2
+If extensive processing or blocking calls are required to process the message, it is best to simply place a copy of the \fBRESP\fP on a queue and then return quickly, and then process the message asynchronously in a background thread\&. 
+.IP "\(bu" 2
+The client on which the push is originated will be locked, thus the implementation should avoid getting explusive access to the client 
+.PP
+.PP
+\fBParameters\fP
+.RS 4
+\fIredis\fP \fBRedis\fP instance 
+.br
+\fIfunc\fP Function to use for processing push messages from the given \fBRedis\fP instance, or NULL to ignore push messages\&. 
+.br
+\fIarg\fP (optional) User-defined pointer argument to pass along to the processing function\&. 
+.RE
+.PP
+\fBReturns\fP
+.RS 4
+X_SUCCESS (0) if successful, or else X_NULL (errno set to EINVAL) if the client argument is NULL, or X_NO_INIT (errno set to EAGAIN) if redis is uninitialized\&. 
+.RE
+.PP
+
+.PP
+References \fBX_SUCCESS\fP\&.
 .SS "int redisxSetTransmitErrorHandler (\fBRedis\fP * redis, \fBRedisErrorHandler\fP f)"
 Sets the user-specific error handler to call if a socket level trasmit error occurs\&. It replaces any prior handlers set earlier\&.
 .PP
@@ -416,7 +512,7 @@ X_SUCCESS if the handler was successfully configured, or X_NULL if the \fBRedis\
 .PP
 
 .PP
-References \fBx_error()\fP, \fBX_NULL\fP, and \fBX_SUCCESS\fP\&.
+References \fBX_SUCCESS\fP\&.
 .SS "int redisxSetUser (\fBRedis\fP * redis, const char * username)"
 Sets the user name to use for authenticating on the \fBRedis\fP server after connection\&. See the \fCAUTH\fP \fBRedis\fP command for more explanation\&. Naturally, you need to call this prior to connecting your \fBRedis\fP instance to have the desired effect\&.
 .PP
@@ -439,7 +535,7 @@ X_SUCCESS (0) if successful, X_NULL if the redis argument is NULL, or X_ALREADY_
 .PP
 
 .PP
-References \fBredisxIsConnected()\fP, \fBX_ALREADY_OPEN\fP, \fBx_error()\fP, \fBX_NULL\fP, \fBX_SUCCESS\fP, and \fBxStringCopyOf()\fP\&.
+References \fBredisxIsConnected()\fP, \fBX_ALREADY_OPEN\fP, \fBx_error()\fP, \fBX_SUCCESS\fP, and \fBxStringCopyOf()\fP\&.
 .SS "void redisxSetVerbose (\fBboolean\fP value)"
 Enable or disable verbose reporting of all \fBRedis\fP operations (and possibly some details of them)\&. Reporting is done on the standard output (stdout)\&. It may be useful when debugging programs that use the redisx interface\&. Verbose reporting is DISABLED by default\&.
 .PP

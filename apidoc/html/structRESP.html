@@ -127,16 +127,28 @@ $(document).ready(function(){initNavTree('structRESP.html',''); initResizable();
 Data Fields</h2></td></tr>
 <tr class="memitem:a76f11d9a0a47b94f72c2d0e77fb32240" id="r_a76f11d9a0a47b94f72c2d0e77fb32240"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structRESP.html#a76f11d9a0a47b94f72c2d0e77fb32240">n</a></td></tr>
 <tr class="separator:a76f11d9a0a47b94f72c2d0e77fb32240"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aff17911edc8208aa8ddb1c7c52c78389" id="r_aff17911edc8208aa8ddb1c7c52c78389"><td class="memItemLeft" align="right" valign="top"><a id="aff17911edc8208aa8ddb1c7c52c78389" name="aff17911edc8208aa8ddb1c7c52c78389"></a>
-char&#160;</td><td class="memItemRight" valign="bottom"><b>type</b></td></tr>
-<tr class="memdesc:aff17911edc8208aa8ddb1c7c52c78389"><td class="mdescLeft">&#160;</td><td class="mdescRight"><a class="el" href="structRESP.html" title="Structure that represents a Redis response (RESP format).">RESP</a> type RESP_ARRAY, RESP_INT ... <br /></td></tr>
-<tr class="separator:aff17911edc8208aa8ddb1c7c52c78389"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a93869a69154ac2297800b0afff64d600" id="r_a93869a69154ac2297800b0afff64d600"><td class="memItemLeft" align="right" valign="top"><a id="a93869a69154ac2297800b0afff64d600" name="a93869a69154ac2297800b0afff64d600"></a>
+enum <a class="el" href="redisx_8h.html#afa5c90630d37c2f77e5d7985932941a0">resp_type</a>&#160;</td><td class="memItemRight" valign="bottom"><b>type</b></td></tr>
+<tr class="memdesc:a93869a69154ac2297800b0afff64d600"><td class="mdescLeft">&#160;</td><td class="mdescRight"><a class="el" href="structRESP.html" title="Structure that represents a Redis response (RESP format).">RESP</a> type; RESP_ARRAY, RESP_INT ... <br /></td></tr>
+<tr class="separator:a93869a69154ac2297800b0afff64d600"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a0f61d63b009d0880a89c843bd50d8d76" id="r_a0f61d63b009d0880a89c843bd50d8d76"><td class="memItemLeft" align="right" valign="top">void *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structRESP.html#a0f61d63b009d0880a89c843bd50d8d76">value</a></td></tr>
 <tr class="separator:a0f61d63b009d0880a89c843bd50d8d76"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>Structure that represents a <a class="el" href="structRedis.html" title="Structure that represents a Redis database instance, with one or more RedisClient connections.">Redis</a> response (<a class="el" href="structRESP.html" title="Structure that represents a Redis response (RESP format).">RESP</a> format). </p>
-<dl class="section see"><dt>See also</dt><dd><a class="el" href="redisx_8c.html#aa4e23a7454f7055711915ec430599011">redisxDestroyRESP()</a> </dd></dl>
+<p>REFERENCES: </p><ol>
+<li>
+<a href="https://github.com/redis/redis-specifications/tree/master/protocol">https://github.com/redis/redis-specifications/tree/master/protocol</a> </li>
+</ol>
+<dl class="section see"><dt>See also</dt><dd><a class="el" href="resp_8c.html#aa4e23a7454f7055711915ec430599011">redisxDestroyRESP()</a> </dd>
+<dd>
+<a class="el" href="resp_8c.html#a944a623a34b5a6a7af064fc0d0cc35bf">redisxIsScalarType()</a> </dd>
+<dd>
+<a class="el" href="resp_8c.html#a7fb3a83bc8345413eb1a722444386abd">redisxIsStringType()</a> </dd>
+<dd>
+<a class="el" href="resp_8c.html#af7d1a91b1d89fb11e6b16db04653a871">redisxIsArrayType()</a> </dd>
+<dd>
+<a class="el" href="resp_8c.html#a460822029ff730cd7a55d64797c329a3">redisxIsMapType()</a> </dd></dl>
 </div><h2 class="groupheader">Field Documentation</h2>
 <a id="a76f11d9a0a47b94f72c2d0e77fb32240" name="a76f11d9a0a47b94f72c2d0e77fb32240"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a76f11d9a0a47b94f72c2d0e77fb32240">&#9670;&#160;</a></span>n</h2>
@@ -149,7 +161,7 @@ char&#160;</td><td class="memItemRight" valign="bottom"><b>type</b></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
-<p>Either the integer value of a RESP_INT response, or the dimension of the value field. </p>
+<p>Either the integer value of a RESP_INT or a RESP3_BOOLEAN response, or the dimension of the value field. </p>
 
 </div>
 </div>
@@ -164,7 +176,7 @@ char&#160;</td><td class="memItemRight" valign="bottom"><b>type</b></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
-<p>Pointer to text (char *) content or to an array of components (RESP**)... </p>
+<p>Pointer to text (char *) content or to an array of components (RESP**) or (<a class="el" href="structRedisMapEntry.html">RedisMapEntry</a> *), or else a pointer to a <code>double</code>, depending on <code>type</code>. </p>
 
 </div>
 </div>

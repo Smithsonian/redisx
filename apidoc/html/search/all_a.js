@@ -1,10 +1,6 @@
 var searchData=
 [
-  ['length_0',['length',['../structRedisEntry.html#a9f59b34b1f25fe00023291b678246bcc',1,'RedisEntry']]],
-  ['linking_20your_20application_20against_20redisx_1',['Linking your application against RedisX',['../index.html#autotoc_md11',1,'']]],
-  ['links_2',['Related links',['../index.html#autotoc_md5',1,'']]],
-  ['listing_20and_20scanning_3',['Listing and Scanning',['../index.html#autotoc_md25',1,'']]],
-  ['loading_20and_20execution_4',['LUA script loading and execution',['../index.html#autotoc_md33',1,'']]],
-  ['lua_20script_20loading_20and_20execution_5',['LUA script loading and execution',['../index.html#autotoc_md33',1,'']]],
-  ['lua_20scripts_6',['Atomic execution blocks and LUA scripts',['../index.html#autotoc_md31',1,'']]]
+  ['key_0',['key',['../structRedisMapEntry.html#ab48749655da556e91b5286bb4d196eb1',1,'RedisMapEntry::key'],['../structRedisEntry.html#a5892a9181e6a332f84d27aecd41dcd12',1,'RedisEntry::key']]],
+  ['key_20value_20data_1',['Accessing key / value data',['../index.html#autotoc_md24',1,'']]],
+  ['keyed_20values_2',['Getting and setting keyed values',['../index.html#autotoc_md25',1,'']]]
 ];

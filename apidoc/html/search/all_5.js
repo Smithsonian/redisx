@@ -1,7 +1,7 @@
 var searchData=
 [
-  ['firstfield_0',['firstField',['../../../xchange/apidoc/html/structXStructure.html#a501ae8af2201d9cfaa60e3af21ff58fc',1,'XStructure']]],
-  ['flags_1',['flags',['../../../xchange/apidoc/html/structXField.html#ac8bf36fe0577cba66bccda3a6f7e80a4',1,'XField']]],
-  ['functions_2',['Custom Redis functions',['../index.html#autotoc_md34',1,'']]],
-  ['future_20plans_3',['Future plans',['../index.html#autotoc_md44',1,'']]]
+  ['error_20handling_0',['Error handling',['../index.html#autotoc_md42',1,'']]],
+  ['execution_1',['LUA script loading and execution',['../index.html#autotoc_md34',1,'']]],
+  ['execution_20blocks_2',['Execution blocks',['../index.html#autotoc_md33',1,'']]],
+  ['execution_20blocks_20and_20lua_20scripts_3',['Atomic execution blocks and LUA scripts',['../index.html#autotoc_md32',1,'']]]
 ];

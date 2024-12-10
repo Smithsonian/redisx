@@ -7,6 +7,7 @@
     <class kind="struct">Redis</class>
     <class kind="struct">RedisClient</class>
     <class kind="struct">RedisEntry</class>
+    <class kind="struct">RedisMapEntry</class>
     <class kind="struct">RESP</class>
     <member kind="define">
       <type>#define</type>
@@ -62,6 +63,13 @@
       <name>REDISX_CMDBUF_SIZE</name>
       <anchorfile>redisx_8h.html</anchorfile>
       <anchor>a7e2b05b584b2b1b7af9430657679fe65</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="define">
+      <type>#define</type>
+      <name>REDISX_DEFAULT_TIMEOUT_MILLIS</name>
+      <anchorfile>redisx_8h.html</anchorfile>
+      <anchor>aff9bac60d5293a00d481b5a6701b3882</anchor>
       <arglist></arglist>
     </member>
     <member kind="define">
@@ -136,37 +144,9 @@
     </member>
     <member kind="define">
       <type>#define</type>
-      <name>RESP_ARRAY</name>
+      <name>RESP3_CONTINUED</name>
       <anchorfile>redisx_8h.html</anchorfile>
-      <anchor>ae140df45d32af33e2334fb677213e887</anchor>
-      <arglist></arglist>
-    </member>
-    <member kind="define">
-      <type>#define</type>
-      <name>RESP_BULK_STRING</name>
-      <anchorfile>redisx_8h.html</anchorfile>
-      <anchor>a980fc225ec0392474ff67e319a33f028</anchor>
-      <arglist></arglist>
-    </member>
-    <member kind="define">
-      <type>#define</type>
-      <name>RESP_ERROR</name>
-      <anchorfile>redisx_8h.html</anchorfile>
-      <anchor>a37dfdba3cdcf140c38564c1a6856c04a</anchor>
-      <arglist></arglist>
-    </member>
-    <member kind="define">
-      <type>#define</type>
-      <name>RESP_INT</name>
-      <anchorfile>redisx_8h.html</anchorfile>
-      <anchor>aea77070444458837e0955ae1e89bd9d0</anchor>
-      <arglist></arglist>
-    </member>
-    <member kind="define">
-      <type>#define</type>
-      <name>RESP_SIMPLE_STRING</name>
-      <anchorfile>redisx_8h.html</anchorfile>
-      <anchor>ab2bc8d02a9fa90910d487412704b99f3</anchor>
+      <anchor>ac8f311a1aacb893bb4e8650e8de9325e</anchor>
       <arglist></arglist>
     </member>
     <member kind="typedef">
@@ -175,6 +155,20 @@
       <anchorfile>redisx_8h.html</anchorfile>
       <anchor>a1c01a3b6357a4dd0ad9499d85d4c0368</anchor>
       <arglist>)(Redis *redis, enum redisx_channel channel, const char *op)</arglist>
+    </member>
+    <member kind="typedef">
+      <type>void(*</type>
+      <name>RedisPipelineProcessor</name>
+      <anchorfile>redisx_8h.html</anchorfile>
+      <anchor>abd8ec8743c997fa372e4ebb27dfd9d33</anchor>
+      <arglist>)(RESP *response)</arglist>
+    </member>
+    <member kind="typedef">
+      <type>void(*</type>
+      <name>RedisPushProcessor</name>
+      <anchorfile>redisx_8h.html</anchorfile>
+      <anchor>ac819fe43d592df70e8bbc6b25f4d090b</anchor>
+      <arglist>)(RedisClient *cl, RESP *message, void *ptr)</arglist>
     </member>
     <member kind="typedef">
       <type>void(*</type>
@@ -206,6 +200,122 @@
       <name>REDISX_SUBSCRIPTION_CHANNEL</name>
       <anchorfile>redisx_8h.html</anchorfile>
       <anchor>a5349b7340813fbd1e32d04ed650bc3d9afafc30afa687bc5c56c42b0e677f5981</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="enumeration">
+      <type></type>
+      <name>redisx_protocol</name>
+      <anchorfile>redisx_8h.html</anchorfile>
+      <anchor>ae63bc3e31da55ad4e1603d9302f41ccc</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="enumvalue">
+      <name>REDISX_RESP2</name>
+      <anchorfile>redisx_8h.html</anchorfile>
+      <anchor>ae63bc3e31da55ad4e1603d9302f41cccad4bea131b09a2add3c5c92c3d0523161</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="enumvalue">
+      <name>REDISX_RESP3</name>
+      <anchorfile>redisx_8h.html</anchorfile>
+      <anchor>ae63bc3e31da55ad4e1603d9302f41cccacd031421d135447f8d1b1422966c8277</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="enumeration">
+      <type></type>
+      <name>resp_type</name>
+      <anchorfile>redisx_8h.html</anchorfile>
+      <anchor>afa5c90630d37c2f77e5d7985932941a0</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="enumvalue">
+      <name>RESP_ARRAY</name>
+      <anchorfile>redisx_8h.html</anchorfile>
+      <anchor>afa5c90630d37c2f77e5d7985932941a0ad16eee767b19b1c4bb650deea0dd0b30</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="enumvalue">
+      <name>RESP_INT</name>
+      <anchorfile>redisx_8h.html</anchorfile>
+      <anchor>afa5c90630d37c2f77e5d7985932941a0a503265f716490a963125ade1e6646e0a</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="enumvalue">
+      <name>RESP_SIMPLE_STRING</name>
+      <anchorfile>redisx_8h.html</anchorfile>
+      <anchor>afa5c90630d37c2f77e5d7985932941a0a7868e33fc03b809c864bf271abd009b9</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="enumvalue">
+      <name>RESP_ERROR</name>
+      <anchorfile>redisx_8h.html</anchorfile>
+      <anchor>afa5c90630d37c2f77e5d7985932941a0ae792047eeaca57b6ad382c02d0306656</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="enumvalue">
+      <name>RESP_BULK_STRING</name>
+      <anchorfile>redisx_8h.html</anchorfile>
+      <anchor>afa5c90630d37c2f77e5d7985932941a0a36dd81166f9ba91db70b1571b25fec9f</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="enumvalue">
+      <name>RESP3_NULL</name>
+      <anchorfile>redisx_8h.html</anchorfile>
+      <anchor>afa5c90630d37c2f77e5d7985932941a0a587dbeb89a4ed22f829b0e0238d8aca1</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="enumvalue">
+      <name>RESP3_DOUBLE</name>
+      <anchorfile>redisx_8h.html</anchorfile>
+      <anchor>afa5c90630d37c2f77e5d7985932941a0adcd1d7124f08e1ed73594d2ac5709cca</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="enumvalue">
+      <name>RESP3_BOOLEAN</name>
+      <anchorfile>redisx_8h.html</anchorfile>
+      <anchor>afa5c90630d37c2f77e5d7985932941a0a764e3114139243c0d896877739d6fc8f</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="enumvalue">
+      <name>RESP3_BLOB_ERROR</name>
+      <anchorfile>redisx_8h.html</anchorfile>
+      <anchor>afa5c90630d37c2f77e5d7985932941a0a955aeeb6f1b51f7a3286e1ac033a7a4b</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="enumvalue">
+      <name>RESP3_VERBATIM_STRING</name>
+      <anchorfile>redisx_8h.html</anchorfile>
+      <anchor>afa5c90630d37c2f77e5d7985932941a0a01f039d5dc20f5c7964b5c27f8084cfe</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="enumvalue">
+      <name>RESP3_BIG_NUMBER</name>
+      <anchorfile>redisx_8h.html</anchorfile>
+      <anchor>afa5c90630d37c2f77e5d7985932941a0a6584ded22b188e62c73ef63c4221333c</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="enumvalue">
+      <name>RESP3_MAP</name>
+      <anchorfile>redisx_8h.html</anchorfile>
+      <anchor>afa5c90630d37c2f77e5d7985932941a0a84ed8b97007ad57425cec2cb9b12e89b</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="enumvalue">
+      <name>RESP3_SET</name>
+      <anchorfile>redisx_8h.html</anchorfile>
+      <anchor>afa5c90630d37c2f77e5d7985932941a0a4ca6058290704cf1fa5aae3d3dcfdff7</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="enumvalue">
+      <name>RESP3_ATTRIBUTE</name>
+      <anchorfile>redisx_8h.html</anchorfile>
+      <anchor>afa5c90630d37c2f77e5d7985932941a0a2da22ebb851ace110ab55425d2fe19fd</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="enumvalue">
+      <name>RESP3_PUSH</name>
+      <anchorfile>redisx_8h.html</anchorfile>
+      <anchor>afa5c90630d37c2f77e5d7985932941a0a3cf51b299d0be37b2d72dee132e6f481</anchor>
       <arglist></arglist>
     </member>
     <member kind="function">
@@ -247,15 +357,29 @@
       <type>int</type>
       <name>redisxCheckDestroyRESP</name>
       <anchorfile>redisx_8h.html</anchorfile>
-      <anchor>a67b8bd13975dd286600f20dc80bdb462</anchor>
-      <arglist>(RESP *resp, char expectedType, int expectedSize)</arglist>
+      <anchor>a9849f4fb9156f3a3f4f4b3021993d4ce</anchor>
+      <arglist>(RESP *resp, enum resp_type, int expectedSize)</arglist>
     </member>
     <member kind="function">
       <type>int</type>
       <name>redisxCheckRESP</name>
       <anchorfile>redisx_8h.html</anchorfile>
-      <anchor>a2d3ffb89129ab04483e3966835a5ff71</anchor>
-      <arglist>(const RESP *resp, char expectedType, int expectedSize)</arglist>
+      <anchor>a4b5674d08da07250c0ca6116a4c48ccf</anchor>
+      <arglist>(const RESP *resp, enum resp_type expectedType, int expectedSize)</arglist>
+    </member>
+    <member kind="function">
+      <type>int</type>
+      <name>redisxCheckValid</name>
+      <anchorfile>redisx_8h.html</anchorfile>
+      <anchor>a0cdebfd895ab4c61c0fc9e0863a66419</anchor>
+      <arglist>(const Redis *redis)</arglist>
+    </member>
+    <member kind="function">
+      <type>int</type>
+      <name>redisxClearAttributesAsync</name>
+      <anchorfile>redisx_8h.html</anchorfile>
+      <anchor>a576bb47774aaf4d5d735a5ef18253048</anchor>
+      <arglist>(RedisClient *cl)</arglist>
     </member>
     <member kind="function">
       <type>void</type>
@@ -284,6 +408,13 @@
       <anchorfile>redisx_8h.html</anchorfile>
       <anchor>ad71822356ffd40ed4b1c71d065f48809</anchor>
       <arglist>(Redis *redis, boolean usePipeline)</arglist>
+    </member>
+    <member kind="function">
+      <type>RESP *</type>
+      <name>redisxCopyOfRESP</name>
+      <anchorfile>redisx_8h.html</anchorfile>
+      <anchor>af093c487ee72ade826ce894f59691475</anchor>
+      <arglist>(const RESP *resp)</arglist>
     </member>
     <member kind="function">
       <type>void</type>
@@ -356,11 +487,25 @@
       <arglist>(RedisClient *cl)</arglist>
     </member>
     <member kind="function">
+      <type>const RESP *</type>
+      <name>redisxGetAttributesAsync</name>
+      <anchorfile>redisx_8h.html</anchorfile>
+      <anchor>a6c9d4ce9babbcaac35e45f536d47858d</anchor>
+      <arglist>(const RedisClient *cl)</arglist>
+    </member>
+    <member kind="function">
       <type>RedisClient *</type>
       <name>redisxGetClient</name>
       <anchorfile>redisx_8h.html</anchorfile>
       <anchor>a14907be8fba6a13505a352673cea5895</anchor>
       <arglist>(Redis *redis, enum redisx_channel channel)</arglist>
+    </member>
+    <member kind="function">
+      <type>RESP *</type>
+      <name>redisxGetHelloData</name>
+      <anchorfile>redisx_8h.html</anchorfile>
+      <anchor>a89fd65118ba731931fe281c83f6fa8ba</anchor>
+      <arglist>(Redis *redis)</arglist>
     </member>
     <member kind="function">
       <type>char **</type>
@@ -370,11 +515,32 @@
       <arglist>(Redis *redis, const char *table, int *n)</arglist>
     </member>
     <member kind="function">
+      <type>RedisMapEntry *</type>
+      <name>redisxGetKeywordEntry</name>
+      <anchorfile>redisx_8h.html</anchorfile>
+      <anchor>af158bd99f4f6733037846979423b6af6</anchor>
+      <arglist>(const RESP *map, const char *key)</arglist>
+    </member>
+    <member kind="function">
       <type>RedisClient *</type>
       <name>redisxGetLockedConnectedClient</name>
       <anchorfile>redisx_8h.html</anchorfile>
       <anchor>a19d2fb18f2f939edfdc412d064741f9f</anchor>
       <arglist>(Redis *redis, enum redisx_channel channel)</arglist>
+    </member>
+    <member kind="function">
+      <type>RedisMapEntry *</type>
+      <name>redisxGetMapEntry</name>
+      <anchorfile>redisx_8h.html</anchorfile>
+      <anchor>a698cffbe2fb664d79fc702aac7028ca9</anchor>
+      <arglist>(const RESP *map, const RESP *key)</arglist>
+    </member>
+    <member kind="function">
+      <type>enum redisx_protocol</type>
+      <name>redisxGetProtocol</name>
+      <anchorfile>redisx_8h.html</anchorfile>
+      <anchor>af756044530dd5b424ec64e89e22eb0a0</anchor>
+      <arglist>(Redis *redis)</arglist>
     </member>
     <member kind="function">
       <type>int</type>
@@ -413,6 +579,13 @@
     </member>
     <member kind="function">
       <type>boolean</type>
+      <name>redisxHasComponents</name>
+      <anchorfile>redisx_8h.html</anchorfile>
+      <anchor>a39055bb1b469883dabfaf1b8efe3b6fe</anchor>
+      <arglist>(const RESP *r)</arglist>
+    </member>
+    <member kind="function">
+      <type>boolean</type>
       <name>redisxHasPipeline</name>
       <anchorfile>redisx_8h.html</anchorfile>
       <anchor>a481678923a653e5227f7dab5a1fd272d</anchor>
@@ -434,10 +607,52 @@
     </member>
     <member kind="function">
       <type>boolean</type>
+      <name>redisxIsArrayType</name>
+      <anchorfile>redisx_8h.html</anchorfile>
+      <anchor>af7d1a91b1d89fb11e6b16db04653a871</anchor>
+      <arglist>(const RESP *r)</arglist>
+    </member>
+    <member kind="function">
+      <type>boolean</type>
       <name>redisxIsConnected</name>
       <anchorfile>redisx_8h.html</anchorfile>
       <anchor>a94326ebfa5868579c8448cdbb941b3da</anchor>
       <arglist>(Redis *redis)</arglist>
+    </member>
+    <member kind="function">
+      <type>boolean</type>
+      <name>redisxIsEqualRESP</name>
+      <anchorfile>redisx_8h.html</anchorfile>
+      <anchor>ac84b780fd0c2ed709d4edd5789e522aa</anchor>
+      <arglist>(const RESP *a, const RESP *b)</arglist>
+    </member>
+    <member kind="function">
+      <type>int</type>
+      <name>redisxIsGlobPattern</name>
+      <anchorfile>redisx_8h.html</anchorfile>
+      <anchor>afed05f00d7dc1b6905b01210b4c8ae6b</anchor>
+      <arglist>(const char *str)</arglist>
+    </member>
+    <member kind="function">
+      <type>boolean</type>
+      <name>redisxIsMapType</name>
+      <anchorfile>redisx_8h.html</anchorfile>
+      <anchor>a460822029ff730cd7a55d64797c329a3</anchor>
+      <arglist>(const RESP *r)</arglist>
+    </member>
+    <member kind="function">
+      <type>boolean</type>
+      <name>redisxIsScalarType</name>
+      <anchorfile>redisx_8h.html</anchorfile>
+      <anchor>a944a623a34b5a6a7af064fc0d0cc35bf</anchor>
+      <arglist>(const RESP *r)</arglist>
+    </member>
+    <member kind="function">
+      <type>boolean</type>
+      <name>redisxIsStringType</name>
+      <anchorfile>redisx_8h.html</anchorfile>
+      <anchor>a7fb3a83bc8345413eb1a722444386abd</anchor>
+      <arglist>(const RESP *r)</arglist>
     </member>
     <member kind="function">
       <type>boolean</type>
@@ -497,6 +712,13 @@
     </member>
     <member kind="function">
       <type>int</type>
+      <name>redisxPrintRESP</name>
+      <anchorfile>redisx_8h.html</anchorfile>
+      <anchor>a033634f60b612f02ebf11823aeb6641a</anchor>
+      <arglist>(const char *name, const RESP *resp)</arglist>
+    </member>
+    <member kind="function">
+      <type>int</type>
       <name>redisxPublish</name>
       <anchorfile>redisx_8h.html</anchorfile>
       <anchor>a06262603a9a3153fb29d81628fee6a8e</anchor>
@@ -552,6 +774,20 @@
       <arglist>(Redis *redis, const char *command, const char *arg1, const char *arg2, const char *arg3, int *status)</arglist>
     </member>
     <member kind="function">
+      <type>char *</type>
+      <name>redisxRESP2JSON</name>
+      <anchorfile>redisx_8h.html</anchorfile>
+      <anchor>a7f4e74ee03cebf38eb9c1fb873784a35</anchor>
+      <arglist>(const char *name, const RESP *resp)</arglist>
+    </member>
+    <member kind="function">
+      <type>XField *</type>
+      <name>redisxRESP2XField</name>
+      <anchorfile>redisx_8h.html</anchorfile>
+      <anchor>adc7235cd1b6be038b9f3c7beb11a13ef</anchor>
+      <arglist>(const char *name, const RESP *resp)</arglist>
+    </member>
+    <member kind="function">
       <type>char **</type>
       <name>redisxScanKeys</name>
       <anchorfile>redisx_8h.html</anchorfile>
@@ -597,8 +833,8 @@
       <type>int</type>
       <name>redisxSetPipelineConsumer</name>
       <anchorfile>redisx_8h.html</anchorfile>
-      <anchor>a27bfc0692f6023f413912129871fed56</anchor>
-      <arglist>(Redis *redis, void(*f)(RESP *))</arglist>
+      <anchor>a0799a0a79705d1a7579bdf57879d1fec</anchor>
+      <arglist>(Redis *redis, RedisPipelineProcessor f)</arglist>
     </member>
     <member kind="function">
       <type>int</type>
@@ -606,6 +842,20 @@
       <anchorfile>redisx_8h.html</anchorfile>
       <anchor>a37f39ede48014a2463e4c72bf6eb5a3e</anchor>
       <arglist>(Redis *redis, int port)</arglist>
+    </member>
+    <member kind="function">
+      <type>int</type>
+      <name>redisxSetProtocol</name>
+      <anchorfile>redisx_8h.html</anchorfile>
+      <anchor>a842cfeb16ae3cb690cb40c5b006dd918</anchor>
+      <arglist>(Redis *redis, enum redisx_protocol protocol)</arglist>
+    </member>
+    <member kind="function">
+      <type>int</type>
+      <name>redisxSetPushProcessor</name>
+      <anchorfile>redisx_8h.html</anchorfile>
+      <anchor>a2caca9bc8a09225edb88699fdda10602</anchor>
+      <arglist>(Redis *redis, RedisPushProcessor func, void *arg)</arglist>
     </member>
     <member kind="function">
       <type>int</type>
@@ -665,6 +915,13 @@
     </member>
     <member kind="function">
       <type>int</type>
+      <name>redisxSplitText</name>
+      <anchorfile>redisx_8h.html</anchorfile>
+      <anchor>a63c29262670cf34d06fc30e684878819</anchor>
+      <arglist>(RESP *resp, char **text)</arglist>
+    </member>
+    <member kind="function">
+      <type>int</type>
       <name>redisxStartBlockAsync</name>
       <anchorfile>redisx_8h.html</anchorfile>
       <anchor>a3e49508e4e4fcc283832226fd1bffd85</anchor>
@@ -703,13 +960,6 @@
       <anchor>ac5021fd53b8fb32c06455b174e849751</anchor>
       <arglist></arglist>
     </member>
-    <member kind="define">
-      <type>#define</type>
-      <name>REDIS_TIMEOUT_SECONDS</name>
-      <anchorfile>redisx-client_8c.html</anchorfile>
-      <anchor>a537f665e7813cee70bc73b5751a50946</anchor>
-      <arglist></arglist>
-    </member>
     <member kind="function">
       <type>int</type>
       <name>redisxAbortBlockAsync</name>
@@ -718,11 +968,25 @@
       <arglist>(RedisClient *cl)</arglist>
     </member>
     <member kind="function">
+      <type>int</type>
+      <name>redisxClearAttributesAsync</name>
+      <anchorfile>redisx-client_8c.html</anchorfile>
+      <anchor>a576bb47774aaf4d5d735a5ef18253048</anchor>
+      <arglist>(RedisClient *cl)</arglist>
+    </member>
+    <member kind="function">
       <type>RESP *</type>
       <name>redisxExecBlockAsync</name>
       <anchorfile>redisx-client_8c.html</anchorfile>
       <anchor>a6fed65f9413569c771d5165a0194477a</anchor>
       <arglist>(RedisClient *cl)</arglist>
+    </member>
+    <member kind="function">
+      <type>const RESP *</type>
+      <name>redisxGetAttributesAsync</name>
+      <anchorfile>redisx-client_8c.html</anchorfile>
+      <anchor>a6c9d4ce9babbcaac35e45f536d47858d</anchor>
+      <arglist>(const RedisClient *cl)</arglist>
     </member>
     <member kind="function">
       <type>RedisClient *</type>
@@ -915,6 +1179,13 @@
       <anchorfile>redisx-net_8c.html</anchorfile>
       <anchor>a37f39ede48014a2463e4c72bf6eb5a3e</anchor>
       <arglist>(Redis *redis, int port)</arglist>
+    </member>
+    <member kind="function">
+      <type>int</type>
+      <name>redisxSetSocketTimeout</name>
+      <anchorfile>redisx-net_8c.html</anchorfile>
+      <anchor>aff6b1f622037a4331c1dab1219b79012</anchor>
+      <arglist>(Redis *redis, int timeoutMillis)</arglist>
     </member>
     <member kind="function">
       <type>void</type>
@@ -1141,17 +1412,10 @@
     </member>
     <member kind="function">
       <type>int</type>
-      <name>redisxCheckDestroyRESP</name>
+      <name>redisxCheckValid</name>
       <anchorfile>redisx_8c.html</anchorfile>
-      <anchor>a67b8bd13975dd286600f20dc80bdb462</anchor>
-      <arglist>(RESP *resp, char expectedType, int expectedSize)</arglist>
-    </member>
-    <member kind="function">
-      <type>int</type>
-      <name>redisxCheckRESP</name>
-      <anchorfile>redisx_8c.html</anchorfile>
-      <anchor>a2d3ffb89129ab04483e3966835a5ff71</anchor>
-      <arglist>(const RESP *resp, char expectedType, int expectedSize)</arglist>
+      <anchor>a0cdebfd895ab4c61c0fc9e0863a66419</anchor>
+      <arglist>(const Redis *redis)</arglist>
     </member>
     <member kind="function">
       <type>void</type>
@@ -1159,13 +1423,6 @@
       <anchorfile>redisx_8c.html</anchorfile>
       <anchor>a7cde25fca6ae274d8d0a66d5c8b63ff5</anchor>
       <arglist>(boolean value)</arglist>
-    </member>
-    <member kind="function">
-      <type>void</type>
-      <name>redisxDestroyRESP</name>
-      <anchorfile>redisx_8c.html</anchorfile>
-      <anchor>aa4e23a7454f7055711915ec430599011</anchor>
-      <arglist>(RESP *resp)</arglist>
     </member>
     <member kind="function">
       <type>int</type>
@@ -1182,6 +1439,20 @@
       <arglist>(int code)</arglist>
     </member>
     <member kind="function">
+      <type>RESP *</type>
+      <name>redisxGetHelloData</name>
+      <anchorfile>redisx_8c.html</anchorfile>
+      <anchor>a89fd65118ba731931fe281c83f6fa8ba</anchor>
+      <arglist>(Redis *redis)</arglist>
+    </member>
+    <member kind="function">
+      <type>enum redisx_protocol</type>
+      <name>redisxGetProtocol</name>
+      <anchorfile>redisx_8c.html</anchorfile>
+      <anchor>af756044530dd5b424ec64e89e22eb0a0</anchor>
+      <arglist>(Redis *redis)</arglist>
+    </member>
+    <member kind="function">
       <type>int</type>
       <name>redisxGetTime</name>
       <anchorfile>redisx_8c.html</anchorfile>
@@ -1194,6 +1465,13 @@
       <anchorfile>redisx_8c.html</anchorfile>
       <anchor>a481678923a653e5227f7dab5a1fd272d</anchor>
       <arglist>(Redis *redis)</arglist>
+    </member>
+    <member kind="function">
+      <type>int</type>
+      <name>redisxIsGlobPattern</name>
+      <anchorfile>redisx_8c.html</anchorfile>
+      <anchor>afed05f00d7dc1b6905b01210b4c8ae6b</anchor>
+      <arglist>(const char *str)</arglist>
     </member>
     <member kind="function">
       <type>boolean</type>
@@ -1234,8 +1512,22 @@
       <type>int</type>
       <name>redisxSetPipelineConsumer</name>
       <anchorfile>redisx_8c.html</anchorfile>
-      <anchor>a27bfc0692f6023f413912129871fed56</anchor>
-      <arglist>(Redis *redis, void(*f)(RESP *))</arglist>
+      <anchor>a0799a0a79705d1a7579bdf57879d1fec</anchor>
+      <arglist>(Redis *redis, RedisPipelineProcessor f)</arglist>
+    </member>
+    <member kind="function">
+      <type>int</type>
+      <name>redisxSetProtocol</name>
+      <anchorfile>redisx_8c.html</anchorfile>
+      <anchor>a842cfeb16ae3cb690cb40c5b006dd918</anchor>
+      <arglist>(Redis *redis, enum redisx_protocol protocol)</arglist>
+    </member>
+    <member kind="function">
+      <type>int</type>
+      <name>redisxSetPushProcessor</name>
+      <anchorfile>redisx_8c.html</anchorfile>
+      <anchor>a2caca9bc8a09225edb88699fdda10602</anchor>
+      <arglist>(Redis *redis, RedisPushProcessor func, void *arg)</arglist>
     </member>
     <member kind="function">
       <type>int</type>
@@ -1257,6 +1549,137 @@
       <anchorfile>redisx_8c.html</anchorfile>
       <anchor>a11454a2359f43b6fd024d25a8148644e</anchor>
       <arglist>(boolean value)</arglist>
+    </member>
+  </compound>
+  <compound kind="file">
+    <name>resp.c</name>
+    <path>src/</path>
+    <filename>resp_8c.html</filename>
+    <member kind="define">
+      <type>#define</type>
+      <name>_DEFAULT_SOURCE</name>
+      <anchorfile>resp_8c.html</anchorfile>
+      <anchor>a8fb447618db946a9e2a596d9ea18763f</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="function">
+      <type>int</type>
+      <name>redisxAppendRESP</name>
+      <anchorfile>resp_8c.html</anchorfile>
+      <anchor>aea5830b9c06c6603c0fc04bf10238b83</anchor>
+      <arglist>(RESP *resp, RESP *part)</arglist>
+    </member>
+    <member kind="function">
+      <type>int</type>
+      <name>redisxCheckDestroyRESP</name>
+      <anchorfile>resp_8c.html</anchorfile>
+      <anchor>a80d5a305523c51da7bc7cf4c9deca962</anchor>
+      <arglist>(RESP *resp, enum resp_type expectedType, int expectedSize)</arglist>
+    </member>
+    <member kind="function">
+      <type>int</type>
+      <name>redisxCheckRESP</name>
+      <anchorfile>resp_8c.html</anchorfile>
+      <anchor>a4b5674d08da07250c0ca6116a4c48ccf</anchor>
+      <arglist>(const RESP *resp, enum resp_type expectedType, int expectedSize)</arglist>
+    </member>
+    <member kind="function">
+      <type>RESP *</type>
+      <name>redisxCopyOfRESP</name>
+      <anchorfile>resp_8c.html</anchorfile>
+      <anchor>af093c487ee72ade826ce894f59691475</anchor>
+      <arglist>(const RESP *resp)</arglist>
+    </member>
+    <member kind="function">
+      <type>void</type>
+      <name>redisxDestroyRESP</name>
+      <anchorfile>resp_8c.html</anchorfile>
+      <anchor>aa4e23a7454f7055711915ec430599011</anchor>
+      <arglist>(RESP *resp)</arglist>
+    </member>
+    <member kind="function">
+      <type>RedisMapEntry *</type>
+      <name>redisxGetKeywordEntry</name>
+      <anchorfile>resp_8c.html</anchorfile>
+      <anchor>af158bd99f4f6733037846979423b6af6</anchor>
+      <arglist>(const RESP *map, const char *key)</arglist>
+    </member>
+    <member kind="function">
+      <type>RedisMapEntry *</type>
+      <name>redisxGetMapEntry</name>
+      <anchorfile>resp_8c.html</anchorfile>
+      <anchor>a698cffbe2fb664d79fc702aac7028ca9</anchor>
+      <arglist>(const RESP *map, const RESP *key)</arglist>
+    </member>
+    <member kind="function">
+      <type>boolean</type>
+      <name>redisxHasComponents</name>
+      <anchorfile>resp_8c.html</anchorfile>
+      <anchor>a39055bb1b469883dabfaf1b8efe3b6fe</anchor>
+      <arglist>(const RESP *r)</arglist>
+    </member>
+    <member kind="function">
+      <type>boolean</type>
+      <name>redisxIsArrayType</name>
+      <anchorfile>resp_8c.html</anchorfile>
+      <anchor>af7d1a91b1d89fb11e6b16db04653a871</anchor>
+      <arglist>(const RESP *r)</arglist>
+    </member>
+    <member kind="function">
+      <type>boolean</type>
+      <name>redisxIsEqualRESP</name>
+      <anchorfile>resp_8c.html</anchorfile>
+      <anchor>ac84b780fd0c2ed709d4edd5789e522aa</anchor>
+      <arglist>(const RESP *a, const RESP *b)</arglist>
+    </member>
+    <member kind="function">
+      <type>boolean</type>
+      <name>redisxIsMapType</name>
+      <anchorfile>resp_8c.html</anchorfile>
+      <anchor>a460822029ff730cd7a55d64797c329a3</anchor>
+      <arglist>(const RESP *r)</arglist>
+    </member>
+    <member kind="function">
+      <type>boolean</type>
+      <name>redisxIsScalarType</name>
+      <anchorfile>resp_8c.html</anchorfile>
+      <anchor>a944a623a34b5a6a7af064fc0d0cc35bf</anchor>
+      <arglist>(const RESP *r)</arglist>
+    </member>
+    <member kind="function">
+      <type>boolean</type>
+      <name>redisxIsStringType</name>
+      <anchorfile>resp_8c.html</anchorfile>
+      <anchor>a7fb3a83bc8345413eb1a722444386abd</anchor>
+      <arglist>(const RESP *r)</arglist>
+    </member>
+    <member kind="function">
+      <type>int</type>
+      <name>redisxPrintRESP</name>
+      <anchorfile>resp_8c.html</anchorfile>
+      <anchor>a033634f60b612f02ebf11823aeb6641a</anchor>
+      <arglist>(const char *name, const RESP *resp)</arglist>
+    </member>
+    <member kind="function">
+      <type>char *</type>
+      <name>redisxRESP2JSON</name>
+      <anchorfile>resp_8c.html</anchorfile>
+      <anchor>a7f4e74ee03cebf38eb9c1fb873784a35</anchor>
+      <arglist>(const char *name, const RESP *resp)</arglist>
+    </member>
+    <member kind="function">
+      <type>XField *</type>
+      <name>redisxRESP2XField</name>
+      <anchorfile>resp_8c.html</anchorfile>
+      <anchor>adc7235cd1b6be038b9f3c7beb11a13ef</anchor>
+      <arglist>(const char *name, const RESP *resp)</arglist>
+    </member>
+    <member kind="function">
+      <type>int</type>
+      <name>redisxSplitText</name>
+      <anchorfile>resp_8c.html</anchorfile>
+      <anchor>a63c29262670cf34d06fc30e684878819</anchor>
+      <arglist>(RESP *resp, char **text)</arglist>
     </member>
   </compound>
   <compound kind="struct">
@@ -1321,6 +1744,24 @@
     </member>
   </compound>
   <compound kind="struct">
+    <name>RedisMapEntry</name>
+    <filename>structRedisMapEntry.html</filename>
+    <member kind="variable">
+      <type>RESP *</type>
+      <name>key</name>
+      <anchorfile>structRedisMapEntry.html</anchorfile>
+      <anchor>ab48749655da556e91b5286bb4d196eb1</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="variable">
+      <type>RESP *</type>
+      <name>value</name>
+      <anchorfile>structRedisMapEntry.html</anchorfile>
+      <anchor>a449b0c7dacd31c5e7edf071da3bda96a</anchor>
+      <arglist></arglist>
+    </member>
+  </compound>
+  <compound kind="struct">
     <name>RESP</name>
     <filename>structRESP.html</filename>
     <member kind="variable">
@@ -1331,10 +1772,10 @@
       <arglist></arglist>
     </member>
     <member kind="variable">
-      <type>char</type>
+      <type>enum resp_type</type>
       <name>type</name>
       <anchorfile>structRESP.html</anchorfile>
-      <anchor>aff17911edc8208aa8ddb1c7c52c78389</anchor>
+      <anchor>a93869a69154ac2297800b0afff64d600</anchor>
       <arglist></arglist>
     </member>
     <member kind="variable">
@@ -1361,6 +1802,7 @@
     <docanchor file="index.html">connection-hooks</docanchor>
     <docanchor file="index.html">simple-redis-queries</docanchor>
     <docanchor file="index.html">interactive-transactions</docanchor>
+    <docanchor file="index.html">push-notifications</docanchor>
     <docanchor file="index.html">resp-data-type</docanchor>
     <docanchor file="index.html">accessing-key-value-data</docanchor>
     <docanchor file="index.html">getting-and-setting-keyed-values</docanchor>
@@ -1374,6 +1816,7 @@
     <docanchor file="index.html">custom-functions</docanchor>
     <docanchor file="index.html">advanced-queries</docanchor>
     <docanchor file="index.html">asynchronous-client-processing</docanchor>
+    <docanchor file="index.html">attributes</docanchor>
     <docanchor file="index.html">pipelined-transactions</docanchor>
     <docanchor file="index.html">error-handling</docanchor>
     <docanchor file="index.html">debug-support</docanchor>

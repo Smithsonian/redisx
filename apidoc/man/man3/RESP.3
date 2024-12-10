@@ -16,9 +16,9 @@ RESP \- Structure that represents a \fBRedis\fP response (\fBRESP\fP format)\&.
 .RI "int \fBn\fP"
 .br
 .ti -1c
-.RI "char \fBtype\fP"
+.RI "enum \fBresp_type\fP \fBtype\fP"
 .br
-.RI "\fBRESP\fP type RESP_ARRAY, RESP_INT \&.\&.\&. "
+.RI "\fBRESP\fP type; RESP_ARRAY, RESP_INT \&.\&.\&. "
 .ti -1c
 .RI "void * \fBvalue\fP"
 .br
@@ -27,20 +27,32 @@ RESP \- Structure that represents a \fBRedis\fP response (\fBRESP\fP format)\&.
 .PP 
 Structure that represents a \fBRedis\fP response (\fBRESP\fP format)\&. 
 
-
+REFERENCES: 
+.PD 0
+.IP "1." 4
+https://github.com/redis/redis-specifications/tree/master/protocol 
+.PP
 .PP
 \fBSee also\fP
 .RS 4
 \fBredisxDestroyRESP()\fP 
+.PP
+\fBredisxIsScalarType()\fP 
+.PP
+\fBredisxIsStringType()\fP 
+.PP
+\fBredisxIsArrayType()\fP 
+.PP
+\fBredisxIsMapType()\fP 
 .RE
 .PP
 
 .SH "Field Documentation"
 .PP 
 .SS "int n"
-Either the integer value of a RESP_INT response, or the dimension of the value field\&. 
+Either the integer value of a RESP_INT or a RESP3_BOOLEAN response, or the dimension of the value field\&. 
 .SS "void* value"
-Pointer to text (char *) content or to an array of components (RESP**)\&.\&.\&. 
+Pointer to text (char *) content or to an array of components (RESP**) or (\fBRedisMapEntry\fP *), or else a pointer to a \fCdouble\fP, depending on \fCtype\fP\&. 
 
 .SH "Author"
 .PP 

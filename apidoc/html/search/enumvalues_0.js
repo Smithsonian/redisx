@@ -2,5 +2,22 @@ var searchData=
 [
   ['redisx_5finteractive_5fchannel_0',['REDISX_INTERACTIVE_CHANNEL',['../redisx_8h.html#a5349b7340813fbd1e32d04ed650bc3d9a65b4f2926885665960480d008ab2a456',1,'redisx.h']]],
   ['redisx_5fpipeline_5fchannel_1',['REDISX_PIPELINE_CHANNEL',['../redisx_8h.html#a5349b7340813fbd1e32d04ed650bc3d9a7a240839c1e943706535b8d69a605f0c',1,'redisx.h']]],
-  ['redisx_5fsubscription_5fchannel_2',['REDISX_SUBSCRIPTION_CHANNEL',['../redisx_8h.html#a5349b7340813fbd1e32d04ed650bc3d9afafc30afa687bc5c56c42b0e677f5981',1,'redisx.h']]]
+  ['redisx_5fresp2_2',['REDISX_RESP2',['../redisx_8h.html#ae63bc3e31da55ad4e1603d9302f41cccad4bea131b09a2add3c5c92c3d0523161',1,'redisx.h']]],
+  ['redisx_5fresp3_3',['REDISX_RESP3',['../redisx_8h.html#ae63bc3e31da55ad4e1603d9302f41cccacd031421d135447f8d1b1422966c8277',1,'redisx.h']]],
+  ['redisx_5fsubscription_5fchannel_4',['REDISX_SUBSCRIPTION_CHANNEL',['../redisx_8h.html#a5349b7340813fbd1e32d04ed650bc3d9afafc30afa687bc5c56c42b0e677f5981',1,'redisx.h']]],
+  ['resp3_5fattribute_5',['RESP3_ATTRIBUTE',['../redisx_8h.html#afa5c90630d37c2f77e5d7985932941a0a2da22ebb851ace110ab55425d2fe19fd',1,'redisx.h']]],
+  ['resp3_5fbig_5fnumber_6',['RESP3_BIG_NUMBER',['../redisx_8h.html#afa5c90630d37c2f77e5d7985932941a0a6584ded22b188e62c73ef63c4221333c',1,'redisx.h']]],
+  ['resp3_5fblob_5ferror_7',['RESP3_BLOB_ERROR',['../redisx_8h.html#afa5c90630d37c2f77e5d7985932941a0a955aeeb6f1b51f7a3286e1ac033a7a4b',1,'redisx.h']]],
+  ['resp3_5fboolean_8',['RESP3_BOOLEAN',['../redisx_8h.html#afa5c90630d37c2f77e5d7985932941a0a764e3114139243c0d896877739d6fc8f',1,'redisx.h']]],
+  ['resp3_5fdouble_9',['RESP3_DOUBLE',['../redisx_8h.html#afa5c90630d37c2f77e5d7985932941a0adcd1d7124f08e1ed73594d2ac5709cca',1,'redisx.h']]],
+  ['resp3_5fmap_10',['RESP3_MAP',['../redisx_8h.html#afa5c90630d37c2f77e5d7985932941a0a84ed8b97007ad57425cec2cb9b12e89b',1,'redisx.h']]],
+  ['resp3_5fnull_11',['RESP3_NULL',['../redisx_8h.html#afa5c90630d37c2f77e5d7985932941a0a587dbeb89a4ed22f829b0e0238d8aca1',1,'redisx.h']]],
+  ['resp3_5fpush_12',['RESP3_PUSH',['../redisx_8h.html#afa5c90630d37c2f77e5d7985932941a0a3cf51b299d0be37b2d72dee132e6f481',1,'redisx.h']]],
+  ['resp3_5fset_13',['RESP3_SET',['../redisx_8h.html#afa5c90630d37c2f77e5d7985932941a0a4ca6058290704cf1fa5aae3d3dcfdff7',1,'redisx.h']]],
+  ['resp3_5fverbatim_5fstring_14',['RESP3_VERBATIM_STRING',['../redisx_8h.html#afa5c90630d37c2f77e5d7985932941a0a01f039d5dc20f5c7964b5c27f8084cfe',1,'redisx.h']]],
+  ['resp_5farray_15',['RESP_ARRAY',['../redisx_8h.html#afa5c90630d37c2f77e5d7985932941a0ad16eee767b19b1c4bb650deea0dd0b30',1,'redisx.h']]],
+  ['resp_5fbulk_5fstring_16',['RESP_BULK_STRING',['../redisx_8h.html#afa5c90630d37c2f77e5d7985932941a0a36dd81166f9ba91db70b1571b25fec9f',1,'redisx.h']]],
+  ['resp_5ferror_17',['RESP_ERROR',['../redisx_8h.html#afa5c90630d37c2f77e5d7985932941a0ae792047eeaca57b6ad382c02d0306656',1,'redisx.h']]],
+  ['resp_5fint_18',['RESP_INT',['../redisx_8h.html#afa5c90630d37c2f77e5d7985932941a0a503265f716490a963125ade1e6646e0a',1,'redisx.h']]],
+  ['resp_5fsimple_5fstring_19',['RESP_SIMPLE_STRING',['../redisx_8h.html#afa5c90630d37c2f77e5d7985932941a0a7868e33fc03b809c864bf271abd009b9',1,'redisx.h']]]
 ];

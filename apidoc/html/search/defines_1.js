@@ -1,4 +1,24 @@
 var searchData=
 [
-  ['scan_5finitial_5fstore_5fcapacity_0',['SCAN_INITIAL_STORE_CAPACITY',['../redisx-tab_8c.html#a5766edfc8d12682de3f57f1ad76f413b',1,'redisx-tab.c']]]
+  ['redis_5ferror_0',['REDIS_ERROR',['../redisx_8h.html#aad063b5d1f8eaeadc0c70f8568113034',1,'redisx.h']]],
+  ['redis_5fincomplete_5ftransfer_1',['REDIS_INCOMPLETE_TRANSFER',['../redisx_8h.html#a158f2b6af2421e42128d014e50896bb4',1,'redisx.h']]],
+  ['redis_5finvalid_5fchannel_2',['REDIS_INVALID_CHANNEL',['../redisx_8h.html#a8827c9e06650c47f2cfd96496af5487e',1,'redisx.h']]],
+  ['redis_5fnull_3',['REDIS_NULL',['../redisx_8h.html#a7e2f81e12d6982c6aa97b50a77fd98f5',1,'redisx.h']]],
+  ['redis_5fsimple_5fstring_5fsize_4',['REDIS_SIMPLE_STRING_SIZE',['../redisx-client_8c.html#ac5021fd53b8fb32c06455b174e849751',1,'redisx-client.c']]],
+  ['redis_5funexpected_5farray_5fsize_5',['REDIS_UNEXPECTED_ARRAY_SIZE',['../redisx_8h.html#a447a38ce70634136b737274965aa5ecc',1,'redisx.h']]],
+  ['redis_5funexpected_5fresp_6',['REDIS_UNEXPECTED_RESP',['../redisx_8h.html#a9d530bcfae7689b4275749b47a6d9b51',1,'redisx.h']]],
+  ['redisx_5fchannels_7',['REDISX_CHANNELS',['../redisx_8h.html#aa748f96c61478c3fbef8074021dee901',1,'redisx.h']]],
+  ['redisx_5fcmdbuf_5fsize_8',['REDISX_CMDBUF_SIZE',['../redisx_8h.html#a7e2b05b584b2b1b7af9430657679fe65',1,'redisx.h']]],
+  ['redisx_5fdefault_5ftimeout_5fmillis_9',['REDISX_DEFAULT_TIMEOUT_MILLIS',['../redisx_8h.html#aff9bac60d5293a00d481b5a6701b3882',1,'redisx.h']]],
+  ['redisx_5flistener_5frel_5fpriority_10',['REDISX_LISTENER_REL_PRIORITY',['../redisx_8h.html#a43ec81454d96c773c6e6dd80dfbb180a',1,'redisx.h']]],
+  ['redisx_5fmajor_5fversion_11',['REDISX_MAJOR_VERSION',['../redisx_8h.html#a05046fd4ff3dc951f29e2f62f2e2c816',1,'redisx.h']]],
+  ['redisx_5fminor_5fversion_12',['REDISX_MINOR_VERSION',['../redisx_8h.html#ab56c292120a99c1e841869b5c8d6dd5d',1,'redisx.h']]],
+  ['redisx_5fpatchlevel_13',['REDISX_PATCHLEVEL',['../redisx_8h.html#aa1c6cddd63b0cee67482cbda6986e8c6',1,'redisx.h']]],
+  ['redisx_5frcvbuf_5fsize_14',['REDISX_RCVBUF_SIZE',['../redisx_8h.html#a57e8fa49f964f2ce738eeb0d9c0c89bf',1,'redisx.h']]],
+  ['redisx_5frelease_5fstring_15',['REDISX_RELEASE_STRING',['../redisx_8h.html#a275d8232b3f701eaba97b6f57ef0f65e',1,'redisx.h']]],
+  ['redisx_5fset_5flistener_5fpriority_16',['REDISX_SET_LISTENER_PRIORITY',['../redisx_8h.html#adc3981d6b06cc87e563e77584765eb19',1,'redisx.h']]],
+  ['redisx_5ftcp_5fbuf_5fsize_17',['REDISX_TCP_BUF_SIZE',['../redisx_8h.html#a98778e47cc76371868212b00e48ac03d',1,'redisx.h']]],
+  ['redisx_5ftcp_5fport_18',['REDISX_TCP_PORT',['../redisx_8h.html#aecec1b5bff8cfc6bd9407b848b09f20d',1,'redisx.h']]],
+  ['redisx_5fversion_5fstring_19',['REDISX_VERSION_STRING',['../redisx_8h.html#a1f22a8f5e970a292c5539f8fcfe139e8',1,'redisx.h']]],
+  ['resp3_5fcontinued_20',['RESP3_CONTINUED',['../redisx_8h.html#ac8f311a1aacb893bb4e8650e8de9325e',1,'redisx.h']]]
 ];

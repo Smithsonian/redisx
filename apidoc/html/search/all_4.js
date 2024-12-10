@@ -1,7 +1,7 @@
 var searchData=
 [
-  ['error_20handling_0',['Error handling',['../index.html#autotoc_md40',1,'']]],
-  ['execution_1',['LUA script loading and execution',['../index.html#autotoc_md33',1,'']]],
-  ['execution_20blocks_2',['Execution blocks',['../index.html#autotoc_md32',1,'']]],
-  ['execution_20blocks_20and_20lua_20scripts_3',['Atomic execution blocks and LUA scripts',['../index.html#autotoc_md31',1,'']]]
+  ['data_0',['Accessing key / value data',['../index.html#autotoc_md24',1,'']]],
+  ['data_20type_1',['RESP data type',['../index.html#autotoc_md22',1,'']]],
+  ['debug_20support_2',['Debug support',['../index.html#autotoc_md44',1,'']]],
+  ['disconnecting_3',['Disconnecting',['../index.html#autotoc_md16',1,'']]]
 ];

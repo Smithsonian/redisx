@@ -1,7 +1,16 @@
 var searchData=
 [
-  ['table_20of_20contents_0',['Table of Contents',['../index.html#autotoc_md3',1,'']]],
-  ['to_20redisx_1',['Contributing to RedisX',['../../../xchange/apidoc/html/md_CONTRIBUTING.html',1,'']]],
-  ['transactions_2',['transactions',['../index.html#autotoc_md20',1,'Interactive transactions'],['../index.html#autotoc_md38',1,'Pipelined transactions']]],
-  ['type_3',['type',['../index.html#autotoc_md21',1,'RESP data type'],['../../../xchange/apidoc/html/structXField.html#a6535ecc7e6d29e64f0d34cd926823fd9',1,'XField::type'],['../structRESP.html#aff17911edc8208aa8ddb1c7c52c78389',1,'RESP::type']]]
+  ['scan_5finitial_5fstore_5fcapacity_0',['SCAN_INITIAL_STORE_CAPACITY',['../redisx-tab_8c.html#a5766edfc8d12682de3f57f1ad76f413b',1,'redisx-tab.c']]],
+  ['scanning_1',['Listing and Scanning',['../index.html#autotoc_md26',1,'']]],
+  ['script_20loading_20and_20execution_2',['LUA script loading and execution',['../index.html#autotoc_md34',1,'']]],
+  ['scripts_3',['Atomic execution blocks and LUA scripts',['../index.html#autotoc_md32',1,'']]],
+  ['server_20connections_4',['Managing Redis server connections',['../index.html#autotoc_md13',1,'']]],
+  ['setting_20keyed_20values_5',['Getting and setting keyed values',['../index.html#autotoc_md25',1,'']]],
+  ['simple_20redis_20queries_6',['Simple Redis queries',['../index.html#autotoc_md19',1,'']]],
+  ['sizes_7',['sizes',['../../../xchange/apidoc/html/structXField.html#af743830ee6c7d5e81a0206b07238ca5d',1,'XField']]],
+  ['sub_20support_8',['Publish/subscribe (PUB/SUB) support',['../index.html#autotoc_md28',1,'']]],
+  ['subscribe_20pub_20sub_20support_9',['Publish/subscribe (PUB/SUB) support',['../index.html#autotoc_md28',1,'']]],
+  ['subscription_10',['subscription',['../structRedis.html#aa4878fb8cef61468ee8e7426a973a75c',1,'Redis']]],
+  ['subscriptions_11',['Subscriptions',['../index.html#autotoc_md30',1,'']]],
+  ['support_12',['support',['../index.html#autotoc_md44',1,'Debug support'],['../index.html#autotoc_md28',1,'Publish/subscribe (PUB/SUB) support']]]
 ];

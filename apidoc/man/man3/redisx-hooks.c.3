@@ -91,7 +91,7 @@ Removes all connect hooks, that is no user callbacks will be made when the speci
 .PP
 
 .PP
-References \fBxvprintf\fP\&.
+References \fBX_SUCCESS\fP, and \fBxvprintf\fP\&.
 .SS "void redisxClearDisconnectHooks (\fBRedis\fP * redis)"
 Removes all disconnect hooks, that is no user-specified callbacks will be made when the specified \fBRedis\fP instance is disconnected\&.
 .PP
@@ -102,7 +102,7 @@ Removes all disconnect hooks, that is no user-specified callbacks will be made w
 .PP
 
 .PP
-References \fBxvprintf\fP\&.
+References \fBX_SUCCESS\fP, and \fBxvprintf\fP\&.
 .SS "int redisxRemoveConnectHook (\fBRedis\fP * redis, void(*)(\fBRedis\fP *) setupCall)"
 Removes a connect call hook\&.
 .PP

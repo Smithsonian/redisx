@@ -1,0 +1,521 @@
+.TH "src/resp.c" 3 "Version v0.9" "RedisX" \" -*- nroff -*-
+.ad l
+.nh
+.SH NAME
+src/resp.c
+.SH SYNOPSIS
+.br
+.PP
+.SS "Macros"
+
+.in +1c
+.ti -1c
+.RI "#define \fB_DEFAULT_SOURCE\fP"
+.br
+.RI "strcasecmp() feature macro starting glibc 2\&.20 (2014-09-08) "
+.in -1c
+.SS "Functions"
+
+.in +1c
+.ti -1c
+.RI "int \fBredisxAppendRESP\fP (\fBRESP\fP *resp, \fBRESP\fP *part)"
+.br
+.ti -1c
+.RI "int \fBredisxCheckDestroyRESP\fP (\fBRESP\fP *resp, enum \fBresp_type\fP expectedType, int expectedSize)"
+.br
+.ti -1c
+.RI "int \fBredisxCheckRESP\fP (const \fBRESP\fP *resp, enum \fBresp_type\fP expectedType, int expectedSize)"
+.br
+.ti -1c
+.RI "\fBRESP\fP * \fBredisxCopyOfRESP\fP (const \fBRESP\fP *resp)"
+.br
+.ti -1c
+.RI "void \fBredisxDestroyRESP\fP (\fBRESP\fP *resp)"
+.br
+.ti -1c
+.RI "\fBRedisMapEntry\fP * \fBredisxGetKeywordEntry\fP (const \fBRESP\fP *map, const char *key)"
+.br
+.ti -1c
+.RI "\fBRedisMapEntry\fP * \fBredisxGetMapEntry\fP (const \fBRESP\fP *map, const \fBRESP\fP *key)"
+.br
+.ti -1c
+.RI "\fBboolean\fP \fBredisxHasComponents\fP (const \fBRESP\fP *r)"
+.br
+.ti -1c
+.RI "\fBboolean\fP \fBredisxIsArrayType\fP (const \fBRESP\fP *r)"
+.br
+.ti -1c
+.RI "\fBboolean\fP \fBredisxIsEqualRESP\fP (const \fBRESP\fP *a, const \fBRESP\fP *b)"
+.br
+.ti -1c
+.RI "\fBboolean\fP \fBredisxIsMapType\fP (const \fBRESP\fP *r)"
+.br
+.ti -1c
+.RI "\fBboolean\fP \fBredisxIsScalarType\fP (const \fBRESP\fP *r)"
+.br
+.ti -1c
+.RI "\fBboolean\fP \fBredisxIsStringType\fP (const \fBRESP\fP *r)"
+.br
+.ti -1c
+.RI "int \fBredisxPrintRESP\fP (const char *name, const \fBRESP\fP *resp)"
+.br
+.ti -1c
+.RI "char * \fBredisxRESP2JSON\fP (const char *name, const \fBRESP\fP *resp)"
+.br
+.ti -1c
+.RI "\fBXField\fP * \fBredisxRESP2XField\fP (const char *name, const \fBRESP\fP *resp)"
+.br
+.ti -1c
+.RI "int \fBredisxSplitText\fP (\fBRESP\fP *resp, char **text)"
+.br
+.in -1c
+.SH "Detailed Description"
+.PP 
+
+.PP
+\fBDate\fP
+.RS 4
+Created on Dec 6, 2024 
+.RE
+.PP
+\fBAuthor\fP
+.RS 4
+Attila Kovacs
+.RE
+.PP
+A set of utilities for handling \fBRESP\fP responses from a \fBRedis\fP / Valkey server\&. 
+.SH "Function Documentation"
+.PP 
+.SS "int redisxAppendRESP (\fBRESP\fP * resp, \fBRESP\fP * part)"
+Appends a part to an existing \fBRESP\fP of the same type, before discarding the part\&.
+.PP
+\fBParameters\fP
+.RS 4
+\fIresp\fP The \fBRESP\fP to which the part is appended 
+.br
+\fIpart\fP The part, which is destroyed after the content is appended to the first \fBRESP\fP argument\&. 
+.RE
+.PP
+\fBReturns\fP
+.RS 4
+X_SUCCESS (0) if successful, or else X_NULL if the first argument is NULL, or REDIS_UNEXPECTED_RESP if the types do not match, or X_FAILURE if there was an allocation error\&. 
+.RE
+.PP
+
+.PP
+References \fBRESP::n\fP, \fBREDIS_UNEXPECTED_RESP\fP, \fBredisxDestroyRESP()\fP, \fBredisxIsArrayType()\fP, \fBredisxIsMapType()\fP, \fBredisxIsScalarType()\fP, \fBRESP3_NULL\fP, \fBRESP::type\fP, \fBRESP::value\fP, \fBx_error()\fP, \fBX_FAILURE\fP, \fBX_NULL\fP, and \fBX_SUCCESS\fP\&.
+.SS "int redisxCheckDestroyRESP (\fBRESP\fP * resp, enum \fBresp_type\fP expectedType, int expectedSize)"
+Like \fBredisxCheckRESP()\fP, but it also destroys the \fBRESP\fP in case of an error\&.
+.PP
+\fBParameters\fP
+.RS 4
+\fIresp\fP Pointer to the \fBRESP\fP structure from \fBRedis\fP\&. 
+.br
+\fIexpectedType\fP The \fBRESP\fP type expected (e\&.g\&. RESP_ARRAY) or 0 if not checking type\&. 
+.br
+\fIexpectedSize\fP The expected size of the \fBRESP\fP (array or bytes) or <=0 to skip checking
+.RE
+.PP
+\fBReturns\fP
+.RS 4
+The return value of \fBredisxCheckRESP()\fP\&.
+.RE
+.PP
+\fBSee also\fP
+.RS 4
+\fBredisxCheckRESP()\fP 
+.RE
+.PP
+
+.PP
+References \fBredisxCheckRESP()\fP, and \fBredisxDestroyRESP()\fP\&.
+.SS "int redisxCheckRESP (const \fBRESP\fP * resp, enum \fBresp_type\fP expectedType, int expectedSize)"
+Checks a \fBRedis\fP \fBRESP\fP for NULL values or unexpected values\&.
+.PP
+\fBParameters\fP
+.RS 4
+\fIresp\fP Pointer to the \fBRESP\fP structure from \fBRedis\fP\&. 
+.br
+\fIexpectedType\fP The \fBRESP\fP type expected (e\&.g\&. RESP_ARRAY) or 0 if not checking type\&. 
+.br
+\fIexpectedSize\fP The expected size of the \fBRESP\fP (array or bytes) or <=0 to skip checking
+.RE
+.PP
+\fBReturns\fP
+.RS 4
+X_SUCCESS (0) if the \fBRESP\fP passes the tests, or X_NULL if the \fBRESP\fP is NULL (garbled response)\&. REDIS_NULL if \fBRedis\fP returned (nil), REDIS_UNEXPECTED_TYPE if got a reply of a different type than expected REDIS_UNEXPECTED_ARRAY_SIZE if got a reply of different size than expected\&.
+.RE
+.PP
+or the error returned in resp->n\&. 
+.PP
+References \fBRESP::n\fP, \fBREDIS_NULL\fP, \fBREDIS_UNEXPECTED_RESP\fP, \fBRESP3_BOOLEAN\fP, \fBRESP3_NULL\fP, \fBRESP_INT\fP, \fBRESP::type\fP, \fBRESP::value\fP, \fBx_error()\fP, \fBX_FAILURE\fP, \fBX_NULL\fP, and \fBX_SUCCESS\fP\&.
+.SS "\fBRESP\fP * redisxCopyOfRESP (const \fBRESP\fP * resp)"
+Creates an independent deep copy of the \fBRESP\fP, which shares no references with the original\&.
+.PP
+\fBParameters\fP
+.RS 4
+\fIresp\fP The original \fBRESP\fP data structure (it may be NULL)\&. 
+.RE
+.PP
+\fBReturns\fP
+.RS 4
+A copy of the original, with no shared references\&. 
+.RE
+.PP
+
+.PP
+References \fBRedisMapEntry::key\fP, \fBRESP::n\fP, \fBredisxCopyOfRESP()\fP, \fBRESP3_ATTRIBUTE\fP, \fBRESP3_BIG_NUMBER\fP, \fBRESP3_BLOB_ERROR\fP, \fBRESP3_DOUBLE\fP, \fBRESP3_MAP\fP, \fBRESP3_PUSH\fP, \fBRESP3_SET\fP, \fBRESP3_VERBATIM_STRING\fP, \fBRESP_ARRAY\fP, \fBRESP_BULK_STRING\fP, \fBRESP_ERROR\fP, \fBRESP_SIMPLE_STRING\fP, \fBRESP::type\fP, \fBRESP::value\fP, and \fBRedisMapEntry::value\fP\&.
+.SS "void redisxDestroyRESP (\fBRESP\fP * resp)"
+Frees up the resources used by a \fBRESP\fP structure that was dynamically allocated\&. The call will segfault if the same \fBRESP\fP is destroyed twice or if the argument is a static allocation\&.
+.PP
+\fBParameters\fP
+.RS 4
+\fIresp\fP Pointer to the \fBRESP\fP structure to be destroyed, which may be NULL (no action taken)\&. 
+.RE
+.PP
+
+.PP
+References \fBRedisMapEntry::key\fP, \fBRESP::n\fP, \fBredisxDestroyRESP()\fP, \fBRESP3_ATTRIBUTE\fP, \fBRESP3_MAP\fP, \fBRESP3_PUSH\fP, \fBRESP3_SET\fP, \fBRESP_ARRAY\fP, \fBRESP::type\fP, \fBRESP::value\fP, and \fBRedisMapEntry::value\fP\&.
+.SS "\fBRedisMapEntry\fP * redisxGetKeywordEntry (const \fBRESP\fP * map, const char * key)"
+Retrieves a entry, by its string keyword, from a map-type \fBRESP\fP data structure\&.
+.PP
+\fBParameters\fP
+.RS 4
+\fImap\fP The map-type REST data structure containing a dictionary 
+.br
+\fIkey\fP The string keyword to match 
+.RE
+.PP
+\fBReturns\fP
+.RS 4
+The matching map entry or NULL if the map contains no such entry\&.
+.RE
+.PP
+\fBSee also\fP
+.RS 4
+\fBRESP3_MAP\fP 
+.PP
+\fBRESP3_ATTRIBUTE\fP
+.PP
+\fBredisxGetMapEntry()\fP 
+.RE
+.PP
+
+.PP
+References \fBRedisMapEntry::key\fP, \fBRESP::n\fP, \fBredisxIsMapType()\fP, \fBredisxIsStringType()\fP, and \fBRESP::value\fP\&.
+.SS "\fBRedisMapEntry\fP * redisxGetMapEntry (const \fBRESP\fP * map, const \fBRESP\fP * key)"
+Retrieves a keyed entry from a map-type \fBRESP\fP data structure\&.
+.PP
+\fBParameters\fP
+.RS 4
+\fImap\fP The map-type REST data structure containing a dictionary 
+.br
+\fIkey\fP The \fBRESP\fP key to match 
+.RE
+.PP
+\fBReturns\fP
+.RS 4
+The matching map entry or NULL if the map contains no such entry\&.
+.RE
+.PP
+\fBSee also\fP
+.RS 4
+\fBRESP3_MAP\fP 
+.PP
+\fBRESP3_ATTRIBUTE\fP
+.PP
+\fBredisxGetKeywordEntry()\fP 
+.RE
+.PP
+
+.PP
+References \fBRedisMapEntry::key\fP, \fBRESP::n\fP, \fBredisxIsMapType()\fP, \fBRESP::type\fP, and \fBRESP::value\fP\&.
+.SS "\fBboolean\fP redisxHasComponents (const \fBRESP\fP * r)"
+Checks if a \fBRESP\fP has subcomponents, such as arrays or maps (dictionaries)\&.
+.PP
+\fBParameters\fP
+.RS 4
+\fIr\fP Pointer to a \fBRESP\fP data structure 
+.RE
+.PP
+\fBReturns\fP
+.RS 4
+TRUE (1) if the data has sub-components, or else FALSE (0)\&.
+.RE
+.PP
+\fBSee also\fP
+.RS 4
+\fBredisxIsArrayType()\fP 
+.PP
+\fBredisxIsMapType()\fP 
+.PP
+\fBRESP3_MAP\fP 
+.PP
+\fBRESP3_ATTRIBUTE\fP 
+.RE
+.PP
+
+.PP
+References \fBFALSE\fP, \fBRESP::n\fP, \fBredisxIsArrayType()\fP, and \fBredisxIsMapType()\fP\&.
+.SS "\fBboolean\fP redisxIsArrayType (const \fBRESP\fP * r)"
+Checks if a \fBRESP\fP holds an array of \fBRESP\fP pointers, and whose \fCvalue\fP can be cast to \fC(\fBRESP\fP **)\fP to use\&.
+.PP
+\fBParameters\fP
+.RS 4
+\fIr\fP Pointer to a \fBRESP\fP data structure 
+.RE
+.PP
+\fBReturns\fP
+.RS 4
+TRUE (1) if the data holds an array of \fC\fBRESP\fP *\fP pointers, or else FALSE (0)\&.
+.RE
+.PP
+\fBSee also\fP
+.RS 4
+\fBredisxIsScalarType()\fP 
+.PP
+\fBredisxIsStringType()\fP 
+.PP
+\fBredisxIsMapType()\fP 
+.PP
+\fBRESP_ARRAY\fP 
+.PP
+\fBRESP3_SET\fP 
+.PP
+\fBRESP3_PUSH\fP 
+.RE
+.PP
+
+.PP
+References \fBFALSE\fP, \fBRESP3_PUSH\fP, \fBRESP3_SET\fP, \fBRESP_ARRAY\fP, \fBTRUE\fP, and \fBRESP::type\fP\&.
+.SS "\fBboolean\fP redisxIsEqualRESP (const \fBRESP\fP * a, const \fBRESP\fP * b)"
+Checks if two \fBRESP\fP are equal, that is they hold the same type of data, have the same 'n' value, and the values match byte-for-byte, or are both NULL\&.
+.PP
+\fBParameters\fP
+.RS 4
+\fIa\fP Ponter to a \fBRESP\fP data structure\&. 
+.br
+\fIb\fP Pointer to another \fBRESP\fP data structure\&. 
+.RE
+.PP
+\fBReturns\fP
+.RS 4
+TRUE (1) if the two \fBRESP\fP structures match, or else FALSE (0)\&. 
+.RE
+.PP
+
+.PP
+References \fBFALSE\fP, \fBRESP::n\fP, \fBTRUE\fP, \fBRESP::type\fP, and \fBRESP::value\fP\&.
+.SS "\fBboolean\fP redisxIsMapType (const \fBRESP\fP * r)"
+Checks if a \fBRESP\fP holds a dictionary, and whose \fCvalue\fP can be cast to \fC(\fBRedisMapEntry\fP *)\fP to use\&.
+.PP
+\fBParameters\fP
+.RS 4
+\fIr\fP Pointer to a \fBRESP\fP data structure 
+.RE
+.PP
+\fBReturns\fP
+.RS 4
+TRUE (1) if the data holds a dictionary (a \fBRedisMapEntry\fP array), or else FALSE (0)\&.
+.RE
+.PP
+\fBSee also\fP
+.RS 4
+\fBredisxIsScalarType()\fP 
+.PP
+\fBredisxIsStringType()\fP 
+.PP
+\fBredisxIsMapType()\fP 
+.PP
+\fBRESP3_MAP\fP 
+.PP
+\fBRESP3_ATTRIBUTE\fP 
+.RE
+.PP
+
+.PP
+References \fBFALSE\fP, \fBRESP3_ATTRIBUTE\fP, \fBRESP3_MAP\fP, \fBTRUE\fP, and \fBRESP::type\fP\&.
+.SS "\fBboolean\fP redisxIsScalarType (const \fBRESP\fP * r)"
+Checks if a \fBRESP\fP holds a scalar type value, such as an integer, a boolean or a double-precision value, or a \fInull\fP value\&.
+.PP
+\fBParameters\fP
+.RS 4
+\fIr\fP Pointer to a \fBRESP\fP data structure 
+.RE
+.PP
+\fBReturns\fP
+.RS 4
+TRUE (1) if the data holds a scalar-type value, or else FALSE (0)\&.
+.RE
+.PP
+\fBSee also\fP
+.RS 4
+\fBredisxIsStringType()\fP 
+.PP
+\fBredisxIsArrayType()\fP 
+.PP
+\fBredisxIsMapType()\fP 
+.PP
+\fBRESP_INT\fP 
+.PP
+\fBRESP3_BOOLEAN\fP 
+.PP
+\fBRESP3_DOUBLE\fP 
+.PP
+\fBRESP3_NULL\fP 
+.RE
+.PP
+
+.PP
+References \fBFALSE\fP, \fBRESP3_BOOLEAN\fP, \fBRESP3_DOUBLE\fP, \fBRESP3_NULL\fP, \fBRESP_INT\fP, \fBTRUE\fP, and \fBRESP::type\fP\&.
+.SS "\fBboolean\fP redisxIsStringType (const \fBRESP\fP * r)"
+Checks if a \fBRESP\fP holds a string type value, whose \fCvalue\fP can be cast to \fC(char *)\fP to use\&.
+.PP
+\fBParameters\fP
+.RS 4
+\fIr\fP Pointer to a \fBRESP\fP data structure 
+.RE
+.PP
+\fBReturns\fP
+.RS 4
+TRUE (1) if the data holds a string type value, or else FALSE (0)\&.
+.RE
+.PP
+\fBSee also\fP
+.RS 4
+\fBredisxIsScalarType()\fP 
+.PP
+\fBredisxIsArrayType()\fP 
+.PP
+\fBredisxIsMapType()\fP 
+.PP
+\fBRESP_SIMPLE_STRING\fP 
+.PP
+\fBRESP_ERROR\fP 
+.PP
+\fBRESP_BULK_STRING\fP 
+.PP
+\fBRESP3_BLOB_ERROR\fP 
+.PP
+\fBRESP3_VERBATIM_STRING\fP 
+.RE
+.PP
+
+.PP
+References \fBFALSE\fP, \fBRESP3_BIG_NUMBER\fP, \fBRESP3_BLOB_ERROR\fP, \fBRESP3_VERBATIM_STRING\fP, \fBRESP_BULK_STRING\fP, \fBRESP_ERROR\fP, \fBRESP_SIMPLE_STRING\fP, \fBTRUE\fP, and \fBRESP::type\fP\&.
+.SS "int redisxPrintRESP (const char * name, const \fBRESP\fP * resp)"
+Prints a \fBRESP\fP in JSON format to the standard output with the specified name
+.PP
+\fBParameters\fP
+.RS 4
+\fIname\fP The name/ID to assign to the \fBRESP\fP 
+.br
+\fIresp\fP The \fBRESP\fP data to print 
+.RE
+.PP
+\fBReturns\fP
+.RS 4
+0
+.RE
+.PP
+\fBSee also\fP
+.RS 4
+\fBredisxRESP2JSON()\fP 
+.RE
+.PP
+
+.PP
+References \fBredisxRESP2JSON()\fP, and \fBX_SUCCESS\fP\&.
+.SS "char * redisxRESP2JSON (const char * name, const \fBRESP\fP * resp)"
+Converts a \fBRESP\fP to the xchange representation as an appropriate \fBXField\fP\&.
+.PP
+\fBParameters\fP
+.RS 4
+\fIname\fP The name to assign to the field 
+.br
+\fIresp\fP The \fBRESP\fP data to convert 
+.RE
+.PP
+\fBReturns\fP
+.RS 4
+An \fBXField\fP with the data from the \fBRESP\fP, or NULL if there was an error (errno will be set to indicate the type of error)\&.
+.RE
+.PP
+\fBSee also\fP
+.RS 4
+resp2XField() 
+.PP
+\fBredisxPrintRESP()\fP 
+.RE
+.PP
+
+.PP
+References \fBredisxRESP2XField()\fP, and \fBxjsonFieldToString()\fP\&.
+.SS "\fBXField\fP * redisxRESP2XField (const char * name, const \fBRESP\fP * resp)"
+Converts a \fBRESP\fP to the xchange representation as an appropriate \fBXField\fP\&.
+.PP
+.PD 0
+.IP "\(bu" 2
+RESP3_NULL values are converted to NULL\&. 
+.IP "\(bu" 2
+Scalar values are converted to an \fBXField\fP with the equivalent type\&. 
+.IP "\(bu" 2
+Homogenerous arrays are converted to a field with a 1D array of corresponding xchange type\&. 
+.IP "\(bu" 2
+Heterogeneous arrays are converted to a field with a 1D array of X_FIELD type (containing an array of fields)\&. 
+.IP "\(bu" 2
+Maps with string keywords are converted to an X_STRUCT\&. 
+.IP "\(bu" 2
+Maps with non-string keywords are added under a sub-structure named '\&.non-string-keys' as indexed structures with separate 'key' and 'value' fields\&. 
+.PP
+.PP
+\fBParameters\fP
+.RS 4
+\fIname\fP The name to assign to the field 
+.br
+\fIresp\fP The \fBRESP\fP data to convert 
+.RE
+.PP
+\fBReturns\fP
+.RS 4
+An \fBXField\fP with the data from the \fBRESP\fP, or NULL if there was an error (errno will be set to indicate the type of error)\&.
+.RE
+.PP
+\fBSee also\fP
+.RS 4
+resp2json() 
+.RE
+.PP
+
+.PP
+References \fBXField::flags\fP, \fBRESP::n\fP, \fBRESP3_ATTRIBUTE\fP, \fBRESP3_BIG_NUMBER\fP, \fBRESP3_BLOB_ERROR\fP, \fBRESP3_BOOLEAN\fP, \fBRESP3_DOUBLE\fP, \fBRESP3_MAP\fP, \fBRESP3_NULL\fP, \fBRESP3_PUSH\fP, \fBRESP3_SET\fP, \fBRESP3_VERBATIM_STRING\fP, \fBRESP_ARRAY\fP, \fBRESP_BULK_STRING\fP, \fBRESP_ERROR\fP, \fBRESP_INT\fP, \fBRESP_SIMPLE_STRING\fP, \fBRESP::type\fP, \fBRESP::value\fP, \fBx_trace_null()\fP, \fBxCreateBooleanField()\fP, \fBxCreateDoubleField()\fP, \fBxCreateIntField()\fP, \fBxCreateStringField()\fP, and \fBxStringCopyOf()\fP\&.
+.SS "int redisxSplitText (\fBRESP\fP * resp, char ** text)"
+Splits the string value of a \fBRESP\fP into two components, by terminating the first component with a null byte and optionally returning the remaining part and length in the output parameters\&. Only RESP_ERROR RESP_BLOB_ERROR and RESP_VERBATIM_STRING types can be split this way\&. All others will return REDIS_UNEXPECTED_RESP\&.
+.PP
+\fBParameters\fP
+.RS 4
+\fIresp\fP The input \fBRESP\fP\&. 
+.br
+\fItext\fP (optional) pointer in which to return the start of the remnant text component\&. 
+.RE
+.PP
+\fBReturns\fP
+.RS 4
+n the length of the remnant text (<=0), or else X_NULL if the input \fBRESP\fP was NULL, or REDIS_UNEXPEXCTED_RESP if the input \fBRESP\fP does not contain a two-component string value\&.
+.RE
+.PP
+\fBSee also\fP
+.RS 4
+\fBRESP_ERROR\fP 
+.PP
+\fBRESP3_BLOB_ERROR\fP 
+.PP
+\fBRESP3_VERBATIM_STRING\fP 
+.RE
+.PP
+
+.PP
+References \fBRESP::n\fP, \fBREDIS_UNEXPECTED_RESP\fP, \fBRESP3_BLOB_ERROR\fP, \fBRESP3_VERBATIM_STRING\fP, \fBRESP_ERROR\fP, \fBRESP::type\fP, \fBRESP::value\fP, \fBx_error()\fP, \fBX_NULL\fP, and \fBX_PARSE_ERROR\fP\&.
+.SH "Author"
+.PP 
+Generated automatically by Doxygen for RedisX from the source code\&.
