@@ -1161,12 +1161,11 @@ settings.
 Some obvious ways the library could evolve and grow in the not too distant future:
 
  - Automated regression testing and coverage tracking.
- - Keep track of subscription patterns, and automatically resubscribe to them on reconnecting.
  - Support for [Redis Sentinel](https://redis.io/docs/latest/develop/reference/sentinel-clients/) clients, for 
    high-availability server configurations.
+ - Keep track of subscription patterns, and automatically resubscribe to them on reconnecting.
  - TLS support (perhaps...)
  - Add high-level support for managing and calling custom Redis functions.
- - Add support for `CLIENT TRACKING` / `CLIENT CACHING`. 
  - Add more high-level [Redis commands](https://redis.io/docs/latest/commands/), e.g. for lists, streams, etc.
 
 If you have an idea for a must have feature, please let me (Attila) know. Pull requests, for new features or fixes to
