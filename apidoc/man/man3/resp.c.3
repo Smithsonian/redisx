@@ -443,7 +443,7 @@ An \fBXField\fP with the data from the \fBRESP\fP, or NULL if there was an error
 .PP
 \fBSee also\fP
 .RS 4
-resp2XField() 
+\fBredisxRESP2XField()\fP 
 .PP
 \fBredisxPrintRESP()\fP 
 .RE
@@ -467,6 +467,8 @@ Heterogeneous arrays are converted to a field with a 1D array of X_FIELD type (c
 Maps with string keywords are converted to an X_STRUCT\&. 
 .IP "\(bu" 2
 Maps with non-string keywords are added under a sub-structure named '\&.non-string-keys' as indexed structures with separate 'key' and 'value' fields\&. 
+.IP "\(bu" 2
+The original \fBRESP\fP type (single character) is preserved as a 0-terminated string in \fBXField\&.subtype\fP field\&. 
 .PP
 .PP
 \fBParameters\fP
@@ -483,12 +485,12 @@ An \fBXField\fP with the data from the \fBRESP\fP, or NULL if there was an error
 .PP
 \fBSee also\fP
 .RS 4
-resp2json() 
+\fBredisxRESP2JSON()\fP 
 .RE
 .PP
 
 .PP
-References \fBXField::flags\fP, \fBRESP::n\fP, \fBRESP3_ATTRIBUTE\fP, \fBRESP3_BIG_NUMBER\fP, \fBRESP3_BLOB_ERROR\fP, \fBRESP3_BOOLEAN\fP, \fBRESP3_DOUBLE\fP, \fBRESP3_MAP\fP, \fBRESP3_NULL\fP, \fBRESP3_PUSH\fP, \fBRESP3_SET\fP, \fBRESP3_VERBATIM_STRING\fP, \fBRESP_ARRAY\fP, \fBRESP_BULK_STRING\fP, \fBRESP_ERROR\fP, \fBRESP_INT\fP, \fBRESP_SIMPLE_STRING\fP, \fBRESP::type\fP, \fBRESP::value\fP, \fBx_trace_null()\fP, \fBxCreateBooleanField()\fP, \fBxCreateDoubleField()\fP, \fBxCreateIntField()\fP, \fBxCreateStringField()\fP, and \fBxStringCopyOf()\fP\&.
+References \fBRESP::n\fP, \fBRESP3_ATTRIBUTE\fP, \fBRESP3_BIG_NUMBER\fP, \fBRESP3_BLOB_ERROR\fP, \fBRESP3_BOOLEAN\fP, \fBRESP3_DOUBLE\fP, \fBRESP3_MAP\fP, \fBRESP3_NULL\fP, \fBRESP3_PUSH\fP, \fBRESP3_SET\fP, \fBRESP3_VERBATIM_STRING\fP, \fBRESP_ARRAY\fP, \fBRESP_BULK_STRING\fP, \fBRESP_ERROR\fP, \fBRESP_INT\fP, \fBRESP_SIMPLE_STRING\fP, \fBRESP::type\fP, \fBRESP::value\fP, \fBx_trace_null()\fP, \fBxCreateBooleanField()\fP, \fBxCreateDoubleField()\fP, \fBxCreateIntField()\fP, \fBxCreateStringField()\fP, and \fBxStringCopyOf()\fP\&.
 .SS "int redisxSplitText (\fBRESP\fP * resp, char ** text)"
 Splits the string value of a \fBRESP\fP into two components, by terminating the first component with a null byte and optionally returning the remaining part and length in the output parameters\&. Only RESP_ERROR RESP_BLOB_ERROR and RESP_VERBATIM_STRING types can be split this way\&. All others will return REDIS_UNEXPECTED_RESP\&.
 .PP

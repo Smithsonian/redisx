@@ -12,5 +12,6 @@ var searchData=
   ['subscribe_20pub_20sub_20support_9',['Publish/subscribe (PUB/SUB) support',['../index.html#autotoc_md28',1,'']]],
   ['subscription_10',['subscription',['../structRedis.html#aa4878fb8cef61468ee8e7426a973a75c',1,'Redis']]],
   ['subscriptions_11',['Subscriptions',['../index.html#autotoc_md30',1,'']]],
-  ['support_12',['support',['../index.html#autotoc_md44',1,'Debug support'],['../index.html#autotoc_md28',1,'Publish/subscribe (PUB/SUB) support']]]
+  ['subtype_12',['subtype',['../../../xchange/apidoc/html/structXField.html#a2f076846fbd6b30183ba3ab61e3334e5',1,'XField']]],
+  ['support_13',['support',['../index.html#autotoc_md44',1,'Debug support'],['../index.html#autotoc_md28',1,'Publish/subscribe (PUB/SUB) support']]]
 ];
