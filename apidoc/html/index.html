@@ -330,8 +330,9 @@ Interactive transactions</h3>
 <div class="line">char *args[] = { <span class="stringliteral">&quot;my_table&quot;</span>, <span class="stringliteral">&quot;my_key&quot;</span> };  <span class="comment">// parameters as an array...</span></div>
 <div class="line"> </div>
 <div class="line"><span class="comment">// Send &quot;HGET my_table my_key&quot; request with an array of 2 parameters...</span></div>
-<div class="line">resp = <a class="code hl_function" href="redisx_8c.html#a09092bd97eead5c5fa73fa0d9241018c">redisxRequest</a>(redis, <span class="stringliteral">&quot;HGET&quot;</span>, args, NULL, 2, &amp;status);</div>
+<div class="line">resp = <a class="code hl_function" href="redisx_8c.html#a13ae33bc25ee03621b23541236ef5f82">redisxArrayRequest</a>(redis, <span class="stringliteral">&quot;HGET&quot;</span>, args, NULL, 2, &amp;status);</div>
 <div class="line">...</div>
+<div class="ttc" id="aredisx_8c_html_a13ae33bc25ee03621b23541236ef5f82"><div class="ttname"><a href="redisx_8c.html#a13ae33bc25ee03621b23541236ef5f82">redisxArrayRequest</a></div><div class="ttdeci">RESP * redisxArrayRequest(Redis *redis, char *args[], int lengths[], int n, int *status)</div><div class="ttdef"><b>Definition</b> redisx.c:612</div></div>
 </div><!-- fragment --><p>The 4th argument in the list is an optional <code>int[]</code> array defining the individual string lengths of the parameters (if need be, or else readily available). Here, we used <code>NULL</code> instead, which will use <code>strlen()</code> on each supplied string-terminated parameter to determine its length automatically. Specifying the length may be necessary if the individual parameters are not 0-terminated strings.</p>
 <p>In interactive mode, each request is sent to the <a class="el" href="structRedis.html" title="Structure that represents a Redis database instance, with one or more RedisClient connections.">Redis</a> server, and the response is collected before the call returns with that response (or <code>NULL</code> if there was an error).</p>
 <p><a class="anchor" id="attributes"></a> </p>
