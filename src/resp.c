@@ -583,13 +583,13 @@ static XField *respArrayToXField(const char *name, const RESP **component, int n
     // --------------------------------------------------------
     // Heterogeneous array...
 
-    XField *array;
+    XField *array = (XField *) calloc(n, sizeof(XField));
+    if(!array) {
+      x_error(0, errno, fn, "alloc error (%d XField)", n);
+      return NULL;
+    }
 
-    f = xCreateMixed1DField(name, n);
-
-    if(!f->value) return x_trace_null(fn, "field array");
-
-    array = (XField *) f->value;
+    f = xCreateMixed1DField(name, n, array);
 
     for(i = 0; i < n; i++) {
       XField *e = redisxRESP2XField(array[i].name, component[i]);
@@ -608,7 +608,7 @@ static XField *respArrayToXField(const char *name, const RESP **component, int n
     char *array;
     size_t eSize;
 
-    if(eType == X_UNKNOWN) return xCreateMixed1DField(name, 0);
+    if(eType == X_UNKNOWN) return xCreateMixed1DField(name, 0, NULL);
 
     eSize = xElementSizeOf(eType);
     array = (char *) calloc(1, n * eSize);
