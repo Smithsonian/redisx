@@ -675,7 +675,8 @@ static XField *respMap2XField(const char *name, const RedisMapEntry *map, int n)
  * <li>Heterogeneous arrays are converted to a field with a 1D array of X_FIELD type (containing an array of fields).</li>
  * <li>Maps with string keywords are converted to an X_STRUCT.</li>
  * <li>Maps with non-string keywords are added under a sub-structure named '.non-string-keys' as indexed structures
- * with separate 'key' and 'value' fields.
+ * with separate 'key' and 'value' fields.</li>
+ * <li>The original RESP type (single character) is preserved as a 0-terminated string in XField.subtype field.</li>
  * </ul>
  *
  * @param name    The name to assign to the field
@@ -683,7 +684,7 @@ static XField *respMap2XField(const char *name, const RedisMapEntry *map, int n)
  * @return        An XField with the data from the RESP, or NULL if there was an error (errno will be
  *                set to indicate the type of error).
  *
- * @sa resp2json()
+ * @sa redisxRESP2JSON()
  */
 XField *redisxRESP2XField(const char *name, const RESP *resp) {
   static const char *fn = "resp2XField";
@@ -744,7 +745,7 @@ XField *redisxRESP2XField(const char *name, const RESP *resp) {
  * @return        An XField with the data from the RESP, or NULL if there was an error (errno will be
  *                set to indicate the type of error).
  *
- * @sa resp2XField()
+ * @sa redisxRESP2XField()
  * @sa redisxPrintRESP()
  */
 char *redisxRESP2JSON(const char *name, const RESP *resp) {
