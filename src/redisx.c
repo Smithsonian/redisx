@@ -702,6 +702,23 @@ RESP *redisxGetHelloData(Redis *redis) {
 }
 
 /**
+ * Checks if a given string is a glob-style pattern.
+ *
+ * \param str       The string to check.
+ *
+ * \return          TRUE if it is a glob pattern (e.g. has '*', '?' or '['), otherwise FALSE.
+ *
+ */
+int redisxIsGlobPattern(const char *str) {
+  for(; *str; str++) switch(*str) {
+    case '*':
+    case '?':
+    case '[': return TRUE;
+  }
+  return FALSE;
+}
+
+/**
  * Returns a string description for one of the RM error codes.
  *
  * \param code      One of the error codes defined in 'rm.h' or in 'redisrm.h' (e.g. X_NO_PIPELINE)

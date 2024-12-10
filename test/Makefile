@@ -14,11 +14,12 @@ include ../config.mk
 all: tests run
 
 .PHONY: tests
-tests: $(BIN)/test-hello
+tests: $(BIN)/test-hello $(BIN)/test-tab
 
 .PHONY: run
 run: tests
 	$(BIN)/test-hello
+	$(BIN)/test-tab
 
 $(BIN)/test-%: $(OBJ)/test-%.o $(LIB)/libredisx.a
 	make $(BIN)

@@ -630,8 +630,8 @@ int redisxSendArrayRequestAsync(RedisClient *cl, char *args[], int lengths[], in
     int l, L1;
 
     if(!args[i]) l = 0; // Check for potential NULL parameters...
-    else if(!lengths) l = (int) strlen(args[i]);
-    else l = lengths[i] > 0 ? lengths[i] : (int) strlen(args[i]);
+    else if(lengths) l = lengths[i] > 0 ? lengths[i] : (int) strlen(args[i]);
+    else l = (int) strlen(args[i]);
 
 
     L += sprintf(buf + L, "$%d\r\n", l);

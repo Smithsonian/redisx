@@ -34,7 +34,9 @@ int main() {
   resp = redisxGetHelloData(redis);
   json = redisxRESP2JSON("server_properties", resp);
   printf("%s", json ? json : "<null>");
+  free(json);
   redisxDestroyRESP(resp);
+
 
   if(redisxGetProtocol(redis) != REDISX_RESP3) {
     fprintf(stderr, "ERROR! verify RESP3 protocol\n");

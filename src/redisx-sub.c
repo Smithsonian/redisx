@@ -329,22 +329,6 @@ int redisxClearSubscribers(Redis *redis) {
   return n;
 }
 
-/**
- * Checks if a given string is a glob-style pattern.
- *
- * \param str       The string to check.
- *
- * \return          TRUE if it is a glob pattern (e.g. has '*', '?' or '['), otherwise FALSE.
- *
- */
-static int rIsGlobPattern(const char *str) {
-  for(; *str; str++) switch(*str) {
-    case '*':
-    case '?':
-    case '[': return TRUE;
-  }
-  return FALSE;
-}
 
 /**
  * Subscribe to a specific Redis channel. The call will also start the subscription listener
@@ -387,7 +371,7 @@ int redisxSubscribe(Redis *redis, const char *pattern) {
   prop_error(fn, status);
 
   prop_error(fn, redisxLockConnected(redis->subscription));
-  status = redisxSendRequestAsync(redis->subscription, rIsGlobPattern(pattern) ? "PSUBSCRIBE" : "SUBSCRIBE", pattern, NULL, NULL);
+  status = redisxSendRequestAsync(redis->subscription, redisxIsGlobPattern(pattern) ? "PSUBSCRIBE" : "SUBSCRIBE", pattern, NULL, NULL);
   redisxUnlockClient(redis->subscription);
   prop_error(fn, status);
 
@@ -420,7 +404,7 @@ int redisxUnsubscribe(Redis *redis, const char *pattern) {
   prop_error(fn, redisxLockConnected(redis->subscription));
 
   if(pattern) {
-    status = redisxSendRequestAsync(redis->subscription, rIsGlobPattern(pattern) ? "PUNSUBSCRIBE" : "UNSUBSCRIBE", pattern, NULL, NULL);
+    status = redisxSendRequestAsync(redis->subscription, redisxIsGlobPattern(pattern) ? "PUNSUBSCRIBE" : "UNSUBSCRIBE", pattern, NULL, NULL);
   }
   else {
     status = redisxSendRequestAsync(redis->subscription, "UNSUBSCRIBE", NULL, NULL, NULL);

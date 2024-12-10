@@ -399,6 +399,7 @@ RESP *redisxExecBlockAsync(RedisClient *cl);
 int redisxLoadScript(Redis *redis, const char *script, char **sha1);
 
 int redisxGetTime(Redis *redis, struct timespec *t);
+int redisxIsGlobPattern(const char *str);
 
 RESP *redisxCopyOfRESP(const RESP *resp);
 int redisxCheckRESP(const RESP *resp, enum resp_type expectedType, int expectedSize);
@@ -413,6 +414,7 @@ boolean redisxIsEqualRESP(const RESP *a, const RESP *b);
 int redisxSplitText(RESP *resp, char **text);
 XField *redisxRESP2XField(const char *name, const RESP *resp);
 char *redisxRESP2JSON(const char *name, const RESP *resp);
+int redisxPrintRESP(const char *name, const RESP *resp);
 
 RedisMapEntry *redisxGetMapEntry(const RESP *map, const RESP *key);
 RedisMapEntry *redisxGetKeywordEntry(const RESP *map, const char *key);

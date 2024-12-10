@@ -744,4 +744,22 @@ char *redisxRESP2JSON(const char *name, const RESP *resp) {
   return xjsonFieldToString(redisxRESP2XField(name, resp));
 }
 
+/**
+ * Prints a RESP in JSON format to the standard output with the specified name
+ *
+ * @param name    The name/ID to assign to the RESP
+ * @param resp    The RESP data to print
+ * @return        0
+ */
+int redisxPrintRESP(const char *name, const RESP *resp) {
+  char *json = redisxRESP2JSON("hello_response", resp);
+
+  if(json) {
+    printf("%s", json);
+    free(json);
+  }
+  else printf("\"%s\": null\n", name);
+
+  return X_SUCCESS;
+}
 

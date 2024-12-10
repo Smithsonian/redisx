@@ -71,7 +71,7 @@ RedisEntry *redisxGetTable(Redis *redis, const char *table, int *n) {
   // Cast RESP2 array respone to RESP3 map also...
   if(reply && reply->type == RESP_ARRAY) {
     reply->type = RESP3_MAP;
-    reply->n >>= 1;
+    reply->n /= 2;
   }
 
   *n = redisxCheckDestroyRESP(reply, RESP3_MAP, 0);
@@ -79,7 +79,7 @@ RedisEntry *redisxGetTable(Redis *redis, const char *table, int *n) {
     return x_trace_null(fn, NULL);
   }
 
-  *n = reply->n / 2;
+  *n = reply->n;
 
   if(*n > 0) {
     RedisMapEntry *dict = (RedisMapEntry *) reply->value;
@@ -201,8 +201,9 @@ int redisxSetValueAsync(RedisClient *cl, const char *table, const char *key, con
  * \param[out] status    (optional) pointer to the return error status, which is either X_SUCCESS on success or else
  *                       the error code set by redisxArrayRequest(). It may be NULL if not required.
  *
- * \return          A freshly allocated RESP array containing the Redis response, or NULL if no valid
- *                  response could be obtained.
+ * \return          A freshly allocated RESP containing the Redis response, or NULL if no valid
+ *                  response could be obtained. Values are returned as RESP_BULK_STRING (count = 1),
+ *                  or else type RESP_ERROR or RESP_NULL if Redis responded with an error or null, respectively.
  *
  * \sa redisxGetStringValue()
  */
@@ -326,10 +327,10 @@ int redisxMultiSetAsync(RedisClient *cl, const char *table, const RedisEntry *en
   req[1] = (char *) table;
 
   for(i=0; i<n; i++) {
-    int m = 2 + (n<<1);
-    req[m] = (char *) entries[n].key;
-    req[m+1] = (char *) entries[n].value;
-    L[m+1] = entries[n].length;
+    int m = 2 + (i<<1);
+    req[m] = (char *) entries[i].key;
+    req[m+1] = (char *) entries[i].value;
+    L[m+1] = entries[i].length;
   }
 
   if(!confirm) status = redisxSkipReplyAsync(cl);
@@ -367,7 +368,6 @@ int redisxMultiSet(Redis *redis, const char *table, const RedisEntry *entries, i
   if(n < 1) return x_error(X_SIZE_INVALID, EINVAL, fn, "invalid size: %d", n);
 
   prop_error(fn, redisxLockConnected(redis->interactive));
-
   status = redisxMultiSetAsync(redis->interactive, table, entries, n, confirm);
   if(status == X_SUCCESS && confirm) {
     RESP *reply = redisxReadReplyAsync(redis->interactive);
@@ -375,6 +375,7 @@ int redisxMultiSet(Redis *redis, const char *table, const RedisEntry *entries, i
     if(!status) if(strcmp(reply->value, "OK")) status = REDIS_ERROR;
     redisxDestroyRESP(reply);
   }
+  redisxUnlockClient(redis->interactive);
 
   prop_error(fn, status);
 
@@ -413,7 +414,7 @@ char **redisxGetKeys(Redis *redis, const char *table, int *n) {
     return NULL;
   }
 
-  reply = redisxRequest(redis, "HKEYS", table, NULL, NULL, n);
+  reply = redisxRequest(redis, table ? "HKEYS" : "KEYS", table ? table : "*", NULL, NULL, n);
 
   if(*n) {
     redisxDestroyRESP(reply);
@@ -567,8 +568,6 @@ char **redisxScanKeys(Redis *redis, const char *pattern, int *n, int *status) {
     cmd[args++] = countArg;
   }
 
-  xdprintf("Redis-X> Calling SCAN (MATCH %s)\n", pattern);
-
   do {
     int count;
     RESP **components;
@@ -639,7 +638,6 @@ char **redisxScanKeys(Redis *redis, const char *pattern, int *n, int *status) {
   if(!names) return NULL;
 
   // Sort alphabetically.
-  xdprintf("Redis-X> Sorting %d scanned table entries.\n", *n);
   qsort(names, *n, sizeof(char *), compare_strings);
 
   // Remove duplicates
@@ -748,8 +746,6 @@ RedisEntry *redisxScanTable(Redis *redis, const char *table, const char *pattern
     cmd[args++] = countArg;
   }
 
-  xdprintf("Redis-X> Calling HSCAN %s (MATCH %s)\n", table, pattern);
-
   do {
     int count;
     RESP **components;
@@ -832,7 +828,6 @@ RedisEntry *redisxScanTable(Redis *redis, const char *table, const char *pattern
   if(!entries) return NULL;
 
   // Sort alphabetically.
-  xdprintf("Redis-X> Sorting %d scanned table entries.\n", *n);
   qsort(entries, *n, sizeof(RedisEntry), compare_entries);
 
   // Remove duplicates
@@ -856,7 +851,16 @@ RedisEntry *redisxScanTable(Redis *redis, const char *table, const char *pattern
 }
 
 /**
- * Destroy a RedisEntry array, such as returned e.g. by redisxScanTable()
+ * Destroy a RedisEntry array with dynamically allocate keys/values, such as returned e.g. by
+ * redisxScanTable().
+ *
+ * IMPORTANT:
+ *
+ * You should not use this function to destroy RedisEntry[] arrays, which contain static
+ * string references (keys or values). If the table contains only static references you can simply
+ * call free() on the table. Otherwise, you will have to first free only the dynamically sized
+ * string fields within before calling free() on the table itself.
+ *
  *
  * @param entries   Pointer to the entries array (or single entry data). It may be NULL, in which
  *                  case this call will return immediately.
@@ -908,36 +912,46 @@ void redisxDestroyKeys(char **keys, int count) {
 int redisxDeleteEntries(Redis *redis, const char *pattern) {
   static const char *fn = "redisxDeleteEntries";
 
+  char *root, *key;
   char **keys;
-  int i, n = 0, status;
+  int i, n = 0, found = 0, status;
 
   if(!pattern) return x_error(X_NULL, EINVAL, fn, "'pattern' is NULL");
   if(!pattern[0]) return x_error(X_NULL, EINVAL, fn, "'pattern' is empty");
 
-  keys = redisxScanKeys(redis, pattern, &n, &status);
-  prop_error(fn, status);
+  // Separate the top-level component
+  root = xStringCopyOf(pattern);
+  xSplitID(root, &key);
 
-  if(!keys) return x_trace(fn, NULL, X_NULL);
+  if(redisxIsGlobPattern(root)) {
+    keys = redisxScanKeys(redis, root, &n, &status);
+    if(status || !keys) {
+      free(root);
+      prop_error(fn, status);
+      return x_trace(fn, NULL, X_NULL);
+    }
+  }
+  else {
+    keys = (char **) calloc(1, sizeof(char *));
+    x_check_alloc(keys);
+    keys[0] = xStringCopyOf(root);
+    n = 1;
+  }
 
   for(i = 0; i < n ; i++) {
-    char *root, *key;
     const char *table = keys[i];
     RedisEntry *entries;
     int nEntries;
 
     // If the table itself matches, delete it wholesale...
-    if(fnmatch(pattern, table, 0) == 0) {
+    if(fnmatch(root, table, 0) == 0) {
       RESP *reply = redisxRequest(redis, "DEL", table, NULL, NULL, &status);
-      if(redisxCheckDestroyRESP(reply, RESP_INT, 1) == X_SUCCESS) n++;
+      if(redisxCheckDestroyRESP(reply, RESP_INT, 1) == X_SUCCESS) found++;
       continue;
     }
 
-    // Look for table:key style patterns
-    root = xStringCopyOf(pattern);
-    xSplitID(root, &key);
-
     // Otherwise check the table entries...
-    entries = redisxScanTable(redis, table, root, &nEntries, &status);
+    entries = redisxScanTable(redis, table, key, &nEntries, &status);
     if(status == X_SUCCESS) {
       int k;
       for(k = 0; k < nEntries; k++) {
@@ -945,9 +959,9 @@ int redisxDeleteEntries(Redis *redis, const char *pattern) {
         char *id = xGetAggregateID(table, e->key);
 
         if(id) {
-          if(fnmatch(pattern, id, 0) == 0) {
+          if(fnmatch(key, id, 0) == 0) {
             RESP *reply = redisxRequest(redis, "HDEL", table, e->key, NULL, &status);
-            if(redisxCheckDestroyRESP(reply, RESP_INT, 1) == X_SUCCESS) n++;
+            if(redisxCheckDestroyRESP(reply, RESP_INT, 1) == X_SUCCESS) found++;
           }
           free(id);
         }
@@ -957,11 +971,14 @@ int redisxDeleteEntries(Redis *redis, const char *pattern) {
       }
     }
 
-    free(root);
-
     if(entries) free(entries);
   }
-  return n;
+
+  redisxDestroyKeys(keys, n);
+  free(root);
+
+
+  return found;
 }
 
 #endif
