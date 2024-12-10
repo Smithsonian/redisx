@@ -231,7 +231,7 @@ redisxGetAttributeAsync()
 .PP
 
 .PP
-References \fBRedis::interactive\fP, \fBredisxCheckValid()\fP, \fBredisxGetAttributesAsync()\fP, \fBredisxLockConnected()\fP, \fBredisxUnlockClient()\fP, \fBX_SUCCESS\fP, and \fBx_trace_null()\fP\&.
+References \fBRedis::interactive\fP, \fBredisxCheckValid()\fP, \fBredisxCopyOfRESP()\fP, \fBredisxGetAttributesAsync()\fP, \fBredisxLockConnected()\fP, \fBredisxUnlockClient()\fP, \fBX_SUCCESS\fP, and \fBx_trace_null()\fP\&.
 .SS "\fBRESP\fP * redisxGetHelloData (\fBRedis\fP * redis)"
 Returns a copy of the \fBRESP\fP map that the \fBRedis\fP server has sent us as a response to HELLO on the last client connection, or NULL if HELLO was not used or available\&.
 .PP
