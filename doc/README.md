@@ -511,7 +511,7 @@ Note, that you can usually convert a RESP to an `XField`, and/or to JSON represe
  
  // Clean up
  redisxDestroyRESP(resp);
-```c
+```
 
 All RESP can be represented in JSON format. This is trivial for map entries, which have strings as their keywords -- 
 which is the case for all RESP sent by Redis. And, it is also possible for map entries with non-string keys, albeit 
