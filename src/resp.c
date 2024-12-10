@@ -559,6 +559,12 @@ static XType resp2xType(enum resp_type type) {
 }
 
 
+static void rSetRESPType(XField *f, char type) {
+  f->subtype = (char *) calloc(2, sizeof(char));
+  x_check_alloc(f->subtype);
+  f->subtype[0] = type;
+}
+
 static XField *respArrayToXField(const char *name, const RESP **component, int n) {
   static const char *fn = "respArrayToXField";
 
@@ -608,7 +614,7 @@ static XField *respArrayToXField(const char *name, const RESP **component, int n
     array = (char *) calloc(1, n * eSize);
 
     f = xCreate1DField(name, eType, n, array);
-    f->flags = type;
+    rSetRESPType(f, type);
     if(!array) return x_trace_null(fn, "field array");
 
     for(i = 0; i < n; i++) {
@@ -704,7 +710,7 @@ XField *redisxRESP2XField(const char *name, const RESP *resp) {
     case RESP3_VERBATIM_STRING:
     case RESP3_BIG_NUMBER: {
       XField *f = xCreateStringField(name, xStringCopyOf((char *) resp->value));
-      f->flags = resp->type;
+      rSetRESPType(f, resp->type);
       return f;
     }
 
@@ -713,7 +719,7 @@ XField *redisxRESP2XField(const char *name, const RESP *resp) {
     case RESP3_PUSH: {
       XField *f = respArrayToXField(name, (const RESP **) resp->value, resp->n);
       if(!f) return x_trace_null(fn, NULL);
-      f->flags = resp->type;
+      rSetRESPType(f, resp->type);
       return f;
     }
 
@@ -721,7 +727,7 @@ XField *redisxRESP2XField(const char *name, const RESP *resp) {
     case RESP3_ATTRIBUTE: {
       XField *f = respMap2XField(name, (const RedisMapEntry *) resp->value, resp->n);
       if(!f) return x_trace_null(fn, NULL);
-      f->flags = resp->type;
+      rSetRESPType(f, resp->type);
       return f;
     }
 
