@@ -7,7 +7,7 @@ A simple, light-weight C/C++ Redis client library.
  
 Author: Attila Kovacs
 
-Last Updated: 18 September 2024
+Last Updated: 10 December 2024
 
 ## Table of Contents
 
