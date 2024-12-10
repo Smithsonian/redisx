@@ -50,6 +50,7 @@ typedef struct {
   int next;                     ///< Index of next unconsumed byte in buffer.
   int socket;                   ///< Changing the socket should require both locks!
   int pendingRequests;          ///< Number of request sent and not yet answered...
+  RESP *attributes;             ///< Attributes from the last packet received.
 } ClientPrivate;
 
 
@@ -57,8 +58,13 @@ typedef struct {
   uint32_t addr;                ///< The 32-bit inet address
   int port;                     ///< port number (usually 6379)
   int dbIndex;                  ///< the zero-based database index
-  char *username;               ///< REdis user name (if any)
+  char *username;               ///< Redis user name (if any)
   char *password;               ///< Redis password (if any)
+
+  int timeoutMillis;            ///< [ms] Socket read/write timeout
+  int protocol;                 ///< RESP version to use
+  boolean hello;                ///< whether to use HELLO (introduced in Redis 6.0.0 only)
+  RESP *helloData;              ///< RESP data received from server during last connection.
 
   RedisClient *clients;
 
@@ -81,17 +87,23 @@ typedef struct {
   pthread_mutex_t subscriberLock;
   MessageConsumer *subscriberList;
 
+  RedisPushProcessor pushConsumer; ///< User-defined function to consume RESP3 push messages.
+  void *pushArg;                ///< User-defined argument to pass along with push messages.
 } RedisPrivate;
 
 
 // in redisx-sub.c ------------------------>
-void rConfigLock(Redis *redis);
-void rConfigUnlock(Redis *redis);
+int rConfigLock(Redis *redis);
+int rConfigUnlock(Redis *redis);
 
 // in redisx-net.c ------------------------>
 int rConnectClient(Redis *redis, enum redisx_channel channel);
 void rCloseClient(RedisClient *cl);
 boolean rIsLowLatency(const ClientPrivate *cp);
+int rCheckClient(const RedisClient *cl);
+
+// in resp.c ------------------------------>
+int redisxAppendRESP(RESP *resp, RESP *part);
 
 /// \endcond
 

@@ -27,19 +27,27 @@ CC ?= gcc
 CPPFLAGS += -I$(INC)
 
 # Base compiler options (if not defined externally...)
-CFLAGS ?= -Os -Wall -std=c99
+CFLAGS ?= -g -Os -Wall
+
+# Compile for specific C standard
+ifdef CSTANDARD
+  CFLAGS += -std=$(CSTANDARD)
+endif
 
 # Extra warnings (not supported on all compilers)
-#CFLAGS += -Wextra
+ifeq ($(WEXTRA), 1) 
+  CFLAGS += -Wextra
+endif
 
 # Extra linker flags (if any)
 #LDFLAGS=
 
 # cppcheck options for 'check' target
 CHECKOPTS ?= --enable=performance,warning,portability,style --language=c \
-            --error-exitcode=1 --std=c99 $(CHECKEXTRA)
+            --error-exitcode=1 --std=c99 
 
-CHECKOPTS += --template='{file}({line}): {severity} ({id}): {message}' --inline-suppr
+# Add-on ccpcheck options
+CHECKOPTS += --inline-suppr $(CHECKEXTRA)
 
 # Exhaustive checking for newer cppcheck
 #CHECKOPTS += --check-level=exhaustive
@@ -52,11 +60,6 @@ CHECKOPTS += --template='{file}({line}): {severity} ({id}): {message}' --inline-
 #
 # Below are some generated constants based on the one that were set above
 # ============================================================================
-
-# Compiler and linker options etc.
-ifeq ($(BUILD_MODE),debug)
-	CFLAGS += -g -DDEBUG
-endif
 
 # Link against math libs (for e.g. isnan()), and xchange dependency
 LDFLAGS += -lm -lxchange

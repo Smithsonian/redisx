@@ -23,9 +23,11 @@ static int rStartSubscriptionListenerAsync(Redis *redis);
  * \param redis         Pointer to a Redis instance.
  *
  */
-static void rSubscriberLock(Redis *redis) {
+static int rSubscriberLock(Redis *redis) {
+  prop_error("rSubscriberLock", redisxCheckValid(redis));
   RedisPrivate *p = (RedisPrivate *) redis->priv;
   pthread_mutex_lock(&p->subscriberLock);
+  return X_SUCCESS;
 }
 
 /**
@@ -34,9 +36,11 @@ static void rSubscriberLock(Redis *redis) {
  * \param redis         Pointer to a Redis instance.
  *
  */
-static void rSubscriberUnlock(Redis *redis) {
+static int rSubscriberUnlock(Redis *redis) {
+  prop_error("rSubscriberLock", redisxCheckValid(redis));
   RedisPrivate *p = (RedisPrivate *) redis->priv;
   pthread_mutex_unlock(&p->subscriberLock);
+  return X_SUCCESS;
 }
 
 /**
@@ -51,10 +55,16 @@ static void rSubscriberUnlock(Redis *redis) {
 static int rConnectSubscriptionClientAsync(Redis *redis) {
   static const char *fn = "rConnectSubscriptionClientAsync";
 
-  int status;
-  const ClientPrivate *sp = (ClientPrivate *) redis->subscription->priv;
+  int status, isEnabled;
+  const ClientPrivate *sp;
 
-  if(sp->isEnabled) {
+  prop_error(fn, redisxCheckValid(redis));
+  prop_error(fn, redisxLockClient(redis->subscription));
+  sp = (ClientPrivate *) redis->subscription->priv;
+  isEnabled = sp->isEnabled;
+  redisxUnlockClient(redis->subscription);
+
+  if(isEnabled) {
     x_warn(fn, "Redis-X : pub/sub client is already connected at %s.\n", redis->id);
     return X_SUCCESS;
   }
@@ -89,7 +99,8 @@ int redisxPublishAsync(Redis *redis, const char *channel, const char *data, int 
   char *args[3];
   int L[3] = {0};
 
-  if(redis == NULL) return x_error(X_NULL,EINVAL, fn, "redis is NULL");
+  prop_error(fn, redisxCheckValid(redis));
+
   if(channel == NULL) return x_error(X_NULL,EINVAL, fn, "channel parameter is NULL");
   if(*channel == '\0') return x_error(X_NULL,EINVAL, fn, "channel parameter is empty");
 
@@ -133,8 +144,7 @@ int redisxPublish(Redis *redis, const char *channel, const char *data, int lengt
 
   int status = 0;
 
-  if(redis == NULL) return x_error(X_NULL,EINVAL, fn, "redis is NULL");
-
+  prop_error(fn, redisxCheckValid(redis));
   prop_error(fn, redisxLockConnected(redis->interactive));
 
   // Now send the message
@@ -201,11 +211,8 @@ int redisxAddSubscriber(Redis *redis, const char *channelStem, RedisSubscriberCa
   MessageConsumer *c;
   RedisPrivate *p;
 
-  if(redis == NULL) return x_error(X_NULL, EINVAL, fn, "redis is NULL");
-
+  prop_error(fn, rSubscriberLock(redis));
   p = (RedisPrivate *) redis->priv;
-
-  rSubscriberLock(redis);
 
   // Check if the subscriber is already listed with the same stem. If so, nothing to do...
   for(c = p->subscriberList; c != NULL; c = c->next) {
@@ -261,12 +268,10 @@ int redisxRemoveSubscribers(Redis *redis, RedisSubscriberCall f) {
   MessageConsumer *c, *last = NULL;
   int removed = 0;
 
-  if(redis == NULL) return x_error(X_NULL, EINVAL, fn, "redis is NULL");
   if(!f) return x_error(X_NULL, EINVAL, fn, "subscriber function parameter is NULL");
 
+  prop_error(fn, rSubscriberLock(redis));
   p = (RedisPrivate *) redis->priv;
-
-  rSubscriberLock(redis);
 
   for(c = p->subscriberList; c != NULL; ) {
     MessageConsumer *next = c->next;
@@ -306,11 +311,8 @@ int redisxClearSubscribers(Redis *redis) {
   MessageConsumer *c;
   int n = 0;
 
-  if(redis == NULL) return x_error(X_NULL, EINVAL, "redisxClearSubscrivers", "redis is NULL");
-
+  prop_error("redisxClearSubscribers", rSubscriberLock(redis));
   p = (RedisPrivate *) redis->priv;
-
-  rSubscriberLock(redis);
   c = p->subscriberList;
   p->subscriberList = NULL;
   rSubscriberUnlock(redis);
@@ -327,22 +329,6 @@ int redisxClearSubscribers(Redis *redis) {
   return n;
 }
 
-/**
- * Checks if a given string is a glob-style pattern.
- *
- * \param str       The string to check.
- *
- * \return          TRUE if it is a glob pattern (e.g. has '*', '?' or '['), otherwise FALSE.
- *
- */
-static int rIsGlobPattern(const char *str) {
-  for(; *str; str++) switch(*str) {
-    case '*':
-    case '?':
-    case '[': return TRUE;
-  }
-  return FALSE;
-}
 
 /**
  * Subscribe to a specific Redis channel. The call will also start the subscription listener
@@ -370,11 +356,10 @@ int redisxSubscribe(Redis *redis, const char *pattern) {
   const ClientPrivate *cp;
   int status = 0;
 
-  if(redis == NULL) return x_error(X_NULL, EINVAL, fn, "redis is NULL");
   if(pattern == NULL) return x_error(X_NULL, EINVAL, fn, "pattern parameter is NULL");
 
   // connect subscription client as needed.
-  rConfigLock(redis);
+  prop_error(fn, rConfigLock(redis));
   cp = (ClientPrivate *) redis->subscription->priv;
   if(!cp->isEnabled) status = rConnectSubscriptionClientAsync(redis);
   if(!status) {
@@ -383,15 +368,11 @@ int redisxSubscribe(Redis *redis, const char *pattern) {
     if(!p->isSubscriptionListenerEnabled) rStartSubscriptionListenerAsync(redis);
   }
   rConfigUnlock(redis);
-
   prop_error(fn, status);
 
-  status = redisxLockConnected(redis->subscription);
-  prop_error(fn, status);
-
-  status = redisxSendRequestAsync(redis->subscription, rIsGlobPattern(pattern) ? "PSUBSCRIBE" : "SUBSCRIBE", pattern, NULL, NULL);
+  prop_error(fn, redisxLockConnected(redis->subscription));
+  status = redisxSendRequestAsync(redis->subscription, redisxIsGlobPattern(pattern) ? "PSUBSCRIBE" : "SUBSCRIBE", pattern, NULL, NULL);
   redisxUnlockClient(redis->subscription);
-
   prop_error(fn, status);
 
   return X_SUCCESS;
@@ -419,12 +400,11 @@ int redisxUnsubscribe(Redis *redis, const char *pattern) {
 
   int status;
 
-  if(redis == NULL) return x_error(X_NULL, EINVAL, fn, "redis is NULL");
-
+  prop_error(fn, redisxCheckValid(redis));
   prop_error(fn, redisxLockConnected(redis->subscription));
 
   if(pattern) {
-    status = redisxSendRequestAsync(redis->subscription, rIsGlobPattern(pattern) ? "PUNSUBSCRIBE" : "UNSUBSCRIBE", pattern, NULL, NULL);
+    status = redisxSendRequestAsync(redis->subscription, redisxIsGlobPattern(pattern) ? "PUNSUBSCRIBE" : "UNSUBSCRIBE", pattern, NULL, NULL);
   }
   else {
     status = redisxSendRequestAsync(redis->subscription, "UNSUBSCRIBE", NULL, NULL, NULL);
@@ -432,8 +412,8 @@ int redisxUnsubscribe(Redis *redis, const char *pattern) {
   }
 
   redisxUnlockClient(redis->subscription);
-
   prop_error(fn, status);
+
   return X_SUCCESS;
 }
 
@@ -456,18 +436,18 @@ static int rEndSubscriptionAsync(Redis *redis) {
   RedisPrivate *p;
   int status;
 
-  if(redis == NULL) return x_error(X_NULL, EINVAL, fn, "redis is NULL");
-
   xvprintf("Redis-X> End all subscriptions, and quit listener.\n");
-
-  p = (RedisPrivate *) redis->priv;
 
   status = redisxUnsubscribe(redis, NULL);
 
+  prop_error(fn, rConfigLock(redis));
+  p = (RedisPrivate *) redis->priv;
   p->isSubscriptionListenerEnabled = FALSE;
-  rCloseClient(redis->subscription);
+  rConfigUnlock(redis);
 
+  rCloseClient(redis->subscription);
   prop_error(fn, status);
+
   return X_SUCCESS;
 }
 
@@ -487,13 +467,11 @@ int redisxEndSubscription(Redis *redis) {
 
   int status;
 
-  if(redis == NULL) return x_error(X_NULL, EINVAL, fn, "redis is NULL");
-
-  rConfigLock(redis);
+  prop_error(fn, rConfigLock(redis));
   status = rEndSubscriptionAsync(redis);
   rConfigUnlock(redis);
-
   prop_error(fn, status);
+
   return X_SUCCESS;
 }
 
@@ -505,11 +483,8 @@ static void rNotifyConsumers(Redis *redis, char *pattern, char *channel, char *m
 
   xdprintf("NOTIFY: %s | %s\n", channel, msg);
 
-  if(!redis) return;
-
+  if(rSubscriberLock(redis) != X_SUCCESS) return;
   p = (RedisPrivate *) redis->priv;
-
-  rSubscriberLock(redis);
 
   // Count how many matching subscribers there are...
   for(c = p->subscriberList ; c != NULL; c = c->next) {
@@ -564,10 +539,7 @@ void *RedisSubscriptionListener(void *pRedis) {
 
   xvprintf("Redis-X> Started processing subsciptions...\n");
 
-  if(redis == NULL) {
-    x_error(0, EINVAL, "RedisSubscriptionListener", "redis is NULL");
-    return NULL;
-  }
+  if(redisxCheckValid(redis) != X_SUCCESS) return x_trace_null("RedisSubscriptionListener", NULL);
 
   p = (RedisPrivate *) redis->priv;
   cl = redis->subscription;
@@ -647,10 +619,11 @@ void *RedisSubscriptionListener(void *pRedis) {
 
   } // <-- End of listener loop
 
-  rConfigLock(redis);
-  // If we are the current listener thread, then mark the listener as disabled.
-  if(pthread_equal(p->subscriptionListenerTID, pthread_self())) p->isSubscriptionListenerEnabled = FALSE;
-  rConfigUnlock(redis);
+  if(rConfigLock(redis) == X_SUCCESS) {
+    // If we are the current listener thread, then mark the listener as disabled.
+    if(pthread_equal(p->subscriptionListenerTID, pthread_self())) p->isSubscriptionListenerEnabled = FALSE;
+    rConfigUnlock(redis);
+  }
 
   xvprintf("Redis-X> Stopped processing subscriptions (%d processed)...\n", counter);
 

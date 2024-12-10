@@ -12,6 +12,7 @@
 #include <string.h>
 #include <errno.h>
 #include <limits.h>
+#include <ctype.h>
 #if __Lynx__
 #  include <socket.h>
 #else
@@ -19,11 +20,6 @@
 #endif
 
 #include "redisx-priv.h"
-
-#ifndef REDIS_TIMEOUT_SECONDS
-/// (seconds) Abort with an error if cannot send before this timeout (<=0 for not timeout)
-#endif
-#  define REDIS_TIMEOUT_SECONDS           3
 
 #ifndef REDIS_SIMPLE_STRING_SIZE
 /// (bytes) Only store up to this many characters from Redis confirms and errors.
@@ -43,6 +39,24 @@
 #define trprintf if(debugTraffic) printf  ///< Use for debugging Redis bound traffic
 
 int debugTraffic = FALSE;    ///< Whether to print excerpts of all traffic to/from the Redis server.
+
+/// \endcond
+
+/// \cond PROTECTED
+
+/**
+ * Checks that a redis instance is valid.
+ *
+ * @param cl      The Redis client instance
+ * @return        X_SUCCESS (0) if the client is valid, or X_NULL if the argument is NULL,
+ *                or else X_NO_INIT if the redis instance is not initialized.
+ */
+int rCheckClient(const RedisClient *cl) {
+  static const char *fn = "rCheckRedis";
+  if(!cl) return x_error(X_NULL, EINVAL, fn, "Redis client is NULL");
+  if(!cl->priv) return x_error(X_NO_INIT, EAGAIN, fn, "Redis client is not initialized");
+  return X_SUCCESS;
+}
 
 /// \endcond
 
@@ -275,22 +289,25 @@ static int rSendBytesAsync(ClientPrivate *cp, const char *buf, int length, boole
  * \param redis         Pointer to a Redis instance.
  * \param channel       REDISX_INTERACTIVE_CHANNEL, REDISX_PIPELINE_CHANNEL, or REDISX_SUBSCRIPTION_CHANNEL
  *
- * \return      Pointer to the matching Redis client, or NULL if the channel argument is invalid.
+ * \return      Pointer to the matching Redis client, or NULL if redis is null (EINVAL) or not initialized
+ *              (EAGAIN) or if the channel argument is invalid (ECHRNG).
  *
+ * @sa redisxGetLockedConnectedClient()
  */
 RedisClient *redisxGetClient(Redis *redis, enum redisx_channel channel) {
+  static const char *fn = "redisxGetClient";
+
   RedisPrivate *p;
 
-  if(redis == NULL) {
-    x_error(0, EINVAL, "redisxGetClient", "redis is NULL");
-    return NULL;
-  }
+  if(redisxCheckValid(redis) != X_SUCCESS) return x_trace_null(fn, NULL);
 
   p = (RedisPrivate *) redis->priv;
-  if(channel < 0 || channel >= REDISX_CHANNELS) return NULL;
+  if(channel < 0 || channel >= REDISX_CHANNELS) {
+    x_error(0, ECHRNG, fn, "channel %d is our of range", channel);
+    return NULL;
+  }
   return &p->clients[channel];
 }
-
 
 /**
  * Returns the redis client for a given connection type in a Redis instance, with the exclusive access lock
@@ -307,12 +324,8 @@ RedisClient *redisxGetClient(Redis *redis, enum redisx_channel channel) {
  * @sa redisxLockConnected()
  */
 RedisClient *redisxGetLockedConnectedClient(Redis *redis, enum redisx_channel channel) {
-  static const char *fn = "redisxGetLockedConnectedClient";
-
   RedisClient *cl = redisxGetClient(redis, channel);
-  if(!cl) return x_trace_null(fn, NULL);
-
-  if(redisxLockConnected(cl) != X_SUCCESS) return x_trace_null(fn, NULL);
+  if(redisxLockConnected(cl) != X_SUCCESS) return x_trace_null("redisxGetLockedConnectedClient", NULL);
   return cl;
 }
 
@@ -334,7 +347,8 @@ int redisxLockClient(RedisClient *cl) {
   ClientPrivate *cp;
   int status;
 
-  if(cl == NULL) return x_error(X_NULL, EINVAL, fn, "client is NULL");
+  prop_error(fn, rCheckClient(cl));
+
   cp = (ClientPrivate *) cl->priv;
   if(cp == NULL) return x_error(X_NO_INIT, EINVAL, fn, "client is not initialized");
 
@@ -393,7 +407,8 @@ int redisxUnlockClient(RedisClient *cl) {
   ClientPrivate *cp;
   int status;
 
-  if(cl == NULL) return x_error(X_NULL, EINVAL, fn, "client is NULL");
+  prop_error(fn, rCheckClient(cl));
+
   cp = (ClientPrivate *) cl->priv;
   if(cp == NULL) return x_error(X_NO_INIT, EINVAL, fn, "client is not initialized");
 
@@ -420,7 +435,8 @@ int redisxSkipReplyAsync(RedisClient *cl) {
   static const char *fn = "redisSkipReplyAsync";
   static const char cmd[] = "*3\r\n$6\r\nCLIENT\r\n$5\r\nREPLY\r\n$4\r\nSKIP\r\n";
 
-  if(cl == NULL) return x_error(X_NULL, EINVAL, fn, "client is NULL");
+  prop_error(fn, rCheckClient(cl));
+
   if(cl->priv == NULL) return x_error(X_NO_INIT, EINVAL, fn, "client is not initialized");
 
   prop_error(fn, rSendBytesAsync((ClientPrivate *) cl->priv, cmd, sizeof(cmd) - 1, TRUE));
@@ -453,7 +469,8 @@ int redisxStartBlockAsync(RedisClient *cl) {
   static const char *fn = "redisxStartBlockAsync";
   static const char cmd[] = "*1\r\n$5\r\nMULTI\r\n";
 
-  if(cl == NULL) return x_error(X_NULL, EINVAL, fn, "client is NULL");
+  prop_error(fn, rCheckClient(cl));
+
   if(cl->priv == NULL) return x_error(X_NO_INIT, EINVAL, fn, "client is not initialized");
 
   prop_error(fn, rSendBytesAsync((ClientPrivate *) cl->priv, cmd, sizeof(cmd) - 1, TRUE));
@@ -477,7 +494,8 @@ int redisxAbortBlockAsync(RedisClient *cl) {
   static const char *fn = "redisxAbortBlockAsync";
   static const char cmd[] = "*1\r\n$7\r\nDISCARD\r\n";
 
-  if(cl == NULL) return x_error(X_NULL, EINVAL, fn, "client is NULL");
+  prop_error(fn, rCheckClient(cl));
+
   if(cl->priv == NULL) return x_error(X_NO_INIT, EINVAL, fn, "client is not initialized");
 
   prop_error(fn, rSendBytesAsync((ClientPrivate *) cl->priv, cmd, sizeof(cmd) - 1, TRUE));
@@ -506,10 +524,7 @@ RESP *redisxExecBlockAsync(RedisClient *cl) {
 
   int status;
 
-  if(cl == NULL) {
-    x_error(0, EINVAL, fn, "client is NULL");
-    return NULL;
-  }
+  if(rCheckClient(cl) != X_SUCCESS) return x_trace_null(fn, NULL);
 
   if(cl->priv == NULL) {
     x_error(0, EINVAL, fn, "client is not initialized");
@@ -557,7 +572,8 @@ int redisxSendRequestAsync(RedisClient *cl, const char *command, const char *arg
   const char *args[] = { command, arg1, arg2, arg3 };
   int n;
 
-  if(cl == NULL) return x_error(X_NULL, EINVAL, fn, "client is NULL");
+  prop_error(fn, rCheckClient(cl));
+
   if(command == NULL) return x_error(X_NAME_INVALID, EINVAL, fn, "command is NULL");
 
   // Count the non-null arguments...
@@ -591,7 +607,7 @@ int redisxSendArrayRequestAsync(RedisClient *cl, char *args[], int lengths[], in
   int i, L;
   ClientPrivate *cp;
 
-  if(cl == NULL) return x_error(X_NULL, EINVAL, fn, "client is NULL");
+  prop_error(fn, rCheckClient(cl));
 
   cp = (ClientPrivate *) cl->priv;
   if(cp == NULL) return x_error(X_NO_INIT, EINVAL, fn, "client is not initialized");
@@ -600,12 +616,23 @@ int redisxSendArrayRequestAsync(RedisClient *cl, char *args[], int lengths[], in
   // Send the number of string elements in the command...
   L = sprintf(buf, "*%d\r\n", n);
 
+
+  xvprintf("Redis-X> request[%d]", n);
+  for(i = 0; i < n; i++) {
+    if(args[i]) xvprintf(" %s", args[i]);
+    if(i == 4) {
+      xvprintf("...");
+    }
+  }
+  xvprintf("\n");
+
   for(i = 0; i < n; i++) {
     int l, L1;
 
     if(!args[i]) l = 0; // Check for potential NULL parameters...
-    else if(!lengths) l = (int) strlen(args[i]);
-    else l = lengths[i] > 0 ? lengths[i] : (int) strlen(args[i]);
+    else if(lengths) l = lengths[i] > 0 ? lengths[i] : (int) strlen(args[i]);
+    else l = (int) strlen(args[i]);
+
 
     L += sprintf(buf + L, "$%d\r\n", l);
 
@@ -660,11 +687,119 @@ int redisxIgnoreReplyAsync(RedisClient *cl) {
   static const char *fn = "redisxIgnoreReplyAsync";
   RESP *resp;
 
-  if(cl == NULL) return x_error(X_NULL, EINVAL, fn, "client is NULL");
+  prop_error(fn, rCheckClient(cl));
 
   resp = redisxReadReplyAsync(cl);
   if(resp == NULL) return x_trace(fn, NULL, REDIS_NULL);
   else redisxDestroyRESP(resp);
+  return X_SUCCESS;
+}
+
+static int rTypeIsParametrized(char type) {
+  switch(type) {
+    case RESP_INT:
+    case RESP_BULK_STRING:
+    case RESP_ARRAY:
+    case RESP3_SET:
+    case RESP3_PUSH:
+    case RESP3_MAP:
+    case RESP3_ATTRIBUTE:
+    case RESP3_BLOB_ERROR:
+    case RESP3_VERBATIM_STRING:
+    case RESP3_CONTINUED:
+      return TRUE;
+    default:
+      return FALSE;
+  }
+}
+
+
+
+static void rPushMessageAsync(RedisClient *cl, RESP *resp) {
+  int i;
+  ClientPrivate *cp = (ClientPrivate *) cl->priv;
+  RedisPrivate *p = (RedisPrivate *) cp->redis->priv;
+  RESP **array;
+
+  if(resp->n < 0) return;
+
+  array = (RESP **) calloc(resp->n, sizeof(RESP *));
+  if(!array) fprintf(stderr, "WARNING! Redis-X : not enough memory for push message (%d elements). Skipping.\n", resp->n);
+
+  for(i = 0; i < resp->n; i++) {
+    RESP *r = redisxReadReplyAsync(cl);
+    if(array) array[i] = r;
+    else redisxDestroyRESP(r);
+  }
+
+  resp->value = array;
+
+  if(p->pushConsumer) p->pushConsumer(cl, resp, p->pushArg);
+
+  redisxDestroyRESP(resp);
+}
+
+/**
+ * Returns the attributes (if any) that were last sent along a response to the client.
+ * This function should be called only if the caller has an exclusive lock on the client's
+ * mutex. Also, there are a few rules the caller should follow:
+ *
+ * <ul>
+ * <li>The caller should not block the client for long and return quickly. If it has
+ * blocking calls, or requires extensive processing, it should make a copy of the
+ * RESP first, and release the lock immediately after.</li>
+ * <li>The caller must not attempt to call free() on the returned RESP</li>
+ * </ul>
+ *
+ * Normally the user would typically call this function right after a redisxReadReplyAsync()
+ * call, for which atributes are expected. The caller might also want to call
+ * redisxClearAttributeAsync() before attempting to read the response to ensure that
+ * the attributes returned are for the same reply from the server.
+ *
+ * @param cl    The Redis client instance
+ * @return      The attributes last received (possibly NULL).
+ *
+ * @sa redisxClearAttributesAsync()
+ * @sa redisxReadReplyAsync()
+ * @sa redisxLockClient()
+ *
+ */
+const RESP *redisxGetAttributesAsync(const RedisClient *cl) {
+  const ClientPrivate *cp;
+  if(!cl) {
+    x_error(0, EINVAL, "redisxGetAttributesAsync", "client is NULL");
+    return NULL;
+  }
+
+  cp = (ClientPrivate *) cl->priv;
+  return cp->attributes;
+}
+
+static void rSetAttributeAsync(ClientPrivate *cp, RESP *resp) {
+  redisxDestroyRESP(cp->attributes);
+  cp->attributes = resp;
+}
+
+/**
+ * Clears the attributes for the specified client. The caller should have an exclusive lock
+ * on the client's mutex prior to making this call.
+ *
+ * Typically a user migh call this function prior to calling redisxReadReplyAsync() on the
+ * same client, to ensure that any attributes that are available after the read will be the
+ * ones that were sent with the last response from the server.
+ *
+ * @param cl    The Redis client instance
+ * @return      X_SUCCESS (0) if successful, or else X_NULL if the client is NULL.
+ *
+ * @sa redisxGetAttributesAsync()
+ * @sa redisxReadReplyAsync()
+ * @sa redisxLockClient()
+ *
+ */
+int redisxClearAttributesAsync(RedisClient *cl) {
+  prop_error("redisxClearAttributesAsync", rCheckClient(cl));
+
+  rSetAttributeAsync((ClientPrivate *) cl->priv, NULL);
   return X_SUCCESS;
 }
 
@@ -686,10 +821,7 @@ RESP *redisxReadReplyAsync(RedisClient *cl) {
   int size = 0;
   int status = X_SUCCESS;
 
-  if(cl == NULL) {
-    x_error(0, EINVAL, fn, "client is NULL");
-    return NULL;
-  }
+  if(rCheckClient(cl) != X_SUCCESS) return x_trace_null(fn, NULL);
 
   cp = cl->priv;
 
@@ -702,62 +834,152 @@ RESP *redisxReadReplyAsync(RedisClient *cl) {
     return NULL;
   }
 
-  size = rReadToken(cp, buf, REDIS_SIMPLE_STRING_SIZE + 1);
-  if(size < 0) {
-    // Either read/recv had an error, or we got garbage...
-    if(cp->isEnabled) x_trace_null(fn, NULL);
-    cp->isEnabled = FALSE;  // Disable this client so we don't attempt to read from it again...
-    return NULL;
-  }
-
-  resp = (RESP *) calloc(1, sizeof(RESP));
-  x_check_alloc(resp);
-  resp->type = buf[0];
-
-  // Get the integer / size value...
-  if(resp->type == RESP_ARRAY || resp->type == RESP_INT || resp->type == RESP_BULK_STRING) {
-    char *tail;
-    errno = 0;
-    resp->n = (int) strtol(&buf[1], &tail, 10);
-    if(errno) {
-      fprintf(stderr, "WARNING! Redis-X : unparseable dimension '%s'\n", &buf[1]);
-      status = X_PARSE_ERROR;
+  for(;;) {
+    size = rReadToken(cp, buf, REDIS_SIMPLE_STRING_SIZE + 1);
+    if(size < 0) {
+      // Either read/recv had an error, or we got garbage...
+      if(cp->isEnabled) x_trace_null(fn, NULL);
+      cp->isEnabled = FALSE;  // Disable this client so we don't attempt to read from it again...
+      return NULL;
     }
+
+    resp = (RESP *) calloc(1, sizeof(RESP));
+    x_check_alloc(resp);
+    resp->type = buf[0];
+
+    // Parametrized type.
+    if(rTypeIsParametrized(resp->type)) {
+
+      if(buf[1] == '?') {
+        // Streaming RESP in parts...
+        for(;;) {
+          RESP *r = redisxReadReplyAsync(cl);
+          if(r->type != RESP3_CONTINUED) {
+            int type = r->type;
+            redisxDestroyRESP(r);
+            fprintf(stderr, "WARNIG! Redis-X: expected type '%c', got type '%c'.", resp->type, type);
+            return resp;
+          }
+
+          if(r->n == 0) {
+            if(resp->type == RESP3_PUSH || resp->type == RESP3_ATTRIBUTE) break;
+            if(redisxHasComponents(resp)) break;
+            return resp; // We are done, return the result.
+          }
+
+          r->type = resp->type;
+          redisxAppendRESP(resp, r);
+        }
+      }
+      else {
+        // Get the integer / size value...
+        char *tail;
+        errno = 0;
+        resp->n = (int) strtol(&buf[1], &tail, 10);
+        if(errno) {
+          fprintf(stderr, "WARNING! Redis-X : unparseable dimension '%s'\n", &buf[1]);
+          status = X_PARSE_ERROR;
+        }
+      }
+    }
+
+    // Deal with push messages and attributes...
+    if(resp->type == RESP3_PUSH) rPushMessageAsync(cl, resp);
+    else if(resp->type == RESP3_ATTRIBUTE) rSetAttributeAsync(cp, resp);
+    else break;
   }
 
   // Now get the body of the response...
   if(!status) switch(resp->type) {
 
-    case RESP_ARRAY: {
+    case RESP3_NULL:
+      resp->n = 0;
+      break;
+
+    case RESP_INT:          // Nothing left to do for INT type response.
+      break;
+
+    case RESP3_BOOLEAN: {
+      switch(tolower(buf[1])) {
+        case 't': resp->n = TRUE; break;
+        case 'f': resp->n = FALSE; break;
+        default:
+          resp->n = -1;
+          fprintf(stderr, "WARNING! Redis-X : invalid boolean value '%c'\n", buf[1]);
+          status = X_PARSE_ERROR;
+      }
+      break;
+    }
+
+    case RESP3_DOUBLE: {
+      double *dval = (double *) calloc(1, sizeof(double));
+      x_check_alloc(dval);
+
+      *dval = xParseDouble(&buf[1], NULL);
+      if(errno) {
+        fprintf(stderr, "WARNING! Redis-X : invalid double value '%s'\n", &buf[1]);
+        status = X_PARSE_ERROR;
+      }
+      resp->value = dval;
+      break;
+    }
+
+    case RESP_ARRAY:
+    case RESP3_SET:
+    case RESP3_PUSH: {
       RESP **component;
       int i;
 
       if(resp->n <= 0) break;
 
-      resp->value = (RESP **) malloc(resp->n * sizeof(RESP *));
-      if(resp->value == NULL) {
+      component = (RESP **) malloc(resp->n * sizeof(RESP *));
+      if(component == NULL) {
         status = x_error(X_FAILURE, errno, fn, "malloc() error (%d RESP)", resp->n);
         // We should get the data from the input even if we have nowhere to store...
       }
 
-      component = (RESP **) resp->value;
 
       for(i=0; i<resp->n; i++) {
-        RESP* r = redisxReadReplyAsync(cl);     // Always read RESP even if we don't have storage for it...
-        if(resp->value) component[i] = r;
+        RESP *r = redisxReadReplyAsync(cl);     // Always read RESP even if we don't have storage for it...
+        if(component) component[i] = r;
+        else redisxDestroyRESP(r);
       }
 
       // Consistency check. Discard response if incomplete (because of read errors...)
-      if(resp->value) for(i = 0; i < resp->n; i++) if(component[i] == NULL) {
+      if(component) for(i = 0; i < resp->n; i++) if(component[i] == NULL || component[i]->type == RESP3_NULL) {
         fprintf(stderr, "WARNING! Redis-X : incomplete array received (index %d of %d).\n", (i+1), resp->n);
         if(!status) status = REDIS_INCOMPLETE_TRANSFER;
         break;
       }
 
+      resp->value = component;
+
+      break;
+    }
+
+    case RESP3_MAP:
+    case RESP3_ATTRIBUTE: {
+      RedisMapEntry *dict;
+      int i;
+
+      if(resp->n <= 0) break;
+
+      dict = (RedisMapEntry *) calloc(resp->n, sizeof(RedisMapEntry));
+      x_check_alloc(dict);
+
+      for(i=0; i<resp->n; i++) {
+        RedisMapEntry *e = &dict[i];
+        e->key = redisxReadReplyAsync(cl);
+        e->value = redisxReadReplyAsync(cl);
+      }
+      resp->value = dict;
+
       break;
     }
 
     case RESP_BULK_STRING:
+    case RESP3_BLOB_ERROR:
+    case RESP3_VERBATIM_STRING:
       if(resp->n < 0) break;                          // no string token following!
 
       resp->value = malloc(resp->n + 2);              // <string>\r\n
@@ -781,6 +1003,7 @@ RESP *redisxReadReplyAsync(RedisClient *cl) {
 
     case RESP_SIMPLE_STRING:
     case RESP_ERROR:
+    case RESP3_BIG_NUMBER:
       resp->value = malloc(size);
 
       if(resp->value == NULL) {
@@ -793,9 +1016,6 @@ RESP *redisxReadReplyAsync(RedisClient *cl) {
       resp->n = size-1;
       ((char *)resp->value)[resp->n] = '\0';
 
-      break;
-
-    case RESP_INT:          // Nothing left to do for INT type response.
       break;
 
     default:
@@ -835,8 +1055,6 @@ int redisxResetClient(RedisClient *cl) {
   static const char *fn = "redisxResetClient";
 
   int status;
-
-  if(cl == NULL) return x_error(X_NULL, EINVAL, fn, "client is NULL");
 
   prop_error(fn, redisxLockConnected(cl));
 

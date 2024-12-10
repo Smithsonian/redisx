@@ -17,22 +17,22 @@
 // Configuration constants ------------------------------------------------------->
 #ifndef REDISX_TCP_PORT
 /// Default TCP/IP port on which Redis server listens to clients.
-#  define REDISX_TCP_PORT                  6379
+#  define REDISX_TCP_PORT                 6379
 #endif
 
 #ifndef REDISX_TCP_BUF_SIZE
 /// (bytes) Default TCP buffer size (send/recv) for Redis clients. Values &lt;= 0 will use system default.
-#  define REDISX_TCP_BUF_SIZE                   0
+#  define REDISX_TCP_BUF_SIZE             0
 #endif
 
 #ifndef REDISX_CMDBUF_SIZE
 /// (bytes) Size of many internal arrays, and the max. send chunk size. At least ~16 bytes...
-#  define REDISX_CMDBUF_SIZE               8192
+#  define REDISX_CMDBUF_SIZE              8192
 #endif
 
 #ifndef REDISX_RCVBUF_SIZE
 /// (bytes) Redis receive buffer size (at most that much is read from the socket in a single call).
-#  define REDISX_RCVBUF_SIZE            8192
+#  define REDISX_RCVBUF_SIZE              8192
 #endif
 
 #ifndef REDISX_SET_LISTENER_PRIORITY
@@ -46,6 +46,11 @@
 #  define REDISX_LISTENER_REL_PRIORITY    (0.5)
 #endif
 
+#ifndef REDISX_DEFAULT_TIMEOUT_MILLIS
+/// [ms] Default socket read/write timeout for Redis clients
+#  define REDISX_DEFAULT_TIMEOUT_MILLIS           3000
+#endif
+
 // Various exposed constants ----------------------------------------------------->
 
 /// API major version
@@ -55,7 +60,7 @@
 #define REDISX_MINOR_VERSION  9
 
 /// Integer sub version of the release
-#define REDISX_PATCHLEVEL     1
+#define REDISX_PATCHLEVEL     2
 
 /// Additional release information in version, e.g. "-1", or "-rc1".
 #define REDISX_RELEASE_STRING "-devel"
@@ -83,12 +88,33 @@
 #define REDISX_VERSION_STRING str_2(REDISX_MAJOR_VERSION) "." str_2(REDISX_MINOR_VERSION) \
                                   "." str_2(REDISX_PATCHLEVEL) REDISX_RELEASE_STRING
 
-// These are the first character ID's for the standard RESP interface implemented by Redis.
-#define RESP_ARRAY              '*'     ///< \hideinitializer RESP array type
-#define RESP_INT                ':'     ///< \hideinitializer RESP integer type
-#define RESP_SIMPLE_STRING      '+'     ///< \hideinitializer RESP simple string type
-#define RESP_ERROR              '-'     ///< \hideinitializer RESP error message type
-#define RESP_BULK_STRING        '$'     ///< \hideinitializer RESP bulk string type
+/**
+ * Enumeration of RESP component types. These are the first character IDs for the standard RESP interface
+ * implemented by Redis.
+ *
+ */
+enum resp_type {
+  // RESP2 types:
+  RESP_ARRAY            = '*',    ///< \hideinitializer RESP array type
+  RESP_INT              = ':',    ///< \hideinitializer RESP integer type
+  RESP_SIMPLE_STRING    = '+',    ///< \hideinitializer RESP simple string type
+  RESP_ERROR            = '-',    ///< \hideinitializer RESP error message type
+  RESP_BULK_STRING      = '$',    ///< \hideinitializer RESP bulk string type
+
+  // RESP3 types:
+  RESP3_NULL            = '_',    ///< \hideinitializer RESP3 null value
+  RESP3_DOUBLE          = ',',    ///< \hideinitializer RESP3 floating-point value
+  RESP3_BOOLEAN         = '#',    ///< \hideinitializer RESP3 boolean value
+  RESP3_BLOB_ERROR      = '!',    ///< \hideinitializer RESP3 blob error
+  RESP3_VERBATIM_STRING = '=',    ///< \hideinitializer RESP3 verbatim string (with type)
+  RESP3_BIG_NUMBER      = '(',    ///< \hideinitializer RESP3 big integer / decimal
+  RESP3_MAP             = '%',    ///< \hideinitializer RESP3 dictionary of key / value
+  RESP3_SET             = '~',    ///< \hideinitializer RESP3 unordered set of elements
+  RESP3_ATTRIBUTE       = '|',    ///< \hideinitializer RESP3 dictionary of attributes (metadata)
+  RESP3_PUSH            = '>',    ///< \hideinitializer RESP3 dictionary of attributes (metadata)
+};
+
+#define RESP3_CONTINUED   ';'     ///< \hideinitializer RESP3 dictionary of attributes (metadata)
 
 #define REDIS_INVALID_CHANNEL       (-101)  ///< \hideinitializer There is no such channel in the Redis instance.
 #define REDIS_NULL                  (-102)  ///< \hideinitializer Redis returned NULL
@@ -112,19 +138,51 @@ enum redisx_channel {
 
 #define REDISX_CHANNELS     (REDISX_SUBSCRIPTION_CHANNEL + 1)  ///< \hideinitializer The number of channels a Redis instance has.
 
+/**
+ * The RESP protocol to use for a Redis instance. Redis originally used RESP2, but later releases added
+ * support for RESP3.
+ *
+ */
+enum redisx_protocol {
+  REDISX_RESP2 = 2,                   ///< \hideinitializer RESP2 protocol
+  REDISX_RESP3                        ///< \hideinitializer RESP3 protocol (since Redis version 6.0.0)
+};
 
 /**
  * \brief Structure that represents a Redis response (RESP format).
  *
+ * REFERENCES:
+ * <ol>
+ * <li>https://github.com/redis/redis-specifications/tree/master/protocol</li>
+ * </ol>
+ *
  * \sa redisxDestroyRESP()
+ * \sa redisxIsScalarType()
+ * \sa redisxIsStringType()
+ * \sa redisxIsArrayType()
+ * \sa redisxIsMapType()
  */
 typedef struct RESP {
-  char type;                    ///< RESP type RESP_ARRAY, RESP_INT ...
-  int n;                        ///< Either the integer value of a RESP_INT response, or the
+  enum resp_type type;          ///< RESP type; RESP_ARRAY, RESP_INT ...
+  int n;                        ///< Either the integer value of a RESP_INT or a RESP3_BOOLEAN response, or the
                                 ///< dimension of the value field.
   void *value;                  ///< Pointer to text (char *) content or to an array of components
-                                ///< (RESP**)...
+                                ///< (RESP**) or (RedisMapEntry *), or else a pointer to a `double`, depending
+                                ///< on `type`.
 } RESP;
+
+/**
+ * Structure that represents a key/value mapping in RESP3.
+ *
+ * @sa redisxIsMapType()
+ * @sa RESP3_MAP
+ * @sa RESP3_ATTRIBUTE
+ *
+ */
+typedef struct {
+  RESP *key;                    ///< The keyword component
+  RESP *value;                  ///< The associated value component
+} RedisMapEntry;
 
 
 /**
@@ -134,7 +192,7 @@ typedef struct RESP {
 typedef struct RedisEntry {
   char *key;                    ///< The Redis key or field name
   char *value;                  ///< The string value stored for that field.
-  int length;                  ///< Bytes in value.
+  int length;                   ///< Bytes in value.
 } RedisEntry;
 
 
@@ -207,7 +265,6 @@ typedef struct Redis {
  */
 typedef void (*RedisSubscriberCall)(const char *pattern, const char *channel, const char *msg, long length);
 
-
 /**
  * User-specified callback function for handling RedisX errors.
  *
@@ -216,6 +273,61 @@ typedef void (*RedisSubscriberCall)(const char *pattern, const char *channel, co
  * @param op        the name/ID of the operation where the error occurred.
  */
 typedef void (*RedisErrorHandler)(Redis *redis, enum redisx_channel channel, const char *op);
+
+
+/**
+ * A user-defined function for consuming responses from a Redis pipeline connection. The implementation
+ * should follow a set of simple rules:
+ *
+ * <ul>
+ * <li>the implementation should not destroy the RESP data. The RESP will be destroyed automatically
+ * after the call returns. However, the call may retain any data from the RESP itself, provided
+ * the data is de-referenced from the RESP before return.<li>
+ * <li>The implementation should not block (aside from maybe a quick mutex unlock) and return quickly,
+ * so as to not block the client for long periods</li>
+ * <li>If extensive processing or blocking calls are required to process the message, it is best to
+ * simply place a copy of the RESP on a queue and then return quickly, and then process the message
+ * asynchronously in a background thread.</li>
+ * </ul>
+ *
+ * @param response     A response received from the pipeline client.
+ *
+ * @sa redisxSetPipelineConsumer()
+ */
+typedef void (*RedisPipelineProcessor)(RESP *response);
+
+/**
+ * A user-defined function for consuming push messages from a Redis client. The implementation
+ * should follow a set of simple rules:
+ *
+ * <ul>
+ * <li>the implementation should not destroy the RESP data. The RESP will be destroyed automatically
+ * after the call returns. However, the call may retain any data from the RESP itself, provided
+ * that such data is de-referenced from the RESP before the return.<li>
+ * <li>The implementation should not block (aside from maybe a quick mutex unlock) and return quickly,
+ * so as to not block the client for long periods</li>
+ * <li>If extensive processing or blocking calls are required to process the message, it is best to
+ * simply place a copy of the RESP on a queue and then return quickly, and then process the message
+ * asynchronously in a background thread.</li>
+ * <li>The client on which the push notification originated will be locked when this function is
+ * called, waiting for a response to an earlier query. Thus the implementation should not attempt to
+ * lock the client again or release the lock. It may send asynchronous requests on the client, e.g. via
+ * redisxSendRequestAsync(), but it should not try to read a response (given that the client is
+ * blocked for another read operation). If more flexible client access is needed, the implementation
+ * should make a copy of the RESP and place it on a queue for asynchronous processing by another thread.
+ * </li>
+ * </ul>
+ *
+ * @param cl          The Redis client that sent the push. The client is locked for exlusive
+ *                    access when this function is called.
+ * @param message     The RESP3 message that was pushed by the client
+ * @param ptr         Additional data passed along.
+ *
+ * @sa redisxSetPushProcessor()
+ */
+typedef void (*RedisPushProcessor)(RedisClient *cl, RESP *message, void *ptr);
+
+
 
 void redisxSetVerbose(boolean value);
 boolean redisxIsVerbose();
@@ -228,8 +340,12 @@ int redisxSetPort(Redis *redis, int port);
 int redisxSetUser(Redis *redis, const char *username);
 int redisxSetPassword(Redis *redis, const char *passwd);
 int redisxSelectDB(Redis *redis, int idx);
+int redisxSetProtocol(Redis *redis, enum redisx_protocol protocol);
+enum redisx_protocol redisxGetProtocol(Redis *redis);
+RESP *redisxGetHelloData(Redis *redis);
 
 Redis *redisxInit(const char *server);
+int redisxCheckValid(const Redis *redis);
 void redisxDestroy(Redis *redis);
 int redisxConnect(Redis *redis, boolean usePipeline);
 void redisxDisconnect(Redis *redis);
@@ -265,7 +381,8 @@ int redisxGetScanCount(Redis *redis);
 void redisxDestroyEntries(RedisEntry *entries, int count);
 void redisxDestroyKeys(char **keys, int count);
 
-int redisxSetPipelineConsumer(Redis *redis, void (*f)(RESP *));
+int redisxSetPipelineConsumer(Redis *redis, RedisPipelineProcessor f);
+int redisxSetPushProcessor(Redis *redis, RedisPushProcessor func, void *arg);
 
 int redisxPublish(Redis *redis, const char *channel, const char *message, int length);
 int redisxNotify(Redis *redis, const char *channel, const char *message);
@@ -282,10 +399,25 @@ RESP *redisxExecBlockAsync(RedisClient *cl);
 int redisxLoadScript(Redis *redis, const char *script, char **sha1);
 
 int redisxGetTime(Redis *redis, struct timespec *t);
+int redisxIsGlobPattern(const char *str);
 
-int redisxCheckRESP(const RESP *resp, char expectedType, int expectedSize);
-int redisxCheckDestroyRESP(RESP *resp, char expectedType, int expectedSize);
+RESP *redisxCopyOfRESP(const RESP *resp);
+int redisxCheckRESP(const RESP *resp, enum resp_type expectedType, int expectedSize);
+int redisxCheckDestroyRESP(RESP *resp, enum resp_type, int expectedSize);
 void redisxDestroyRESP(RESP *resp);
+boolean redisxIsScalarType(const RESP *r);
+boolean redisxIsStringType(const RESP *r);
+boolean redisxIsArrayType(const RESP *r);
+boolean redisxIsMapType(const RESP *r);
+boolean redisxHasComponents(const RESP *r);
+boolean redisxIsEqualRESP(const RESP *a, const RESP *b);
+int redisxSplitText(RESP *resp, char **text);
+XField *redisxRESP2XField(const char *name, const RESP *resp);
+char *redisxRESP2JSON(const char *name, const RESP *resp);
+int redisxPrintRESP(const char *name, const RESP *resp);
+
+RedisMapEntry *redisxGetMapEntry(const RESP *map, const RESP *key);
+RedisMapEntry *redisxGetKeywordEntry(const RESP *map, const char *key);
 
 // Locks for async calls
 int redisxLockClient(RedisClient *cl);
@@ -298,9 +430,12 @@ int redisxSendArrayRequestAsync(RedisClient *cl, char *args[], int length[], int
 int redisxSetValueAsync(RedisClient *cl, const char *table, const char *key, const char *value, boolean confirm);
 int redisxMultiSetAsync(RedisClient *cl, const char *table, const RedisEntry *entries, int n, boolean confirm);
 RESP *redisxReadReplyAsync(RedisClient *cl);
+int redisxClearAttributesAsync(RedisClient *cl);
+const RESP *redisxGetAttributesAsync(const RedisClient *cl);
 int redisxIgnoreReplyAsync(RedisClient *cl);
 int redisxSkipReplyAsync(RedisClient *cl);
 int redisxPublishAsync(Redis *redis, const char *channel, const char *data, int length);
+
 
 // Error generation with stderr message...
 int redisxError(const char *func, int errorCode);
