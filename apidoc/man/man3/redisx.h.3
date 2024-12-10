@@ -1114,7 +1114,7 @@ redisxGetAttributeAsync()
 .PP
 
 .PP
-References \fBRedis::interactive\fP, \fBredisxCheckValid()\fP, \fBredisxGetAttributesAsync()\fP, \fBredisxUnlockClient()\fP, \fBX_SUCCESS\fP, and \fBx_trace_null()\fP\&.
+References \fBRedis::interactive\fP, \fBredisxCheckValid()\fP, \fBredisxGetAttributesAsync()\fP, \fBredisxLockConnected()\fP, \fBredisxUnlockClient()\fP, \fBX_SUCCESS\fP, and \fBx_trace_null()\fP\&.
 .SS "const \fBRESP\fP * redisxGetAttributesAsync (const \fBRedisClient\fP * cl)"
 Returns the attributes (if any) that were last sent along a response to the client\&. This function should be called only if the caller has an exclusive lock on the client's mutex\&. Also, there are a few rules the caller should follow:
 .PP
