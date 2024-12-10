@@ -739,6 +739,7 @@ XField *redisxRESP2XField(const char *name, const RESP *resp) {
  *                set to indicate the type of error).
  *
  * @sa resp2XField()
+ * @sa redisxPrintRESP()
  */
 char *redisxRESP2JSON(const char *name, const RESP *resp) {
   return xjsonFieldToString(redisxRESP2XField(name, resp));
@@ -750,9 +751,11 @@ char *redisxRESP2JSON(const char *name, const RESP *resp) {
  * @param name    The name/ID to assign to the RESP
  * @param resp    The RESP data to print
  * @return        0
+ *
+ * @sa redisxRESP2JSON()
  */
 int redisxPrintRESP(const char *name, const RESP *resp) {
-  char *json = redisxRESP2JSON("hello_response", resp);
+  char *json = redisxRESP2JSON(name, resp);
 
   if(json) {
     printf("%s", json);

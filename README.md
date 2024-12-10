@@ -458,9 +458,8 @@ while for `RESP_ARRAY` types the `value` is a pointer to an embedded `RESP` arra
 in that.
 
 To help with deciding what cast to use for a given `value` field of the RESP data structure, we provide the 
-convenience methods `redisxIsScalarType()` when cast is `(void)` or else `(double *)`), `redisxIsArrayType()` if the 
-cast is `(RESP **)`, `redisxIsStringTupe()` if the cast should be `(char *)`, and `redisxIsMapType()` if the cast
-should be to `(RedisMapEntry *)`.
+convenience methods `redisxIsScalarType()`, `redisxIsStringType()`, `redisxIsArrayType()`, and `redisxIsMapType()`
+functions.
 
 You can check that two `RESP` data structures are equivalent with `redisxIsEqualRESP(RESP *a, RESP *b)`.
 
@@ -529,7 +528,7 @@ Note, that you can usually convert a RESP to an `XField`, and/or to JSON represe
  
  // Clean up
  redisxDestroyRESP(resp);
-```c
+```
 
 All RESP can be represented in JSON format. This is trivial for map entries, which have strings as their keywords -- 
 which is the case for all RESP sent by Redis. And, it is also possible for map entries with non-string keys, albeit 
@@ -1179,12 +1178,11 @@ settings.
 Some obvious ways the library could evolve and grow in the not too distant future:
 
  - Automated regression testing and coverage tracking.
- - Keep track of subscription patterns, and automatically resubscribe to them on reconnecting.
  - Support for [Redis Sentinel](https://redis.io/docs/latest/develop/reference/sentinel-clients/) clients, for 
    high-availability server configurations.
+ - Keep track of subscription patterns, and automatically resubscribe to them on reconnecting.
  - TLS support (perhaps...)
  - Add high-level support for managing and calling custom Redis functions.
- - Add support for `CLIENT TRACKING` / `CLIENT CACHING`. 
  - Add more high-level [Redis commands](https://redis.io/docs/latest/commands/), e.g. for lists, streams, etc.
 
 If you have an idea for a must have feature, please let me (Attila) know. Pull requests, for new features or fixes to
