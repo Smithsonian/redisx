@@ -193,7 +193,7 @@ Alternatively, you may initialize the client for a high-availability configurati
     return;
   }
 
-  // Optionally set a sentinel discovery timeout in ms...
+  // (optional) set a sentinel discovery timeout in ms...
   redisxSetSentinelTimeout(redis, 30);
 ```
 
