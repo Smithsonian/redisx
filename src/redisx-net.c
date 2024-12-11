@@ -557,23 +557,7 @@ int redisxReconnect(Redis *redis, boolean usePipeline) {
 }
 
 /**
- * Shuts down the Redis connection immediately. It does not obtain excluive locks
- * to either configuration settings or to open channels. As such it should only
- * be called to clean up an otherwise terminated program.
- *
- * @param redis   Pointer to the Redis intance to shut down.
- */
-static void rShutdownLinkAsync(Redis *redis) {
-  RedisPrivate *p = (RedisPrivate *) redis->priv;
-  int i;
-
-  // NOTE: Don't use client locks, as they may deadlock when trying to shut down...
-  for(i=0; i<REDISX_CHANNELS; i++) rDisconnectClientAsync(&p->clients[i]);
-}
-
-
-/**
- * Shuts down Redis immediately, including all running Redis instances. It does not obtain
+ * Shuts down and destroys all Redis clients immediately. It does not obtain
  * excluive locks to server list, configuration settings, or to open channels. As such
  * it should only be called to clean up an otherwise terminated program, e.g.
  * with atexit().
@@ -583,12 +567,11 @@ static void rShutdownAsync() {
   ServerLink *l;
 
   // NOTE: Don't use any locks, as they may deadlock when trying to shut down...
-
   l = serverList;
 
   while(l != NULL) {
     ServerLink *next = l->next;
-    rShutdownLinkAsync(l->redis);
+    redisxDestroy(l->redis);
     free(l);
     l = next;
   }
@@ -1004,6 +987,7 @@ void redisxDestroy(Redis *redis) {
   p = (RedisPrivate *) redis->priv;
 
   if(redisxIsConnected(redis)) redisxDisconnect(redis);
+
 
   for(i = REDISX_CHANNELS; --i >= 0; ) {
     ClientPrivate *cp = (ClientPrivate *) p->clients[i].priv;
