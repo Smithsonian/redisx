@@ -523,6 +523,13 @@
       <arglist>(Redis *redis)</arglist>
     </member>
     <member kind="function">
+      <type>XLookupTable *</type>
+      <name>redisxGetInfo</name>
+      <anchorfile>redisx_8h.html</anchorfile>
+      <anchor>a1693736dbc3d9a3ba17a31cf2bb4246d</anchor>
+      <arglist>(Redis *redis, const char *parameter)</arglist>
+    </member>
+    <member kind="function">
       <type>char **</type>
       <name>redisxGetKeys</name>
       <anchorfile>redisx_8h.html</anchorfile>
@@ -984,6 +991,13 @@
       <anchor>af64c112d9c395f1e08af52acd6f5c3ec</anchor>
       <arglist>(Redis *redis, const char *channel)</arglist>
     </member>
+    <member kind="function">
+      <type>int</type>
+      <name>redisxValidateSentinel</name>
+      <anchorfile>redisx_8h.html</anchorfile>
+      <anchor>ace7dcf75a6f60817e1b3be00fb15658b</anchor>
+      <arglist>(const char *serviceName, const RedisServer *serverList, int nServers)</arglist>
+    </member>
   </compound>
   <compound kind="file">
     <name>redisx-client.c</name>
@@ -1244,6 +1258,13 @@
       <anchor>a83fce113d042490e77efdc574e64d76f</anchor>
       <arglist>(int size)</arglist>
     </member>
+    <member kind="function">
+      <type>int</type>
+      <name>redisxValidateSentinel</name>
+      <anchorfile>redisx-net_8c.html</anchorfile>
+      <anchor>ace7dcf75a6f60817e1b3be00fb15658b</anchor>
+      <arglist>(const char *serviceName, const RedisServer *serverList, int nServers)</arglist>
+    </member>
   </compound>
   <compound kind="file">
     <name>redisx-script.c</name>
@@ -1501,6 +1522,13 @@
       <anchorfile>redisx_8c.html</anchorfile>
       <anchor>a89fd65118ba731931fe281c83f6fa8ba</anchor>
       <arglist>(Redis *redis)</arglist>
+    </member>
+    <member kind="function">
+      <type>XLookupTable *</type>
+      <name>redisxGetInfo</name>
+      <anchorfile>redisx_8c.html</anchorfile>
+      <anchor>a1693736dbc3d9a3ba17a31cf2bb4246d</anchor>
+      <arglist>(Redis *redis, const char *parameter)</arglist>
     </member>
     <member kind="function">
       <type>enum redisx_protocol</type>

@@ -11,5 +11,6 @@ var redisx_net_8c =
     [ "redisxSetPort", "redisx-net_8c.html#a37f39ede48014a2463e4c72bf6eb5a3e", null ],
     [ "redisxSetSentinelTimeout", "redisx-net_8c.html#a192ba03de94c1e8a1876d7c533b4df9a", null ],
     [ "redisxSetSocketTimeout", "redisx-net_8c.html#aaa87635d37e5d348b7dbb12952b39183", null ],
-    [ "redisxSetTcpBuf", "redisx-net_8c.html#a83fce113d042490e77efdc574e64d76f", null ]
+    [ "redisxSetTcpBuf", "redisx-net_8c.html#a83fce113d042490e77efdc574e64d76f", null ],
+    [ "redisxValidateSentinel", "redisx-net_8c.html#ace7dcf75a6f60817e1b3be00fb15658b", null ]
 ];

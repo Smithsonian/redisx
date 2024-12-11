@@ -45,6 +45,9 @@ src/redisx-net.c
 .ti -1c
 .RI "void \fBredisxSetTcpBuf\fP (int size)"
 .br
+.ti -1c
+.RI "int \fBredisxValidateSentinel\fP (const char *serviceName, const \fBRedisServer\fP *serverList, int nServers)"
+.br
 .in -1c
 .SH "Detailed Description"
 .PP 
@@ -141,7 +144,7 @@ Initializes the \fBRedis\fP client library, and sets the hostname or IP address 
 .PP
 \fBParameters\fP
 .RS 4
-\fIserver\fP Server host name or numeric IP address, e\&.g\&. '127\&.0\&.0\&.1'
+\fIserver\fP Server host name or numeric IP address, e\&.g\&. '127\&.0\&.0\&.1'\&. The string will be copied, not referenced, for the internal configuration, such that the string passed may be destroyed freely after the call\&.
 .RE
 .PP
 \fBReturns\fP
@@ -162,9 +165,9 @@ Initializes a \fBRedis\fP client with a Sentinel configuration of alternate serv
 .PP
 \fBParameters\fP
 .RS 4
-\fIserviceName\fP The service name as registered in the Sentinel server configuration\&. 
+\fIserviceName\fP The service name as registered in the Sentinel server configuration\&. The supplied name will be copied, not referenced, so that the value passed may be freely destroyed after the call\&. 
 .br
-\fIserverList\fP An set of Sentinel servers to use to dynamically find the current master\&. A copy of the supplied name will be used, so the argument passed can be freely destroyed after the call\&. 
+\fIserverList\fP An set of Sentinel servers to use to dynamically find the current master\&. The list itself and its contents are not referenced\&. Instead a deep copy will be made of it, so the list that was pased can be freely destroyed after the call\&. 
 .br
 \fInServers\fP The number of servers in the list 
 .RE
@@ -185,7 +188,7 @@ X_SUCCESS (0) if successful, or else an error code <0\&.
 .PP
 
 .PP
-References \fBREDISX_DEFAULT_SENTINEL_TIMEOUT_MILLIS\fP, \fBredisxInit()\fP, \fBx_error()\fP, \fBx_trace_null()\fP, and \fBxStringCopyOf()\fP\&.
+References \fBREDISX_DEFAULT_SENTINEL_TIMEOUT_MILLIS\fP, \fBredisxInit()\fP, \fBredisxValidateSentinel()\fP, \fBx_error()\fP, \fBX_SUCCESS\fP, \fBx_trace_null()\fP, and \fBxStringCopyOf()\fP\&.
 .SS "\fBboolean\fP redisxIsConnected (\fBRedis\fP * redis)"
 Checks if a \fBRedis\fP instance is connected\&.
 .PP
@@ -297,6 +300,26 @@ Set the size of the TCP/IP buffers (send and receive) for future client connecti
 
 .PP
 References \fBxvprintf\fP\&.
+.SS "int redisxValidateSentinel (const char * serviceName, const \fBRedisServer\fP * serverList, int nServers)"
+Validates a Sentinel configuration\&.
+.PP
+\fBParameters\fP
+.RS 4
+\fIserviceName\fP The service name as registered in the Sentinel server configuration\&. 
+.br
+\fIserverList\fP An set of Sentinel servers to use to dynamically find the current master\&. 
+.br
+\fInServers\fP The number of servers in the list 
+.RE
+.PP
+\fBReturns\fP
+.RS 4
+X_SUCCESS (0) if successful, or X_NAME_INVALID if the serviceName is NULL or empty, or X_NULL if the serverList is NULL, or X_SIZE_INVALID if nServers is 0 or negative, or else X_GROUP_INVALID if the first server has a NULL or empty host name\&. 
+.RE
+.PP
+
+.PP
+References \fBx_error()\fP, \fBX_GROUP_INVALID\fP, \fBX_NAME_INVALID\fP, \fBX_NULL\fP, \fBX_SIZE_INVALID\fP, and \fBX_SUCCESS\fP\&.
 .SH "Author"
 .PP 
 Generated automatically by Doxygen for RedisX from the source code\&.

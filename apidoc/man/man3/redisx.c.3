@@ -32,6 +32,9 @@ src/redisx.c \- A \fBRedis\fP client library that compiles on older and newer pl
 .RI "\fBRESP\fP * \fBredisxGetHelloData\fP (\fBRedis\fP *redis)"
 .br
 .ti -1c
+.RI "\fBXLookupTable\fP * \fBredisxGetInfo\fP (\fBRedis\fP *redis, const char *parameter)"
+.br
+.ti -1c
 .RI "enum \fBredisx_protocol\fP \fBredisxGetProtocol\fP (\fBRedis\fP *redis)"
 .br
 .ti -1c
@@ -248,11 +251,36 @@ A copy of the response sent by HELLO on the last client connection, or NULL\&.
 \fBSee also\fP
 .RS 4
 \fBredisxSetProtocol()\fP 
+.PP
+\fBredisxGetInfo()\fP 
 .RE
 .PP
 
 .PP
 References \fBredisxCopyOfRESP()\fP, and \fBx_trace_null()\fP\&.
+.SS "\fBXLookupTable\fP * redisxGetInfo (\fBRedis\fP * redis, const char * parameter)"
+Returns the result of an INFO query (with the optional parameter) as a lookup table of keywords and string values\&.
+.PP
+\fBParameters\fP
+.RS 4
+\fIredis\fP Pointer to \fBRedis\fP instance 
+.br
+\fIparameter\fP Optional parameter to pass with INFO, or NULL\&. 
+.RE
+.PP
+\fBReturns\fP
+.RS 4
+a newly created lookup table with the string key/value pairs of the response from the \fBRedis\fP server, or NULL if there was an error\&. The caller should destroy the lookup table after using it\&.
+.RE
+.PP
+\fBSee also\fP
+.RS 4
+\fBredisxGetHelloData()\fP 
+.RE
+.PP
+
+.PP
+References \fBFALSE\fP, \fBredisxCheckDestroyRESP()\fP, \fBredisxDestroyRESP()\fP, \fBredisxRequest()\fP, \fBRESP_BULK_STRING\fP, \fBRESP::value\fP, \fBx_trace_null()\fP, \fBxCreateLookup()\fP, \fBxCreateStringField()\fP, \fBxCreateStruct()\fP, \fBxSetField()\fP, and \fBxStringCopyOf()\fP\&.
 .SS "enum \fBredisx_protocol\fP redisxGetProtocol (\fBRedis\fP * redis)"
 Returns the actual protocol used with the \fBRedis\fP server\&. If HELLO was used during connection it will be the protocol that was confirmed in the response of HELLO (and which hopefully matches the protocol requested)\&. Otherwise, RedisX will default to RESP2\&.
 .PP

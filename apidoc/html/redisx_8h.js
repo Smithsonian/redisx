@@ -85,6 +85,7 @@ var redisx_8h =
     [ "redisxGetAttributesAsync", "redisx_8h.html#a6c9d4ce9babbcaac35e45f536d47858d", null ],
     [ "redisxGetClient", "redisx_8h.html#a14907be8fba6a13505a352673cea5895", null ],
     [ "redisxGetHelloData", "redisx_8h.html#a89fd65118ba731931fe281c83f6fa8ba", null ],
+    [ "redisxGetInfo", "redisx_8h.html#a1693736dbc3d9a3ba17a31cf2bb4246d", null ],
     [ "redisxGetKeys", "redisx_8h.html#aaa45af252b10e19c647d2cd5b51d7c05", null ],
     [ "redisxGetKeywordEntry", "redisx_8h.html#af158bd99f4f6733037846979423b6af6", null ],
     [ "redisxGetLockedConnectedClient", "redisx_8h.html#a19d2fb18f2f939edfdc412d064741f9f", null ],
@@ -150,5 +151,6 @@ var redisx_8h =
     [ "redisxStartBlockAsync", "redisx_8h.html#a3e49508e4e4fcc283832226fd1bffd85", null ],
     [ "redisxSubscribe", "redisx_8h.html#a789f711733a55601cd71a2c0f61ec2db", null ],
     [ "redisxUnlockClient", "redisx_8h.html#a87efe53c80fcff3fcf189362cbc602f7", null ],
-    [ "redisxUnsubscribe", "redisx_8h.html#af64c112d9c395f1e08af52acd6f5c3ec", null ]
+    [ "redisxUnsubscribe", "redisx_8h.html#af64c112d9c395f1e08af52acd6f5c3ec", null ],
+    [ "redisxValidateSentinel", "redisx_8h.html#ace7dcf75a6f60817e1b3be00fb15658b", null ]
 ];

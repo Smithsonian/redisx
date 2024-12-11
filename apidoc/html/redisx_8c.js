@@ -7,6 +7,7 @@ var redisx_8c =
     [ "redisxErrorDescription", "redisx_8c.html#a38f3de77ad5a48d37b302bce2e3cd25b", null ],
     [ "redisxGetAttributes", "redisx_8c.html#a48b6b8949276f59cd2f13d6b13384996", null ],
     [ "redisxGetHelloData", "redisx_8c.html#a89fd65118ba731931fe281c83f6fa8ba", null ],
+    [ "redisxGetInfo", "redisx_8c.html#a1693736dbc3d9a3ba17a31cf2bb4246d", null ],
     [ "redisxGetProtocol", "redisx_8c.html#af756044530dd5b424ec64e89e22eb0a0", null ],
     [ "redisxGetTime", "redisx_8c.html#a5dbdb6bef9c8ac3a4a8e901abe505d30", null ],
     [ "redisxHasPipeline", "redisx_8c.html#a481678923a653e5227f7dab5a1fd272d", null ],
