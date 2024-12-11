@@ -1038,19 +1038,24 @@ void redisxSetTcpBuf(int size) {
  * @param port    The TCP port number to use.
  *
  * @return                X_SUCCESS (0) if successful, or else X_NULL if the redis instance is NULL,
- *                        or X_NO_INIT if the redis instance is not initialized.
+ *                        or X_NO_INIT if the redis instance is not initialized, or X_FAILURE
+ *                        if Redis was initialized in Sentinel configuration.
  *
  * @sa redisxConnect();
  */
 int redisxSetPort(Redis *redis, int port) {
-  RedisPrivate *p;
+  static const char *fn = "redisxSetPort";
 
-  prop_error("redisxSetPort", rConfigLock(redis));
+  RedisPrivate *p;
+  int status = X_SUCCESS;
+
+  prop_error(fn, rConfigLock(redis));
   p = (RedisPrivate *) redis->priv;
-  p->port = port;
+  if(p->sentinel) status = x_error(X_FAILURE, EAGAIN, fn, "redis is in Sentinel configuration");
+  else p->port = port;
   rConfigUnlock(redis);
 
-  return X_SUCCESS;
+  return status;
 }
 
 
