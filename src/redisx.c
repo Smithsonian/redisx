@@ -738,7 +738,6 @@ RESP *redisxGetHelloData(Redis *redis) {
 XLookupTable *redisxGetInfo(Redis *redis, const char *parameter) {
   static const char *fn = "redisxGetInfo";
 
-  // Fallback to using INFO replication...
   XStructure *s;
   XLookupTable *lookup;
   RESP *reply;
@@ -764,6 +763,8 @@ XLookupTable *redisxGetInfo(Redis *redis, const char *parameter) {
     }
     line = strtok(NULL, "\n");
   }
+
+  redisxDestroyRESP(reply);
 
   lookup = xCreateLookup(s, FALSE);
   free(s);

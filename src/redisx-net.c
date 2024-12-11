@@ -286,6 +286,7 @@ static int rConfirmMasterRole(Redis *redis) {
   prop_error(fn, status);
 
   if(redisxCheckDestroyRESP(reply, RESP_ARRAY, 0) != X_SUCCESS) {
+    // Fallback to using INFO replication...
     XLookupTable *info = redisxGetInfo(redis, "replication");
     const XField *role;
 
