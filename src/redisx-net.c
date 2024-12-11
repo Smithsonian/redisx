@@ -699,7 +699,7 @@ Redis *redisxInit(const char *server) {
   }
 
   p->addr = inet_addr((char *) ipAddress);
-  p->port = REDISX_TCP_PORT;
+  p->port = p->port > 0 ? p->port : REDISX_TCP_PORT;
   p->protocol = REDISX_RESP2;     // Default
   p->timeoutMillis = REDISX_DEFAULT_TIMEOUT_MILLIS;
 
@@ -734,15 +734,29 @@ void redisxDestroy(Redis *redis) {
 
   for(i = REDISX_CHANNELS; --i >= 0; ) {
     ClientPrivate *cp = (ClientPrivate *) p->clients[i].priv;
+    if(!cp) continue;
+
     pthread_mutex_destroy(&cp->readLock);
     pthread_mutex_destroy(&cp->writeLock);
     pthread_mutex_destroy(&cp->pendingLock);
-    if(cp != NULL) free(cp);
+
+    redisxDestroyRESP(cp->attributes);
+    free(cp);
   }
-  free(p->clients);
+
+  redisxDestroyRESP(p->helloData);
+  redisxClearConnectHooks(redis);
+  redisxClearSubscribers(redis);
+
+  if(p->username) free(p->username);
+  if(p->password) free(p->password);
+  if(p->clients) free(p->clients);
+
   free(p);
 
   rUnregisterServer(redis);
+
+  if(redis->id) free(redis->id);
 
   free(redis);
 }
