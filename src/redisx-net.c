@@ -29,6 +29,8 @@
 #include "redisx-priv.h"
 
 static int rStartPipelineListenerAsync(Redis *redis);
+static void rDisconnectClientAsync(RedisClient *cl);
+static int rReconnectAsync(Redis *redis, boolean usePipeline);
 
 /// \cond PRIVATE
 ///
@@ -83,6 +85,28 @@ static int hostnameToIP(const char *hostName, char *ip) {
   }
 
   return x_error(X_NULL, ENODEV, fn, "no valid address for host %s", hostName);
+}
+
+static int rSetServerAsync(Redis *redis, const char *desc, const char *hostname, int port) {
+  static const char *fn = "rSetServer";
+
+  RedisPrivate *p = (RedisPrivate *) redis;
+  char ipAddress[IP_ADDRESS_LENGTH] = {'\0'};
+  int status;
+
+  if(!hostname) return x_error(X_NULL, EINVAL, fn, "%s address is NULL", desc);
+  if(!hostname[0]) return x_error(X_NAME_INVALID, EINVAL, fn, "%s name is empty", desc);
+
+  status = hostnameToIP(hostname, ipAddress);
+  if(status) return x_trace(fn, desc, status);
+
+  p->addr = inet_addr((char *) ipAddress);
+  p->port = port > 0 ? port : 0;
+
+  if(redis->id) free(redis->id);
+  redis->id = xStringCopyOf(ipAddress);
+
+  return X_SUCCESS;
 }
 
 /**
@@ -178,6 +202,133 @@ static int rAuthAsync(RedisClient *cl) {
   return X_SUCCESS;
 }
 
+static int rRegisterServer(Redis *redis) {
+  ServerLink *l = (ServerLink *) calloc(1, sizeof(ServerLink));
+  x_check_alloc(l);
+  l->redis = redis;
+
+  pthread_mutex_lock(&serverLock);
+  l->next = serverList;
+  serverList = l;
+  pthread_mutex_unlock(&serverLock);
+
+  return X_SUCCESS;
+}
+
+static int rTryConnectSentinel(Redis *redis, int serverIndex) {
+  static const char *fn = "rTryConnectSentinel";
+
+  RedisPrivate *p = (RedisPrivate *) redis->priv;
+  RedisSentinel *s = p->sentinel;
+  RedisServer server = s->servers[serverIndex];  // A copy, not a reference...
+  char desc[80];
+  int status;
+
+  sprintf(desc, "sentinel server %d", serverIndex);
+  prop_error(fn, rSetServerAsync(redis, desc, server.host, server.port));
+
+  status = rConnectClient(redis, REDISX_INTERACTIVE_CHANNEL);
+  if(status != X_SUCCESS) return status; // No error propagation. It's OK if server is down...
+
+  // Move server to the top of the list, so next time we try this one first...
+  memmove(&s->servers[1], s->servers, serverIndex * sizeof(RedisServer));
+  s->servers[0] = server;
+
+  return X_SUCCESS;
+}
+
+
+static int rDiscoverSentinel(Redis *redis) {
+  static const char *fn = "rConnectSentinel";
+
+  RedisPrivate *p = (RedisPrivate *) redis->priv;
+  const RedisSentinel *s = p->sentinel;
+  int i, savedTimeout = p->timeoutMillis;
+
+  p->timeoutMillis = s->timeoutMillis > 0 ? s->timeoutMillis : REDISX_DEFAULT_SENTINEL_TIMEOUT_MILLIS;
+
+  for(i = 0; i < s->nServers; i++) if(rTryConnectSentinel(redis, i) == X_SUCCESS) {
+    RESP *reply;
+    int status;
+
+    // Get the name of the master...
+    reply = redisxRequest(redis, "SENTINEL", "get-master-addr-by-name", s->serviceName, NULL, &status);
+    if(status) continue;
+
+    rDisconnectClientAsync(redis->interactive);
+
+    if(redisxCheckDestroyRESP(reply, RESP_ARRAY, 2) == X_SUCCESS) {
+      RESP **component = (RESP **) reply->value;
+      int port = (int) strtol((char *) component[1]->value, NULL, 10);
+
+      status = rSetServerAsync(redis, "sentinel master", (char *) component[0]->value, port);
+
+      redisxDestroyRESP(reply);
+      p->timeoutMillis = savedTimeout;
+
+      prop_error(fn, status);
+      return X_SUCCESS;
+    }
+  }
+
+  p->timeoutMillis = savedTimeout;
+  return x_error(X_NO_SERVICE, ENOTCONN, fn, "no Sentinel server available");
+}
+
+static int rConfirmMasterRole(Redis *redis) {
+  static const char *fn = "rConfirmMasterRole";
+
+  RESP *reply, **component;
+  int status;
+
+  // Try ROLE command first (available since Redis 4)
+  reply = redisxRequest(redis, "ROLE", NULL, NULL, NULL, &status);
+  prop_error(fn, status);
+
+  if(redisxCheckDestroyRESP(reply, RESP_ARRAY, 0) != X_SUCCESS) {
+    // Fallback to using INFO replication...
+    char *str;
+
+    reply = redisxRequest(redis, "INFO", "replication", NULL, NULL, &status);
+    prop_error(fn, status);
+    prop_error(fn, redisxCheckDestroyRESP(reply, RESP_BULK_STRING, 0));
+
+    // Go line by line...
+    str = strtok((char *) reply->value, "\n");
+
+    while(str) {
+      const char *tok = strtok(str, ":");
+
+      if(strcmp("role", tok) == 0) {
+        tok = strtok(NULL, "\n");
+
+        status = strcmp("master", tok);
+        redisxDestroyRESP(reply);
+
+        if(status) return x_error(X_FAILURE, EAGAIN, fn, "Replica is not master");
+        return X_SUCCESS;
+      }
+
+      str = strtok(NULL, "\n");
+    }
+
+    return x_error(X_FAILURE, EBADE, fn, "Got empty array response");
+  }
+
+  if(reply->n < 1) {
+    redisxDestroyRESP(reply);
+    return x_error(X_FAILURE, EBADE, fn, "Got empty array response");
+  }
+
+  component = (RESP **) reply->value;
+  status = strcmp("master", (char *) component[0]->value);
+
+  redisxDestroyRESP(reply);
+
+  if(status) return x_error(X_FAILURE, EAGAIN, fn, "Replica is not master");
+  return X_SUCCESS;
+}
+
 /**
  * Same as connectRedis() except without the exlusive locking mechanism...
  *
@@ -207,6 +358,11 @@ static int rConnectAsync(Redis *redis, boolean usePipeline) {
     return X_ALREADY_OPEN;
   }
 
+  if(p->sentinel) {
+    prop_error(fn, rDiscoverSentinel(redis));
+    // TODO update sentinel server list...
+  }
+
   if(!ip->isEnabled) {
     static int warnedInteractive;
 
@@ -221,6 +377,10 @@ static int rConnectAsync(Redis *redis, boolean usePipeline) {
       return x_trace(fn, "interactive", X_NO_SERVICE);
     }
     warnedInteractive = FALSE;
+  }
+
+  if(p->sentinel) {
+    if(rConfirmMasterRole(redis) != X_SUCCESS) prop_error(fn, rReconnectAsync(redis, usePipeline));
   }
 
   if(usePipeline) {
@@ -397,23 +557,7 @@ int redisxReconnect(Redis *redis, boolean usePipeline) {
 }
 
 /**
- * Shuts down the Redis connection immediately. It does not obtain excluive locks
- * to either configuration settings or to open channels. As such it should only
- * be called to clean up an otherwise terminated program.
- *
- * @param redis   Pointer to the Redis intance to shut down.
- */
-static void rShutdownLinkAsync(Redis *redis) {
-  RedisPrivate *p = (RedisPrivate *) redis->priv;
-  int i;
-
-  // NOTE: Don't use client locks, as they may deadlock when trying to shut down...
-  for(i=0; i<REDISX_CHANNELS; i++) rDisconnectClientAsync(&p->clients[i]);
-}
-
-
-/**
- * Shuts down Redis immediately, including all running Redis instances. It does not obtain
+ * Shuts down and destroys all Redis clients immediately. It does not obtain
  * excluive locks to server list, configuration settings, or to open channels. As such
  * it should only be called to clean up an otherwise terminated program, e.g.
  * with atexit().
@@ -423,12 +567,11 @@ static void rShutdownAsync() {
   ServerLink *l;
 
   // NOTE: Don't use any locks, as they may deadlock when trying to shut down...
-
   l = serverList;
 
   while(l != NULL) {
     ServerLink *next = l->next;
-    rShutdownLinkAsync(l->redis);
+    redisxDestroy(l->redis);
     free(l);
     l = next;
   }
@@ -469,13 +612,17 @@ static void rUnregisterServer(const Redis *redis) {
  * @param cl
  * @param idx
  */
-static void rInitClient(RedisClient *cl, enum redisx_channel idx) {
+static void rInitClient(Redis *redis, enum redisx_channel idx) {
+  RedisPrivate *p = (RedisPrivate *) redis->priv;
+  RedisClient *cl = &p->clients[idx];
   ClientPrivate *cp;
 
   cp = calloc(1, sizeof(ClientPrivate));
   x_check_alloc(cp);
 
+  cp->redis = redis;
   cp->idx = idx;
+
   pthread_mutex_init(&cp->readLock, NULL);
   pthread_mutex_init(&cp->writeLock, NULL);
   pthread_mutex_init(&cp->pendingLock, NULL);
@@ -649,6 +796,8 @@ int rConnectClient(Redis *redis, enum redisx_channel channel) {
  *  \return             X_SUCCESS or
  *                      X_FAILURE       if the IP address is invalid.
  *                      X_NULL          if the IP address is NULL.
+ *
+ *  @sa redisxInitSentinel()
  */
 Redis *redisxInit(const char *server) {
   static const char *fn = "redisxInit";
@@ -656,16 +805,12 @@ Redis *redisxInit(const char *server) {
 
   Redis *redis;
   RedisPrivate *p;
-  ServerLink *l;
   int i;
-  char ipAddress[IP_ADDRESS_LENGTH];
 
   if(server == NULL) {
     x_error(0, EINVAL, fn, "server name is NULL");
     return NULL;
   }
-
-  if(hostnameToIP(server, ipAddress) < 0) return x_trace_null(fn, NULL);
 
   if(!isInitialized) {
     // Initialize the thread attributes once only to avoid segfaulting...
@@ -673,46 +818,157 @@ Redis *redisxInit(const char *server) {
     isInitialized = TRUE;
   }
 
+  // Allocate Redis, including private data...
   p = (RedisPrivate *) calloc(1, sizeof(RedisPrivate));
   x_check_alloc(p);
-
-  pthread_mutex_init(&p->configLock, NULL);
-  pthread_mutex_init(&p->subscriberLock, NULL);
-  p->clients = (RedisClient *) calloc(3, sizeof(RedisClient));
-  x_check_alloc(p->clients);
-
-  // Initialize the store access mutexes for each client channel.
-  for(i = REDISX_CHANNELS; --i >= 0; ) rInitClient(&p->clients[i], i);
 
   redis = (Redis *) calloc(1, sizeof(Redis));
   x_check_alloc(redis);
 
   redis->priv = p;
-  redis->interactive = &p->clients[REDISX_INTERACTIVE_CHANNEL];
-  redis->pipeline = &p->clients[REDISX_PIPELINE_CHANNEL];
-  redis->subscription = &p->clients[REDISX_SUBSCRIPTION_CHANNEL];
-  redis->id = xStringCopyOf(ipAddress);
 
-  for(i = REDISX_CHANNELS; --i >= 0; ) {
-    ClientPrivate *cp = (ClientPrivate *) p->clients[i].priv;
-    cp->redis = redis;
+  // Try set server...
+  i = rSetServerAsync(redis, "server", server, 0);
+  if(i) {
+    free(redis->priv);
+    free(redis);
+    return x_trace_null(fn, NULL);
   }
 
-  p->addr = inet_addr((char *) ipAddress);
-  p->port = p->port > 0 ? p->port : REDISX_TCP_PORT;
+  // Initialize mutexes
+  pthread_mutex_init(&p->configLock, NULL);
+  pthread_mutex_init(&p->subscriberLock, NULL);
+
   p->protocol = REDISX_RESP2;     // Default
   p->timeoutMillis = REDISX_DEFAULT_TIMEOUT_MILLIS;
 
-  l = (ServerLink *) calloc(1, sizeof(ServerLink));
-  x_check_alloc(l);
-  l->redis = redis;
+  // Create clients...
+  p->clients = (RedisClient *) calloc(3, sizeof(RedisClient));
+  x_check_alloc(p->clients);
 
-  pthread_mutex_lock(&serverLock);
-  l->next = serverList;
-  serverList = l;
-  pthread_mutex_unlock(&serverLock);
+  // Initialize clients.
+  for(i = REDISX_CHANNELS; --i >= 0; ) rInitClient(redis, i);
+
+  // Alias clients
+  redis->interactive = &p->clients[REDISX_INTERACTIVE_CHANNEL];
+  redis->pipeline = &p->clients[REDISX_PIPELINE_CHANNEL];
+  redis->subscription = &p->clients[REDISX_SUBSCRIPTION_CHANNEL];
+
+  rRegisterServer(redis);
 
   return redis;
+}
+
+/**
+ * Initializes a Redis client with a Sentinel configuration of alternate servers, and the default
+ * sentinel node connection timeout.
+ *
+ * @param serviceName     The service name as registered in the Sentinel server configuration.
+ * @param serverList      An set of Sentinel servers to use to dynamically find the current master. A
+ *                        copy of the supplied name will be used, so the argument passed can be
+ *                        freely destroyed after the call.
+ * @param nServers        The number of servers in the list
+ * @return                X_SUCCESS (0) if successful, or else an error code &lt;0.
+ *
+ * @sa redisxSetSentinelTimeout()
+ * @sa redisxInit()
+ * @sa redisxConnect()
+ */
+Redis *redisxInitSentinel(const char *serviceName, const RedisServer *serverList, int nServers) {
+  static const char *fn = "redisxInitSentinel";
+
+  Redis *redis;
+  RedisPrivate *p;
+  RedisSentinel *s;
+
+  if(!serviceName) {
+    x_error(0, EINVAL, fn, "input serviceName is NULL");
+    return NULL;
+  }
+
+  if(!serviceName[0]) {
+    x_error(0, EINVAL, fn, "input serviceName is empty");
+    return NULL;
+  }
+
+  if(!serverList) {
+    x_error(0, EINVAL, fn, "input serverList is NULL");
+    return NULL;
+  }
+  if(nServers < 1) {
+    x_error(0, EINVAL, fn, "invalid nServers: %d", nServers);
+    return NULL;
+  }
+
+  if(serverList[0].host == NULL) {
+    x_error(0, EINVAL, fn, "first server address is NULL");
+    return NULL;
+  }
+  if(!serverList[0].host[0]) {
+    x_error(0, EINVAL, fn, "first server address is empty");
+    return NULL;
+  }
+
+  redis = redisxInit(serverList[0].host);
+  if(!redis) return x_trace_null(fn, NULL);
+
+  p = (RedisPrivate *) redis->priv;
+  s = (RedisSentinel *) calloc(1, sizeof(RedisSentinel));
+  x_check_alloc(s);
+
+  s->servers = (RedisServer *) calloc(nServers, sizeof(RedisServer));
+  if(!s->servers) {
+    x_error(0, errno, fn, "alloc error (%d RedisServer)", nServers);
+    free(s);
+    return NULL;
+  }
+  memcpy(s->servers, serverList, nServers * sizeof(RedisServer));
+
+  s->nServers = nServers;
+  s->serviceName = xStringCopyOf(serviceName);
+  s->timeoutMillis = REDISX_DEFAULT_SENTINEL_TIMEOUT_MILLIS;
+
+  p->sentinel = s;
+
+  return redis;
+}
+
+/**
+ * Changes the connection timeout for Sentinel server instances in the discovery phase. This is different
+ * from the timeout that is used for the master server, once it is discovered.
+ *
+ * @param redis     The Redis instance, which was initialized for Sentinel via redisxInitSentinel().
+ * @param millis    [ms] The new connection timeout or &lt;=0 to use the default value.
+ * @return          X_SUCCESS (0) if successfully set sentinel connection timeout, or else X_NULL if the
+ *                  redis instance is NULL, or X_NO_INIT if the redis instance is not initialized for
+ *                  Sentinel.
+ *
+ * @sa redisxSetSocketTimeout()
+ * @sa redisxInitSentinel()
+ */
+int redisxSetSentinelTimeout(Redis *redis, int millis) {
+  static const char *fn = "redisxSetSentinelTimeout";
+
+  RedisPrivate *p;
+  int status = X_SUCCESS;
+
+  prop_error(fn, rConfigLock(redis));
+  p = (RedisPrivate *) redis->priv;
+  if(p->sentinel) p->sentinel->timeoutMillis = millis > 0 ? millis : REDISX_DEFAULT_SENTINEL_TIMEOUT_MILLIS;
+  else status = x_error(X_NO_INIT, EAGAIN, fn, "Redis was not initialized for Sentinel");
+  rConfigUnlock(redis);
+
+  return status;
+}
+
+static void rDestroySentinel(RedisSentinel *sentinel) {
+  if(!sentinel) return;
+
+  while(--sentinel->nServers >= 0) {
+    RedisServer *server = &sentinel->servers[sentinel->nServers];
+    if(server->host) free(server->host);
+  }
+  if(sentinel->serviceName) free(sentinel->serviceName);
 }
 
 /**
@@ -732,18 +988,21 @@ void redisxDestroy(Redis *redis) {
 
   if(redisxIsConnected(redis)) redisxDisconnect(redis);
 
+
   for(i = REDISX_CHANNELS; --i >= 0; ) {
     ClientPrivate *cp = (ClientPrivate *) p->clients[i].priv;
     if(!cp) continue;
+
+    redisxDestroyRESP(cp->attributes);
 
     pthread_mutex_destroy(&cp->readLock);
     pthread_mutex_destroy(&cp->writeLock);
     pthread_mutex_destroy(&cp->pendingLock);
 
-    redisxDestroyRESP(cp->attributes);
     free(cp);
   }
 
+  rDestroySentinel(p->sentinel);
   redisxDestroyRESP(p->helloData);
   redisxClearConnectHooks(redis);
   redisxClearSubscribers(redis);
@@ -779,7 +1038,7 @@ void redisxSetTcpBuf(int size) {
  * @param port    The TCP port number to use.
  *
  * @return                X_SUCCESS (0) if successful, or else X_NULL if the redis instance is NULL,
- *                        or X_N_INIT if the redis instance is not initialized.
+ *                        or X_NO_INIT if the redis instance is not initialized.
  *
  * @sa redisxConnect();
  */
@@ -800,17 +1059,17 @@ int redisxSetPort(Redis *redis, int port) {
  * or a negative value), then the timeout will not be configured for sockets, and the system default
  * timeout values will apply.
  *
- * @param redis           The Redis instance
- * @param timeoutMillis   [ms] The desired socket read/write timeout, or &lt;0 for socket default.
- * @return                X_SUCCESS (0) if successful, or else X_NULL if the redis instance is NULL,
- *                        or X_N_INIT if the redis instance is not initialized.
+ * @param redis      The Redis instance
+ * @param millis     [ms] The desired socket read/write timeout, or &lt;0 for socket default.
+ * @return           X_SUCCESS (0) if successful, or else X_NULL if the redis instance is NULL,
+ *                   or X_NO_INIT if the redis instance is not initialized.
  */
-int redisxSetSocketTimeout(Redis *redis, int timeoutMillis) {
+int redisxSetSocketTimeout(Redis *redis, int millis) {
   RedisPrivate *p;
 
   prop_error("redisxSetPort", rConfigLock(redis));
   p = (RedisPrivate *) redis->priv;
-  p->timeoutMillis = timeoutMillis;
+  p->timeoutMillis = millis > 0 ? millis : REDISX_DEFAULT_TIMEOUT_MILLIS;
   rConfigUnlock(redis);
 
   return X_SUCCESS;

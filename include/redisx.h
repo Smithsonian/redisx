@@ -51,6 +51,11 @@
 #  define REDISX_DEFAULT_TIMEOUT_MILLIS           3000
 #endif
 
+#ifndef REDISX_DEFAULT_SENTINEL_TIMEOUT_MILLIS
+/// [ms] Default socket read/write timeout for Redis clients
+#  define REDISX_DEFAULT_SENTINEL_TIMEOUT_MILLIS   100
+#endif
+
 // Various exposed constants ----------------------------------------------------->
 
 /// API major version
@@ -195,6 +200,15 @@ typedef struct RedisEntry {
   int length;                   ///< Bytes in value.
 } RedisEntry;
 
+/**
+ * Redis server host and port specification.
+ *
+ * @sa redisxInitSentinel()
+ */
+typedef struct RedisServer {
+  char *host;                   ///< The hostname or IP address of the server
+  int port;                     ///< The port number or &lt;=0 to use the default 6379
+} RedisServer;
 
 /**
  * \brief Structure that represents a single Redis client connection instance.
@@ -334,6 +348,8 @@ boolean redisxIsVerbose();
 void redisxDebugTraffic(boolean value);
 
 void redisxSetTcpBuf(int size);
+int redisxSetSocketTimeout(Redis *redis, int millis);
+int redisxSetSentinelTimeout(Redis *redis, int millis);
 int redisxSetTransmitErrorHandler(Redis *redis, RedisErrorHandler f);
 
 int redisxSetPort(Redis *redis, int port);
@@ -345,6 +361,7 @@ enum redisx_protocol redisxGetProtocol(Redis *redis);
 RESP *redisxGetHelloData(Redis *redis);
 
 Redis *redisxInit(const char *server);
+Redis *redisxInitSentinel(const char *serviceName, const RedisServer *serverList, int nServers);
 int redisxCheckValid(const Redis *redis);
 void redisxDestroy(Redis *redis);
 int redisxConnect(Redis *redis, boolean usePipeline);

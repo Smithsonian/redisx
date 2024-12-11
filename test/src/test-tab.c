@@ -40,8 +40,10 @@ int main() {
     perror("ERROR! get value");
     return 1;
   }
+
   redisxPrintRESP("get value", resp);
   redisxCheckDestroyRESP(resp, RESP_BULK_STRING, 1);
+
   if(strcmp("2", (char *) resp->value) != 0) {
     fprintf(stderr, "ERROR! mismatched value: got '%s', expected '%s'\n", (char *) resp->value, "2");
     return 1;

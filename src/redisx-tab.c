@@ -62,11 +62,7 @@ RedisEntry *redisxGetTable(Redis *redis, const char *table, int *n) {
   }
 
   reply = redisxRequest(redis, "HGETALL", table, NULL, NULL, n);
-
-  if(*n) {
-    redisxDestroyRESP(reply);
-    return x_trace_null(fn, NULL);
-  }
+  if(*n) return x_trace_null(fn, NULL);
 
   // Cast RESP2 array respone to RESP3 map also...
   if(reply && reply->type == RESP_ARRAY) {
@@ -415,11 +411,7 @@ char **redisxGetKeys(Redis *redis, const char *table, int *n) {
   }
 
   reply = redisxRequest(redis, table ? "HKEYS" : "KEYS", table ? table : "*", NULL, NULL, n);
-
-  if(*n) {
-    redisxDestroyRESP(reply);
-    return x_trace_null(fn, NULL);
-  }
+  if(*n) return x_trace_null(fn, NULL);
 
   *n = redisxCheckDestroyRESP(reply, RESP_ARRAY, 0);
   if(*n) return x_trace_null(fn, NULL);
@@ -946,7 +938,8 @@ int redisxDeleteEntries(Redis *redis, const char *pattern) {
     // If the table itself matches, delete it wholesale...
     if(fnmatch(root, table, 0) == 0) {
       RESP *reply = redisxRequest(redis, "DEL", table, NULL, NULL, &status);
-      if(redisxCheckDestroyRESP(reply, RESP_INT, 1) == X_SUCCESS) found++;
+      if(status == X_SUCCESS) if(redisxCheckRESP(reply, RESP_INT, 1) == X_SUCCESS) found++;
+      redisxDestroyRESP(reply);
       continue;
     }
 
@@ -961,7 +954,8 @@ int redisxDeleteEntries(Redis *redis, const char *pattern) {
         if(id) {
           if(fnmatch(key, id, 0) == 0) {
             RESP *reply = redisxRequest(redis, "HDEL", table, e->key, NULL, &status);
-            if(redisxCheckDestroyRESP(reply, RESP_INT, 1) == X_SUCCESS) found++;
+            if(status == X_SUCCESS) if(redisxCheckRESP(reply, RESP_INT, 1) == X_SUCCESS) found++;
+            redisxDestroyRESP(reply);
           }
           free(id);
         }
