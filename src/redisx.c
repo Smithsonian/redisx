@@ -708,6 +708,7 @@ int redisxSetPushProcessor(Redis *redis, RedisPushProcessor func, void *arg) {
  * @return        A copy of the response sent by HELLO on the last client connection, or NULL.
  *
  * @sa redisxSetProtocol()
+ * @sa redisxGetInfo()
  */
 RESP *redisxGetHelloData(Redis *redis) {
   const RedisPrivate *p;
@@ -723,39 +724,83 @@ RESP *redisxGetHelloData(Redis *redis) {
 }
 
 /**
- * Checks if a given string is a glob-style pattern.
+ * Returns the result of an INFO query (with the optional parameter) as a lookup table
+ * of keywords and string values.
  *
- * \param str       The string to check.
+ * @param redis       Pointer to Redis instance
+ * @param parameter   Optional parameter to pass with INFO, or NULL.
+ * @return            a newly created lookup table with the string key/value pairs of the
+ *                    response from the Redis server, or NULL if there was an error.
  *
- * \return          TRUE if it is a glob pattern (e.g. has '*', '?' or '['), otherwise FALSE.
- *
+ * @sa redisxGetHelloData()
  */
-int redisxIsGlobPattern(const char *str) {
-  for(; *str; str++) switch(*str) {
-    case '*':
-    case '?':
-    case '[': return TRUE;
+XLookupTable *redisxGetInfo(Redis *redis, const char *parameter) {
+  static const char *fn = "redisxGetInfo";
+
+  // Fallback to using INFO replication...
+  XStructure *s;
+  XLookupTable *lookup;
+  RESP *reply;
+  char *str;
+  int status;
+
+  reply = redisxRequest(redis, "INFO", parameter, NULL, NULL, &status);
+  if(status) return x_trace_null(fn, NULL);
+
+  if(redisxCheckDestroyRESP(reply, RESP_BULK_STRING, 0) != 0) return x_trace_null(fn, NULL);
+
+  s = xCreateStruct();
+
+  // Go line by line...
+  str = strtok((char *) reply->value, "\n");
+
+  // Parse key:value lines into a structure.
+  while(str) {
+    const char *tok = strtok(str, ":");
+    if(tok) xSetField(s, xCreateStringField(tok, xStringCopyOf(strtok(NULL, "\n"))));
+    str = strtok(NULL, "\n");
   }
-  return FALSE;
+
+  lookup = xCreateLookup(s, FALSE);
+  free(s);
+
+  return lookup;
 }
 
-/**
- * Returns a string description for one of the RM error codes.
- *
- * \param code      One of the error codes defined in 'rm.h' or in 'redisrm.h' (e.g. X_NO_PIPELINE)
- *
- * \return      A constant string with the error description.
- *
- */
-const char *redisxErrorDescription(int code) {
-  switch(code) {
-    case REDIS_INVALID_CHANNEL: return "invalid Redis channel";
-    case REDIS_NULL: return "Redis returned null";
-    case REDIS_ERROR: return "Redis returned an error";
-    case REDIS_INCOMPLETE_TRANSFER: return "incomplete Redis transfer";
-    case REDIS_UNEXPECTED_RESP: return "unexpected Redis response type";
-    case REDIS_UNEXPECTED_ARRAY_SIZE: return "unexpected Redis array size";
+  /**
+   * Checks if a given string is a glob-style pattern.
+   *
+   * \param str       The string to check.
+   *
+   * \return          TRUE if it is a glob pattern (e.g. has '*', '?' or '['), otherwise FALSE.
+   *
+   */
+  int redisxIsGlobPattern(const char *str) {
+    for(; *str; str++) switch(*str) {
+      case '*':
+      case '?':
+      case '[': return TRUE;
+    }
+    return FALSE;
   }
-  return xErrorDescription(code);
-}
+
+  /**
+   * Returns a string description for one of the RM error codes.
+   *
+   * \param code      One of the error codes defined in 'rm.h' or in 'redisrm.h' (e.g. X_NO_PIPELINE)
+   *
+   * \return      A constant string with the error description.
+   *
+   */
+  const char *redisxErrorDescription(int code) {
+    switch(code) {
+      case REDIS_INVALID_CHANNEL: return "invalid Redis channel";
+      case REDIS_NULL: return "Redis returned null";
+      case REDIS_ERROR: return "Redis returned an error";
+      case REDIS_INCOMPLETE_TRANSFER: return "incomplete Redis transfer";
+      case REDIS_UNEXPECTED_RESP: return "unexpected Redis response type";
+      case REDIS_UNEXPECTED_ARRAY_SIZE: return "unexpected Redis array size";
+    }
+    return xErrorDescription(code);
+  }
 

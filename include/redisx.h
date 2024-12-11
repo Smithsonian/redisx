@@ -358,10 +358,12 @@ int redisxSetPassword(Redis *redis, const char *passwd);
 int redisxSelectDB(Redis *redis, int idx);
 int redisxSetProtocol(Redis *redis, enum redisx_protocol protocol);
 enum redisx_protocol redisxGetProtocol(Redis *redis);
+XLookupTable *redisxGetInfo(Redis *redis, const char *parameter);
 RESP *redisxGetHelloData(Redis *redis);
 
 Redis *redisxInit(const char *server);
 Redis *redisxInitSentinel(const char *serviceName, const RedisServer *serverList, int nServers);
+int redisxValidateSentinel(const char *serviceName, const RedisServer *serverList, int nServers);
 int redisxCheckValid(const Redis *redis);
 void redisxDestroy(Redis *redis);
 int redisxConnect(Redis *redis, boolean usePipeline);

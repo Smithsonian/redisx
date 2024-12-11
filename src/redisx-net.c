@@ -286,33 +286,17 @@ static int rConfirmMasterRole(Redis *redis) {
   prop_error(fn, status);
 
   if(redisxCheckDestroyRESP(reply, RESP_ARRAY, 0) != X_SUCCESS) {
-    // Fallback to using INFO replication...
-    char *str;
+    XLookupTable *info = redisxGetInfo(redis, "replication");
+    const XField *role;
 
-    reply = redisxRequest(redis, "INFO", "replication", NULL, NULL, &status);
-    prop_error(fn, status);
-    prop_error(fn, redisxCheckDestroyRESP(reply, RESP_BULK_STRING, 0));
+    if(!info) return x_trace(fn, NULL, X_FAILURE);
 
-    // Go line by line...
-    str = strtok((char *) reply->value, "\n");
+    role = xLookupField(info, "role");
+    if(role) status = strcmp("master", (char *) role->value);
+    else status = x_trace(fn, NULL, X_FAILURE);
 
-    while(str) {
-      const char *tok = strtok(str, ":");
-
-      if(strcmp("role", tok) == 0) {
-        tok = strtok(NULL, "\n");
-
-        status = strcmp("master", tok);
-        redisxDestroyRESP(reply);
-
-        if(status) return x_error(X_FAILURE, EAGAIN, fn, "Replica is not master");
-        return X_SUCCESS;
-      }
-
-      str = strtok(NULL, "\n");
-    }
-
-    return x_error(X_FAILURE, EBADE, fn, "Got empty array response");
+    xDestroyLookup(info);
+    return status;
   }
 
   if(reply->n < 1) {
@@ -860,6 +844,30 @@ Redis *redisxInit(const char *server) {
 }
 
 /**
+ * Validates a Sentinel configuration.
+ *
+ * @param serviceName   The service name as registered in the Sentinel server configuration.
+ * @param serverList    An set of Sentinel servers to use to dynamically find the current master.
+ * @param nServers      The number of servers in the list
+ * @return              X_SUCCESS (0) if successful, or X_NAME_INVALID if the serviceName is
+ *                      NULL or empty, or X_NULL if the serverList is NULL, or X_SIZE_INVALID
+ *                      if nServers is 0 or negative, or else X_GROUP_INVALID if the first server
+ *                      has a NULL or empty host name.
+ */
+int redisxValidateSentinel(const char *serviceName, const RedisServer *serverList, int nServers) {
+  static const char *fn = "redisxValidateSentinel";
+
+  if(!serviceName) return x_error(X_NAME_INVALID, EINVAL, fn, "service name is NULL");
+  if(!serviceName[0]) return x_error(X_NAME_INVALID, EINVAL, fn, "service name is empty");
+  if(!serverList) return x_error(X_NULL, EINVAL, fn, "server list is NULL");
+  if(nServers < 1) return x_error(X_SIZE_INVALID, EINVAL, fn, "invalid number of servers: %d", nServers);
+  if(serverList[0].host == NULL) return x_error(X_GROUP_INVALID, EINVAL, fn, "first server address is NULL");
+  if(!serverList[0].host[0]) return x_error(X_GROUP_INVALID, EINVAL, fn, "first server address is empty");
+
+  return X_SUCCESS;
+}
+
+/**
  * Initializes a Redis client with a Sentinel configuration of alternate servers, and the default
  * sentinel node connection timeout.
  *
@@ -881,33 +889,7 @@ Redis *redisxInitSentinel(const char *serviceName, const RedisServer *serverList
   RedisPrivate *p;
   RedisSentinel *s;
 
-  if(!serviceName) {
-    x_error(0, EINVAL, fn, "input serviceName is NULL");
-    return NULL;
-  }
-
-  if(!serviceName[0]) {
-    x_error(0, EINVAL, fn, "input serviceName is empty");
-    return NULL;
-  }
-
-  if(!serverList) {
-    x_error(0, EINVAL, fn, "input serverList is NULL");
-    return NULL;
-  }
-  if(nServers < 1) {
-    x_error(0, EINVAL, fn, "invalid nServers: %d", nServers);
-    return NULL;
-  }
-
-  if(serverList[0].host == NULL) {
-    x_error(0, EINVAL, fn, "first server address is NULL");
-    return NULL;
-  }
-  if(!serverList[0].host[0]) {
-    x_error(0, EINVAL, fn, "first server address is empty");
-    return NULL;
-  }
+  if(redisxValidateSentinel(serviceName, serverList, nServers) != X_SUCCESS) return x_trace_null(fn, NULL);
 
   redis = redisxInit(serverList[0].host);
   if(!redis) return x_trace_null(fn, NULL);
