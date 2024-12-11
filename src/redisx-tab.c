@@ -938,7 +938,7 @@ int redisxDeleteEntries(Redis *redis, const char *pattern) {
     // If the table itself matches, delete it wholesale...
     if(fnmatch(root, table, 0) == 0) {
       RESP *reply = redisxRequest(redis, "DEL", table, NULL, NULL, &status);
-      if(!status) if(redisxCheckRESP(reply, RESP_INT, 1) == X_SUCCESS) found++;
+      if(status == X_SUCCESS) if(redisxCheckRESP(reply, RESP_INT, 1) == X_SUCCESS) found++;
       redisxDestroyRESP(reply);
       continue;
     }
@@ -954,7 +954,7 @@ int redisxDeleteEntries(Redis *redis, const char *pattern) {
         if(id) {
           if(fnmatch(key, id, 0) == 0) {
             RESP *reply = redisxRequest(redis, "HDEL", table, e->key, NULL, &status);
-            if(!status) if(redisxCheckRESP(reply, RESP_INT, 1) == X_SUCCESS) found++;
+            if(status == X_SUCCESS) if(redisxCheckRESP(reply, RESP_INT, 1) == X_SUCCESS) found++;
             redisxDestroyRESP(reply);
           }
           free(id);

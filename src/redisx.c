@@ -282,7 +282,7 @@ int redisxGetTime(Redis *redis, struct timespec *t) {
   memset(t, 0, sizeof(*t));
 
   reply = redisxRequest(redis, "TIME", NULL, NULL, NULL, &status);
-  if(status) return x_trace(fn, NULL, status);
+  prop_error(fn, status);
 
   status = redisxCheckDestroyRESP(reply, RESP_ARRAY, 2);
   prop_error(fn, status);

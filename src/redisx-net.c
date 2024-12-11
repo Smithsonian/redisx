@@ -293,15 +293,16 @@ static int rConfirmMasterRole(Redis *redis) {
     prop_error(fn, status);
     prop_error(fn, redisxCheckDestroyRESP(reply, RESP_BULK_STRING, 0));
 
+    // Go line by line...
     str = strtok((char *) reply->value, "\n");
 
     while(str) {
       const char *tok = strtok(str, ":");
 
       if(strcmp("role", tok) == 0) {
-        const char *role = strtok(NULL, "\n");
+        tok = strtok(NULL, "\n");
 
-        status = strcmp("master", role)  == 0;
+        status = strcmp("master", tok);
         redisxDestroyRESP(reply);
 
         if(status) return x_error(X_FAILURE, EAGAIN, fn, "Replica is not master");
@@ -314,14 +315,14 @@ static int rConfirmMasterRole(Redis *redis) {
     return x_error(X_FAILURE, EBADE, fn, "Got empty array response");
   }
 
-  component = (RESP **) reply->value;
-
   if(reply->n < 1) {
     redisxDestroyRESP(reply);
     return x_error(X_FAILURE, EBADE, fn, "Got empty array response");
   }
 
-  status = strcmp("master", (char *) component[0]->value)  == 0;
+  component = (RESP **) reply->value;
+  status = strcmp("master", (char *) component[0]->value);
+
   redisxDestroyRESP(reply);
 
   if(status) return x_error(X_FAILURE, EAGAIN, fn, "Replica is not master");
@@ -897,6 +898,16 @@ Redis *redisxInitSentinel(const char *serviceName, const RedisServer *serverList
   RedisPrivate *p;
   RedisSentinel *s;
 
+  if(!serviceName) {
+    x_error(0, EINVAL, fn, "input serviceName is NULL");
+    return NULL;
+  }
+
+  if(!serviceName[0]) {
+    x_error(0, EINVAL, fn, "input serviceName is empty");
+    return NULL;
+  }
+
   if(!serverList) {
     x_error(0, EINVAL, fn, "input serverList is NULL");
     return NULL;
@@ -933,6 +944,7 @@ Redis *redisxInitSentinel(const char *serviceName, const RedisServer *serverList
   s->nServers = nServers;
   s->serviceName = xStringCopyOf(serviceName);
   s->timeoutMillis = REDISX_DEFAULT_SENTINEL_TIMEOUT_MILLIS;
+
   p->sentinel = s;
 
   return redis;
@@ -1042,7 +1054,7 @@ void redisxSetTcpBuf(int size) {
  * @param port    The TCP port number to use.
  *
  * @return                X_SUCCESS (0) if successful, or else X_NULL if the redis instance is NULL,
- *                        or X_N_INIT if the redis instance is not initialized.
+ *                        or X_NO_INIT if the redis instance is not initialized.
  *
  * @sa redisxConnect();
  */
@@ -1073,7 +1085,7 @@ int redisxSetSocketTimeout(Redis *redis, int millis) {
 
   prop_error("redisxSetPort", rConfigLock(redis));
   p = (RedisPrivate *) redis->priv;
-  p->timeoutMillis = millis;
+  p->timeoutMillis = millis > 0 ? millis : REDISX_DEFAULT_TIMEOUT_MILLIS;
   rConfigUnlock(redis);
 
   return X_SUCCESS;
