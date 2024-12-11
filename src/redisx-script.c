@@ -41,12 +41,7 @@ int redisxLoadScript(Redis *redis, const char *script, char **sha1) {
   *sha1 = NULL;
 
   reply = redisxRequest(redis, "SCRIPT", "LOAD", script, NULL, &status);
-
-  if(status) {
-    redisxDestroyRESP(reply);
-    return x_trace(fn, NULL, status);
-  }
-
+  prop_error(fn, status);
   prop_error(fn, redisxCheckDestroyRESP(reply, RESP_BULK_STRING, 0));
 
   *sha1 = (char *) reply->value;

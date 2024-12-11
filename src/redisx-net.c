@@ -241,10 +241,11 @@ static int rTryConnectSentinel(Redis *redis, int serverIndex) {
 static int rDiscoverSentinel(Redis *redis) {
   static const char *fn = "rConnectSentinel";
 
-  const RedisPrivate *p = (RedisPrivate *) redis->priv;
+  RedisPrivate *p = (RedisPrivate *) redis->priv;
   const RedisSentinel *s = p->sentinel;
-  int i;
+  int i, savedTimeout = p->timeoutMillis;
 
+  p->timeoutMillis = s->timeoutMillis > 0 ? s->timeoutMillis : REDISX_DEFAULT_SENTINEL_TIMEOUT_MILLIS;
 
   for(i = 0; i < s->nServers; i++) if(rTryConnectSentinel(redis, i) == X_SUCCESS) {
     RESP *reply;
@@ -261,13 +262,16 @@ static int rDiscoverSentinel(Redis *redis) {
       int port = (int) strtol((char *) component[1]->value, NULL, 10);
 
       status = rSetServerAsync(redis, "sentinel master", (char *) component[0]->value, port);
+
       redisxDestroyRESP(reply);
+      p->timeoutMillis = savedTimeout;
 
       prop_error(fn, status);
       return X_SUCCESS;
     }
   }
 
+  p->timeoutMillis = savedTimeout;
   return x_error(X_NO_SERVICE, ENOTCONN, fn, "no Sentinel server available");
 }
 
@@ -872,15 +876,17 @@ Redis *redisxInit(const char *server) {
 }
 
 /**
- * Initializes a Redis client with a Sentinel configuration of alternate servers
+ * Initializes a Redis client with a Sentinel configuration of alternate servers, and the default
+ * sentinel node connection timeout.
  *
- * @param serviceName   The service name as registered in the Sentinel server configuration.
- * @param serverList    An set of Sentinel servers to use to dynamically find the current master. A
- *                      copy of the supplied name will be used, so the argument passed can be
- *                      freely destroyed after the call.
- * @param nServers      The number of servers in the list
- * @return              X_SUCCESS (0) if successful, or else an error code &lt;0.
+ * @param serviceName     The service name as registered in the Sentinel server configuration.
+ * @param serverList      An set of Sentinel servers to use to dynamically find the current master. A
+ *                        copy of the supplied name will be used, so the argument passed can be
+ *                        freely destroyed after the call.
+ * @param nServers        The number of servers in the list
+ * @return                X_SUCCESS (0) if successful, or else an error code &lt;0.
  *
+ * @sa redisxSetSentinelTimeout()
  * @sa redisxInit()
  * @sa redisxConnect()
  */
@@ -926,10 +932,38 @@ Redis *redisxInitSentinel(const char *serviceName, const RedisServer *serverList
 
   s->nServers = nServers;
   s->serviceName = xStringCopyOf(serviceName);
-
+  s->timeoutMillis = REDISX_DEFAULT_SENTINEL_TIMEOUT_MILLIS;
   p->sentinel = s;
 
   return redis;
+}
+
+/**
+ * Changes the connection timeout for Sentinel server instances in the discovery phase. This is different
+ * from the timeout that is used for the master server, once it is discovered.
+ *
+ * @param redis     The Redis instance, which was initialized for Sentinel via redisxInitSentinel().
+ * @param millis    [ms] The new connection timeout or &lt;=0 to use the default value.
+ * @return          X_SUCCESS (0) if successfully set sentinel connection timeout, or else X_NULL if the
+ *                  redis instance is NULL, or X_NO_INIT if the redis instance is not initialized for
+ *                  Sentinel.
+ *
+ * @sa redisxSetSocketTimeout()
+ * @sa redisxInitSentinel()
+ */
+int redisxSetSentinelTimeout(Redis *redis, int millis) {
+  static const char *fn = "redisxSetSentinelTimeout";
+
+  RedisPrivate *p;
+  int status = X_SUCCESS;
+
+  prop_error(fn, rConfigLock(redis));
+  p = (RedisPrivate *) redis->priv;
+  if(p->sentinel) p->sentinel->timeoutMillis = millis > 0 ? millis : REDISX_DEFAULT_SENTINEL_TIMEOUT_MILLIS;
+  else status = x_error(X_NO_INIT, EAGAIN, fn, "Redis was not initialized for Sentinel");
+  rConfigUnlock(redis);
+
+  return status;
 }
 
 static void rDestroySentinel(RedisSentinel *sentinel) {
@@ -1029,17 +1063,17 @@ int redisxSetPort(Redis *redis, int port) {
  * or a negative value), then the timeout will not be configured for sockets, and the system default
  * timeout values will apply.
  *
- * @param redis           The Redis instance
- * @param timeoutMillis   [ms] The desired socket read/write timeout, or &lt;0 for socket default.
- * @return                X_SUCCESS (0) if successful, or else X_NULL if the redis instance is NULL,
- *                        or X_N_INIT if the redis instance is not initialized.
+ * @param redis      The Redis instance
+ * @param millis     [ms] The desired socket read/write timeout, or &lt;0 for socket default.
+ * @return           X_SUCCESS (0) if successful, or else X_NULL if the redis instance is NULL,
+ *                   or X_NO_INIT if the redis instance is not initialized.
  */
-int redisxSetSocketTimeout(Redis *redis, int timeoutMillis) {
+int redisxSetSocketTimeout(Redis *redis, int millis) {
   RedisPrivate *p;
 
   prop_error("redisxSetPort", rConfigLock(redis));
   p = (RedisPrivate *) redis->priv;
-  p->timeoutMillis = timeoutMillis;
+  p->timeoutMillis = millis;
   rConfigUnlock(redis);
 
   return X_SUCCESS;

@@ -51,6 +51,11 @@
 #  define REDISX_DEFAULT_TIMEOUT_MILLIS           3000
 #endif
 
+#ifndef REDISX_DEFAULT_SENTINEL_TIMEOUT_MILLIS
+/// [ms] Default socket read/write timeout for Redis clients
+#  define REDISX_DEFAULT_SENTINEL_TIMEOUT_MILLIS   100
+#endif
+
 // Various exposed constants ----------------------------------------------------->
 
 /// API major version
@@ -343,6 +348,8 @@ boolean redisxIsVerbose();
 void redisxDebugTraffic(boolean value);
 
 void redisxSetTcpBuf(int size);
+int redisxSetSocketTimeout(Redis *redis, int millis);
+int redisxSetSentinelTimeout(Redis *redis, int millis);
 int redisxSetTransmitErrorHandler(Redis *redis, RedisErrorHandler f);
 
 int redisxSetPort(Redis *redis, int port);

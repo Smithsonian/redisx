@@ -282,10 +282,7 @@ int redisxGetTime(Redis *redis, struct timespec *t) {
   memset(t, 0, sizeof(*t));
 
   reply = redisxRequest(redis, "TIME", NULL, NULL, NULL, &status);
-  if(status) {
-    redisxDestroyRESP(reply);
-    return x_trace(fn, NULL, status);
-  }
+  if(status) return x_trace(fn, NULL, status);
 
   status = redisxCheckDestroyRESP(reply, RESP_ARRAY, 2);
   prop_error(fn, status);
@@ -334,24 +331,19 @@ int redisxGetTime(Redis *redis, struct timespec *t) {
  */
 int redisxPing(Redis *redis, const char *message) {
   static const char *fn = "redisxPing";
+
   int status = X_SUCCESS;
-  RESP *reply;
 
-  reply = redisxRequest(redis, "PING", message, NULL, NULL, &status);
+  RESP *reply = redisxRequest(redis, "PING", message, NULL, NULL, &status);
+  prop_error(fn, status);
+  prop_error(fn, redisxCheckDestroyRESP(reply, message ? RESP_BULK_STRING : RESP_SIMPLE_STRING, 0));
 
-  if(!status) {
-    if(!reply) status = x_error(X_NULL, errno, fn, "reply was NULL");
-    else {
-      status = redisxCheckRESP(reply, message ? RESP_BULK_STRING : RESP_SIMPLE_STRING, 0);
-      if(!status) if(strcmp(message ? message : "PONG", (char *)reply->value) != 0)
-        status = x_error(REDIS_UNEXPECTED_RESP, ENOMSG, fn, "expected 'PONG', got '%s'", (char *)reply->value);
-    }
-  }
+  if(strcmp(message ? message : "PONG", (char *) reply->value) != 0)
+    status = x_error(REDIS_UNEXPECTED_RESP, ENOMSG, fn, "expected 'PONG', got '%s'", (char *) reply->value);
 
   redisxDestroyRESP(reply);
-  prop_error(fn, status);
 
-  return X_SUCCESS;
+  return status;
 }
 
 /**
@@ -554,7 +546,7 @@ int redisxSetPipelineConsumer(Redis *redis, RedisPipelineProcessor f) {
  *                  the error code set by redisxArrayRequest().
  *
  * \return          A freshly allocated RESP array containing the Redis response, or NULL if no valid
- *                  response could be obtained.
+ *                  response could be obtained or status is not X_SUCCESS.
  *
  * @sa redisxArrayRequest()
  * @sa redisxSendRequestAsync()
@@ -572,7 +564,6 @@ RESP *redisxRequest(Redis *redis, const char *command, const char *arg1, const c
   else n = 4;
 
   reply = redisxArrayRequest(redis, (char **) args, NULL, n, &s);
-
   if(status) *status = s;
 
   if(s) {

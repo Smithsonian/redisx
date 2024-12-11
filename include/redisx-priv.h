@@ -57,6 +57,7 @@ typedef struct {
   RedisServer *servers;         ///< List of sentinel servers.
   int nServers;                 ///< number of servers in list
   char *serviceName;            ///< Name of service (for Sentinel).
+  int timeoutMillis;            ///< [ms] Connection timeout for sentinel nodes.
 } RedisSentinel;
 
 
