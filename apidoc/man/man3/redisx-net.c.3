@@ -25,6 +25,9 @@ src/redisx-net.c
 .RI "\fBRedis\fP * \fBredisxInit\fP (const char *server)"
 .br
 .ti -1c
+.RI "\fBRedis\fP * \fBredisxInitSentinel\fP (const char *serviceName, const \fBRedisServer\fP *serverList, int nServers)"
+.br
+.ti -1c
 .RI "\fBboolean\fP \fBredisxIsConnected\fP (\fBRedis\fP *redis)"
 .br
 .ti -1c
@@ -34,7 +37,10 @@ src/redisx-net.c
 .RI "int \fBredisxSetPort\fP (\fBRedis\fP *redis, int port)"
 .br
 .ti -1c
-.RI "int \fBredisxSetSocketTimeout\fP (\fBRedis\fP *redis, int timeoutMillis)"
+.RI "int \fBredisxSetSentinelTimeout\fP (\fBRedis\fP *redis, int millis)"
+.br
+.ti -1c
+.RI "int \fBredisxSetSocketTimeout\fP (\fBRedis\fP *redis, int millis)"
 .br
 .ti -1c
 .RI "void \fBredisxSetTcpBuf\fP (int size)"
@@ -118,7 +124,7 @@ Destroys a \fBRedis\fP intance, disconnecting any clients that may be connected,
 .PP
 
 .PP
-References \fBREDISX_CHANNELS\fP, \fBredisxDisconnect()\fP, and \fBredisxIsConnected()\fP\&.
+References \fBRedis::id\fP, \fBREDISX_CHANNELS\fP, \fBredisxClearConnectHooks()\fP, \fBredisxClearSubscribers()\fP, \fBredisxDestroyRESP()\fP, \fBredisxDisconnect()\fP, and \fBredisxIsConnected()\fP\&.
 .SS "void redisxDisconnect (\fBRedis\fP * redis)"
 Disconnect all clients from the \fBRedis\fP server\&.
 .PP
@@ -140,12 +146,46 @@ Initializes the \fBRedis\fP client library, and sets the hostname or IP address 
 .PP
 \fBReturns\fP
 .RS 4
-X_SUCCESS or X_FAILURE if the IP address is invalid\&. X_NULL if the IP address is NULL\&. 
+X_SUCCESS or X_FAILURE if the IP address is invalid\&. X_NULL if the IP address is NULL\&.
+.RE
+.PP
+\fBSee also\fP
+.RS 4
+\fBredisxInitSentinel()\fP 
 .RE
 .PP
 
 .PP
-References \fBFALSE\fP, \fBRedis::id\fP, \fBRedis::interactive\fP, \fBRedis::pipeline\fP, \fBREDISX_CHANNELS\fP, \fBREDISX_DEFAULT_TIMEOUT_MILLIS\fP, \fBREDISX_INTERACTIVE_CHANNEL\fP, \fBREDISX_PIPELINE_CHANNEL\fP, \fBREDISX_RESP2\fP, \fBREDISX_SUBSCRIPTION_CHANNEL\fP, \fBREDISX_TCP_PORT\fP, \fBRedis::subscription\fP, \fBTRUE\fP, \fBx_error()\fP, \fBx_trace_null()\fP, and \fBxStringCopyOf()\fP\&.
+References \fBFALSE\fP, \fBRedis::interactive\fP, \fBRedis::pipeline\fP, \fBREDISX_CHANNELS\fP, \fBREDISX_DEFAULT_TIMEOUT_MILLIS\fP, \fBREDISX_INTERACTIVE_CHANNEL\fP, \fBREDISX_PIPELINE_CHANNEL\fP, \fBREDISX_RESP2\fP, \fBREDISX_SUBSCRIPTION_CHANNEL\fP, \fBRedis::subscription\fP, \fBTRUE\fP, \fBx_error()\fP, and \fBx_trace_null()\fP\&.
+.SS "\fBRedis\fP * redisxInitSentinel (const char * serviceName, const \fBRedisServer\fP * serverList, int nServers)"
+Initializes a \fBRedis\fP client with a Sentinel configuration of alternate servers, and the default sentinel node connection timeout\&.
+.PP
+\fBParameters\fP
+.RS 4
+\fIserviceName\fP The service name as registered in the Sentinel server configuration\&. 
+.br
+\fIserverList\fP An set of Sentinel servers to use to dynamically find the current master\&. A copy of the supplied name will be used, so the argument passed can be freely destroyed after the call\&. 
+.br
+\fInServers\fP The number of servers in the list 
+.RE
+.PP
+\fBReturns\fP
+.RS 4
+X_SUCCESS (0) if successful, or else an error code <0\&.
+.RE
+.PP
+\fBSee also\fP
+.RS 4
+\fBredisxSetSentinelTimeout()\fP 
+.PP
+\fBredisxInit()\fP 
+.PP
+\fBredisxConnect()\fP 
+.RE
+.PP
+
+.PP
+References \fBREDISX_DEFAULT_SENTINEL_TIMEOUT_MILLIS\fP, \fBredisxInit()\fP, \fBx_error()\fP, \fBx_trace_null()\fP, and \fBxStringCopyOf()\fP\&.
 .SS "\fBboolean\fP redisxIsConnected (\fBRedis\fP * redis)"
 Checks if a \fBRedis\fP instance is connected\&.
 .PP
@@ -192,7 +232,7 @@ Sets a non-standard TCP port number to use for the \fBRedis\fP server, prior to 
 .PP
 \fBReturns\fP
 .RS 4
-X_SUCCESS (0) if successful, or else X_NULL if the redis instance is NULL, or X_N_INIT if the redis instance is not initialized\&.
+X_SUCCESS (0) if successful, or else X_NULL if the redis instance is NULL, or X_NO_INIT if the redis instance is not initialized, or X_FAILURE if \fBRedis\fP was initialized in Sentinel configuration\&.
 .RE
 .PP
 \fBSee also\fP
@@ -202,25 +242,50 @@ X_SUCCESS (0) if successful, or else X_NULL if the redis instance is NULL, or X_
 .PP
 
 .PP
-References \fBX_SUCCESS\fP\&.
-.SS "int redisxSetSocketTimeout (\fBRedis\fP * redis, int timeoutMillis)"
+References \fBx_error()\fP, \fBX_FAILURE\fP, and \fBX_SUCCESS\fP\&.
+.SS "int redisxSetSentinelTimeout (\fBRedis\fP * redis, int millis)"
+Changes the connection timeout for Sentinel server instances in the discovery phase\&. This is different from the timeout that is used for the master server, once it is discovered\&.
+.PP
+\fBParameters\fP
+.RS 4
+\fIredis\fP The \fBRedis\fP instance, which was initialized for Sentinel via \fBredisxInitSentinel()\fP\&. 
+.br
+\fImillis\fP [ms] The new connection timeout or <=0 to use the default value\&. 
+.RE
+.PP
+\fBReturns\fP
+.RS 4
+X_SUCCESS (0) if successfully set sentinel connection timeout, or else X_NULL if the redis instance is NULL, or X_NO_INIT if the redis instance is not initialized for Sentinel\&.
+.RE
+.PP
+\fBSee also\fP
+.RS 4
+\fBredisxSetSocketTimeout()\fP 
+.PP
+\fBredisxInitSentinel()\fP 
+.RE
+.PP
+
+.PP
+References \fBREDISX_DEFAULT_SENTINEL_TIMEOUT_MILLIS\fP, \fBx_error()\fP, \fBX_NO_INIT\fP, and \fBX_SUCCESS\fP\&.
+.SS "int redisxSetSocketTimeout (\fBRedis\fP * redis, int millis)"
 Sets a socket timeout for future client connections on a \fBRedis\fP instance\&. If not set (or set to zero or a negative value), then the timeout will not be configured for sockets, and the system default timeout values will apply\&.
 .PP
 \fBParameters\fP
 .RS 4
 \fIredis\fP The \fBRedis\fP instance 
 .br
-\fItimeoutMillis\fP [ms] The desired socket read/write timeout, or <0 for socket default\&. 
+\fImillis\fP [ms] The desired socket read/write timeout, or <0 for socket default\&. 
 .RE
 .PP
 \fBReturns\fP
 .RS 4
-X_SUCCESS (0) if successful, or else X_NULL if the redis instance is NULL, or X_N_INIT if the redis instance is not initialized\&. 
+X_SUCCESS (0) if successful, or else X_NULL if the redis instance is NULL, or X_NO_INIT if the redis instance is not initialized\&. 
 .RE
 .PP
 
 .PP
-References \fBX_SUCCESS\fP\&.
+References \fBREDISX_DEFAULT_TIMEOUT_MILLIS\fP, and \fBX_SUCCESS\fP\&.
 .SS "void redisxSetTcpBuf (int size)"
 Set the size of the TCP/IP buffers (send and receive) for future client connections\&.
 .PP

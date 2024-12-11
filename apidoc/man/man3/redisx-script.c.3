@@ -55,7 +55,7 @@ X_SUCCESS (0) if the script has been successfully loaded into \fBRedis\fP, or X_
 .PP
 
 .PP
-References \fBredisxCheckDestroyRESP()\fP, \fBredisxDestroyRESP()\fP, \fBredisxRequest()\fP, \fBRESP_BULK_STRING\fP, \fBRESP::value\fP, \fBx_error()\fP, \fBX_NULL\fP, \fBX_SUCCESS\fP, and \fBx_trace()\fP\&.
+References \fBredisxCheckDestroyRESP()\fP, \fBredisxDestroyRESP()\fP, \fBredisxRequest()\fP, \fBRESP_BULK_STRING\fP, \fBRESP::value\fP, \fBx_error()\fP, \fBX_NULL\fP, and \fBX_SUCCESS\fP\&.
 .SS "\fBRESP\fP * redisxRunScript (\fBRedis\fP * redis, const char * sha1, const char ** keys, const char ** params)"
 Runs a LUA script that has been loaded into the \fBRedis\fP database, returning the response received, or NULL if there was an error\&.
 .PP

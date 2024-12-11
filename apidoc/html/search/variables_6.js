@@ -1,6 +1,7 @@
 var searchData=
 [
-  ['sizes_0',['sizes',['../../../xchange/apidoc/html/structXField.html#af743830ee6c7d5e81a0206b07238ca5d',1,'XField']]],
-  ['subscription_1',['subscription',['../structRedis.html#aa4878fb8cef61468ee8e7426a973a75c',1,'Redis']]],
-  ['subtype_2',['subtype',['../../../xchange/apidoc/html/structXField.html#a2f076846fbd6b30183ba3ab61e3334e5',1,'XField']]]
+  ['parent_0',['parent',['../../../xchange/apidoc/html/structXStructure.html#a82ba053944ce97d83d41c05f68ec4f3d',1,'XStructure']]],
+  ['pipeline_1',['pipeline',['../structRedis.html#a59d367a240bf9c00366465d842402de8',1,'Redis']]],
+  ['port_2',['port',['../structRedisServer.html#a63c89c04d1feae07ca35558055155ffb',1,'RedisServer']]],
+  ['priv_3',['priv',['../../../xchange/apidoc/html/structXLookupTable.html#a8b6505c37d4ff95854b8b00527e4d9fa',1,'XLookupTable']]]
 ];

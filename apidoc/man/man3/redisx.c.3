@@ -350,7 +350,7 @@ X_SUCCESS (0) if successful, or else an error code (<0) from \fBredisx\&.h\fP / 
 .PP
 
 .PP
-References \fBREDIS_UNEXPECTED_RESP\fP, \fBredisxCheckRESP()\fP, \fBredisxDestroyRESP()\fP, \fBredisxRequest()\fP, \fBRESP_BULK_STRING\fP, \fBRESP_SIMPLE_STRING\fP, \fBRESP::value\fP, \fBx_error()\fP, \fBX_NULL\fP, and \fBX_SUCCESS\fP\&.
+References \fBREDIS_UNEXPECTED_RESP\fP, \fBredisxCheckDestroyRESP()\fP, \fBredisxDestroyRESP()\fP, \fBredisxRequest()\fP, \fBRESP_BULK_STRING\fP, \fBRESP_SIMPLE_STRING\fP, \fBRESP::value\fP, \fBx_error()\fP, and \fBX_SUCCESS\fP\&.
 .SS "\fBRESP\fP * redisxRequest (\fBRedis\fP * redis, const char * command, const char * arg1, const char * arg2, const char * arg3, int * status)"
 Returns the result of a \fBRedis\fP command with up to 3 regularly terminated string arguments\&. This is not the highest throughput mode (that would be sending asynchronous pipeline request, and then asynchronously collecting the results such as with \fBredisxSendRequestAsync()\fP / \fBredisxReadReplyAsync()\fP, because it requires separate network roundtrips for each and every request\&. But, it is simple and perfectly good method when one needs to retrieve only a few (<1000) variables per second\&.\&.\&.
 .PP
@@ -373,7 +373,7 @@ To make \fBRedis\fP calls with binary (non-string) data, you can use \fBredisxAr
 .PP
 \fBReturns\fP
 .RS 4
-A freshly allocated \fBRESP\fP array containing the \fBRedis\fP response, or NULL if no valid response could be obtained\&.
+A freshly allocated \fBRESP\fP array containing the \fBRedis\fP response, or NULL if no valid response could be obtained or status is not X_SUCCESS\&.
 .RE
 .PP
 \fBSee also\fP
@@ -387,7 +387,7 @@ A freshly allocated \fBRESP\fP array containing the \fBRedis\fP response, or NUL
 .PP
 
 .PP
-References \fBredisxArrayRequest()\fP, \fBX_SUCCESS\fP, and \fBx_trace_null()\fP\&.
+References \fBredisxArrayRequest()\fP, \fBredisxDestroyRESP()\fP, \fBX_SUCCESS\fP, and \fBx_trace_null()\fP\&.
 .SS "int redisxSelectDB (\fBRedis\fP * redis, int idx)"
 Switches to another database index on the \fBRedis\fP server\&. Note that you cannot change the database on an active PUB/SUB channel, hence the call will return X_INCOMPLETE if attempted\&. You should instead switch DB when there are no active subscriptions\&.
 .PP

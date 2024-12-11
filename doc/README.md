@@ -172,16 +172,35 @@ The first step is to create a `Redis` object, with the server name or IP address
     // Abort: something did not got to plan...
     return;
   }
+  
+  // (optional) configure a non-standard port number to use
+  redisxSetPort(redis, 7089);
 ```
 
-Before connecting to the Redis server, you may configure optional settings, such as the TCP port number to use (if not
-the default 6379), and the database authentication (if any):
+Alternatively, you may initialize the client for a high-availability configuration using with a set of 
+[Redis Sentinel](https://redis.io/docs/latest/develop/reference/sentinel-clients/) servers, using 
+`redisxInitSentinel()`, e.g.:
+
+```c
+  // An array defining N sentinel servers and ports to use.
+  // A port number 0 or negative will use the default Redis port of 6379.
+  RedisServer sentinels[N] = { { "server1", 0 }, { "server2", 7024 } ... };
+  
+  // Configure a Redis client instance for the Sentinel servers and "my-service" service name
+  Redis *redis = redisxInitSentinel(sentinels, N, "my-service");
+  if (redis == NULL) {
+    // Abort: something did not got to plan...
+    return;
+  }
+
+  // Optionally set a sentinel discovery timeout in ms...
+  redisxSetSentinelTimeout(redis, 30);
+```
+
+Before connecting to the Redis server, you may configure the database authentication (if any):
 
 ```c
   Redis *redis = ...
-  
-  // (optional) configure a non-standard port number
-  redisxSetPort(redis, 7089);
   
   // (optional) Configure the database user (since Redis 6.0, using ACL)
   redisxSetUser(redis, "johndoe"); 
@@ -248,7 +267,10 @@ Once configured, you can connect to the server as:
 ```
 
 The above will establish both an interactive connection and a pipelined connection client, for processing both 
-synchronous and asynchronous requests (and responses).
+synchronous and asynchronous requests (and responses). For 
+[Sentinel](https://redis.io/docs/latest/develop/reference/sentinel-clients/) configurations, it will return with 
+`X_SUCCESS` only after having located and connected to the master server, and confirmed that it is indeed the master.
+
 
 <a name="disconnecting"></a>
 ### Disconnecting
@@ -1190,8 +1212,6 @@ settings.
 Some obvious ways the library could evolve and grow in the not too distant future:
 
  - Automated regression testing and coverage tracking.
- - Support for [Redis Sentinel](https://redis.io/docs/latest/develop/reference/sentinel-clients/) clients, for 
-   high-availability server configurations.
  - Keep track of subscription patterns, and automatically resubscribe to them on reconnecting.
  - TLS support (perhaps...)
  - Add high-level support for managing and calling custom Redis functions.

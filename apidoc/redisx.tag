@@ -8,6 +8,7 @@
     <class kind="struct">RedisClient</class>
     <class kind="struct">RedisEntry</class>
     <class kind="struct">RedisMapEntry</class>
+    <class kind="struct">RedisServer</class>
     <class kind="struct">RESP</class>
     <member kind="define">
       <type>#define</type>
@@ -63,6 +64,13 @@
       <name>REDISX_CMDBUF_SIZE</name>
       <anchorfile>redisx_8h.html</anchorfile>
       <anchor>a7e2b05b584b2b1b7af9430657679fe65</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="define">
+      <type>#define</type>
+      <name>REDISX_DEFAULT_SENTINEL_TIMEOUT_MILLIS</name>
+      <anchorfile>redisx_8h.html</anchorfile>
+      <anchor>a48e370d18ae57f463116e2cfe52570ce</anchor>
       <arglist></arglist>
     </member>
     <member kind="define">
@@ -613,6 +621,13 @@
       <arglist>(const char *server)</arglist>
     </member>
     <member kind="function">
+      <type>Redis *</type>
+      <name>redisxInitSentinel</name>
+      <anchorfile>redisx_8h.html</anchorfile>
+      <anchor>a993ae780daeae021fba1866d752ba9c5</anchor>
+      <arglist>(const char *serviceName, const RedisServer *serverList, int nServers)</arglist>
+    </member>
+    <member kind="function">
       <type>boolean</type>
       <name>redisxIsArrayType</name>
       <anchorfile>redisx_8h.html</anchorfile>
@@ -870,6 +885,20 @@
       <anchorfile>redisx_8h.html</anchorfile>
       <anchor>a3bd0d2964966ed6655358ff2fe0802c0</anchor>
       <arglist>(Redis *redis, int count)</arglist>
+    </member>
+    <member kind="function">
+      <type>int</type>
+      <name>redisxSetSentinelTimeout</name>
+      <anchorfile>redisx_8h.html</anchorfile>
+      <anchor>a192ba03de94c1e8a1876d7c533b4df9a</anchor>
+      <arglist>(Redis *redis, int millis)</arglist>
+    </member>
+    <member kind="function">
+      <type>int</type>
+      <name>redisxSetSocketTimeout</name>
+      <anchorfile>redisx_8h.html</anchorfile>
+      <anchor>aaa87635d37e5d348b7dbb12952b39183</anchor>
+      <arglist>(Redis *redis, int millis)</arglist>
     </member>
     <member kind="function">
       <type>void</type>
@@ -1167,6 +1196,13 @@
       <arglist>(const char *server)</arglist>
     </member>
     <member kind="function">
+      <type>Redis *</type>
+      <name>redisxInitSentinel</name>
+      <anchorfile>redisx-net_8c.html</anchorfile>
+      <anchor>a993ae780daeae021fba1866d752ba9c5</anchor>
+      <arglist>(const char *serviceName, const RedisServer *serverList, int nServers)</arglist>
+    </member>
+    <member kind="function">
       <type>boolean</type>
       <name>redisxIsConnected</name>
       <anchorfile>redisx-net_8c.html</anchorfile>
@@ -1189,10 +1225,17 @@
     </member>
     <member kind="function">
       <type>int</type>
+      <name>redisxSetSentinelTimeout</name>
+      <anchorfile>redisx-net_8c.html</anchorfile>
+      <anchor>a192ba03de94c1e8a1876d7c533b4df9a</anchor>
+      <arglist>(Redis *redis, int millis)</arglist>
+    </member>
+    <member kind="function">
+      <type>int</type>
       <name>redisxSetSocketTimeout</name>
       <anchorfile>redisx-net_8c.html</anchorfile>
-      <anchor>aff6b1f622037a4331c1dab1219b79012</anchor>
-      <arglist>(Redis *redis, int timeoutMillis)</arglist>
+      <anchor>aaa87635d37e5d348b7dbb12952b39183</anchor>
+      <arglist>(Redis *redis, int millis)</arglist>
     </member>
     <member kind="function">
       <type>void</type>
@@ -1772,6 +1815,24 @@
       <name>value</name>
       <anchorfile>structRedisMapEntry.html</anchorfile>
       <anchor>a449b0c7dacd31c5e7edf071da3bda96a</anchor>
+      <arglist></arglist>
+    </member>
+  </compound>
+  <compound kind="struct">
+    <name>RedisServer</name>
+    <filename>structRedisServer.html</filename>
+    <member kind="variable">
+      <type>char *</type>
+      <name>host</name>
+      <anchorfile>structRedisServer.html</anchorfile>
+      <anchor>a1c2046dcb30a629d6d9f45ff8f403f12</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="variable">
+      <type>int</type>
+      <name>port</name>
+      <anchorfile>structRedisServer.html</anchorfile>
+      <anchor>a63c89c04d1feae07ca35558055155ffb</anchor>
       <arglist></arglist>
     </member>
   </compound>

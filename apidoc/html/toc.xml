@@ -61,6 +61,10 @@
         <topic label="key" href="structRedisMapEntry.html#ab48749655da556e91b5286bb4d196eb1"/>
         <topic label="value" href="structRedisMapEntry.html#a449b0c7dacd31c5e7edf071da3bda96a"/>
       </topic>
+      <topic label="RedisServer" href="structRedisServer.html">
+        <topic label="host" href="structRedisServer.html#a1c2046dcb30a629d6d9f45ff8f403f12"/>
+        <topic label="port" href="structRedisServer.html#a63c89c04d1feae07ca35558055155ffb"/>
+      </topic>
       <topic label="RESP" href="structRESP.html">
         <topic label="n" href="structRESP.html#a76f11d9a0a47b94f72c2d0e77fb32240"/>
         <topic label="type" href="structRESP.html#a93869a69154ac2297800b0afff64d600"/>
@@ -93,6 +97,10 @@
             <topic label="key" href="structRedisMapEntry.html#ab48749655da556e91b5286bb4d196eb1"/>
             <topic label="value" href="structRedisMapEntry.html#a449b0c7dacd31c5e7edf071da3bda96a"/>
           </topic>
+          <topic label="RedisServer" href="structRedisServer.html">
+            <topic label="host" href="structRedisServer.html#a1c2046dcb30a629d6d9f45ff8f403f12"/>
+            <topic label="port" href="structRedisServer.html#a63c89c04d1feae07ca35558055155ffb"/>
+          </topic>
           <topic label="RESP" href="structRESP.html">
             <topic label="n" href="structRESP.html#a76f11d9a0a47b94f72c2d0e77fb32240"/>
             <topic label="type" href="structRESP.html#a93869a69154ac2297800b0afff64d600"/>
@@ -106,6 +114,7 @@
           <topic label="REDIS_UNEXPECTED_RESP" href="redisx_8h.html#a9d530bcfae7689b4275749b47a6d9b51"/>
           <topic label="REDISX_CHANNELS" href="redisx_8h.html#aa748f96c61478c3fbef8074021dee901"/>
           <topic label="REDISX_CMDBUF_SIZE" href="redisx_8h.html#a7e2b05b584b2b1b7af9430657679fe65"/>
+          <topic label="REDISX_DEFAULT_SENTINEL_TIMEOUT_MILLIS" href="redisx_8h.html#a48e370d18ae57f463116e2cfe52570ce"/>
           <topic label="REDISX_DEFAULT_TIMEOUT_MILLIS" href="redisx_8h.html#aff9bac60d5293a00d481b5a6701b3882"/>
           <topic label="REDISX_LISTENER_REL_PRIORITY" href="redisx_8h.html#a43ec81454d96c773c6e6dd80dfbb180a"/>
           <topic label="REDISX_MAJOR_VERSION" href="redisx_8h.html#a05046fd4ff3dc951f29e2f62f2e2c816"/>
@@ -190,6 +199,7 @@
           <topic label="redisxHasPipeline" href="redisx_8h.html#a481678923a653e5227f7dab5a1fd272d"/>
           <topic label="redisxIgnoreReplyAsync" href="redisx_8h.html#ac0f30d62044638a2ead07583ad723fdf"/>
           <topic label="redisxInit" href="redisx_8h.html#a5c78c2189a76a077231016564a0cecd5"/>
+          <topic label="redisxInitSentinel" href="redisx_8h.html#a993ae780daeae021fba1866d752ba9c5"/>
           <topic label="redisxIsArrayType" href="redisx_8h.html#af7d1a91b1d89fb11e6b16db04653a871"/>
           <topic label="redisxIsConnected" href="redisx_8h.html#a94326ebfa5868579c8448cdbb941b3da"/>
           <topic label="redisxIsEqualRESP" href="redisx_8h.html#ac84b780fd0c2ed709d4edd5789e522aa"/>
@@ -227,6 +237,8 @@
           <topic label="redisxSetProtocol" href="redisx_8h.html#a842cfeb16ae3cb690cb40c5b006dd918"/>
           <topic label="redisxSetPushProcessor" href="redisx_8h.html#a2caca9bc8a09225edb88699fdda10602"/>
           <topic label="redisxSetScanCount" href="redisx_8h.html#a3bd0d2964966ed6655358ff2fe0802c0"/>
+          <topic label="redisxSetSentinelTimeout" href="redisx_8h.html#a192ba03de94c1e8a1876d7c533b4df9a"/>
+          <topic label="redisxSetSocketTimeout" href="redisx_8h.html#aaa87635d37e5d348b7dbb12952b39183"/>
           <topic label="redisxSetTcpBuf" href="redisx_8h.html#a83fce113d042490e77efdc574e64d76f"/>
           <topic label="redisxSetTransmitErrorHandler" href="redisx_8h.html#ae060c9e745fe25f8cb742d7e82cf586e"/>
           <topic label="redisxSetUser" href="redisx_8h.html#a3beff3a9e373a0f1de626a8e64da98cf"/>
@@ -275,10 +287,12 @@
           <topic label="redisxDestroy" href="redisx-net_8c.html#ac54dd4c46d8615db4da02702c18f062b"/>
           <topic label="redisxDisconnect" href="redisx-net_8c.html#acae5ab8af4db1c4ab13c4069aa744a44"/>
           <topic label="redisxInit" href="redisx-net_8c.html#a5c78c2189a76a077231016564a0cecd5"/>
+          <topic label="redisxInitSentinel" href="redisx-net_8c.html#a993ae780daeae021fba1866d752ba9c5"/>
           <topic label="redisxIsConnected" href="redisx-net_8c.html#a94326ebfa5868579c8448cdbb941b3da"/>
           <topic label="redisxReconnect" href="redisx-net_8c.html#a55a2efad7c8d8f840f4144a217f58965"/>
           <topic label="redisxSetPort" href="redisx-net_8c.html#a37f39ede48014a2463e4c72bf6eb5a3e"/>
-          <topic label="redisxSetSocketTimeout" href="redisx-net_8c.html#aff6b1f622037a4331c1dab1219b79012"/>
+          <topic label="redisxSetSentinelTimeout" href="redisx-net_8c.html#a192ba03de94c1e8a1876d7c533b4df9a"/>
+          <topic label="redisxSetSocketTimeout" href="redisx-net_8c.html#aaa87635d37e5d348b7dbb12952b39183"/>
           <topic label="redisxSetTcpBuf" href="redisx-net_8c.html#a83fce113d042490e77efdc574e64d76f"/>
         </topic>
         <topic label="redisx-script.c" href="redisx-script_8c.html">
