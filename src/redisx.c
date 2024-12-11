@@ -731,6 +731,7 @@ RESP *redisxGetHelloData(Redis *redis) {
  * @param parameter   Optional parameter to pass with INFO, or NULL.
  * @return            a newly created lookup table with the string key/value pairs of the
  *                    response from the Redis server, or NULL if there was an error.
+ *                    The caller should destroy the lookup table after using it.
  *
  * @sa redisxGetHelloData()
  */
@@ -741,7 +742,7 @@ XLookupTable *redisxGetInfo(Redis *redis, const char *parameter) {
   XStructure *s;
   XLookupTable *lookup;
   RESP *reply;
-  char *str;
+  const char *line;
   int status;
 
   reply = redisxRequest(redis, "INFO", parameter, NULL, NULL, &status);
@@ -752,13 +753,16 @@ XLookupTable *redisxGetInfo(Redis *redis, const char *parameter) {
   s = xCreateStruct();
 
   // Go line by line...
-  str = strtok((char *) reply->value, "\n");
+  line = strtok((char *) reply->value, "\n");
 
   // Parse key:value lines into a structure.
-  while(str) {
-    const char *tok = strtok(str, ":");
-    if(tok) xSetField(s, xCreateStringField(tok, xStringCopyOf(strtok(NULL, "\n"))));
-    str = strtok(NULL, "\n");
+  while(line) {
+    char *sep = strchr(line, ':');
+    if(sep) {
+      *sep = '\0';
+      xSetField(s, xCreateStringField(line, xStringCopyOf(sep + 1)));
+    }
+    line = strtok(NULL, "\n");
   }
 
   lookup = xCreateLookup(s, FALSE);

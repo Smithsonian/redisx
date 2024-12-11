@@ -14,10 +14,11 @@ include ../config.mk
 all: tests run
 
 .PHONY: tests
-tests: $(BIN)/test-ping $(BIN)/test-hello $(BIN)/test-tab
+tests: $(BIN)/test-ping $(BIN)/test-info $(BIN)/test-hello $(BIN)/test-tab
 
 .PHONY: run
 run: tests
+	$(BIN)/test-info
 	$(BIN)/test-ping
 	$(BIN)/test-hello
 	$(BIN)/test-tab

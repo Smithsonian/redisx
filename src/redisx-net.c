@@ -775,7 +775,9 @@ int rConnectClient(Redis *redis, enum redisx_channel channel) {
 /**
  *  Initializes the Redis client library, and sets the hostname or IP address for the Redis server.
  *
- *  \param server       Server host name or numeric IP address, e.g. "127.0.0.1"
+ *  \param server       Server host name or numeric IP address, e.g. "127.0.0.1". The string will
+ *                      be copied, not referenced, for the internal configuration, such that the
+ *                      string passed may be destroyed freely after the call.
  *
  *  \return             X_SUCCESS or
  *                      X_FAILURE       if the IP address is invalid.
@@ -872,9 +874,12 @@ int redisxValidateSentinel(const char *serviceName, const RedisServer *serverLis
  * sentinel node connection timeout.
  *
  * @param serviceName     The service name as registered in the Sentinel server configuration.
- * @param serverList      An set of Sentinel servers to use to dynamically find the current master. A
- *                        copy of the supplied name will be used, so the argument passed can be
- *                        freely destroyed after the call.
+ *                        The supplied name will be copied, not referenced, so that the value
+ *                        passed may be freely destroyed after the call.
+ * @param serverList      An set of Sentinel servers to use to dynamically find the current master.
+ *                        The list itself and its contents are not referenced. Instead a deep copy
+ *                        will be made of it, so the list that was pased can be freely destroyed
+ *                        after the call.
  * @param nServers        The number of servers in the list
  * @return                X_SUCCESS (0) if successful, or else an error code &lt;0.
  *

@@ -135,7 +135,8 @@ static int rReadToken(ClientPrivate *cp, char *buf, int length) {
       int status = rReadChunkAsync(cp);
       if(status) {
         pthread_mutex_unlock(&cp->readLock);
-        return x_trace(fn, NULL, status);
+        if(cp->isEnabled) return x_trace(fn, NULL, status);
+        return status;
       }
     }
 
@@ -161,7 +162,8 @@ static int rReadToken(ClientPrivate *cp, char *buf, int length) {
   // If client was disabled before we got everything, then simply return X_NO_SERVICE
   if(!cp->isEnabled) {
     *buf = '\0';
-    return x_trace(fn, NULL, X_NO_SERVICE);
+    if(L > 0) return x_trace(fn, NULL, X_NO_SERVICE);
+    return X_NO_SERVICE;
   }
 
   // From here on L is the number of characters actually buffered.

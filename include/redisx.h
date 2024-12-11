@@ -357,9 +357,7 @@ int redisxSetUser(Redis *redis, const char *username);
 int redisxSetPassword(Redis *redis, const char *passwd);
 int redisxSelectDB(Redis *redis, int idx);
 int redisxSetProtocol(Redis *redis, enum redisx_protocol protocol);
-enum redisx_protocol redisxGetProtocol(Redis *redis);
-XLookupTable *redisxGetInfo(Redis *redis, const char *parameter);
-RESP *redisxGetHelloData(Redis *redis);
+
 
 Redis *redisxInit(const char *server);
 Redis *redisxInitSentinel(const char *serviceName, const RedisServer *serverList, int nServers);
@@ -369,7 +367,11 @@ void redisxDestroy(Redis *redis);
 int redisxConnect(Redis *redis, boolean usePipeline);
 void redisxDisconnect(Redis *redis);
 int redisxReconnect(Redis *redis, boolean usePipeline);
+
 int redisxPing(Redis *redis, const char *message);
+enum redisx_protocol redisxGetProtocol(Redis *redis);
+XLookupTable *redisxGetInfo(Redis *redis, const char *parameter);
+RESP *redisxGetHelloData(Redis *redis);
 
 boolean redisxIsConnected(Redis *redis);
 boolean redisxHasPipeline(Redis *redis);
