@@ -57,8 +57,8 @@ platforms also. It is also small and fast, but still capable and versatile.
 
 Rather than providing high-level support for every possible Redis command (which would probably be impossible given 
 the pace new commands are being introduced all the time), it provides a basic framework for synchronous and 
-asynchronous queries, with some higher-level functions for managing key/value storage types (including hash tables), 
-and PUB/SUB. Future releases may add further higher-level functionality based on demand for such features.
+asynchronous queries, with some higher-level functions, such as for managing key/value storage types (including hash 
+tables) and PUB/SUB. Future releases may add further higher-level functionality based on demand for such features.
 
 The __RedisX__ library was created, and is maintained, by Attila Kovács at the Center for Astrophysics \| Harvard 
 &amp; Smithsonian, and it is available through the [Smithsonian/redisx](https://github.com/Smithsonian/redisx) 
