@@ -578,7 +578,7 @@ int rConnectClient(Redis *redis, enum redisx_channel channel) {
   cp = (ClientPrivate *) cl->priv;
 
   serverAddress.sin_family      = AF_INET;
-  serverAddress.sin_port        = htons(REDISX_TCP_PORT);
+  serverAddress.sin_port        = htons(p->port > 0 ? p->port : REDISX_TCP_PORT);
   serverAddress.sin_addr.s_addr = p->addr;
   memset(serverAddress.sin_zero, '\0', sizeof(serverAddress.sin_zero));
 
