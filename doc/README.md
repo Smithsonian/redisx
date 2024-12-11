@@ -514,8 +514,8 @@ Before destroying a RESP structure, the caller may want to dereference values wi
   }
 ```
 
-Note, that you can usually convert a RESP to an `XField`, and/or to JSON representation using the 
-`redisxRESP2XField()` and `redisxRESP2JSON()` functions, e.g.:
+Note, that you can convert a RESP to an `XField`, and/or to JSON representation using the `redisxRESP2XField()` and 
+`redisxRESP2JSON()` functions, e.g.:
 
 ```c
  Redis redis = ...
@@ -765,7 +765,7 @@ We should also start subscribing to specific channels and/or channel patterns.
   }
 ```
 
-The `redisxSuibscribe()` function will translate to either a Redis `PSUBSCRIBE` or `SUBSCRIBE` command, depending 
+The `redisxSubscribe()` function will translate to either a Redis `PSUBSCRIBE` or `SUBSCRIBE` command, depending on
 whether the `pattern` argument contains globbing patterns or not (respectively).
 
 Now, we are capturing and processing all messages published to channels whose name begins with `"event:"`, using our
@@ -800,6 +800,7 @@ atomically. Such an execution block in __RedisX__ may look something like:
 ```c
   Redis *redis = ...;
   RESP *result;
+  int status;
   
   // Obtain a lock on the client on which to execute the block.
   // e.g. the interactive client channel.
@@ -814,7 +815,12 @@ atomically. Such an execution block in __RedisX__ may look something like:
   redisxStartBlockAsync(cl);
   
   // Send a number of Async requests
-  redisxSendRequestAsync(cl, ...);
+  status = redisxSendRequestAsync(cl, ...);
+  if(status < 0) {
+    // Oops, something went wrong, we should abort and return
+    redisxAbortBlockAsync(cl);
+    return status;
+  }
   ...
 
   // Execute the block of commands above atomically, and get the resulting RESP
