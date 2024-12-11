@@ -42,7 +42,7 @@ int redisxLoadScript(Redis *redis, const char *script, char **sha1) {
 
   reply = redisxRequest(redis, "SCRIPT", "LOAD", script, NULL, &status);
 
-  if(!status) {
+  if(status) {
     redisxDestroyRESP(reply);
     return x_trace(fn, NULL, status);
   }
