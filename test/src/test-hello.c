@@ -17,7 +17,7 @@ int main() {
   Redis *redis = redisxInit("localhost");
   RedisEntry *e;
   RESP *resp;
-  const char *json;
+  char *json;
   int n = -1;
 
   xSetDebug(TRUE);

@@ -629,13 +629,17 @@ static void rUnregisterServer(const Redis *redis) {
  * @param cl
  * @param idx
  */
-static void rInitClient(RedisClient *cl, enum redisx_channel idx) {
+static void rInitClient(Redis *redis, enum redisx_channel idx) {
+  RedisPrivate *p = (RedisPrivate *) redis->priv;
+  RedisClient *cl = &p->clients[idx];
   ClientPrivate *cp;
 
   cp = calloc(1, sizeof(ClientPrivate));
   x_check_alloc(cp);
 
+  cp->redis = redis;
   cp->idx = idx;
+
   pthread_mutex_init(&cp->readLock, NULL);
   pthread_mutex_init(&cp->writeLock, NULL);
   pthread_mutex_init(&cp->pendingLock, NULL);
@@ -860,11 +864,7 @@ Redis *redisxInit(const char *server) {
   x_check_alloc(p->clients);
 
   // Initialize clients.
-  for(i = REDISX_CHANNELS; --i >= 0; ) {
-    ClientPrivate *cp = (ClientPrivate *) p->clients[i].priv;
-    rInitClient(&p->clients[i], i);
-    cp->redis = redis;
-  }
+  for(i = REDISX_CHANNELS; --i >= 0; ) rInitClient(redis, i);
 
   // Alias clients
   redis->interactive = &p->clients[REDISX_INTERACTIVE_CHANNEL];
