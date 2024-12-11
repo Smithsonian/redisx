@@ -574,7 +574,11 @@ RESP *redisxRequest(Redis *redis, const char *command, const char *arg1, const c
   reply = redisxArrayRequest(redis, (char **) args, NULL, n, &s);
 
   if(status) *status = s;
-  if(s) x_trace_null("redisxRequest", NULL);
+
+  if(s) {
+    redisxDestroyRESP(reply);
+    return x_trace_null("redisxRequest", NULL);
+  }
 
   return reply;
 }

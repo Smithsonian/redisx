@@ -53,8 +53,15 @@ typedef struct {
   RESP *attributes;             ///< Attributes from the last packet received.
 } ClientPrivate;
 
+typedef struct {
+  RedisServer *servers;         ///< List of sentinel servers.
+  int nServers;                 ///< number of servers in list
+  char *serviceName;            ///< Name of service (for Sentinel).
+} RedisSentinel;
+
 
 typedef struct {
+  RedisSentinel *sentinel;      ///< Sentinel (high-availability) server configuration.
   uint32_t addr;                ///< The 32-bit inet address
   int port;                     ///< port number (usually 6379)
   int dbIndex;                  ///< the zero-based database index
