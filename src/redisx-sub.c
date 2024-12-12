@@ -526,7 +526,7 @@ static void rNotifyConsumers(Redis *redis, char *pattern, char *channel, char *m
  *
  */
 void *RedisSubscriptionListener(void *pRedis) {
-  static int counter, lastError;
+  static long counter, lastError;
 
   Redis *redis = (Redis *) pRedis;
   RedisPrivate *p;
@@ -585,7 +585,7 @@ void *RedisSubscriptionListener(void *pRedis) {
 
     // Check for NULL component (all except last -- the payload -- which may be NULL)
     for(i=reply->n-1; --i >= 0; ) if(component[i] == NULL) {
-      fprintf(stderr, "WARNING! Redis-X : subscriber NULL in component %d.\n", (i+1));
+      fprintf(stderr, "WARNING! Redis-X : subscriber NULL in component %d\n", (i+1));
       continue;
     }
 
@@ -625,7 +625,7 @@ void *RedisSubscriptionListener(void *pRedis) {
     rConfigUnlock(redis);
   }
 
-  xvprintf("Redis-X> Stopped processing subscriptions (%d processed)...\n", counter);
+  xvprintf("Redis-X> Stopped processing subscriptions (%ld processed)...\n", counter);
 
   redisxDestroyRESP(reply);
 

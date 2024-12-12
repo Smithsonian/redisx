@@ -942,7 +942,7 @@ RESP *redisxReadReplyAsync(RedisClient *cl) {
       }
 
 
-      for(i=0; i<resp->n; i++) {
+      for(i = 0; i < resp->n; i++) {
         RESP *r = redisxReadReplyAsync(cl);     // Always read RESP even if we don't have storage for it...
         if(component) component[i] = r;
         else redisxDestroyRESP(r);
@@ -970,7 +970,7 @@ RESP *redisxReadReplyAsync(RedisClient *cl) {
       dict = (RedisMapEntry *) calloc(resp->n, sizeof(RedisMapEntry));
       x_check_alloc(dict);
 
-      for(i=0; i<resp->n; i++) {
+      for(i = 0; i < resp->n; i++) {
         RedisMapEntry *e = &dict[i];
         e->key = redisxReadReplyAsync(cl);
         e->value = redisxReadReplyAsync(cl);

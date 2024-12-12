@@ -23,7 +23,12 @@ $(LIB)/lib%.so:
 $(LIB)/%.a:
 	@make $(LIB)
 	ar -rc $@ $^
-	ranlib $@	
+	ranlib $@
+
+# Simple binaries
+$(BIN)/%: $(OBJ)/%.o
+	@make $(BIN)
+	$(CC) -o $@ $^ $(LDFLAGS)
 
 # Create sub-directories for build targets
 dep $(OBJ) $(LIB) $(BIN) apidoc:

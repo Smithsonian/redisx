@@ -34,7 +34,7 @@ LDFLAGS += -pthread
 
 # Build for distribution
 .PHONY: distro
-distro: shared $(DOC_TARGETS)
+distro: shared tools $(DOC_TARGETS)
 
 # Build everything...
 .PHONY: all
@@ -47,6 +47,15 @@ shared: $(LIB)/libredisx.so
 # Legacy static libraries (locally built)
 .PHONY: static
 static: $(LIB)/libredisx.a
+
+# Command-line tools
+.PHONY: tools
+ifdef STATICLINK
+tools: static
+else
+tools: shared
+endif
+	make -f tools.mk
 
 # Run regression tests
 .PHONY: test
@@ -92,6 +101,11 @@ $(LIB)/libredisx.so.$(SO_VERSION): $(SOURCES)
 # Static library
 $(LIB)/libredisx.a: $(OBJECTS)
 
+# redisx-cli
+$(BIN)/redisx-cli: LDFLAGS += -lredisx
+$(BIN)/redisx-cli: $(OBJ)/redisx-cli.o
+
+
 README-redisx.md: README.md
 	LINE=`sed -n '/\# /{=;q;}' $<` && tail -n +$$((LINE+2)) $< > $@
 
@@ -125,6 +139,7 @@ pdf:
 # See https://www.gnu.org/prep/standards/html_node/Directory-Variables.html 
 prefix ?= /usr
 exec_prefix ?= $(prefix)
+bindir ?= $(exec_prefix)/bin
 libdir ?= $(exec_prefix)/lib
 includedir ?= $(prefix)/include
 datarootdir ?= $(prefix)/share
@@ -138,7 +153,7 @@ INSTALL_PROGRAM ?= install
 INSTALL_DATA ?= install -m 644
 
 .PHONY: install
-install: install-libs install-headers install-html
+install: install-libs install-bin install-headers install-html
 
 .PHONY: install-libs
 install-libs:
@@ -148,6 +163,16 @@ ifneq ($(wildcard $(LIB)/*),)
 	$(INSTALL_PROGRAM) -D $(LIB)/lib*.so* $(DESTDIR)$(libdir)/
 else
 	@echo "WARNING! Skipping libs install: needs 'shared' and/or 'static'"
+endif
+
+.PHONY: install-bin
+install-bin:
+ifneq ($(wildcard $(BIN)/*),)
+	@echo "installing executables to $(DESTDIR)$(bindir)"
+	install -d $(DESTDIR)$(bindir)
+	$(INSTALL_PROGRAM) -D $(BIN)/* $(DESTDIR)$(bindir)/
+else
+	@echo "WARNING! Skipping bins install: needs 'tools'"
 endif
 
 .PHONY: install-headers

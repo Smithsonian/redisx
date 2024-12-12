@@ -41,7 +41,7 @@ int main() {
     return 1;
   }
 
-  redisxPrintRESP("get value", resp);
+  redisxPrintJSON("get value", resp);
   redisxCheckDestroyRESP(resp, RESP_BULK_STRING, 1);
 
   if(strcmp("2", (char *) resp->value) != 0) {

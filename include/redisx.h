@@ -169,7 +169,7 @@ enum redisx_protocol {
  */
 typedef struct RESP {
   enum resp_type type;          ///< RESP type; RESP_ARRAY, RESP_INT ...
-  int n;                        ///< Either the integer value of a RESP_INT or a RESP3_BOOLEAN response, or the
+  int n;                       ///< Either the integer value of a RESP_INT or a RESP3_BOOLEAN response, or the
                                 ///< dimension of the value field.
   void *value;                  ///< Pointer to text (char *) content or to an array of components
                                 ///< (RESP**) or (RedisMapEntry *), or else a pointer to a `double`, depending
@@ -436,7 +436,8 @@ boolean redisxIsEqualRESP(const RESP *a, const RESP *b);
 int redisxSplitText(RESP *resp, char **text);
 XField *redisxRESP2XField(const char *name, const RESP *resp);
 char *redisxRESP2JSON(const char *name, const RESP *resp);
-int redisxPrintRESP(const char *name, const RESP *resp);
+int redisxPrintRESP(const RESP *resp);
+int redisxPrintJSON(const char *name, const RESP *resp);
 
 RedisMapEntry *redisxGetMapEntry(const RESP *map, const RESP *key);
 RedisMapEntry *redisxGetKeywordEntry(const RESP *map, const char *key);

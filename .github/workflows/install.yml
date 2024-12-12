@@ -28,8 +28,8 @@ jobs:
     env:
       CC: gcc
     steps:
-    - name: install doxygen
-      run: sudo apt-get install doxygen
+    - name: install build deps
+      run: sudo apt-get install doxygen libpopt-dev
 
     - name: Check out RedisX
       uses: actions/checkout@v4

@@ -87,7 +87,7 @@ RedisEntry *redisxGetTable(Redis *redis, const char *table, int *n) {
     else {
       int i;
 
-      for(i=0; i<reply->n; i+=2) {
+      for(i = 0; i < reply->n; i += 2) {
         RedisEntry *e = &entries[i];
         RedisMapEntry *component = &dict[i];
         e->key = component->key->value;
@@ -423,7 +423,7 @@ char **redisxGetKeys(Redis *redis, const char *table, int *n) {
     if(names == NULL) fprintf(stderr, "WARNING! Redis-X : alloc pointers for %d keys: %s\n", reply->n, strerror(errno));
     else {
       int i;
-      for(i=0; i<reply->n; i++) {
+      for(i = 0; i < reply->n; i++) {
         RESP **component = (RESP **) reply->value;
         names[i] = (char *) component[i]->value;
 
@@ -527,7 +527,8 @@ char **redisxScanKeys(Redis *redis, const char *pattern, int *n, int *status) {
   char **pCursor;
   char **names = NULL;
   char countArg[20];
-  int args = 0, i, j, capacity = SCAN_INITIAL_STORE_CAPACITY;
+  int capacity = SCAN_INITIAL_STORE_CAPACITY;
+  int args = 0, i, j;
 
   if(n == NULL) {
     x_error(X_NULL, EINVAL, fn, "parameter 'n' is NULL");
@@ -633,13 +634,13 @@ char **redisxScanKeys(Redis *redis, const char *pattern, int *n, int *status) {
   qsort(names, *n, sizeof(char *), compare_strings);
 
   // Remove duplicates
-  for(i=*n; --i > 0; ) if(!strcmp(names[i], names[i-1])) {
+  for(i = *n; --i > 0; ) if(!strcmp(names[i], names[i-1])) {
     free(names[i]);
     names[i] = NULL;
   }
 
   // Compact...
-  for(i=0, j=0; i < *n; i++) if(names[i]) {
+  for(i = 0, j = 0; i < *n; i++) if(names[i]) {
     if(i != j) names[j] = names[i];
     j++;
   }
@@ -692,7 +693,8 @@ RedisEntry *redisxScanTable(Redis *redis, const char *table, const char *pattern
   RedisEntry *entries = NULL;
   char *cmd[7] = {NULL}, countArg[20];
   char **pCursor;
-  int args= 0, i, j, capacity = SCAN_INITIAL_STORE_CAPACITY;
+  int capacity = SCAN_INITIAL_STORE_CAPACITY;
+  int args= 0, i, j;
 
   if(n == NULL) {
     x_error(X_NULL, EINVAL, fn, "parameter 'n' is NULL");

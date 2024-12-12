@@ -557,7 +557,6 @@ static void rShutdownAsync() {
   while(l != NULL) {
     ServerLink *next = l->next;
     redisxDestroy(l->redis);
-    free(l);
     l = next;
   }
 
@@ -1127,7 +1126,7 @@ boolean redisxIsConnected(Redis *redis) {
  *
  */
 void *RedisPipelineListener(void *pRedis) {
-  static int counter, lastError;
+  static long counter, lastError;
 
   Redis *redis = (Redis *) pRedis;
   RedisPrivate *p;
@@ -1187,7 +1186,7 @@ void *RedisPipelineListener(void *pRedis) {
 
   } // <-- End of listener loop...
 
-  xvprintf("Redis-X> Stopped processing pipeline responses (%d processed)...\n", counter);
+  xvprintf("Redis-X> Stopped processing pipeline responses (%ld processed)...\n", counter);
 
   rConfigLock(redis);
   // If we are the current listener thread, then mark the listener as disabled.

@@ -427,7 +427,7 @@ int redisxAppendRESP(RESP *resp, RESP *part) {
   extend = (char *) realloc(resp->value, (resp->n + part->n) * eSize);
   if(!extend) {
     free(old);
-    return x_error(X_FAILURE, errno, fn, "alloc RESP array (%d components)", resp->n + part->n);
+    return x_error(X_FAILURE, errno, fn, "alloc RESP array (%ld components)", resp->n + part->n);
   }
 
   memcpy(extend + resp->n * eSize, part->value, part->n * eSize);
@@ -472,8 +472,8 @@ boolean redisxIsEqualRESP(const RESP *a, const RESP *b) {
  * @sa redisxGetKeywordEntry()
  */
 RedisMapEntry *redisxGetMapEntry(const RESP *map, const RESP *key) {
-  int i;
   RedisMapEntry *entries;
+  int i;
 
   if(!key) return NULL;
   if(!redisxIsMapType(map)) return NULL;
@@ -510,8 +510,8 @@ RedisMapEntry *redisxGetMapEntry(const RESP *map, const RESP *key) {
  * @sa redisxGetMapEntry()
  */
 RedisMapEntry *redisxGetKeywordEntry(const RESP *map, const char *key) {
-  int i;
   RedisMapEntry *entries;
+  int i;
 
   if(!key) return NULL;
   if(!redisxIsMapType(map)) return NULL;
@@ -566,66 +566,74 @@ static void rSetRESPType(XField *f, char type) {
 }
 
 static XField *respArrayToXField(const char *name, const RESP **component, int n) {
-  static const char *fn = "respArrayToXField";
 
-  XField *f;
   enum resp_type type = RESP3_NULL;
+  XType eType;
+  XField *f;
+
   int i;
 
-  if(n < 0) return NULL;
+  if(n <= 0) return NULL;
 
   for(i = 0; i < n; i++) {
     if(i == 0) type = component[i]->type;
     else if(component[i]->type != type) break;
   }
 
-  if(i < n) {
+  eType = resp2xType(type);
+
+  if(i < n || eType == X_FIELD) {
     // --------------------------------------------------------
     // Heterogeneous array...
 
     XField *array = (XField *) calloc(n, sizeof(XField));
     if(!array) {
-      x_error(0, errno, fn, "alloc error (%d XField)", n);
+      x_error(0, errno, "respArrayToXField", "alloc error (%d XField)", n);
       return NULL;
     }
 
-    f = xCreateMixed1DField(name, n, array);
-
     for(i = 0; i < n; i++) {
-      XField *e = redisxRESP2XField(array[i].name, component[i]);
+      XField *e;
+      char idx[20];
+      sprintf(idx, ".%d", (i + 1));
+      e = redisxRESP2XField(idx, component[i]);
       if(e) {
         array[i] = *e;
         free(e);
       }
     }
+
+    f = xCreateMixed1DField(name, n, array);
   }
 
   else {
     // --------------------------------------------------------
     // Homogeneous array...
 
-    XType eType = resp2xType(type);
     char *array;
     size_t eSize;
 
-    if(eType == X_UNKNOWN) return xCreateMixed1DField(name, 0, NULL);
+    if(eType == X_UNKNOWN) eType = X_STRING;
 
     eSize = xElementSizeOf(eType);
-    array = (char *) calloc(1, n * eSize);
-
-    f = xCreate1DField(name, eType, n, array);
-    rSetRESPType(f, type);
-    if(!array) return x_trace_null(fn, "field array");
+    array = (char *) calloc(n, eSize);
 
     for(i = 0; i < n; i++) {
-      XField *e = redisxRESP2XField("<element>", component[i]);
+      XField *e;
+      char idx[20];
+
+      sprintf(idx, ".%d", (i + 1));
+      e = redisxRESP2XField(idx, component[i]);
       if(e) {
-        memcpy(&array[i * eSize], e, sizeof(XField));
+        memcpy(&array[i * eSize], e->value, eSize);
         free(e);
       }
     }
+
+    f = xCreate1DField(name, eType, n, array);
   }
 
+  rSetRESPType(f, type);
   return f;
 }
 
@@ -634,10 +642,14 @@ static XField *respMap2XField(const char *name, const RedisMapEntry *map, int n)
   XStructure *s = xCreateStruct(), *nonstring = NULL;
   int nNonString = 0;
 
+  printf("### map\n");
+
   while(--n >= 0) {
     const RedisMapEntry *e = &map[n];
 
     if(redisxIsStringType(e->key)) {
+      printf("### + %s\n", (char *) e->key->value);
+
       XField *fi = redisxRESP2XField((char *) e->key->value, e->value);
       if(fi) {
         fi->next = s->firstField;
@@ -654,7 +666,7 @@ static XField *respMap2XField(const char *name, const RedisMapEntry *map, int n)
       sprintf(idx, ".%d", ++nNonString);
       if(!nonstring)
         nonstring = xCreateStruct();
-      xSetSubstruct(nonstring, xStringCopyOf(idx), sub);
+      xSetSubstruct(nonstring, idx, sub);
     }
   }
 
@@ -687,13 +699,11 @@ static XField *respMap2XField(const char *name, const RedisMapEntry *map, int n)
  * @sa redisxRESP2JSON()
  */
 XField *redisxRESP2XField(const char *name, const RESP *resp) {
-  static const char *fn = "resp2XField";
-
-  errno = 0;
+  if(!resp) return NULL;
 
   switch(resp->type) {
     case RESP3_NULL:
-      return xCreateStringField(name, NULL);
+      return xCreateScalarField(name, X_UNKNOWN, NULL);
 
     case RESP3_BOOLEAN:
       return xCreateBooleanField(name, resp->n);
@@ -719,7 +729,7 @@ XField *redisxRESP2XField(const char *name, const RESP *resp) {
     case RESP3_SET:
     case RESP3_PUSH: {
       XField *f = respArrayToXField(name, (const RESP **) resp->value, resp->n);
-      if(!f) return x_trace_null(fn, NULL);
+      if(!f) return NULL;
       rSetRESPType(f, resp->type);
       return f;
     }
@@ -727,14 +737,14 @@ XField *redisxRESP2XField(const char *name, const RESP *resp) {
     case RESP3_MAP:
     case RESP3_ATTRIBUTE: {
       XField *f = respMap2XField(name, (const RedisMapEntry *) resp->value, resp->n);
-      if(!f) return x_trace_null(fn, NULL);
+      if(!f) return NULL;
       rSetRESPType(f, resp->type);
       return f;
     }
 
   }
 
-  return NULL;
+  return xCreateStringField(name, "<!!!unknown RESP type!!!>");
 }
 
 /**
@@ -746,7 +756,7 @@ XField *redisxRESP2XField(const char *name, const RESP *resp) {
  *                set to indicate the type of error).
  *
  * @sa redisxRESP2XField()
- * @sa redisxPrintRESP()
+ * @sa redisxPrintJSON()
  */
 char *redisxRESP2JSON(const char *name, const RESP *resp) {
   return xjsonFieldToString(redisxRESP2XField(name, resp));
@@ -759,9 +769,10 @@ char *redisxRESP2JSON(const char *name, const RESP *resp) {
  * @param resp    The RESP data to print
  * @return        0
  *
+ * @sa redisxPrintRESP()
  * @sa redisxRESP2JSON()
  */
-int redisxPrintRESP(const char *name, const RESP *resp) {
+int redisxPrintJSON(const char *name, const RESP *resp) {
   char *json = redisxRESP2JSON(name, resp);
 
   if(json) {
@@ -771,5 +782,106 @@ int redisxPrintRESP(const char *name, const RESP *resp) {
   else printf("\"%s\": null\n", name);
 
   return X_SUCCESS;
+}
+
+static void rNewLine(int ident) {
+  putchar('\n');
+  while(--ident >= 0) putchar(' ');
+}
+
+static int rIndexWidth(int count) {
+  return 1 + (int) floor(log10(count));
+}
+
+static int rPrintRESP(int ident, const RESP *resp) {
+
+  if(!resp) {
+    printf("(null)");
+    return X_SUCCESS;
+  }
+
+  if(resp->type == RESP3_NULL) {
+    printf("null");
+    return X_SUCCESS;
+  }
+
+  if(redisxIsStringType(resp)) {
+    int quote = !(resp->type == RESP_SIMPLE_STRING || resp->type == RESP_ERROR || resp->type == RESP3_BIG_NUMBER);
+
+    if(!resp->value) printf("(nil)");
+    else {
+      if(quote) putchar('"');
+      printf("%s", ((char *) resp->value));
+      if(quote) putchar('"');
+    }
+    return X_SUCCESS;
+  }
+
+  switch(resp->type) {
+    case RESP_INT:
+      printf("(integer) %d", resp->n);
+      return X_SUCCESS;
+
+    case RESP3_DOUBLE:
+      printf("(double) %g", *(double *) resp->value);
+      return X_SUCCESS;
+
+    case RESP_ARRAY:
+    case RESP3_SET:
+    case RESP3_PUSH: {
+      RESP **component = (RESP **) resp->value;
+
+      if(!resp->value) printf("(empty array)");
+      else {
+        int i;
+        for(i = 0; i < resp->n; i++) {
+          rNewLine(ident);
+          printf("%*d) ", rIndexWidth(resp->n), (i + 1));
+          rPrintRESP(ident + 2, component[i]);
+        }
+      }
+      return X_SUCCESS;
+    }
+
+    case RESP3_MAP:
+    case RESP3_ATTRIBUTE: {
+      const RedisMapEntry *component = (RedisMapEntry *) resp->value;
+
+      if(!resp->value) printf("(empty map)");
+      else {
+        int i;
+        for(i = 0; i < resp->n; i++) {
+          rNewLine(ident);
+          printf("%*d# ", rIndexWidth(resp->n), (i + 1));
+          rPrintRESP(ident + 2, component[i].key);
+          printf(" => ");
+          rPrintRESP(ident + 2, component[i].value);
+        }
+      }
+      return X_SUCCESS;
+    }
+
+    default:
+      if(!resp->value) printf("(nil)");
+      else printf("<unknown> type '%c'", resp->type);
+      return X_FAILURE;
+  }
+
+
+}
+
+/**
+ * Prints a RESP to the standard output, in a format that is similar to the one used by the standard
+ * redis-cli tool.
+ *
+ * @param resp    Pointer to a RESP data structure. (It may be NULL).
+ * @return        X_SUCCESS (0) if successful or else X_FAILURE if there was an error.
+ *
+ * @sa redisxPrintJSON()
+ */
+int redisxPrintRESP(const RESP *resp) {
+  int status = rPrintRESP(0, resp);
+  printf("\n");
+  return status;
 }
 

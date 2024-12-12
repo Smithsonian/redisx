@@ -31,6 +31,7 @@ Last Updated: 10 December 2024
  - [Introduction](#introduction)
  - [Prerequisites](#prerequisites)
  - [Building RedisX](#building-redisx)
+ - [Command-line interface (`redisx-cli`)](#redisx-cli)
  - [Linking your application against RedisX](#linking)
  - [Managing Redis server connections](#managing-redis-server-connections)
  - [Simple Redis queries](#simple-redis-queries)
@@ -141,6 +142,25 @@ Or, to stage the installation (to `/usr`) under a 'build root':
 ```bash
   $ make DESTDIR="/tmp/stage" install
 ```
+
+-----------------------------------------------------------------------------
+
+<a name="redisx-cli"></a>
+## Command-line interface (`redisx-cli`)
+
+The __RedisX__ library provides its own command-line tool, called `redisx-cli`. It works very similar to `redis-cli`,
+except that it supports a subset of the options (so far...).
+
+```bash
+ $ redisx-cli ping "Hello World"
+```
+will print:
+
+```bash
+ "Hello world!"
+```
+
+provided it successfully connected to the Redis / Valkey server. (Otherwise it will print an error and a trace).
 
 -----------------------------------------------------------------------------
 
