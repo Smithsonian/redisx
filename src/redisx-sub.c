@@ -96,7 +96,7 @@ static int rConnectSubscriptionClientAsync(Redis *redis) {
 int redisxPublishAsync(Redis *redis, const char *channel, const char *data, int length) {
   static const char *fn = "redisPublishAsync";
 
-  char *args[3];
+  const char *args[3];
   int L[3] = {0};
 
   prop_error(fn, redisxCheckValid(redis));

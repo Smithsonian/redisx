@@ -563,7 +563,7 @@ RESP *redisxRequest(Redis *redis, const char *command, const char *arg1, const c
   else if(arg3 == NULL) n = 3;
   else n = 4;
 
-  reply = redisxArrayRequest(redis, (char **) args, NULL, n, &s);
+  reply = redisxArrayRequest(redis, args, NULL, n, &s);
   if(status) *status = s;
 
   if(s) {
@@ -604,7 +604,7 @@ RESP *redisxRequest(Redis *redis, const char *command, const char *arg1, const c
  * @sa redisxSendArrayRequestAsync()
  * @sa redisxReadReplyAsync()
  */
-RESP *redisxArrayRequest(Redis *redis, char *args[], int lengths[], int n, int *status) {
+RESP *redisxArrayRequest(Redis *redis, const char *args[], int lengths[], int n, int *status) {
   static const char *fn = "redisxArrayRequest";
   RESP *reply = NULL;
   RedisClient *cl;

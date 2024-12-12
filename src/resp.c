@@ -805,25 +805,29 @@ static int rPrintRESP(int ident, const RESP *resp) {
     return X_SUCCESS;
   }
 
-  if(redisxIsStringType(resp)) {
-    int quote = !(resp->type == RESP_SIMPLE_STRING || resp->type == RESP_ERROR || resp->type == RESP3_BIG_NUMBER);
-
-    if(!resp->value) printf("(nil)");
-    else {
-      if(quote) putchar('"');
-      printf("%s", ((char *) resp->value));
-      if(quote) putchar('"');
-    }
-    return X_SUCCESS;
-  }
-
   switch(resp->type) {
+
     case RESP_INT:
       printf("(integer) %d", resp->n);
       return X_SUCCESS;
 
     case RESP3_DOUBLE:
       printf("(double) %g", *(double *) resp->value);
+      return X_SUCCESS;
+
+    case RESP3_BIG_NUMBER:
+      printf("(big number) %s", (char *) resp->value);
+      return X_SUCCESS;
+
+    case RESP_SIMPLE_STRING:
+    case RESP_ERROR:
+      printf("%s", (char *) resp->value);
+      return X_SUCCESS;
+
+    case RESP_BULK_STRING:
+    case RESP3_BLOB_ERROR:
+    case RESP3_VERBATIM_STRING:
+      printf("\"%s\"", (char *) resp->value);
       return X_SUCCESS;
 
     case RESP_ARRAY:
@@ -866,8 +870,6 @@ static int rPrintRESP(int ident, const RESP *resp) {
       else printf("<unknown> type '%c'", resp->type);
       return X_FAILURE;
   }
-
-
 }
 
 /**

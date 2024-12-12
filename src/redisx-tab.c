@@ -296,7 +296,7 @@ char *redisxGetStringValue(Redis *redis, const char *table, const char *key, int
 int redisxMultiSetAsync(RedisClient *cl, const char *table, const RedisEntry *entries, int n, boolean confirm) {
   static const char *fn = "redisxMultiSetAsync";
   int i, *L, N, status = X_SUCCESS;
-  char **req;
+  const char **req;
 
   if(cl == NULL) return  x_error(X_NULL, EINVAL, fn, "redis is NULL");
   if(table == NULL) return  x_error(X_GROUP_INVALID, EINVAL, fn, "table parameter is NULL");
@@ -306,7 +306,7 @@ int redisxMultiSetAsync(RedisClient *cl, const char *table, const RedisEntry *en
 
   N = (n<<1)+2;
 
-  req = (char **) malloc(N * sizeof(char *));
+  req = (const char **) malloc(N * sizeof(char *));
   if(!req) {
     fprintf(stderr, "WARNING! Redis-X : alloc %d request components: %s\n", N, strerror(errno));
     return x_trace(fn, NULL, X_FAILURE);
@@ -523,7 +523,7 @@ char **redisxScanKeys(Redis *redis, const char *pattern, int *n, int *status) {
   static const char *fn = "redisxScanKeys";
 
   RESP *reply = NULL;
-  char *cmd[6] = {NULL};
+  const char *cmd[6] = {NULL};
   char **pCursor;
   char **names = NULL;
   char countArg[20];
@@ -546,7 +546,7 @@ char **redisxScanKeys(Redis *redis, const char *pattern, int *n, int *status) {
 
   cmd[args++] = "SCAN";
 
-  pCursor = &cmd[args];
+  pCursor = (char **) &cmd[args];
   cmd[args++] = xStringCopyOf(SCAN_INITIAL_CURSOR);
 
   if(pattern) {
@@ -691,8 +691,8 @@ RedisEntry *redisxScanTable(Redis *redis, const char *table, const char *pattern
 
   RESP *reply = NULL;
   RedisEntry *entries = NULL;
-  char *cmd[7] = {NULL}, countArg[20];
-  char **pCursor;
+  const char *cmd[7] = {NULL};
+  char countArg[20], **pCursor;
   int capacity = SCAN_INITIAL_STORE_CAPACITY;
   int args= 0, i, j;
 
@@ -725,7 +725,7 @@ RedisEntry *redisxScanTable(Redis *redis, const char *table, const char *pattern
   cmd[args++] = "HSCAN";
   cmd[args++] = (char *) table;
 
-  pCursor = &cmd[args];
+  pCursor = (char **) &cmd[args];
   cmd[args++] = xStringCopyOf(SCAN_INITIAL_CURSOR);
 
   if(pattern) {

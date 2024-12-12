@@ -101,10 +101,6 @@ $(LIB)/libredisx.so.$(SO_VERSION): $(SOURCES)
 # Static library
 $(LIB)/libredisx.a: $(OBJECTS)
 
-# redisx-cli
-$(BIN)/redisx-cli: LDFLAGS += -lredisx
-$(BIN)/redisx-cli: $(OBJ)/redisx-cli.o
-
 
 README-redisx.md: README.md
 	LINE=`sed -n '/\# /{=;q;}' $<` && tail -n +$$((LINE+2)) $< > $@

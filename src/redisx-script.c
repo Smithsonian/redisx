@@ -94,7 +94,7 @@ int redisxRunScriptAsync(RedisClient *cl, const char *sha1, const char **keys, c
   for(k = 0; k < nkeys; k++) args[i++] = (char *) keys[k];
   for(k = 0; k < nparams; k++) args[i++] = (char *) params[k];
 
-  i = redisxSendArrayRequestAsync(cl, args, NULL, nargs);
+  i = redisxSendArrayRequestAsync(cl, (const char **) args, NULL, nargs);
   free(args);
 
   prop_error(fn, i);

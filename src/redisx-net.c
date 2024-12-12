@@ -636,7 +636,7 @@ static int rHelloAsync(RedisClient *cl, char *clientID) {
   RedisPrivate *p = (RedisPrivate *) cp->redis->priv;
   RESP *reply;
   char proto[20];
-  char *args[6];
+  const char *args[6];
   int status, k = 0;
 
   args[k++] = "HELLO";

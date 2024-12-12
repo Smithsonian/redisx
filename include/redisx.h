@@ -388,7 +388,7 @@ int redisxRemoveDisconnectHook(Redis *redis, void (*cleanupCall)(Redis *));
 void redisxClearDisconnectHooks(Redis *redis);
 
 RESP *redisxRequest(Redis *redis, const char *command, const char *arg1, const char *arg2, const char *arg3, int *status);
-RESP *redisxArrayRequest(Redis *redis, char *args[], int length[], int n, int *status);
+RESP *redisxArrayRequest(Redis *redis, const char *args[], int length[], int n, int *status);
 RESP *redisxGetAttributes(Redis *redis);
 int redisxSetValue(Redis *redis, const char *table, const char *key, const char *value, boolean confirm);
 RESP *redisxGetValue(Redis*redis, const char *table, const char *key, int *status);
@@ -449,7 +449,7 @@ int redisxUnlockClient(RedisClient *cl);
 
 // Asynchronous access routines (use within redisxLockClient()/ redisxUnlockClient() blocks)...
 int redisxSendRequestAsync(RedisClient *cl, const char *command, const char *arg1, const char *arg2, const char *arg3);
-int redisxSendArrayRequestAsync(RedisClient *cl, char *args[], int length[], int n);
+int redisxSendArrayRequestAsync(RedisClient *cl, const char *args[], int length[], int n);
 int redisxSetValueAsync(RedisClient *cl, const char *table, const char *key, const char *value, boolean confirm);
 int redisxMultiSetAsync(RedisClient *cl, const char *table, const RedisEntry *entries, int n, boolean confirm);
 RESP *redisxReadReplyAsync(RedisClient *cl);

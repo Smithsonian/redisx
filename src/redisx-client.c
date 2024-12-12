@@ -584,7 +584,7 @@ int redisxSendRequestAsync(RedisClient *cl, const char *command, const char *arg
   else if(arg3 == NULL) n = 3;
   else n = 4;
 
-  prop_error("redisxSendRequestAsync", redisxSendArrayRequestAsync(cl, (char **) args, NULL, n));
+  prop_error("redisxSendRequestAsync", redisxSendArrayRequestAsync(cl, args, NULL, n));
   return X_SUCCESS;
 }
 
@@ -603,7 +603,7 @@ int redisxSendRequestAsync(RedisClient *cl, const char *command, const char *arg
  *                      X_NO_SERVICE if not connected to the client or if send() failed, or
  *                      X_NO_INIT if the client was not initialized.
  */
-int redisxSendArrayRequestAsync(RedisClient *cl, char *args[], int lengths[], int n) {
+int redisxSendArrayRequestAsync(RedisClient *cl, const char *args[], int lengths[], int n) {
   static const char *fn = "redisxSendArrayRequestAsync";
   char buf[REDISX_CMDBUF_SIZE];
   int i, L;
