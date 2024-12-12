@@ -14,7 +14,8 @@ var resp_8c =
     [ "redisxIsMapType", "resp_8c.html#a460822029ff730cd7a55d64797c329a3", null ],
     [ "redisxIsScalarType", "resp_8c.html#a944a623a34b5a6a7af064fc0d0cc35bf", null ],
     [ "redisxIsStringType", "resp_8c.html#a7fb3a83bc8345413eb1a722444386abd", null ],
-    [ "redisxPrintRESP", "resp_8c.html#a033634f60b612f02ebf11823aeb6641a", null ],
+    [ "redisxPrintJSON", "resp_8c.html#a0c3e84681ddfeabf29bac807ff46160b", null ],
+    [ "redisxPrintRESP", "resp_8c.html#ae1691b2452bc3badd1cc8874b139b846", null ],
     [ "redisxRESP2JSON", "resp_8c.html#a7f4e74ee03cebf38eb9c1fb873784a35", null ],
     [ "redisxRESP2XField", "resp_8c.html#adc7235cd1b6be038b9f3c7beb11a13ef", null ],
     [ "redisxSplitText", "resp_8c.html#a63c29262670cf34d06fc30e684878819", null ]

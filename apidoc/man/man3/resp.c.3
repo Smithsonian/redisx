@@ -57,7 +57,10 @@ src/resp.c
 .RI "\fBboolean\fP \fBredisxIsStringType\fP (const \fBRESP\fP *r)"
 .br
 .ti -1c
-.RI "int \fBredisxPrintRESP\fP (const char *name, const \fBRESP\fP *resp)"
+.RI "int \fBredisxPrintJSON\fP (const char *name, const \fBRESP\fP *resp)"
+.br
+.ti -1c
+.RI "int \fBredisxPrintRESP\fP (const \fBRESP\fP *resp)"
 .br
 .ti -1c
 .RI "char * \fBredisxRESP2JSON\fP (const char *name, const \fBRESP\fP *resp)"
@@ -403,7 +406,7 @@ TRUE (1) if the data holds a string type value, or else FALSE (0)\&.
 
 .PP
 References \fBFALSE\fP, \fBRESP3_BIG_NUMBER\fP, \fBRESP3_BLOB_ERROR\fP, \fBRESP3_VERBATIM_STRING\fP, \fBRESP_BULK_STRING\fP, \fBRESP_ERROR\fP, \fBRESP_SIMPLE_STRING\fP, \fBTRUE\fP, and \fBRESP::type\fP\&.
-.SS "int redisxPrintRESP (const char * name, const \fBRESP\fP * resp)"
+.SS "int redisxPrintJSON (const char * name, const \fBRESP\fP * resp)"
 Prints a \fBRESP\fP in JSON format to the standard output with the specified name
 .PP
 \fBParameters\fP
@@ -420,12 +423,33 @@ Prints a \fBRESP\fP in JSON format to the standard output with the specified nam
 .PP
 \fBSee also\fP
 .RS 4
+\fBredisxPrintRESP()\fP 
+.PP
 \fBredisxRESP2JSON()\fP 
 .RE
 .PP
 
 .PP
 References \fBredisxRESP2JSON()\fP, and \fBX_SUCCESS\fP\&.
+.SS "int redisxPrintRESP (const \fBRESP\fP * resp)"
+Prints a \fBRESP\fP to the standard output, in a format that is similar to the one used by the standard redis-cli tool\&.
+.PP
+\fBParameters\fP
+.RS 4
+\fIresp\fP Pointer to a \fBRESP\fP data structure\&. (It may be NULL)\&. 
+.RE
+.PP
+\fBReturns\fP
+.RS 4
+X_SUCCESS (0) if successful or else X_FAILURE if there was an error\&.
+.RE
+.PP
+\fBSee also\fP
+.RS 4
+\fBredisxPrintJSON()\fP 
+.RE
+.PP
+
 .SS "char * redisxRESP2JSON (const char * name, const \fBRESP\fP * resp)"
 Converts a \fBRESP\fP to the xchange representation as an appropriate \fBXField\fP\&.
 .PP
@@ -445,7 +469,7 @@ An \fBXField\fP with the data from the \fBRESP\fP, or NULL if there was an error
 .RS 4
 \fBredisxRESP2XField()\fP 
 .PP
-\fBredisxPrintRESP()\fP 
+\fBredisxPrintJSON()\fP 
 .RE
 .PP
 
@@ -490,7 +514,7 @@ An \fBXField\fP with the data from the \fBRESP\fP, or NULL if there was an error
 .PP
 
 .PP
-References \fBRESP::n\fP, \fBRESP3_ATTRIBUTE\fP, \fBRESP3_BIG_NUMBER\fP, \fBRESP3_BLOB_ERROR\fP, \fBRESP3_BOOLEAN\fP, \fBRESP3_DOUBLE\fP, \fBRESP3_MAP\fP, \fBRESP3_NULL\fP, \fBRESP3_PUSH\fP, \fBRESP3_SET\fP, \fBRESP3_VERBATIM_STRING\fP, \fBRESP_ARRAY\fP, \fBRESP_BULK_STRING\fP, \fBRESP_ERROR\fP, \fBRESP_INT\fP, \fBRESP_SIMPLE_STRING\fP, \fBRESP::type\fP, \fBRESP::value\fP, \fBx_trace_null()\fP, \fBxCreateBooleanField()\fP, \fBxCreateDoubleField()\fP, \fBxCreateIntField()\fP, \fBxCreateStringField()\fP, and \fBxStringCopyOf()\fP\&.
+References \fBRESP::n\fP, \fBRESP3_ATTRIBUTE\fP, \fBRESP3_BIG_NUMBER\fP, \fBRESP3_BLOB_ERROR\fP, \fBRESP3_BOOLEAN\fP, \fBRESP3_DOUBLE\fP, \fBRESP3_MAP\fP, \fBRESP3_NULL\fP, \fBRESP3_PUSH\fP, \fBRESP3_SET\fP, \fBRESP3_VERBATIM_STRING\fP, \fBRESP_ARRAY\fP, \fBRESP_BULK_STRING\fP, \fBRESP_ERROR\fP, \fBRESP_INT\fP, \fBRESP_SIMPLE_STRING\fP, \fBRESP::type\fP, \fBRESP::value\fP, \fBX_UNKNOWN\fP, \fBxCreateBooleanField()\fP, \fBxCreateDoubleField()\fP, \fBxCreateIntField()\fP, \fBxCreateScalarField()\fP, \fBxCreateStringField()\fP, and \fBxStringCopyOf()\fP\&.
 .SS "int redisxSplitText (\fBRESP\fP * resp, char ** text)"
 Splits the string value of a \fBRESP\fP into two components, by terminating the first component with a null byte and optionally returning the remaining part and length in the output parameters\&. Only RESP_ERROR RESP_BLOB_ERROR and RESP_VERBATIM_STRING types can be split this way\&. All others will return REDIS_UNEXPECTED_RESP\&.
 .PP

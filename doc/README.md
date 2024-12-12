@@ -14,6 +14,7 @@ Last Updated: 10 December 2024
  - [Introduction](#introduction)
  - [Prerequisites](#prerequisites)
  - [Building RedisX](#building-redisx)
+ - [Command-line interface (`redisx-cli`)](#redisx-cli)
  - [Linking your application against RedisX](#linking)
  - [Managing Redis server connections](#managing-redis-server-connections)
  - [Simple Redis queries](#simple-redis-queries)
@@ -67,6 +68,12 @@ Before then the API may undergo slight changes and tweaks. Use the repository as
 
 The [Smithsonian/xchange](https://github.com/Smithsonian/xchange) library is both a build and a runtime dependency of 
 RedisX.
+
+Additionally `redisx-cli` has the following dependencies:
+ 
+  - POPT library (`popt-devel` on RPM-based, or `libpopt-dev` on Debian based Linux).
+  - BSD libraries (`libbsd-devel` on RPM-based, or `libbsd-dev` on Debian based Linux).
+  - readline library (`readline-devel` on RPM based, or `libreadline-dev` on Debian based Linux).
 
 -----------------------------------------------------------------------------
 
@@ -124,6 +131,29 @@ Or, to stage the installation (to `/usr`) under a 'build root':
 ```bash
   $ make DESTDIR="/tmp/stage" install
 ```
+
+-----------------------------------------------------------------------------
+
+<a name="redisx-cli"></a>
+## Command-line interface (`redisx-cli`)
+
+The __RedisX__ library provides its own command-line tool, called `redisx-cli`. It works very similar to `redis-cli`,
+except that it supports a subset of the options (so far...).
+
+```bash
+ $ redisx-cli ping "Hello World"
+```
+will print:
+
+```bash
+ "Hello world!"
+```
+
+provided it successfully connected to the Redis / Valkey server on localhost. (Otherwise it will print an error and a 
+trace). It can also be used in interatice mode if no Redis command arguments are supplied. And, you can run 
+`redisx-cli --help` to see what options are available, and you can also consult the 
+[redis-cli](https://redis.io/docs/latest/develop/tools/cli/) documentation for the same general description and usage 
+(so far as the implementation allows).
 
 -----------------------------------------------------------------------------
 

@@ -11,7 +11,7 @@ src/redisx.c \- A \fBRedis\fP client library that compiles on older and newer pl
 
 .in +1c
 .ti -1c
-.RI "\fBRESP\fP * \fBredisxArrayRequest\fP (\fBRedis\fP *redis, char *args[], int lengths[], int n, int *status)"
+.RI "\fBRESP\fP * \fBredisxArrayRequest\fP (\fBRedis\fP *redis, const char *args[], int lengths[], int n, int *status)"
 .br
 .ti -1c
 .RI "int \fBredisxCheckValid\fP (const \fBRedis\fP *redis)"
@@ -99,7 +99,7 @@ Attila Kovacs
 
 .SH "Function Documentation"
 .PP 
-.SS "\fBRESP\fP * redisxArrayRequest (\fBRedis\fP * redis, char * args[], int lengths[], int n, int * status)"
+.SS "\fBRESP\fP * redisxArrayRequest (\fBRedis\fP * redis, const char * args[], int lengths[], int n, int * status)"
 Returns the result of the most generic type of \fBRedis\fP request with any number of arguments\&. This is not the highest throughput mode (that would be sending asynchronous pipeline request, and then asynchronously collecting the results such as with \fBredisxSendArrayRequestAsync()\fP / \fBredisxReadReplyAsync()\fP, because it requires separate network roundtrips for each and every request\&. But, it is simple and perfectly good method when one needs to retrieve only a few (<1000) variables per second\&.\&.\&.
 .PP
 \fBParameters\fP

@@ -12,7 +12,7 @@ var redisx_client_8c =
     [ "redisxLockConnected", "redisx-client_8c.html#aad864c08ef9365c264c30bbacb0b77b2", null ],
     [ "redisxReadReplyAsync", "redisx-client_8c.html#abc855133c2af4f5d929a05292aa634d1", null ],
     [ "redisxResetClient", "redisx-client_8c.html#a05f0f4d0a2f3d8fb5e385541be6624a2", null ],
-    [ "redisxSendArrayRequestAsync", "redisx-client_8c.html#a899f4f8853add789db4bd4de106fd6d8", null ],
+    [ "redisxSendArrayRequestAsync", "redisx-client_8c.html#ab809bbaed9d3466dbaeb38e82a712ee7", null ],
     [ "redisxSendRequestAsync", "redisx-client_8c.html#afc7b28288c07baf0b3c8fdc9d8ddf263", null ],
     [ "redisxSkipReplyAsync", "redisx-client_8c.html#a44c5d0bd24f5a4f2f131218f14c9c599", null ],
     [ "redisxStartBlockAsync", "redisx-client_8c.html#a3e49508e4e4fcc283832226fd1bffd85", null ],

@@ -150,8 +150,8 @@ Functions</h2></td></tr>
 <tr class="separator:abc855133c2af4f5d929a05292aa634d1"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a05f0f4d0a2f3d8fb5e385541be6624a2" id="r_a05f0f4d0a2f3d8fb5e385541be6624a2"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="redisx-client_8c.html#a05f0f4d0a2f3d8fb5e385541be6624a2">redisxResetClient</a> (<a class="el" href="structRedisClient.html">RedisClient</a> *cl)</td></tr>
 <tr class="separator:a05f0f4d0a2f3d8fb5e385541be6624a2"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a899f4f8853add789db4bd4de106fd6d8" id="r_a899f4f8853add789db4bd4de106fd6d8"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="redisx-client_8c.html#a899f4f8853add789db4bd4de106fd6d8">redisxSendArrayRequestAsync</a> (<a class="el" href="structRedisClient.html">RedisClient</a> *cl, char *args[], int lengths[], int n)</td></tr>
-<tr class="separator:a899f4f8853add789db4bd4de106fd6d8"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ab809bbaed9d3466dbaeb38e82a712ee7" id="r_ab809bbaed9d3466dbaeb38e82a712ee7"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="redisx-client_8c.html#ab809bbaed9d3466dbaeb38e82a712ee7">redisxSendArrayRequestAsync</a> (<a class="el" href="structRedisClient.html">RedisClient</a> *cl, const char *args[], int lengths[], int n)</td></tr>
+<tr class="separator:ab809bbaed9d3466dbaeb38e82a712ee7"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:afc7b28288c07baf0b3c8fdc9d8ddf263" id="r_afc7b28288c07baf0b3c8fdc9d8ddf263"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="redisx-client_8c.html#afc7b28288c07baf0b3c8fdc9d8ddf263">redisxSendRequestAsync</a> (<a class="el" href="structRedisClient.html">RedisClient</a> *cl, const char *command, const char *arg1, const char *arg2, const char *arg3)</td></tr>
 <tr class="separator:afc7b28288c07baf0b3c8fdc9d8ddf263"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a44c5d0bd24f5a4f2f131218f14c9c599" id="r_a44c5d0bd24f5a4f2f131218f14c9c599"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="redisx-client_8c.html#a44c5d0bd24f5a4f2f131218f14c9c599">redisxSkipReplyAsync</a> (<a class="el" href="structRedisClient.html">RedisClient</a> *cl)</td></tr>
@@ -534,8 +534,8 @@ The caller must not attempt to call free() on the returned <a class="el" href="s
 
 </div>
 </div>
-<a id="a899f4f8853add789db4bd4de106fd6d8" name="a899f4f8853add789db4bd4de106fd6d8"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a899f4f8853add789db4bd4de106fd6d8">&#9670;&#160;</a></span>redisxSendArrayRequestAsync()</h2>
+<a id="ab809bbaed9d3466dbaeb38e82a712ee7" name="ab809bbaed9d3466dbaeb38e82a712ee7"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ab809bbaed9d3466dbaeb38e82a712ee7">&#9670;&#160;</a></span>redisxSendArrayRequestAsync()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -549,7 +549,7 @@ The caller must not attempt to call free() on the returned <a class="el" href="s
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">char *&#160;</td>
+          <td class="paramtype">const char *&#160;</td>
           <td class="paramname"><em>args</em>[], </td>
         </tr>
         <tr>
@@ -643,7 +643,7 @@ The caller must not attempt to call free() on the returned <a class="el" href="s
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>X_SUCCESS (0) on success or X_NULL if the client is NULL, or else X_NO_SERVICE if not connected to the client or if send() failed </dd></dl>
 
-<p class="reference">References <a class="el" href="redisx-client_8c.html#a899f4f8853add789db4bd4de106fd6d8">redisxSendArrayRequestAsync()</a>, <a class="elRef" href="../../xchange/apidoc/html/xchange_8c.html#ae73aaf705dc4e7d58dfb0fd81f4805c7">x_error()</a>, <a class="elRef" href="../../xchange/apidoc/html/xchange_8h.html#a5426366367d169401f779c4764ba7736">X_NAME_INVALID</a>, and <a class="elRef" href="../../xchange/apidoc/html/xchange_8h.html#a7b2679c964ea5f2160380ed55654b873">X_SUCCESS</a>.</p>
+<p class="reference">References <a class="el" href="redisx-client_8c.html#ab809bbaed9d3466dbaeb38e82a712ee7">redisxSendArrayRequestAsync()</a>, <a class="elRef" href="../../xchange/apidoc/html/xchange_8c.html#ae73aaf705dc4e7d58dfb0fd81f4805c7">x_error()</a>, <a class="elRef" href="../../xchange/apidoc/html/xchange_8h.html#a5426366367d169401f779c4764ba7736">X_NAME_INVALID</a>, and <a class="elRef" href="../../xchange/apidoc/html/xchange_8h.html#a7b2679c964ea5f2160380ed55654b873">X_SUCCESS</a>.</p>
 
 </div>
 </div>

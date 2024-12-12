@@ -15,6 +15,7 @@ RESP \- Structure that represents a \fBRedis\fP response (\fBRESP\fP format)\&.
 .ti -1c
 .RI "int \fBn\fP"
 .br
+.RI "dimension of the value field\&. "
 .ti -1c
 .RI "enum \fBresp_type\fP \fBtype\fP"
 .br
@@ -50,7 +51,9 @@ https://github.com/redis/redis-specifications/tree/master/protocol
 .SH "Field Documentation"
 .PP 
 .SS "int n"
-Either the integer value of a RESP_INT or a RESP3_BOOLEAN response, or the dimension of the value field\&. 
+
+.PP
+dimension of the value field\&. Either the integer value of a RESP_INT or a RESP3_BOOLEAN response, or the 
 .SS "void* value"
 Pointer to text (char *) content or to an array of components (RESP**) or (\fBRedisMapEntry\fP *), or else a pointer to a \fCdouble\fP, depending on \fCtype\fP\&. 
 

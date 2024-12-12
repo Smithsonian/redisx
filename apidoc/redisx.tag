@@ -358,8 +358,8 @@
       <type>RESP *</type>
       <name>redisxArrayRequest</name>
       <anchorfile>redisx_8h.html</anchorfile>
-      <anchor>a3277da532f102e9f6ea47e3c86d1e510</anchor>
-      <arglist>(Redis *redis, char *args[], int length[], int n, int *status)</arglist>
+      <anchor>a59b7f0cb895a7c4f16dc5413ddf1f963</anchor>
+      <arglist>(Redis *redis, const char *args[], int length[], int n, int *status)</arglist>
     </member>
     <member kind="function">
       <type>int</type>
@@ -741,10 +741,17 @@
     </member>
     <member kind="function">
       <type>int</type>
+      <name>redisxPrintJSON</name>
+      <anchorfile>redisx_8h.html</anchorfile>
+      <anchor>a0c3e84681ddfeabf29bac807ff46160b</anchor>
+      <arglist>(const char *name, const RESP *resp)</arglist>
+    </member>
+    <member kind="function">
+      <type>int</type>
       <name>redisxPrintRESP</name>
       <anchorfile>redisx_8h.html</anchorfile>
-      <anchor>a033634f60b612f02ebf11823aeb6641a</anchor>
-      <arglist>(const char *name, const RESP *resp)</arglist>
+      <anchor>ae1691b2452bc3badd1cc8874b139b846</anchor>
+      <arglist>(const RESP *resp)</arglist>
     </member>
     <member kind="function">
       <type>int</type>
@@ -841,8 +848,8 @@
       <type>int</type>
       <name>redisxSendArrayRequestAsync</name>
       <anchorfile>redisx_8h.html</anchorfile>
-      <anchor>aa215ffce482d0b0edf5ca4ef5eaf3f8b</anchor>
-      <arglist>(RedisClient *cl, char *args[], int length[], int n)</arglist>
+      <anchor>addf31b7508fe17f032a1c3168e32d967</anchor>
+      <arglist>(RedisClient *cl, const char *args[], int length[], int n)</arglist>
     </member>
     <member kind="function">
       <type>int</type>
@@ -1091,8 +1098,8 @@
       <type>int</type>
       <name>redisxSendArrayRequestAsync</name>
       <anchorfile>redisx-client_8c.html</anchorfile>
-      <anchor>a899f4f8853add789db4bd4de106fd6d8</anchor>
-      <arglist>(RedisClient *cl, char *args[], int lengths[], int n)</arglist>
+      <anchor>ab809bbaed9d3466dbaeb38e82a712ee7</anchor>
+      <arglist>(RedisClient *cl, const char *args[], int lengths[], int n)</arglist>
     </member>
     <member kind="function">
       <type>int</type>
@@ -1478,8 +1485,8 @@
       <type>RESP *</type>
       <name>redisxArrayRequest</name>
       <anchorfile>redisx_8c.html</anchorfile>
-      <anchor>a13ae33bc25ee03621b23541236ef5f82</anchor>
-      <arglist>(Redis *redis, char *args[], int lengths[], int n, int *status)</arglist>
+      <anchor>adc8c148c008f7668674edec57a3fa832</anchor>
+      <arglist>(Redis *redis, const char *args[], int lengths[], int n, int *status)</arglist>
     </member>
     <member kind="function">
       <type>int</type>
@@ -1740,10 +1747,17 @@
     </member>
     <member kind="function">
       <type>int</type>
+      <name>redisxPrintJSON</name>
+      <anchorfile>resp_8c.html</anchorfile>
+      <anchor>a0c3e84681ddfeabf29bac807ff46160b</anchor>
+      <arglist>(const char *name, const RESP *resp)</arglist>
+    </member>
+    <member kind="function">
+      <type>int</type>
       <name>redisxPrintRESP</name>
       <anchorfile>resp_8c.html</anchorfile>
-      <anchor>a033634f60b612f02ebf11823aeb6641a</anchor>
-      <arglist>(const char *name, const RESP *resp)</arglist>
+      <anchor>ae1691b2452bc3badd1cc8874b139b846</anchor>
+      <arglist>(const RESP *resp)</arglist>
     </member>
     <member kind="function">
       <type>char *</type>
@@ -1897,6 +1911,7 @@
     <docanchor file="index.html">introduction</docanchor>
     <docanchor file="index.html">prerequisites</docanchor>
     <docanchor file="index.html">building-redisx</docanchor>
+    <docanchor file="index.html">redisx-cli</docanchor>
     <docanchor file="index.html">linking</docanchor>
     <docanchor file="index.html">managing-redis-server-connections</docanchor>
     <docanchor file="index.html">initializing</docanchor>

@@ -4,40 +4,41 @@
       <topic label="Related links" href="index.html#autotoc_md5"/>
     <topic label="Prerequisites" href="index.html#autotoc_md7"/>
     <topic label="Building RedisX" href="index.html#autotoc_md9"/>
-    <topic label="Linking your application against RedisX" href="index.html#autotoc_md11"/>
-    <topic label="Managing Redis server connections" href="index.html#autotoc_md13">
-      <topic label="Initializing" href="index.html#autotoc_md14"/>
-      <topic label="Connecting" href="index.html#autotoc_md15"/>
-      <topic label="Disconnecting" href="index.html#autotoc_md16"/>
-      <topic label="Connection hooks" href="index.html#autotoc_md17"/>
+    <topic label="Command-line interface (&lt;tt&gt;redisx-cli&lt;/tt&gt;)" href="index.html#autotoc_md11"/>
+    <topic label="Linking your application against RedisX" href="index.html#autotoc_md13"/>
+    <topic label="Managing Redis server connections" href="index.html#autotoc_md15">
+      <topic label="Initializing" href="index.html#autotoc_md16"/>
+      <topic label="Connecting" href="index.html#autotoc_md17"/>
+      <topic label="Disconnecting" href="index.html#autotoc_md18"/>
+      <topic label="Connection hooks" href="index.html#autotoc_md19"/>
     </topic>
-    <topic label="Simple Redis queries" href="index.html#autotoc_md19">
-      <topic label="Interactive transactions" href="index.html#autotoc_md20"/>
-      <topic label="Bundled Attributes" href="index.html#autotoc_md21"/>
-      <topic label="Push notifications" href="index.html#autotoc_md22"/>
-      <topic label="RESP data type" href="index.html#autotoc_md23"/>
+    <topic label="Simple Redis queries" href="index.html#autotoc_md21">
+      <topic label="Interactive transactions" href="index.html#autotoc_md22"/>
+      <topic label="Bundled Attributes" href="index.html#autotoc_md23"/>
+      <topic label="Push notifications" href="index.html#autotoc_md24"/>
+      <topic label="RESP data type" href="index.html#autotoc_md25"/>
     </topic>
-    <topic label="Accessing key / value data" href="index.html#autotoc_md25">
-      <topic label="Getting and setting keyed values" href="index.html#autotoc_md26"/>
-      <topic label="Listing and Scanning" href="index.html#autotoc_md27"/>
+    <topic label="Accessing key / value data" href="index.html#autotoc_md27">
+      <topic label="Getting and setting keyed values" href="index.html#autotoc_md28"/>
+      <topic label="Listing and Scanning" href="index.html#autotoc_md29"/>
     </topic>
-    <topic label="Publish / subscribe (PUB/SUB) support" href="index.html#autotoc_md29">
-      <topic label="Broadcasting messages" href="index.html#autotoc_md30"/>
-      <topic label="Subscriptions" href="index.html#autotoc_md31"/>
+    <topic label="Publish / subscribe (PUB/SUB) support" href="index.html#autotoc_md31">
+      <topic label="Broadcasting messages" href="index.html#autotoc_md32"/>
+      <topic label="Subscriptions" href="index.html#autotoc_md33"/>
     </topic>
-    <topic label="Atomic execution blocks and LUA scripts" href="index.html#autotoc_md33">
-      <topic label="Execution blocks" href="index.html#autotoc_md34"/>
-      <topic label="LUA script loading and execution" href="index.html#autotoc_md35"/>
-      <topic label="Custom Redis functions" href="index.html#autotoc_md36"/>
+    <topic label="Atomic execution blocks and LUA scripts" href="index.html#autotoc_md35">
+      <topic label="Execution blocks" href="index.html#autotoc_md36"/>
+      <topic label="LUA script loading and execution" href="index.html#autotoc_md37"/>
+      <topic label="Custom Redis functions" href="index.html#autotoc_md38"/>
     </topic>
-    <topic label="Advanced queries and pipelining" href="index.html#autotoc_md38">
-      <topic label="Asynchronous client processing" href="index.html#autotoc_md39"/>
-      <topic label="Bundled Attributes" href="index.html#autotoc_md40"/>
-      <topic label="Pipelined transactions" href="index.html#autotoc_md41"/>
+    <topic label="Advanced queries and pipelining" href="index.html#autotoc_md40">
+      <topic label="Asynchronous client processing" href="index.html#autotoc_md41"/>
+      <topic label="Bundled Attributes" href="index.html#autotoc_md42"/>
+      <topic label="Pipelined transactions" href="index.html#autotoc_md43"/>
     </topic>
-    <topic label="Error handling" href="index.html#autotoc_md43"/>
-    <topic label="Debug support" href="index.html#autotoc_md45"/>
-    <topic label="Future plans" href="index.html#autotoc_md47"/>
+    <topic label="Error handling" href="index.html#autotoc_md45"/>
+    <topic label="Debug support" href="index.html#autotoc_md47"/>
+    <topic label="Future plans" href="index.html#autotoc_md49"/>
   </topic>
   <topic label="Changelog" href="md_CHANGELOG.html">
     <topic label="[Unreleased]" href="md_CHANGELOG.html#autotoc_md1"/>
@@ -161,7 +162,7 @@
           <topic label="redisxAddConnectHook" href="redisx_8h.html#aab103bdeb66dd1daded10e1f6e993568"/>
           <topic label="redisxAddDisconnectHook" href="redisx_8h.html#a37d95c69831058865b078f0f0f20d540"/>
           <topic label="redisxAddSubscriber" href="redisx_8h.html#a4c268c33f23438af67117b09c26ec615"/>
-          <topic label="redisxArrayRequest" href="redisx_8h.html#a3277da532f102e9f6ea47e3c86d1e510"/>
+          <topic label="redisxArrayRequest" href="redisx_8h.html#a59b7f0cb895a7c4f16dc5413ddf1f963"/>
           <topic label="redisxCheckDestroyRESP" href="redisx_8h.html#a9849f4fb9156f3a3f4f4b3021993d4ce"/>
           <topic label="redisxCheckRESP" href="redisx_8h.html#a4b5674d08da07250c0ca6116a4c48ccf"/>
           <topic label="redisxCheckValid" href="redisx_8h.html#a0cdebfd895ab4c61c0fc9e0863a66419"/>
@@ -216,7 +217,8 @@
           <topic label="redisxMultiSetAsync" href="redisx_8h.html#a750023f759dd5192dd3c802a542af770"/>
           <topic label="redisxNotify" href="redisx_8h.html#ace918fd1adb80e26cfae107685a314e0"/>
           <topic label="redisxPing" href="redisx_8h.html#afd19b1137e80ed26065d9e6e7039c8fe"/>
-          <topic label="redisxPrintRESP" href="redisx_8h.html#a033634f60b612f02ebf11823aeb6641a"/>
+          <topic label="redisxPrintJSON" href="redisx_8h.html#a0c3e84681ddfeabf29bac807ff46160b"/>
+          <topic label="redisxPrintRESP" href="redisx_8h.html#ae1691b2452bc3badd1cc8874b139b846"/>
           <topic label="redisxPublish" href="redisx_8h.html#a06262603a9a3153fb29d81628fee6a8e"/>
           <topic label="redisxPublishAsync" href="redisx_8h.html#a89b6c2128548882616c081553ea2436c"/>
           <topic label="redisxReadReplyAsync" href="redisx_8h.html#abc855133c2af4f5d929a05292aa634d1"/>
@@ -230,7 +232,7 @@
           <topic label="redisxScanKeys" href="redisx_8h.html#a67dd05115ae75dac9637ac04220d73b6"/>
           <topic label="redisxScanTable" href="redisx_8h.html#a47d28fd9f2f35f0af5abd67a1ae7b987"/>
           <topic label="redisxSelectDB" href="redisx_8h.html#aec99fb8b19d6751038bf9c4c6d04f8d0"/>
-          <topic label="redisxSendArrayRequestAsync" href="redisx_8h.html#aa215ffce482d0b0edf5ca4ef5eaf3f8b"/>
+          <topic label="redisxSendArrayRequestAsync" href="redisx_8h.html#addf31b7508fe17f032a1c3168e32d967"/>
           <topic label="redisxSendRequestAsync" href="redisx_8h.html#afc7b28288c07baf0b3c8fdc9d8ddf263"/>
           <topic label="redisxSetPassword" href="redisx_8h.html#a0e9eda38aa6f084ac151cbebe2886c2f"/>
           <topic label="redisxSetPipelineConsumer" href="redisx_8h.html#a0799a0a79705d1a7579bdf57879d1fec"/>
@@ -269,7 +271,7 @@
           <topic label="redisxLockConnected" href="redisx-client_8c.html#aad864c08ef9365c264c30bbacb0b77b2"/>
           <topic label="redisxReadReplyAsync" href="redisx-client_8c.html#abc855133c2af4f5d929a05292aa634d1"/>
           <topic label="redisxResetClient" href="redisx-client_8c.html#a05f0f4d0a2f3d8fb5e385541be6624a2"/>
-          <topic label="redisxSendArrayRequestAsync" href="redisx-client_8c.html#a899f4f8853add789db4bd4de106fd6d8"/>
+          <topic label="redisxSendArrayRequestAsync" href="redisx-client_8c.html#ab809bbaed9d3466dbaeb38e82a712ee7"/>
           <topic label="redisxSendRequestAsync" href="redisx-client_8c.html#afc7b28288c07baf0b3c8fdc9d8ddf263"/>
           <topic label="redisxSkipReplyAsync" href="redisx-client_8c.html#a44c5d0bd24f5a4f2f131218f14c9c599"/>
           <topic label="redisxStartBlockAsync" href="redisx-client_8c.html#a3e49508e4e4fcc283832226fd1bffd85"/>
@@ -332,7 +334,7 @@
           <topic label="redisxSetValueAsync" href="redisx-tab_8c.html#a9e784632598b0c418a3ae3a87aa09fe4"/>
         </topic>
         <topic label="redisx.c" href="redisx_8c.html">
-          <topic label="redisxArrayRequest" href="redisx_8c.html#a13ae33bc25ee03621b23541236ef5f82"/>
+          <topic label="redisxArrayRequest" href="redisx_8c.html#adc8c148c008f7668674edec57a3fa832"/>
           <topic label="redisxCheckValid" href="redisx_8c.html#a0cdebfd895ab4c61c0fc9e0863a66419"/>
           <topic label="redisxDebugTraffic" href="redisx_8c.html#a7cde25fca6ae274d8d0a66d5c8b63ff5"/>
           <topic label="redisxError" href="redisx_8c.html#ae722b046fa70a55db725341ef8ee56dc"/>
@@ -371,7 +373,8 @@
           <topic label="redisxIsMapType" href="resp_8c.html#a460822029ff730cd7a55d64797c329a3"/>
           <topic label="redisxIsScalarType" href="resp_8c.html#a944a623a34b5a6a7af064fc0d0cc35bf"/>
           <topic label="redisxIsStringType" href="resp_8c.html#a7fb3a83bc8345413eb1a722444386abd"/>
-          <topic label="redisxPrintRESP" href="resp_8c.html#a033634f60b612f02ebf11823aeb6641a"/>
+          <topic label="redisxPrintJSON" href="resp_8c.html#a0c3e84681ddfeabf29bac807ff46160b"/>
+          <topic label="redisxPrintRESP" href="resp_8c.html#ae1691b2452bc3badd1cc8874b139b846"/>
           <topic label="redisxRESP2JSON" href="resp_8c.html#a7f4e74ee03cebf38eb9c1fb873784a35"/>
           <topic label="redisxRESP2XField" href="resp_8c.html#adc7235cd1b6be038b9f3c7beb11a13ef"/>
           <topic label="redisxSplitText" href="resp_8c.html#a63c29262670cf34d06fc30e684878819"/>
