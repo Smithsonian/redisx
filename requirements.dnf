@@ -1,0 +1,5 @@
+# sudo dnf install $(grep -v ^# requirements.dnf)
+popt-devel
+readline-devel
+libbsd-devel
+

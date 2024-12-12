@@ -1,0 +1,5 @@
+# sudo apt install $(grep -v ^# requirements.apt)
+libpopt-dev
+libreadline-dev
+libbsd-dev
+
