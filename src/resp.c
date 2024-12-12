@@ -427,7 +427,7 @@ int redisxAppendRESP(RESP *resp, RESP *part) {
   extend = (char *) realloc(resp->value, (resp->n + part->n) * eSize);
   if(!extend) {
     free(old);
-    return x_error(X_FAILURE, errno, fn, "alloc RESP array (%ld components)", resp->n + part->n);
+    return x_error(X_FAILURE, errno, fn, "alloc RESP array (%d components)", resp->n + part->n);
   }
 
   memcpy(extend + resp->n * eSize, part->value, part->n * eSize);
@@ -642,14 +642,10 @@ static XField *respMap2XField(const char *name, const RedisMapEntry *map, int n)
   XStructure *s = xCreateStruct(), *nonstring = NULL;
   int nNonString = 0;
 
-  printf("### map\n");
-
   while(--n >= 0) {
     const RedisMapEntry *e = &map[n];
 
     if(redisxIsStringType(e->key)) {
-      printf("### + %s\n", (char *) e->key->value);
-
       XField *fi = redisxRESP2XField((char *) e->key->value, e->value);
       if(fi) {
         fi->next = s->firstField;
