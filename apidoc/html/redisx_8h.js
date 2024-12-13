@@ -116,7 +116,7 @@ var redisx_8h =
     [ "redisxMultiSetAsync", "redisx_8h.html#a750023f759dd5192dd3c802a542af770", null ],
     [ "redisxNotify", "redisx_8h.html#ace918fd1adb80e26cfae107685a314e0", null ],
     [ "redisxPing", "redisx_8h.html#afd19b1137e80ed26065d9e6e7039c8fe", null ],
-    [ "redisxPrintDelimited", "redisx_8h.html#a964f3d72f790b38032326d9115a5f145", null ],
+    [ "redisxPrintDelimited", "redisx_8h.html#aff1df58b8ef619139cd5ea92ef656e02", null ],
     [ "redisxPrintJSON", "redisx_8h.html#a0c3e84681ddfeabf29bac807ff46160b", null ],
     [ "redisxPrintRESP", "redisx_8h.html#ae1691b2452bc3badd1cc8874b139b846", null ],
     [ "redisxPublish", "redisx_8h.html#a06262603a9a3153fb29d81628fee6a8e", null ],

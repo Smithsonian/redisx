@@ -743,8 +743,8 @@
       <type>void</type>
       <name>redisxPrintDelimited</name>
       <anchorfile>redisx_8h.html</anchorfile>
-      <anchor>a964f3d72f790b38032326d9115a5f145</anchor>
-      <arglist>(const RESP *resp, const char *delim, const char *groupDelim)</arglist>
+      <anchor>aff1df58b8ef619139cd5ea92ef656e02</anchor>
+      <arglist>(const RESP *resp, const char *delim, const char *groupPrefix)</arglist>
     </member>
     <member kind="function">
       <type>int</type>
@@ -1756,8 +1756,8 @@
       <type>void</type>
       <name>redisxPrintDelimited</name>
       <anchorfile>resp_8c.html</anchorfile>
-      <anchor>a964f3d72f790b38032326d9115a5f145</anchor>
-      <arglist>(const RESP *resp, const char *delim, const char *groupDelim)</arglist>
+      <anchor>aff1df58b8ef619139cd5ea92ef656e02</anchor>
+      <arglist>(const RESP *resp, const char *delim, const char *groupPrefix)</arglist>
     </member>
     <member kind="function">
       <type>int</type>

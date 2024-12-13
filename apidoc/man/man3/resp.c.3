@@ -57,7 +57,7 @@ src/resp.c
 .RI "\fBboolean\fP \fBredisxIsStringType\fP (const \fBRESP\fP *r)"
 .br
 .ti -1c
-.RI "void \fBredisxPrintDelimited\fP (const \fBRESP\fP *resp, const char *delim, const char *groupDelim)"
+.RI "void \fBredisxPrintDelimited\fP (const \fBRESP\fP *resp, const char *delim, const char *groupPrefix)"
 .br
 .ti -1c
 .RI "int \fBredisxPrintJSON\fP (const char *name, const \fBRESP\fP *resp)"
@@ -409,16 +409,23 @@ TRUE (1) if the data holds a string type value, or else FALSE (0)\&.
 
 .PP
 References \fBFALSE\fP, \fBRESP3_BIG_NUMBER\fP, \fBRESP3_BLOB_ERROR\fP, \fBRESP3_VERBATIM_STRING\fP, \fBRESP_BULK_STRING\fP, \fBRESP_ERROR\fP, \fBRESP_SIMPLE_STRING\fP, \fBTRUE\fP, and \fBRESP::type\fP\&.
-.SS "void redisxPrintDelimited (const \fBRESP\fP * resp, const char * delim, const char * groupDelim)"
+.SS "void redisxPrintDelimited (const \fBRESP\fP * resp, const char * delim, const char * groupPrefix)"
 Prints a \fBRESP\fP in raw form using delimiters only\&.
 .PP
 \fBParameters\fP
 .RS 4
 \fIresp\fP Pointer to a \fBRESP\fP (it may be NULL) 
 .br
-\fIdelim\fP delimiter between \fBRESP\fP array/map entries 
+\fIdelim\fP Delimiter between elements 
 .br
-\fIgroupDelim\fP group delimiter between arrays / maps 
+\fIgroupPrefix\fP Prefix in front of arrays and maps
+.RE
+.PP
+\fBSee also\fP
+.RS 4
+\fBredisxPrintRESP()\fP 
+.PP
+\fBredisxPrintJSON()\fP 
 .RE
 .PP
 
@@ -443,6 +450,8 @@ Prints a \fBRESP\fP in JSON format to the standard output with the specified nam
 .RS 4
 \fBredisxPrintRESP()\fP 
 .PP
+\fBredisxPrintDelimited()\fP 
+.PP
 \fBredisxRESP2JSON()\fP 
 .RE
 .PP
@@ -465,6 +474,8 @@ X_SUCCESS (0) if successful or else X_FAILURE if there was an error\&.
 \fBSee also\fP
 .RS 4
 \fBredisxPrintJSON()\fP 
+.PP
+\fBredisxPrintDelimited()\fP 
 .RE
 .PP
 
