@@ -25,6 +25,10 @@ static char *host = "127.0.0.1";
 static int port = 6379;
 static int format = 0;
 
+static void printVersion(const char *name) {
+  printf("%s %s\n", name, REDISX_VERSION_STRING);
+}
+
 
 static void printRESP(const char *prefix, const RESP *resp) {
   if(format == FORMAT_JSON) redisxPrintJSON(prefix, resp);
@@ -105,8 +109,40 @@ static char *readScript(const char *eval) {
   return script;
 }
 
+/**
+ * Converts command-line arguments to parameters passed to EVAL.
+ *
+ * @param script    The script itself
+ * @param args      The command-line arguments of the form `key1 key2 ... , arg1 arg2...`.
+ * @param nargs     The number of command-line args
+ * @return          The argument list to pass to Redis , of the form:
+ *                  `EVAL <script> <NKEYS> [key1 [key2] ...] [arg1 [arg2 ...]]`
+ */
+static char **setScriptArgs(char *script, char **args, int *nargs) {
+  int i, to = 0, n = *nargs, nkeys = 0;
+  char keys[20], **a;
+
+  // Count the number of keys on the command-line up to the comma separator
+  for(nkeys = 0; nkeys < n; nkeys++) if(strcmp(",", args[nkeys])) break;
+  sprintf(keys, "%d", nkeys);
+
+  a = (char **) calloc((n + 2), sizeof(char *));
+  x_check_alloc(a);
+
+  a[to++] = "EVAL";
+  a[to++] = script;
+  a[to++] = xStringCopyOf(keys);
+
+  for(i = 0; i < nkeys; i++) a[to++] = args[i];       // key arguments
+  for(i = nkeys + 1; i < n; i++) a[to++] = args[i];   // additional parametes
+
+  *nargs += 2;
+
+  return a;
+}
+
 int main(int argc, const char *argv[]) {
-  static const char *fn = "redis-cli";
+  static const char *fn = "redisx-cli";
 
   double timeout = 0.0;
   char *password = NULL;
@@ -116,37 +152,46 @@ int main(int argc, const char *argv[]) {
   double interval = 1.0;
   int dbIndex = 0;
   int protocol = -1;
+  int input = 0;
   char *push = "y";
   const char *eval = NULL;
+  int verbose = 0;
+  int debug = 0;
+
 
   struct poptOption options[] = { //
-          {NULL,        'h', POPT_ARG_STRING | POPT_ARGFLAG_SHOW_DEFAULT,    &host,     0, "Server hostname.", "<hostname>"}, //
-          {NULL,        'p', POPT_ARG_INT    | POPT_ARGFLAG_SHOW_DEFAULT,    &port,     0, "Server port.", "<port>"}, //
-          {NULL,        't', POPT_ARG_DOUBLE, &timeout,    0, "Server connection timeout in seconds (decimals allowed).", "<timeout>"}, //
+          {NULL,         'h', POPT_ARG_STRING | POPT_ARGFLAG_SHOW_DEFAULT,    &host,     0, "Server hostname.", "<hostname>"}, //
+          {NULL,         'p', POPT_ARG_INT    | POPT_ARGFLAG_SHOW_DEFAULT,    &port,     0, "Server port.", "<port>"}, //
+          {NULL,         't', POPT_ARG_DOUBLE, &timeout,    0, "Server connection timeout in seconds (decimals allowed).", "<timeout>"}, //
           {"pass",       'a', POPT_ARG_STRING, &password,   0, "Password to use when connecting to the server.", "<password>"}, //
           {"user",        0, POPT_ARG_STRING, &user,       0, "Used to send ACL style 'AUTH username pass'. Needs -a.", "<username>"}, //
-          {"askpass",     0, POPT_ARG_NONE,   &askpass,    0, "Force user to input password with mask from STDIN." //
+          {"askpass",     0, POPT_ARG_NONE,   &askpass,    0, "Force user to input password with mask from STDIN.  " //
                   "If this argument is used, '-a' will be ignored.", NULL //
           }, //
           {NULL,        'r', POPT_ARG_INT,    &repeat,     0, "Execute specified command N times.", "<repeat>"}, //
-          {NULL,        'i', POPT_ARG_DOUBLE | POPT_ARGFLAG_SHOW_DEFAULT, &interval, 0, "When -r is used, waits <interval> seconds per command. " //
+          {NULL,        'i', POPT_ARG_DOUBLE | POPT_ARGFLAG_SHOW_DEFAULT, &interval, 0, "When -r is used, waits <interval> seconds per command.  " //
                   "It is possible to specify sub-second times like -i 0.1.", "<interval>" //
           }, //
           {NULL,        'n', POPT_ARG_INT,    &dbIndex,    0, "Database number.", "<db>"}, //
           {NULL,        '2', POPT_ARG_VAL,    &protocol,   2, "Start session in RESP2 protocol mode.", NULL}, //
           {NULL,        '3', POPT_ARG_VAL,    &protocol,   3, "Start session in RESP3 protocol mode.", NULL}, //
+          {NULL,        'x', POPT_ARG_VAL,    &input,      0, "Read last argument from STDIN", NULL}, //
           {"json",        0, POPT_ARG_NONE,   NULL,      'j', "Output in JSON format", NULL}, //
           {"show-pushes", 0, POPT_ARG_STRING, &push,       0, "Whether to print RESP3 PUSH messages.  Enabled by default when STDOUT " //
                   "is a tty but can be overridden with --show-pushes no.", "<yes|no>" //
           }, //
-          {"eval",        0, POPT_ARG_STRING, &push,       0, "Send an EVAL command using the Lua script at <file>.", "<file>" },
+          {"eval",        0, POPT_ARG_STRING, &push,       0, "Send an EVAL command using the Lua script at <file>.  " //
+                  "The keyword and other arguments should be separated with a standalone comma on the command-line, such as: 'key1 key2 , arg1 arg2 ...'", "<file>" //
+          },
+          {"verbose",     0, POPT_ARG_NONE,   &verbose,    0, "Verbose mode.", NULL }, //
+          {"debug",       0, POPT_ARG_NONE   | POPT_ARGFLAG_DOC_HIDDEN,   &debug  ,    0, "Debug mode. Prints all network traffic.", NULL }, //
+          {"version",     0, POPT_ARG_NONE,   NULL,      'v', "Output version and exit.", NULL }, //
 
           POPT_AUTOHELP POPT_TABLEEND //
   };
 
   int rc;
   char **cmdargs;
-  char *script;
   int i, nargs = 0;
   Redis *redis;
 
@@ -164,6 +209,7 @@ int main(int argc, const char *argv[]) {
       case '3': protocol = 3; break;
       case 'j': format = FORMAT_JSON; break;
       case 'r': format = FORMAT_RAW; break;
+      case 'v': printVersion(fn); return 0;
     }
   }
 
@@ -178,15 +224,19 @@ int main(int argc, const char *argv[]) {
   }
 
   if(eval) {
-    // Insert 'EVAL <script>' in front of the command-line args.
-    script = readScript(eval);
-    cmdargs = realloc(cmdargs, nargs + 2 * sizeof(char *));
-    x_check_alloc(cmdargs);
-    memmove(cmdargs[2], cmdargs, nargs * sizeof(char *));
-    cmdargs[0] = "EVAL";
-    cmdargs[1] = script;
-    nargs += 2;
+    // Make an EVAL <script> <NKEYS> ... command
+    cmdargs = setScriptArgs(readScript(eval), cmdargs, &nargs);
   }
+
+  if(input) {
+    // Add trailing argument from STDIN.
+    cmdargs = realloc(cmdargs, nargs + 1 * sizeof(char *));
+    x_check_alloc(cmdargs);
+    cmdargs[nargs++] = readline(NULL);
+  }
+
+  if(verbose) redisxSetVerbose(1);
+  if(debug) redisxDebugTraffic(1);
 
   redis = redisxInit(host);
 
