@@ -780,51 +780,39 @@ int redisxPrintJSON(const char *name, const RESP *resp) {
   return X_SUCCESS;
 }
 
-static void rNewLine(int ident) {
-  putchar('\n');
-  while(--ident >= 0) putchar(' ');
+static int rIndentLine(int indent) {
+  while(--indent >= 0) putchar(' ');
+  return indent;
 }
 
 static int rIndexWidth(int count) {
   return 1 + (int) floor(log10(count));
 }
 
-static int rPrintRESP(int ident, const RESP *resp) {
+static int rPrintRESP(int indent, const RESP *resp) {
 
-  if(!resp) {
-    printf("(null)");
-    return X_SUCCESS;
-  }
-
-  if(resp->type == RESP3_NULL) {
-    printf("null");
-    return X_SUCCESS;
-  }
+  if(!resp) return printf("(null)");
+  if(resp->type == RESP3_NULL) return printf("null");
 
   switch(resp->type) {
 
     case RESP_INT:
-      printf("(integer) %d", resp->n);
-      return X_SUCCESS;
+      return printf("(integer) %d", resp->n);
 
     case RESP3_DOUBLE:
-      printf("(double) %g", *(double *) resp->value);
-      return X_SUCCESS;
+      return printf("(double) %g", *(double *) resp->value);
 
     case RESP3_BIG_NUMBER:
-      printf("(big number) %s", (char *) resp->value);
-      return X_SUCCESS;
+      return printf("(big number) %s", (char *) resp->value);
 
     case RESP_SIMPLE_STRING:
     case RESP_ERROR:
-      printf("%s", (char *) resp->value);
-      return X_SUCCESS;
+      return printf("%s", (char *) resp->value);
 
     case RESP_BULK_STRING:
     case RESP3_BLOB_ERROR:
     case RESP3_VERBATIM_STRING:
-      printf("\"%s\"", (char *) resp->value);
-      return X_SUCCESS;
+      return printf("\"%s\"", (char *) resp->value);
 
     case RESP_ARRAY:
     case RESP3_SET:
@@ -833,14 +821,16 @@ static int rPrintRESP(int ident, const RESP *resp) {
 
       if(!resp->value) printf("(empty array)");
       else {
-        int i;
+        int i, w = rIndexWidth(resp->n);
         for(i = 0; i < resp->n; i++) {
-          rNewLine(ident);
-          printf("%*d) ", rIndexWidth(resp->n), (i + 1));
-          rPrintRESP(ident + 2, component[i]);
+          int pos = indent;
+          if(i) rIndentLine(indent);
+          pos += printf("%*d) ", w, (i + 1));
+          rPrintRESP(pos, component[i]);
+          if(i + 1 < resp->n) printf("\n");
         }
       }
-      return X_SUCCESS;
+      return 0;
     }
 
     case RESP3_MAP:
@@ -849,22 +839,24 @@ static int rPrintRESP(int ident, const RESP *resp) {
 
       if(!resp->value) printf("(empty map)");
       else {
-        int i;
+        int i, w = rIndexWidth(resp->n);
         for(i = 0; i < resp->n; i++) {
-          rNewLine(ident);
-          printf("%*d# ", rIndexWidth(resp->n), (i + 1));
-          rPrintRESP(ident + 2, component[i].key);
-          printf(" => ");
-          rPrintRESP(ident + 2, component[i].value);
+          int pos = indent;
+          if(i) rIndentLine(indent);
+          pos += printf("%*d# ", w, (i + 1));
+          pos += rPrintRESP(indent + w + 2, component[i].key);
+          pos += printf(" => ");
+          rPrintRESP(pos, component[i].value);
+          if(i + 1 < resp->n) printf("\n");
         }
       }
-      return X_SUCCESS;
+      return 0;
     }
 
     default:
       if(!resp->value) printf("(nil)");
       else printf("<unknown> type '%c'", resp->type);
-      return X_FAILURE;
+      return -1;
   }
 }
 
@@ -878,8 +870,8 @@ static int rPrintRESP(int ident, const RESP *resp) {
  * @sa redisxPrintJSON()
  */
 int redisxPrintRESP(const RESP *resp) {
-  int status = rPrintRESP(0, resp);
+  int n = rPrintRESP(0, resp);
   printf("\n");
-  return status;
+  return n >= 0 ? X_SUCCESS : X_FAILURE;
 }
 
