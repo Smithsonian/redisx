@@ -82,7 +82,7 @@ Before then the API may undergo slight changes and tweaks. Use the repository as
  | interactive queries               |  __yes__   | dedicated (low-latency) client                               |
  | pipelined (batch) processing      |  __yes__   | dedicated (high-bandwidth) client / user-defined callback    |
  | PUB/SUB support                   |  __yes__   | dedicated client / user callbacks / subscription management  |
- | Redis Sentinel                    |  __yes__   |                                                              |
+ | Redis Sentinel                    |  __yes__   | _help me test it_                                            |
  | Redis cluster support             |    no      | _coming soon..._                                             |
  | TLS support                       |    no      | _coming soon..._                                             |
  | resubscribe on reconnect          |    no      | _in the not too distance future..._                          |
