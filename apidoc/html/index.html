@@ -154,45 +154,45 @@ Features overview</h3>
 <tr class="markdownTableHead">
 <th class="markdownTableHeadNone">Feature   </th><th class="markdownTableHeadCenter">supported   </th><th class="markdownTableHeadNone">comments    </th></tr>
 <tr class="markdownTableRowOdd">
-<td class="markdownTableBodyNone">Concurrent <a class="el" href="structRedis.html" title="Structure that represents a Redis database instance, with one or more RedisClient connections.">Redis</a> instances   </td><td class="markdownTableBodyCenter"><b>yes</b>   </td><td class="markdownTableBodyNone">You can manage and use multiple <a class="el" href="structRedis.html" title="Structure that represents a Redis database instance, with one or more RedisClient connections.">Redis</a> servers simultaneously    </td></tr>
+<td class="markdownTableBodyNone">concurrent <a class="el" href="structRedis.html" title="Structure that represents a Redis database instance, with one or more RedisClient connections.">Redis</a> instances   </td><td class="markdownTableBodyCenter"><b>yes</b>   </td><td class="markdownTableBodyNone">You can manage and use multiple <a class="el" href="structRedis.html" title="Structure that represents a Redis database instance, with one or more RedisClient connections.">Redis</a> servers simultaneously    </td></tr>
 <tr class="markdownTableRowEven">
 <td class="markdownTableBodyNone">connect over TCP   </td><td class="markdownTableBodyCenter"><b>yes</b>   </td><td class="markdownTableBodyNone"></td></tr>
 <tr class="markdownTableRowOdd">
 <td class="markdownTableBodyNone">connect over UDP   </td><td class="markdownTableBodyCenter">no   </td><td class="markdownTableBodyNone">(why would you, really?)    </td></tr>
 <tr class="markdownTableRowEven">
-<td class="markdownTableBodyNone">Configurable socket timeout   </td><td class="markdownTableBodyCenter"><b>yes</b>   </td><td class="markdownTableBodyNone"></td></tr>
+<td class="markdownTableBodyNone">connect / disconnect hooks   </td><td class="markdownTableBodyCenter"><b>yes</b>   </td><td class="markdownTableBodyNone"></td></tr>
 <tr class="markdownTableRowOdd">
-<td class="markdownTableBodyNone">Configurable socket buffer size   </td><td class="markdownTableBodyCenter"><b>yes</b>   </td><td class="markdownTableBodyNone"></td></tr>
+<td class="markdownTableBodyNone">configurable socket timeout   </td><td class="markdownTableBodyCenter"><b>yes</b>   </td><td class="markdownTableBodyNone"></td></tr>
 <tr class="markdownTableRowEven">
-<td class="markdownTableBodyNone">Socket error handling   </td><td class="markdownTableBodyCenter"><b>yes</b>   </td><td class="markdownTableBodyNone">user-defined callback    </td></tr>
+<td class="markdownTableBodyNone">configurable socket buffer size   </td><td class="markdownTableBodyCenter"><b>yes</b>   </td><td class="markdownTableBodyNone"></td></tr>
 <tr class="markdownTableRowOdd">
-<td class="markdownTableBodyNone">Authentication (user/password)   </td><td class="markdownTableBodyCenter"><b>yes</b>   </td><td class="markdownTableBodyNone">via <code>HELLO</code> if protocol is set, otherwise via <code>AUTH</code>    </td></tr>
+<td class="markdownTableBodyNone">socket error handling   </td><td class="markdownTableBodyCenter"><b>yes</b>   </td><td class="markdownTableBodyNone">user-defined callback    </td></tr>
 <tr class="markdownTableRowEven">
-<td class="markdownTableBodyNone">Connection / Disconnection hooks   </td><td class="markdownTableBodyCenter"><b>yes</b>   </td><td class="markdownTableBodyNone"></td></tr>
+<td class="markdownTableBodyNone">authentication (user/password)   </td><td class="markdownTableBodyCenter"><b>yes</b>   </td><td class="markdownTableBodyNone">via <code>HELLO</code> if protocol is set, otherwise via <code>AUTH</code>    </td></tr>
 <tr class="markdownTableRowOdd">
 <td class="markdownTableBodyNone"><code>HELLO</code>   </td><td class="markdownTableBodyCenter"><b>yes</b>   </td><td class="markdownTableBodyNone">optional (if specific protocol is set)    </td></tr>
 <tr class="markdownTableRowEven">
 <td class="markdownTableBodyNone">RESP3 support   </td><td class="markdownTableBodyCenter"><b>yes</b>   </td><td class="markdownTableBodyNone"></td></tr>
 <tr class="markdownTableRowOdd">
-<td class="markdownTableBodyNone">Thread safe (MT-safe)   </td><td class="markdownTableBodyCenter"><b>yes</b>   </td><td class="markdownTableBodyNone">both synchronized, and async calls with locking    </td></tr>
+<td class="markdownTableBodyNone">thread safe (MT-safe)   </td><td class="markdownTableBodyCenter"><b>yes</b>   </td><td class="markdownTableBodyNone">both synchronized, and async calls with locking    </td></tr>
 <tr class="markdownTableRowEven">
-<td class="markdownTableBodyNone">Push messages   </td><td class="markdownTableBodyCenter"><b>yes</b>   </td><td class="markdownTableBodyNone">user-defined callback    </td></tr>
+<td class="markdownTableBodyNone">push messages   </td><td class="markdownTableBodyCenter"><b>yes</b>   </td><td class="markdownTableBodyNone">user-defined callback    </td></tr>
 <tr class="markdownTableRowOdd">
-<td class="markdownTableBodyNone">Attributes   </td><td class="markdownTableBodyCenter"><b>yes</b>   </td><td class="markdownTableBodyNone">on demand    </td></tr>
+<td class="markdownTableBodyNone">attributes   </td><td class="markdownTableBodyCenter"><b>yes</b>   </td><td class="markdownTableBodyNone">on demand    </td></tr>
 <tr class="markdownTableRowEven">
-<td class="markdownTableBodyNone">Interactive queries   </td><td class="markdownTableBodyCenter"><b>yes</b>   </td><td class="markdownTableBodyNone">dedicated (low-latency) client    </td></tr>
+<td class="markdownTableBodyNone">interactive queries   </td><td class="markdownTableBodyCenter"><b>yes</b>   </td><td class="markdownTableBodyNone">dedicated (low-latency) client    </td></tr>
 <tr class="markdownTableRowOdd">
-<td class="markdownTableBodyNone">Pipelined (batch) processing   </td><td class="markdownTableBodyCenter"><b>yes</b>   </td><td class="markdownTableBodyNone">dedicated (high-bandwidth) client / user-defined callback    </td></tr>
+<td class="markdownTableBodyNone">pipelined (batch) processing   </td><td class="markdownTableBodyCenter"><b>yes</b>   </td><td class="markdownTableBodyNone">dedicated (high-bandwidth) client / user-defined callback    </td></tr>
 <tr class="markdownTableRowEven">
 <td class="markdownTableBodyNone">PUB/SUB support   </td><td class="markdownTableBodyCenter"><b>yes</b>   </td><td class="markdownTableBodyNone">dedicated client / user callbacks / subscription management    </td></tr>
 <tr class="markdownTableRowOdd">
 <td class="markdownTableBodyNone">Sentinel   </td><td class="markdownTableBodyCenter"><b>yes</b>   </td><td class="markdownTableBodyNone"></td></tr>
 <tr class="markdownTableRowEven">
-<td class="markdownTableBodyNone">Cluster support   </td><td class="markdownTableBodyCenter">no   </td><td class="markdownTableBodyNone">coming soon...    </td></tr>
+<td class="markdownTableBodyNone">cluster support   </td><td class="markdownTableBodyCenter">no   </td><td class="markdownTableBodyNone">coming soon...    </td></tr>
 <tr class="markdownTableRowOdd">
 <td class="markdownTableBodyNone">TLS support   </td><td class="markdownTableBodyCenter">no   </td><td class="markdownTableBodyNone">coming soon...    </td></tr>
 <tr class="markdownTableRowEven">
-<td class="markdownTableBodyNone">Resubscribe on reconnect   </td><td class="markdownTableBodyCenter">no   </td><td class="markdownTableBodyNone">in the not too distance future...    </td></tr>
+<td class="markdownTableBodyNone">resubscribe on reconnect   </td><td class="markdownTableBodyCenter">no   </td><td class="markdownTableBodyNone">in the not too distance future...    </td></tr>
 <tr class="markdownTableRowOdd">
 <td class="markdownTableBodyNone">command-line client   </td><td class="markdownTableBodyCenter"><b>yes</b>   </td><td class="markdownTableBodyNone"><code>redisx-cli</code>    </td></tr>
 <tr class="markdownTableRowEven">
@@ -200,7 +200,7 @@ Features overview</h3>
 <tr class="markdownTableRowOdd">
 <td class="markdownTableBodyNone"><a class="el" href="structRESP.html" title="Structure that represents a Redis response (RESP format).">RESP</a> to structured data   </td><td class="markdownTableBodyCenter"><b>yes</b>   </td><td class="markdownTableBodyNone">via <code>xchange</code> library    </td></tr>
 <tr class="markdownTableRowEven">
-<td class="markdownTableBodyNone">Debug error tracing   </td><td class="markdownTableBodyCenter"><b>yes</b>   </td><td class="markdownTableBodyNone">via <code><a class="elRef" href="../../xchange/apidoc/html/xchange_8h.html#a6c1304b59a5882b2286e86c6837faead">xSetDebug()</a></code>   </td></tr>
+<td class="markdownTableBodyNone">debug error tracing   </td><td class="markdownTableBodyCenter"><b>yes</b>   </td><td class="markdownTableBodyNone">via <code><a class="elRef" href="../../xchange/apidoc/html/xchange_8h.html#a6c1304b59a5882b2286e86c6837faead">xSetDebug()</a></code>   </td></tr>
 </table>
 <h3><a class="anchor" id="autotoc_md6"></a>
 Related links</h3>
