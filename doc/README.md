@@ -51,6 +51,17 @@ repository on GitHub.
 There are no official releases of __RedisX__ yet. An initial 1.0.0 release is expected in late 2024 or early 2025. 
 Before then the API may undergo slight changes and tweaks. Use the repository as is at your own risk for now.
 
+### Related links
+
+ - [Redis commands](https://redis.io/docs/latest/commands/) (reference documentation)
+ - [SMA eXchange (SMA-X)](https://docs.google.com/document/d/1eYbWDClKkV7JnJxv4MxuNBNV47dFXuUWu7C4Ve_YTf0/edit?usp=sharing) 
+   -- A structured realtime database built on Redis / Valkey.
+   * [Smithsonian/smax-server](https://github.com/Smithsonian/smax-server) -- SMA-X server configuration kit
+   * [Smithsonian/smax-clib](https://github.com/Smithsonian/smax-clib) -- A C/C++ client library and toolkit to SMA-X,
+     based on __RedisX__
+   * [Smithsonian/smax-python](https://github.com/Smithsonian/smax-python) -- A Python 3 client library to SMA-X
+
+
 ### Features overview
 
  | Feature                           | supported  | comments                                                     |
@@ -81,15 +92,6 @@ Before then the API may undergo slight changes and tweaks. Use the repository as
  | debug error tracing               |  __yes__   | via `xSetDebug()`                                            |
 
  
-### Related links
-
- - [Redis commands](https://redis.io/docs/latest/commands/) (reference documentation)
- - [SMA eXchange (SMA-X)](https://docs.google.com/document/d/1eYbWDClKkV7JnJxv4MxuNBNV47dFXuUWu7C4Ve_YTf0/edit?usp=sharing) 
-   -- A structured realtime database built on Redis / Valkey.
-   * [Smithsonian/smax-server](https://github.com/Smithsonian/smax-server) -- SMA-X server configuration kit
-   * [Smithsonian/smax-clib](https://github.com/Smithsonian/smax-clib) -- A C/C++ client library and toolkit to SMA-X,
-     based on __RedisX__
-   * [Smithsonian/smax-python](https://github.com/Smithsonian/smax-python) -- A Python 3 client library to SMA-X
 
 -----------------------------------------------------------------------------
 

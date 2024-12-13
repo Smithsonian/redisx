@@ -28,8 +28,8 @@ var NAVTREE =
     [ "Changelog", "../../xchange/apidoc/html/md_CHANGELOG.html", [
       [ "Table of Contents", "index.html#autotoc_md3", null ],
       [ "Introduction", "index.html#autotoc_md4", [
-        [ "Features overview", "index.html#autotoc_md5", null ],
-        [ "Related links", "index.html#autotoc_md6", null ]
+        [ "Related links", "index.html#autotoc_md5", null ],
+        [ "Features overview", "index.html#autotoc_md6", null ]
       ] ],
       [ "Prerequisites", "index.html#autotoc_md8", null ],
       [ "Building RedisX", "index.html#autotoc_md10", null ],
