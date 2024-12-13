@@ -150,10 +150,10 @@ will print:
 ```
 
 provided it successfully connected to the Redis / Valkey server on localhost. (Otherwise it will print an error and a 
-trace). It can also be used in interatice mode if no Redis command arguments are supplied. And, you can run 
+trace). It can also be used in interactive mode if no Redis command arguments are supplied. And, you can run 
 `redisx-cli --help` to see what options are available, and you can also consult the 
 [redis-cli](https://redis.io/docs/latest/develop/tools/cli/) documentation for the same general description and usage 
-(so far as the implementation allows).
+(so far as our implementation supports it).
 
 -----------------------------------------------------------------------------
 
