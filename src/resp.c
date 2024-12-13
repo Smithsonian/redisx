@@ -18,13 +18,11 @@
 #  define _BSD_SOURCE             ///< strcasecmp() feature macro for glibc <= 2.19
 #endif
 
-
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <errno.h>
 #include <math.h>
-
 
 #include "redisx-priv.h"
 #include <xjson.h>
@@ -389,7 +387,6 @@ boolean redisxHasComponents(const RESP *r) {
   return r->n > 0 && (redisxIsArrayType(r) || redisxIsMapType(r));
 }
 
-
 /**
  * Appends a part to an existing RESP of the same type, before discarding the part.
  *
@@ -558,7 +555,6 @@ static XType resp2xType(enum resp_type type) {
   return X_UNKNOWN;
 }
 
-
 static void rSetRESPType(XField *f, char type) {
   f->subtype = (char *) calloc(2, sizeof(char));
   x_check_alloc(f->subtype);
@@ -637,7 +633,6 @@ static XField *respArrayToXField(const char *name, const RESP **component, int n
   return f;
 }
 
-
 static XField *respMap2XField(const char *name, const RedisMapEntry *map, int n) {
   XStructure *s = xCreateStruct(), *nonstring = NULL;
   int nNonString = 0;
@@ -670,8 +665,6 @@ static XField *respMap2XField(const char *name, const RedisMapEntry *map, int n)
 
   return xCreateScalarField(name, X_STRUCT, s);
 }
-
-
 
 /**
  * Converts a RESP to the xchange representation as an appropriate XField.
@@ -737,7 +730,6 @@ XField *redisxRESP2XField(const char *name, const RESP *resp) {
       rSetRESPType(f, resp->type);
       return f;
     }
-
   }
 
   return xCreateStringField(name, "<!!!unknown RESP type!!!>");
@@ -766,6 +758,7 @@ char *redisxRESP2JSON(const char *name, const RESP *resp) {
  * @return        0
  *
  * @sa redisxPrintRESP()
+ * @sa redisxPrintDelimited()
  * @sa redisxRESP2JSON()
  */
 int redisxPrintJSON(const char *name, const RESP *resp) {
@@ -869,6 +862,9 @@ static int rPrintRESP(int indent, const RESP *resp) {
  * @param resp          Pointer to a RESP (it may be NULL)
  * @param delim         Delimiter between elements
  * @param groupPrefix   Prefix in front of arrays and maps
+ *
+ * @sa redisxPrintRESP()
+ * @sa redisxPrintJSON()
  */
 void redisxPrintDelimited(const RESP *resp, const char *delim, const char *groupPrefix) {
 
@@ -878,8 +874,6 @@ void redisxPrintDelimited(const RESP *resp, const char *delim, const char *group
     printf("%s", delim);
     return;
   }
-
-
 
   switch(resp->type) {
 
@@ -938,7 +932,6 @@ void redisxPrintDelimited(const RESP *resp, const char *delim, const char *group
   }
 }
 
-
 /**
  * Prints a RESP to the standard output, in a format that is similar to the one used by the standard
  * redis-cli tool.
@@ -947,6 +940,7 @@ void redisxPrintDelimited(const RESP *resp, const char *delim, const char *group
  * @return        X_SUCCESS (0) if successful or else X_FAILURE if there was an error.
  *
  * @sa redisxPrintJSON()
+ * @sa redisxPrintDelimited()
  */
 int redisxPrintRESP(const RESP *resp) {
   int n = rPrintRESP(0, resp);

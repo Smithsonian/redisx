@@ -33,7 +33,6 @@ static void printVersion(const char *name) {
   printf("%s %s\n", name, REDISX_VERSION_STRING);
 }
 
-
 static void printRESP(const RESP *resp) {
   if(format == FORMAT_JSON) {
     const char *type = "REPLY";
