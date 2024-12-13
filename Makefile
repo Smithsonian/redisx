@@ -50,11 +50,7 @@ static: $(LIB)/libredisx.a
 
 # Command-line tools
 .PHONY: tools
-ifdef STATICLINK
-tools: static
-else
 tools: shared
-endif
 	make -f tools.mk
 
 # Run regression tests

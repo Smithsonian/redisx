@@ -86,11 +86,11 @@ Before then the API may undergo slight changes and tweaks. Use the repository as
 The [Smithsonian/xchange](https://github.com/Smithsonian/xchange) library is both a build and a runtime dependency of 
 RedisX.
 
-Additionally `redisx-cli` has the following dependencies:
+Additionally `redisx-cli` has the following dependencies on standard GNU/POSIX libraries:
  
-  - POPT library (`popt-devel` on RPM-based, or `libpopt-dev` on Debian based Linux).
-  - BSD libraries (`libbsd-devel` on RPM-based, or `libbsd-dev` on Debian based Linux).
-  - readline library (`readline-devel` on RPM based, or `libreadline-dev` on Debian based Linux).
+  - POPT (`popt-devel` on RPM-based, or `libpopt-dev` on Debian based Linux).
+  - BSD (`libbsd-devel` on RPM-based, or `libbsd-dev` on Debian based Linux).
+  - readline (`readline-devel` on RPM based, or `libreadline-dev` on Debian based Linux).
 
 -----------------------------------------------------------------------------
 
