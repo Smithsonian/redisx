@@ -153,7 +153,7 @@ var searchData=
   ['redisxunlockclient_150',['redisxunlockclient',['../redisx-client_8c.html#a87efe53c80fcff3fcf189362cbc602f7',1,'redisxUnlockClient(RedisClient *cl):&#160;redisx-client.c'],['../redisx_8h.html#a87efe53c80fcff3fcf189362cbc602f7',1,'redisxUnlockClient(RedisClient *cl):&#160;redisx-client.c']]],
   ['redisxunsubscribe_151',['redisxunsubscribe',['../redisx-sub_8c.html#accafa9bf1ced851cc2e95c2d9fa1e9f8',1,'redisxUnsubscribe(Redis *redis, const char *pattern):&#160;redisx-sub.c'],['../redisx_8h.html#af64c112d9c395f1e08af52acd6f5c3ec',1,'redisxUnsubscribe(Redis *redis, const char *channel):&#160;redisx-sub.c']]],
   ['redisxvalidatesentinel_152',['redisxvalidatesentinel',['../redisx_8h.html#ace7dcf75a6f60817e1b3be00fb15658b',1,'redisxValidateSentinel(const char *serviceName, const RedisServer *serverList, int nServers):&#160;redisx-net.c'],['../redisx-net_8c.html#ace7dcf75a6f60817e1b3be00fb15658b',1,'redisxValidateSentinel(const char *serviceName, const RedisServer *serverList, int nServers):&#160;redisx-net.c']]],
-  ['related_20links_153',['Related links',['../index.html#autotoc_md5',1,'']]],
+  ['related_20links_153',['Related links',['../index.html#autotoc_md6',1,'']]],
   ['resp_154',['RESP',['../structRESP.html',1,'']]],
   ['resp_20data_20type_155',['RESP data type',['../index.html#autotoc_md26',1,'']]],
   ['resp_2ec_156',['resp.c',['../resp_8c.html',1,'']]],

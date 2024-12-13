@@ -1,8 +1,8 @@
 <toc label="RedisX" topic="index.html">
     <topic label="Table of Contents" href="index.html#autotoc_md3"/>
     <topic label="Introduction" href="index.html#autotoc_md4">
-      <topic label="Related links" href="index.html#autotoc_md5"/>
-      <topic label="Features overview" href="index.html#autotoc_md6"/>
+      <topic label="Features overview" href="index.html#autotoc_md5"/>
+      <topic label="Related links" href="index.html#autotoc_md6"/>
     <topic label="Prerequisites" href="index.html#autotoc_md8"/>
     <topic label="Building RedisX" href="index.html#autotoc_md10"/>
     <topic label="Command-line interface (&lt;tt&gt;redisx-cli&lt;/tt&gt;)" href="index.html#autotoc_md12"/>
