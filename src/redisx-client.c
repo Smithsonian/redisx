@@ -592,7 +592,8 @@ int redisxSendRequestAsync(RedisClient *cl, const char *command, const char *arg
  * Send a Redis request with an arbitrary number of arguments.
  *
  * \param cl            Pointer to the Redis client.
- * \param args          The array of string arguments to send.
+ * \param args          The array of string arguments to send. If you have an `char **` array, you
+ *                      may need to cast to `(const char **)` to avoid compiler warnings.
  * \param lengths       Array indicating the number of bytes to send from each string argument. Zero
  *                      or negative values can be used to determine the string length automatically
  *                      using strlen(), and the length argument itself may be NULL to determine the
@@ -603,7 +604,7 @@ int redisxSendRequestAsync(RedisClient *cl, const char *command, const char *arg
  *                      X_NO_SERVICE if not connected to the client or if send() failed, or
  *                      X_NO_INIT if the client was not initialized.
  */
-int redisxSendArrayRequestAsync(RedisClient *cl, const char *args[], int lengths[], int n) {
+int redisxSendArrayRequestAsync(RedisClient *cl, const char **args, const int *lengths, int n) {
   static const char *fn = "redisxSendArrayRequestAsync";
   char buf[REDISX_CMDBUF_SIZE];
   int i, L;

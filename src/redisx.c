@@ -583,6 +583,8 @@ RESP *redisxRequest(Redis *redis, const char *command, const char *arg1, const c
  *
  * \param redis     Pointer to a Redis instance.
  * \param args      An array of strings to send to Redis, corresponding to a single query.
+ *                  If you have an `char **` array, you may need to cast to `(const char **)` to avoid
+ *                  compiler warnings.
  * \param lengths   Array indicating the number of bytes to send from each string argument. Zero
  *                  values can be used to determine the string length automatically using strlen(),
  *                  and the length argument itself may be NULL to determine the lengths of all
@@ -604,7 +606,7 @@ RESP *redisxRequest(Redis *redis, const char *command, const char *arg1, const c
  * @sa redisxSendArrayRequestAsync()
  * @sa redisxReadReplyAsync()
  */
-RESP *redisxArrayRequest(Redis *redis, const char *args[], int lengths[], int n, int *status) {
+RESP *redisxArrayRequest(Redis *redis, const char **args, const int *lengths, int n, int *status) {
   static const char *fn = "redisxArrayRequest";
   RESP *reply = NULL;
   RedisClient *cl;

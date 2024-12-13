@@ -97,7 +97,7 @@ Additionally `redisx-cli` has the following dependencies on standard GNU/POSIX l
 <a name="building-redisx"></a>
 ## Building RedisX
 
-The __RedisX__ library can be built either as a shared (`libredisx.so[.1]`) and as a static (`libredisx.a`) library, 
+The __RedisX__ library can be built either as a shared (`libredisx.so[.1]`) or as a static (`libredisx.a`) library, 
 depending on what suits your needs best.
 
 You can configure the build, either by editing `config.mk` or else by defining the relevant environment variables 
