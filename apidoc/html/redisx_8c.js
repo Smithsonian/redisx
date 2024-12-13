@@ -1,6 +1,6 @@
 var redisx_8c =
 [
-    [ "redisxArrayRequest", "redisx_8c.html#adc8c148c008f7668674edec57a3fa832", null ],
+    [ "redisxArrayRequest", "redisx_8c.html#ac6767cea95b4cc90348796c61ebdac75", null ],
     [ "redisxCheckValid", "redisx_8c.html#a0cdebfd895ab4c61c0fc9e0863a66419", null ],
     [ "redisxDebugTraffic", "redisx_8c.html#a7cde25fca6ae274d8d0a66d5c8b63ff5", null ],
     [ "redisxError", "redisx_8c.html#ae722b046fa70a55db725341ef8ee56dc", null ],

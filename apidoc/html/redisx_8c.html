@@ -123,8 +123,8 @@ $(document).ready(function(){initNavTree('redisx_8c.html',''); initResizable(); 
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="func-members" name="func-members"></a>
 Functions</h2></td></tr>
-<tr class="memitem:adc8c148c008f7668674edec57a3fa832" id="r_adc8c148c008f7668674edec57a3fa832"><td class="memItemLeft" align="right" valign="top"><a class="el" href="structRESP.html">RESP</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="redisx_8c.html#adc8c148c008f7668674edec57a3fa832">redisxArrayRequest</a> (<a class="el" href="structRedis.html">Redis</a> *redis, const char *args[], int lengths[], int n, int *status)</td></tr>
-<tr class="separator:adc8c148c008f7668674edec57a3fa832"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ac6767cea95b4cc90348796c61ebdac75" id="r_ac6767cea95b4cc90348796c61ebdac75"><td class="memItemLeft" align="right" valign="top"><a class="el" href="structRESP.html">RESP</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="redisx_8c.html#ac6767cea95b4cc90348796c61ebdac75">redisxArrayRequest</a> (<a class="el" href="structRedis.html">Redis</a> *redis, const char **args, const int *lengths, int n, int *status)</td></tr>
+<tr class="separator:ac6767cea95b4cc90348796c61ebdac75"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a0cdebfd895ab4c61c0fc9e0863a66419" id="r_a0cdebfd895ab4c61c0fc9e0863a66419"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="redisx_8c.html#a0cdebfd895ab4c61c0fc9e0863a66419">redisxCheckValid</a> (const <a class="el" href="structRedis.html">Redis</a> *redis)</td></tr>
 <tr class="separator:a0cdebfd895ab4c61c0fc9e0863a66419"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a7cde25fca6ae274d8d0a66d5c8b63ff5" id="r_a7cde25fca6ae274d8d0a66d5c8b63ff5"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="redisx_8c.html#a7cde25fca6ae274d8d0a66d5c8b63ff5">redisxDebugTraffic</a> (<a class="elRef" href="../../xchange/apidoc/html/xchange_8h.html#a621c38f1f10a1c565d897e3178b16d6e">boolean</a> value)</td></tr>
@@ -175,8 +175,8 @@ Functions</h2></td></tr>
 <dl class="section date"><dt>Date</dt><dd>May 4, 2018 </dd></dl>
 <dl class="section author"><dt>Author</dt><dd>Attila Kovacs</dd></dl>
 </div><h2 class="groupheader">Function Documentation</h2>
-<a id="adc8c148c008f7668674edec57a3fa832" name="adc8c148c008f7668674edec57a3fa832"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#adc8c148c008f7668674edec57a3fa832">&#9670;&#160;</a></span>redisxArrayRequest()</h2>
+<a id="ac6767cea95b4cc90348796c61ebdac75" name="ac6767cea95b4cc90348796c61ebdac75"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ac6767cea95b4cc90348796c61ebdac75">&#9670;&#160;</a></span>redisxArrayRequest()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -190,14 +190,14 @@ Functions</h2></td></tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">const char *&#160;</td>
-          <td class="paramname"><em>args</em>[], </td>
+          <td class="paramtype">const char **&#160;</td>
+          <td class="paramname"><em>args</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">int&#160;</td>
-          <td class="paramname"><em>lengths</em>[], </td>
+          <td class="paramtype">const int *&#160;</td>
+          <td class="paramname"><em>lengths</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
@@ -218,11 +218,11 @@ Functions</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
-<p>Returns the result of the most generic type of <a class="el" href="structRedis.html" title="Structure that represents a Redis database instance, with one or more RedisClient connections.">Redis</a> request with any number of arguments. This is not the highest throughput mode (that would be sending asynchronous pipeline request, and then asynchronously collecting the results such as with <a class="el" href="redisx-client_8c.html#ab809bbaed9d3466dbaeb38e82a712ee7">redisxSendArrayRequestAsync()</a> / <a class="el" href="redisx-client_8c.html#abc855133c2af4f5d929a05292aa634d1">redisxReadReplyAsync()</a>, because it requires separate network roundtrips for each and every request. But, it is simple and perfectly good method when one needs to retrieve only a few (&lt;1000) variables per second...</p>
+<p>Returns the result of the most generic type of <a class="el" href="structRedis.html" title="Structure that represents a Redis database instance, with one or more RedisClient connections.">Redis</a> request with any number of arguments. This is not the highest throughput mode (that would be sending asynchronous pipeline request, and then asynchronously collecting the results such as with <a class="el" href="redisx-client_8c.html#a17de2c4323d3da4b3a3d386d85c12d8e">redisxSendArrayRequestAsync()</a> / <a class="el" href="redisx-client_8c.html#abc855133c2af4f5d929a05292aa634d1">redisxReadReplyAsync()</a>, because it requires separate network roundtrips for each and every request. But, it is simple and perfectly good method when one needs to retrieve only a few (&lt;1000) variables per second...</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">redis</td><td>Pointer to a <a class="el" href="structRedis.html" title="Structure that represents a Redis database instance, with one or more RedisClient connections.">Redis</a> instance. </td></tr>
-    <tr><td class="paramname">args</td><td>An array of strings to send to <a class="el" href="structRedis.html" title="Structure that represents a Redis database instance, with one or more RedisClient connections.">Redis</a>, corresponding to a single query. </td></tr>
+    <tr><td class="paramname">args</td><td>An array of strings to send to <a class="el" href="structRedis.html" title="Structure that represents a Redis database instance, with one or more RedisClient connections.">Redis</a>, corresponding to a single query. If you have an <code>char **</code> array, you may need to cast to <code>(const char **)</code> to avoid compiler warnings. </td></tr>
     <tr><td class="paramname">lengths</td><td>Array indicating the number of bytes to send from each string argument. Zero values can be used to determine the string length automatically using strlen(), and the length argument itself may be NULL to determine the lengths of all string arguments automatically. </td></tr>
     <tr><td class="paramname">n</td><td>Number of string arguments. </td></tr>
     <tr><td class="paramname">status</td><td>Pointer to the return error status, which is either <pre class="fragment">                 X_SUCCESS       on success.
@@ -237,11 +237,11 @@ Functions</h2></td></tr>
 <dl class="section return"><dt>Returns</dt><dd>A freshly allocated <a class="el" href="structRESP.html" title="Structure that represents a Redis response (RESP format).">RESP</a> array containing the <a class="el" href="structRedis.html" title="Structure that represents a Redis database instance, with one or more RedisClient connections.">Redis</a> response, or NULL if no valid response could be obtained.</dd></dl>
 <dl class="section see"><dt>See also</dt><dd><a class="el" href="redisx_8c.html#a09092bd97eead5c5fa73fa0d9241018c">redisxRequest()</a> </dd>
 <dd>
-<a class="el" href="redisx-client_8c.html#ab809bbaed9d3466dbaeb38e82a712ee7">redisxSendArrayRequestAsync()</a> </dd>
+<a class="el" href="redisx-client_8c.html#a17de2c4323d3da4b3a3d386d85c12d8e">redisxSendArrayRequestAsync()</a> </dd>
 <dd>
 <a class="el" href="redisx-client_8c.html#abc855133c2af4f5d929a05292aa634d1">redisxReadReplyAsync()</a> </dd></dl>
 
-<p class="reference">References <a class="el" href="structRedis.html#af51011d99955d6f036a9f2c291577749">Redis::interactive</a>, <a class="el" href="redisx_8c.html#a0cdebfd895ab4c61c0fc9e0863a66419">redisxCheckValid()</a>, <a class="el" href="redisx-client_8c.html#a576bb47774aaf4d5d735a5ef18253048">redisxClearAttributesAsync()</a>, <a class="el" href="redisx-client_8c.html#aad864c08ef9365c264c30bbacb0b77b2">redisxLockConnected()</a>, <a class="el" href="redisx-client_8c.html#abc855133c2af4f5d929a05292aa634d1">redisxReadReplyAsync()</a>, <a class="el" href="redisx-client_8c.html#ab809bbaed9d3466dbaeb38e82a712ee7">redisxSendArrayRequestAsync()</a>, <a class="el" href="redisx-client_8c.html#a87efe53c80fcff3fcf189362cbc602f7">redisxUnlockClient()</a>, <a class="elRef" href="../../xchange/apidoc/html/xchange_8c.html#ae73aaf705dc4e7d58dfb0fd81f4805c7">x_error()</a>, <a class="elRef" href="../../xchange/apidoc/html/xchange_8h.html#aadbbe3ae01369cbddf4d57d430b33133">X_NULL</a>, <a class="elRef" href="../../xchange/apidoc/html/xchange_8h.html#a7b2679c964ea5f2160380ed55654b873">X_SUCCESS</a>, and <a class="elRef" href="../../xchange/apidoc/html/xchange_8c.html#ac39ae03ca89b115d49a12f633522dc31">x_trace_null()</a>.</p>
+<p class="reference">References <a class="el" href="structRedis.html#af51011d99955d6f036a9f2c291577749">Redis::interactive</a>, <a class="el" href="redisx_8c.html#a0cdebfd895ab4c61c0fc9e0863a66419">redisxCheckValid()</a>, <a class="el" href="redisx-client_8c.html#a576bb47774aaf4d5d735a5ef18253048">redisxClearAttributesAsync()</a>, <a class="el" href="redisx-client_8c.html#aad864c08ef9365c264c30bbacb0b77b2">redisxLockConnected()</a>, <a class="el" href="redisx-client_8c.html#abc855133c2af4f5d929a05292aa634d1">redisxReadReplyAsync()</a>, <a class="el" href="redisx-client_8c.html#a17de2c4323d3da4b3a3d386d85c12d8e">redisxSendArrayRequestAsync()</a>, <a class="el" href="redisx-client_8c.html#a87efe53c80fcff3fcf189362cbc602f7">redisxUnlockClient()</a>, <a class="elRef" href="../../xchange/apidoc/html/xchange_8c.html#ae73aaf705dc4e7d58dfb0fd81f4805c7">x_error()</a>, <a class="elRef" href="../../xchange/apidoc/html/xchange_8h.html#aadbbe3ae01369cbddf4d57d430b33133">X_NULL</a>, <a class="elRef" href="../../xchange/apidoc/html/xchange_8h.html#a7b2679c964ea5f2160380ed55654b873">X_SUCCESS</a>, and <a class="elRef" href="../../xchange/apidoc/html/xchange_8c.html#ac39ae03ca89b115d49a12f633522dc31">x_trace_null()</a>.</p>
 
 </div>
 </div>
@@ -395,7 +395,7 @@ Functions</h2></td></tr>
 <dd>
 <a class="el" href="redisx_8c.html#a09092bd97eead5c5fa73fa0d9241018c">redisxRequest()</a> </dd>
 <dd>
-<a class="el" href="redisx_8c.html#adc8c148c008f7668674edec57a3fa832">redisxArrayRequest()</a> </dd>
+<a class="el" href="redisx_8c.html#ac6767cea95b4cc90348796c61ebdac75">redisxArrayRequest()</a> </dd>
 <dd>
 <a class="el" href="resp_8c.html#aa4e23a7454f7055711915ec430599011">redisxDestroyRESP()</a> </dd></dl>
 
@@ -706,7 +706,7 @@ Functions</h2></td></tr>
       </table>
 </div><div class="memdoc">
 <p>Returns the result of a <a class="el" href="structRedis.html" title="Structure that represents a Redis database instance, with one or more RedisClient connections.">Redis</a> command with up to 3 regularly terminated string arguments. This is not the highest throughput mode (that would be sending asynchronous pipeline request, and then asynchronously collecting the results such as with <a class="el" href="redisx-client_8c.html#afc7b28288c07baf0b3c8fdc9d8ddf263">redisxSendRequestAsync()</a> / <a class="el" href="redisx-client_8c.html#abc855133c2af4f5d929a05292aa634d1">redisxReadReplyAsync()</a>, because it requires separate network roundtrips for each and every request. But, it is simple and perfectly good method when one needs to retrieve only a few (&lt;1000) variables per second...</p>
-<p>To make <a class="el" href="structRedis.html" title="Structure that represents a Redis database instance, with one or more RedisClient connections.">Redis</a> calls with binary (non-string) data, you can use <a class="el" href="redisx_8c.html#adc8c148c008f7668674edec57a3fa832">redisxArrayRequest()</a> instead, where you can set the number of bytes for each argument explicitly.</p>
+<p>To make <a class="el" href="structRedis.html" title="Structure that represents a Redis database instance, with one or more RedisClient connections.">Redis</a> calls with binary (non-string) data, you can use <a class="el" href="redisx_8c.html#ac6767cea95b4cc90348796c61ebdac75">redisxArrayRequest()</a> instead, where you can set the number of bytes for each argument explicitly.</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">redis</td><td>Pointer to a <a class="el" href="structRedis.html" title="Structure that represents a Redis database instance, with one or more RedisClient connections.">Redis</a> instance. </td></tr>
@@ -714,18 +714,18 @@ Functions</h2></td></tr>
     <tr><td class="paramname">arg1</td><td>First terminated string argument or NULL. </td></tr>
     <tr><td class="paramname">arg2</td><td>Second terminated string argument or NULL. </td></tr>
     <tr><td class="paramname">arg3</td><td>Third terminated string argument or NULL. </td></tr>
-    <tr><td class="paramname">status</td><td>Pointer to the return error status, which is either X_SUCCESS on success or else the error code set by <a class="el" href="redisx_8c.html#adc8c148c008f7668674edec57a3fa832">redisxArrayRequest()</a>.</td></tr>
+    <tr><td class="paramname">status</td><td>Pointer to the return error status, which is either X_SUCCESS on success or else the error code set by <a class="el" href="redisx_8c.html#ac6767cea95b4cc90348796c61ebdac75">redisxArrayRequest()</a>.</td></tr>
   </table>
   </dd>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>A freshly allocated <a class="el" href="structRESP.html" title="Structure that represents a Redis response (RESP format).">RESP</a> array containing the <a class="el" href="structRedis.html" title="Structure that represents a Redis database instance, with one or more RedisClient connections.">Redis</a> response, or NULL if no valid response could be obtained or status is not X_SUCCESS.</dd></dl>
-<dl class="section see"><dt>See also</dt><dd><a class="el" href="redisx_8c.html#adc8c148c008f7668674edec57a3fa832">redisxArrayRequest()</a> </dd>
+<dl class="section see"><dt>See also</dt><dd><a class="el" href="redisx_8c.html#ac6767cea95b4cc90348796c61ebdac75">redisxArrayRequest()</a> </dd>
 <dd>
 <a class="el" href="redisx-client_8c.html#afc7b28288c07baf0b3c8fdc9d8ddf263">redisxSendRequestAsync()</a> </dd>
 <dd>
 <a class="el" href="redisx-client_8c.html#abc855133c2af4f5d929a05292aa634d1">redisxReadReplyAsync()</a> </dd></dl>
 
-<p class="reference">References <a class="el" href="redisx_8c.html#adc8c148c008f7668674edec57a3fa832">redisxArrayRequest()</a>, <a class="el" href="resp_8c.html#aa4e23a7454f7055711915ec430599011">redisxDestroyRESP()</a>, <a class="elRef" href="../../xchange/apidoc/html/xchange_8h.html#a7b2679c964ea5f2160380ed55654b873">X_SUCCESS</a>, and <a class="elRef" href="../../xchange/apidoc/html/xchange_8c.html#ac39ae03ca89b115d49a12f633522dc31">x_trace_null()</a>.</p>
+<p class="reference">References <a class="el" href="redisx_8c.html#ac6767cea95b4cc90348796c61ebdac75">redisxArrayRequest()</a>, <a class="el" href="resp_8c.html#aa4e23a7454f7055711915ec430599011">redisxDestroyRESP()</a>, <a class="elRef" href="../../xchange/apidoc/html/xchange_8h.html#a7b2679c964ea5f2160380ed55654b873">X_SUCCESS</a>, and <a class="elRef" href="../../xchange/apidoc/html/xchange_8c.html#ac39ae03ca89b115d49a12f633522dc31">x_trace_null()</a>.</p>
 
 </div>
 </div>

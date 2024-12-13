@@ -162,7 +162,7 @@
           <topic label="redisxAddConnectHook" href="redisx_8h.html#aab103bdeb66dd1daded10e1f6e993568"/>
           <topic label="redisxAddDisconnectHook" href="redisx_8h.html#a37d95c69831058865b078f0f0f20d540"/>
           <topic label="redisxAddSubscriber" href="redisx_8h.html#a4c268c33f23438af67117b09c26ec615"/>
-          <topic label="redisxArrayRequest" href="redisx_8h.html#a59b7f0cb895a7c4f16dc5413ddf1f963"/>
+          <topic label="redisxArrayRequest" href="redisx_8h.html#ae76c209d7c58c0feddb0e52391b2d037"/>
           <topic label="redisxCheckDestroyRESP" href="redisx_8h.html#a9849f4fb9156f3a3f4f4b3021993d4ce"/>
           <topic label="redisxCheckRESP" href="redisx_8h.html#a4b5674d08da07250c0ca6116a4c48ccf"/>
           <topic label="redisxCheckValid" href="redisx_8h.html#a0cdebfd895ab4c61c0fc9e0863a66419"/>
@@ -233,7 +233,7 @@
           <topic label="redisxScanKeys" href="redisx_8h.html#a67dd05115ae75dac9637ac04220d73b6"/>
           <topic label="redisxScanTable" href="redisx_8h.html#a47d28fd9f2f35f0af5abd67a1ae7b987"/>
           <topic label="redisxSelectDB" href="redisx_8h.html#aec99fb8b19d6751038bf9c4c6d04f8d0"/>
-          <topic label="redisxSendArrayRequestAsync" href="redisx_8h.html#addf31b7508fe17f032a1c3168e32d967"/>
+          <topic label="redisxSendArrayRequestAsync" href="redisx_8h.html#a9b869bd8912f647f4abe5c98abf3a88d"/>
           <topic label="redisxSendRequestAsync" href="redisx_8h.html#afc7b28288c07baf0b3c8fdc9d8ddf263"/>
           <topic label="redisxSetPassword" href="redisx_8h.html#a0e9eda38aa6f084ac151cbebe2886c2f"/>
           <topic label="redisxSetPipelineConsumer" href="redisx_8h.html#a0799a0a79705d1a7579bdf57879d1fec"/>
@@ -272,7 +272,7 @@
           <topic label="redisxLockConnected" href="redisx-client_8c.html#aad864c08ef9365c264c30bbacb0b77b2"/>
           <topic label="redisxReadReplyAsync" href="redisx-client_8c.html#abc855133c2af4f5d929a05292aa634d1"/>
           <topic label="redisxResetClient" href="redisx-client_8c.html#a05f0f4d0a2f3d8fb5e385541be6624a2"/>
-          <topic label="redisxSendArrayRequestAsync" href="redisx-client_8c.html#ab809bbaed9d3466dbaeb38e82a712ee7"/>
+          <topic label="redisxSendArrayRequestAsync" href="redisx-client_8c.html#a17de2c4323d3da4b3a3d386d85c12d8e"/>
           <topic label="redisxSendRequestAsync" href="redisx-client_8c.html#afc7b28288c07baf0b3c8fdc9d8ddf263"/>
           <topic label="redisxSkipReplyAsync" href="redisx-client_8c.html#a44c5d0bd24f5a4f2f131218f14c9c599"/>
           <topic label="redisxStartBlockAsync" href="redisx-client_8c.html#a3e49508e4e4fcc283832226fd1bffd85"/>
@@ -335,7 +335,7 @@
           <topic label="redisxSetValueAsync" href="redisx-tab_8c.html#a9e784632598b0c418a3ae3a87aa09fe4"/>
         </topic>
         <topic label="redisx.c" href="redisx_8c.html">
-          <topic label="redisxArrayRequest" href="redisx_8c.html#adc8c148c008f7668674edec57a3fa832"/>
+          <topic label="redisxArrayRequest" href="redisx_8c.html#ac6767cea95b4cc90348796c61ebdac75"/>
           <topic label="redisxCheckValid" href="redisx_8c.html#a0cdebfd895ab4c61c0fc9e0863a66419"/>
           <topic label="redisxDebugTraffic" href="redisx_8c.html#a7cde25fca6ae274d8d0a66d5c8b63ff5"/>
           <topic label="redisxError" href="redisx_8c.html#ae722b046fa70a55db725341ef8ee56dc"/>

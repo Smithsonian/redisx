@@ -358,8 +358,8 @@
       <type>RESP *</type>
       <name>redisxArrayRequest</name>
       <anchorfile>redisx_8h.html</anchorfile>
-      <anchor>a59b7f0cb895a7c4f16dc5413ddf1f963</anchor>
-      <arglist>(Redis *redis, const char *args[], int length[], int n, int *status)</arglist>
+      <anchor>ae76c209d7c58c0feddb0e52391b2d037</anchor>
+      <arglist>(Redis *redis, const char **args, const int *length, int n, int *status)</arglist>
     </member>
     <member kind="function">
       <type>int</type>
@@ -855,8 +855,8 @@
       <type>int</type>
       <name>redisxSendArrayRequestAsync</name>
       <anchorfile>redisx_8h.html</anchorfile>
-      <anchor>addf31b7508fe17f032a1c3168e32d967</anchor>
-      <arglist>(RedisClient *cl, const char *args[], int length[], int n)</arglist>
+      <anchor>a9b869bd8912f647f4abe5c98abf3a88d</anchor>
+      <arglist>(RedisClient *cl, const char **args, const int *length, int n)</arglist>
     </member>
     <member kind="function">
       <type>int</type>
@@ -1105,8 +1105,8 @@
       <type>int</type>
       <name>redisxSendArrayRequestAsync</name>
       <anchorfile>redisx-client_8c.html</anchorfile>
-      <anchor>ab809bbaed9d3466dbaeb38e82a712ee7</anchor>
-      <arglist>(RedisClient *cl, const char *args[], int lengths[], int n)</arglist>
+      <anchor>a17de2c4323d3da4b3a3d386d85c12d8e</anchor>
+      <arglist>(RedisClient *cl, const char **args, const int *lengths, int n)</arglist>
     </member>
     <member kind="function">
       <type>int</type>
@@ -1492,8 +1492,8 @@
       <type>RESP *</type>
       <name>redisxArrayRequest</name>
       <anchorfile>redisx_8c.html</anchorfile>
-      <anchor>adc8c148c008f7668674edec57a3fa832</anchor>
-      <arglist>(Redis *redis, const char *args[], int lengths[], int n, int *status)</arglist>
+      <anchor>ac6767cea95b4cc90348796c61ebdac75</anchor>
+      <arglist>(Redis *redis, const char **args, const int *lengths, int n, int *status)</arglist>
     </member>
     <member kind="function">
       <type>int</type>

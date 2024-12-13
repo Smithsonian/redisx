@@ -51,7 +51,7 @@ src/redisx-client.c
 .RI "int \fBredisxResetClient\fP (\fBRedisClient\fP *cl)"
 .br
 .ti -1c
-.RI "int \fBredisxSendArrayRequestAsync\fP (\fBRedisClient\fP *cl, const char *args[], int lengths[], int n)"
+.RI "int \fBredisxSendArrayRequestAsync\fP (\fBRedisClient\fP *cl, const char **args, const int *lengths, int n)"
 .br
 .ti -1c
 .RI "int \fBredisxSendRequestAsync\fP (\fBRedisClient\fP *cl, const char *command, const char *arg1, const char *arg2, const char *arg3)"
@@ -336,14 +336,14 @@ X_SUCCESS (0) if successful, or X_NULL if the client is NULL, or another error c
 
 .PP
 References \fBREDIS_UNEXPECTED_RESP\fP, \fBredisxCheckRESP()\fP, \fBredisxDestroyRESP()\fP, \fBredisxLockConnected()\fP, \fBredisxReadReplyAsync()\fP, \fBredisxSendRequestAsync()\fP, \fBredisxUnlockClient()\fP, \fBRESP_SIMPLE_STRING\fP, \fBRESP::value\fP, \fBx_error()\fP, and \fBX_SUCCESS\fP\&.
-.SS "int redisxSendArrayRequestAsync (\fBRedisClient\fP * cl, const char * args[], int lengths[], int n)"
+.SS "int redisxSendArrayRequestAsync (\fBRedisClient\fP * cl, const char ** args, const int * lengths, int n)"
 Send a \fBRedis\fP request with an arbitrary number of arguments\&.
 .PP
 \fBParameters\fP
 .RS 4
 \fIcl\fP Pointer to the \fBRedis\fP client\&. 
 .br
-\fIargs\fP The array of string arguments to send\&. 
+\fIargs\fP The array of string arguments to send\&. If you have an \fCchar **\fP array, you may need to cast to \fC(const char **)\fP to avoid compiler warnings\&. 
 .br
 \fIlengths\fP Array indicating the number of bytes to send from each string argument\&. Zero or negative values can be used to determine the string length automatically using strlen(), and the length argument itself may be NULL to determine the lengths of all string arguments automatically\&. 
 .br

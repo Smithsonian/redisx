@@ -163,7 +163,7 @@ include/redisx.h
 .RI "int \fBredisxAddSubscriber\fP (\fBRedis\fP *redis, const char *channelStem, \fBRedisSubscriberCall\fP f)"
 .br
 .ti -1c
-.RI "\fBRESP\fP * \fBredisxArrayRequest\fP (\fBRedis\fP *redis, const char *args[], int length[], int n, int *status)"
+.RI "\fBRESP\fP * \fBredisxArrayRequest\fP (\fBRedis\fP *redis, const char **args, const int *length, int n, int *status)"
 .br
 .ti -1c
 .RI "int \fBredisxCheckDestroyRESP\fP (\fBRESP\fP *resp, enum \fBresp_type\fP, int expectedSize)"
@@ -376,7 +376,7 @@ include/redisx.h
 .RI "int \fBredisxSelectDB\fP (\fBRedis\fP *redis, int idx)"
 .br
 .ti -1c
-.RI "int \fBredisxSendArrayRequestAsync\fP (\fBRedisClient\fP *cl, const char *args[], int length[], int n)"
+.RI "int \fBredisxSendArrayRequestAsync\fP (\fBRedisClient\fP *cl, const char **args, const int *length, int n)"
 .br
 .ti -1c
 .RI "int \fBredisxSendRequestAsync\fP (\fBRedisClient\fP *cl, const char *command, const char *arg1, const char *arg2, const char *arg3)"
@@ -727,14 +727,14 @@ Add a targeted subscriber processing function to the list of functions that proc
 
 .PP
 References \fBX_SUCCESS\fP, \fBx_warn()\fP, \fBxStringCopyOf()\fP, and \fBxvprintf\fP\&.
-.SS "\fBRESP\fP * redisxArrayRequest (\fBRedis\fP * redis, const char * args[], int lengths[], int n, int * status)"
+.SS "\fBRESP\fP * redisxArrayRequest (\fBRedis\fP * redis, const char ** args, const int * lengths, int n, int * status)"
 Returns the result of the most generic type of \fBRedis\fP request with any number of arguments\&. This is not the highest throughput mode (that would be sending asynchronous pipeline request, and then asynchronously collecting the results such as with \fBredisxSendArrayRequestAsync()\fP / \fBredisxReadReplyAsync()\fP, because it requires separate network roundtrips for each and every request\&. But, it is simple and perfectly good method when one needs to retrieve only a few (<1000) variables per second\&.\&.\&.
 .PP
 \fBParameters\fP
 .RS 4
 \fIredis\fP Pointer to a \fBRedis\fP instance\&. 
 .br
-\fIargs\fP An array of strings to send to \fBRedis\fP, corresponding to a single query\&. 
+\fIargs\fP An array of strings to send to \fBRedis\fP, corresponding to a single query\&. If you have an \fCchar **\fP array, you may need to cast to \fC(const char **)\fP to avoid compiler warnings\&. 
 .br
 \fIlengths\fP Array indicating the number of bytes to send from each string argument\&. Zero values can be used to determine the string length automatically using strlen(), and the length argument itself may be NULL to determine the lengths of all string arguments automatically\&. 
 .br
@@ -2394,14 +2394,14 @@ X_SUCCESS (0) if successful, or X_NULL if the redis argument is NULL, X_INCOMPLE
 
 .PP
 References \fBREDIS_INVALID_CHANNEL\fP, \fBREDISX_CHANNELS\fP, \fBREDISX_PIPELINE_CHANNEL\fP, \fBREDISX_SUBSCRIPTION_CHANNEL\fP, \fBredisxAddConnectHook()\fP, \fBredisxGetClient()\fP, \fBredisxIsConnected()\fP, \fBredisxLockConnected()\fP, \fBredisxRemoveConnectHook()\fP, \fBredisxUnlockClient()\fP, \fBX_INCOMPLETE\fP, \fBX_SUCCESS\fP, and \fBx_trace()\fP\&.
-.SS "int redisxSendArrayRequestAsync (\fBRedisClient\fP * cl, const char * args[], int lengths[], int n)"
+.SS "int redisxSendArrayRequestAsync (\fBRedisClient\fP * cl, const char ** args, const int * lengths, int n)"
 Send a \fBRedis\fP request with an arbitrary number of arguments\&.
 .PP
 \fBParameters\fP
 .RS 4
 \fIcl\fP Pointer to the \fBRedis\fP client\&. 
 .br
-\fIargs\fP The array of string arguments to send\&. 
+\fIargs\fP The array of string arguments to send\&. If you have an \fCchar **\fP array, you may need to cast to \fC(const char **)\fP to avoid compiler warnings\&. 
 .br
 \fIlengths\fP Array indicating the number of bytes to send from each string argument\&. Zero or negative values can be used to determine the string length automatically using strlen(), and the length argument itself may be NULL to determine the lengths of all string arguments automatically\&. 
 .br
