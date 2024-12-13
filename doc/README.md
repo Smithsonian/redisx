@@ -71,8 +71,8 @@ Before then the API may undergo slight changes and tweaks. Use the repository as
  | interactive queries               |  __yes__   | dedicated (low-latency) client                               |
  | pipelined (batch) processing      |  __yes__   | dedicated (high-bandwidth) client / user-defined callback    |
  | PUB/SUB support                   |  __yes__   | dedicated client / user callbacks / subscription management  |
- | Sentinel                          |  __yes__   |                                                              |
- | cluster support                   |    no      | coming soon...                                               |
+ | Redis Sentinel                    |  __yes__   |                                                              |
+ | Redis cluster support             |    no      | coming soon...                                               |
  | TLS support                       |    no      | coming soon...                                               |
  | resubscribe on reconnect          |    no      | in the not too distance future...                            |
  | command-line client               |  __yes__   | `redisx-cli`                                                 |
