@@ -27,30 +27,48 @@ static int port = 6379;
 static int format = 0;
 static char *delim = "\\n";
 static char *groupDelim = "\\n";
+static int attrib = 0;
 
 static void printVersion(const char *name) {
   printf("%s %s\n", name, REDISX_VERSION_STRING);
 }
 
 
-static void printRESP(const char *prefix, const RESP *resp) {
-  if(format == FORMAT_JSON) redisxPrintJSON(prefix, resp);
+static void printRESP(const RESP *resp) {
+  if(format == FORMAT_JSON) {
+    const char *type = "REPLY";
+
+    if(resp) {
+      if(resp->type == RESP3_PUSH) type = "PUSH";
+      else if(resp->type == RESP3_ATTRIBUTE) type = "ATTRIBUTES";
+    }
+
+    redisxPrintJSON(type, resp);
+  }
   if(format == FORMAT_RAW) redisxPrintDelimited(resp, delim, groupDelim);
   else redisxPrintRESP(resp);
 }
 
-static void process(Redis *redis, const char *prefix, const char **cmdargs, int nargs) {
+static void process(Redis *redis, const char **cmdargs, int nargs) {
   int status = X_SUCCESS;
   RESP *reply = redisxArrayRequest(redis, cmdargs, NULL, nargs, &status);
-  if(!status) printRESP(prefix, reply);
+  if(!status) printRESP(reply);
   redisxDestroyRESP(reply);
+
+  if(attrib) {
+    reply = redisxGetAttributes(redis);
+    if(reply) {
+      printRESP(reply);
+      redisxDestroyRESP(reply);
+    }
+  }
 }
 
 // cppcheck-suppress constParameterCallback
 static void PushProcessor(RedisClient *cl, RESP *resp, void *ptr) {
   (void) cl;
   (void) ptr;
-  printRESP("PUSH", resp);
+  printRESP(resp);
 }
 
 static int interactive(Redis *redis) {
@@ -72,7 +90,7 @@ static int interactive(Redis *redis) {
 
     if(args) {
       if(nargs > 0) {
-        process(redis, "REPLY", (const char **) args, nargs);
+        process(redis, (const char **) args, nargs);
         add_history(line);
       }
       free(args);
@@ -184,11 +202,11 @@ int main(int argc, const char *argv[]) {
           {"delim",     'd', POPT_ARG_STRING  | POPT_ARGFLAG_SHOW_DEFAULT, &delim,      0, "delimiter between elements for raw format.  " //
                   "You can use JSON convention for escaping special characters.", "<string>" //
           },
-          {"group",     'D', POPT_ARG_STRING  | POPT_ARGFLAG_SHOW_DEFAULT, &groupDelim, 0, "delimiter between groups for raw format.  " //
+          {"group",     'D', POPT_ARG_STRING  | POPT_ARGFLAG_SHOW_DEFAULT, &groupDelim, 0, "group prefix for raw format.  " //
                   "You can use JSON convention for escaping special characters.", "<string>" //
           },
-          {"show-pushes", 0, POPT_ARG_STRING  | POPT_ARGFLAG_SHOW_DEFAULT, &push,       0, "Whether to print RESP3 PUSH messages.", "yes|no" //
-          }, //
+          {"show-pushes", 0, POPT_ARG_STRING  | POPT_ARGFLAG_SHOW_DEFAULT, &push,       0, "Whether to print RESP3 PUSH messages.", "yes|no" }, //
+          {"attributes",  0, POPT_ARG_NONE,   &attrib,     0, "Show RESP3 attributes also, if available.", NULL}, //
           {"eval",        0, POPT_ARG_STRING, &push,       0, "Send an EVAL command using the Lua script at <file>.  " //
                   "The keyword and other arguments should be separated with a standalone comma on the command-line, such as: 'key1 key2 , arg1 arg2 ...'", "<file>" //
           },
@@ -278,7 +296,7 @@ int main(int argc, const char *argv[]) {
       nanosleep(&sleeptime, NULL);
     }
 
-    if(nargs) process(redis, "REPLY", (const char **) cmdargs, nargs);
+    if(nargs) process(redis, (const char **) cmdargs, nargs);
   }
 
   redisxDisconnect(redis);

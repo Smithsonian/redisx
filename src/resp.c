@@ -792,6 +792,9 @@ static int rIndexWidth(int count) {
 static int rPrintRESP(int indent, const RESP *resp) {
 
   if(!resp) return printf("(null)");
+
+  if(resp->type == RESP3_ATTRIBUTE) printf("(attributes) ");
+
   if(resp->type == RESP3_NULL) return printf("null");
 
   switch(resp->type) {
@@ -863,16 +866,20 @@ static int rPrintRESP(int indent, const RESP *resp) {
 /**
  * Prints a RESP in raw form using delimiters only.
  *
- * @param resp        Pointer to a RESP (it may be NULL)
- * @param delim       delimiter between RESP array/map entries
- * @param groupDelim  group delimiter between arrays / maps
+ * @param resp          Pointer to a RESP (it may be NULL)
+ * @param delim         Delimiter between elements
+ * @param groupPrefix   Prefix in front of arrays and maps
  */
-void redisxPrintDelimited(const RESP *resp, const char *delim, const char *groupDelim) {
+void redisxPrintDelimited(const RESP *resp, const char *delim, const char *groupPrefix) {
+
+  if(resp && resp->type == RESP3_ATTRIBUTE) printf("\n<attributes>\n");
 
   if(!resp || resp->type == RESP3_NULL) {
     printf("%s", delim);
     return;
   }
+
+
 
   switch(resp->type) {
 
@@ -900,9 +907,9 @@ void redisxPrintDelimited(const RESP *resp, const char *delim, const char *group
 
       if(resp->value) {
         int i;
-        if(resp->n > 1) printf("%s", groupDelim);
+        if(resp->n > 1) printf("%s", groupPrefix);
         for(i = 0; i < resp->n; i++) {
-          redisxPrintDelimited(component[i], delim, groupDelim);
+          redisxPrintDelimited(component[i], delim, groupPrefix);
         }
       }
       else printf("%s", delim);
@@ -916,10 +923,10 @@ void redisxPrintDelimited(const RESP *resp, const char *delim, const char *group
 
       if(resp->value) {
         int i;
-        if(resp->n > 1) printf("%s", groupDelim);
+        if(resp->n > 1) printf("%s", groupPrefix);
         for(i = 0; i < resp->n; i++) {
-          redisxPrintDelimited(component[i].key, delim, groupDelim);
-          redisxPrintDelimited(component[i].key, delim, groupDelim);
+          redisxPrintDelimited(component[i].key, delim, groupPrefix);
+          redisxPrintDelimited(component[i].key, delim, groupPrefix);
         }
       }
       else printf("%s", delim);
