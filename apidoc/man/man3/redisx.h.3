@@ -87,7 +87,7 @@ include/redisx.h
 .br
 .RI "API minor version\&. "
 .ti -1c
-.RI "#define \fBREDISX_PATCHLEVEL\fP   2"
+.RI "#define \fBREDISX_PATCHLEVEL\fP   3"
 .br
 .RI "Integer sub version of the release\&. "
 .ti -1c
@@ -326,6 +326,9 @@ include/redisx.h
 .br
 .ti -1c
 .RI "int \fBredisxPing\fP (\fBRedis\fP *redis, const char *message)"
+.br
+.ti -1c
+.RI "void \fBredisxPrintDelimited\fP (const \fBRESP\fP *resp, const char *delim, const char *groupDelim)"
 .br
 .ti -1c
 .RI "int \fBredisxPrintJSON\fP (const char *name, const \fBRESP\fP *resp)"
@@ -1970,6 +1973,21 @@ X_SUCCESS (0) if successful, or else an error code (<0) from \fBredisx\&.h\fP / 
 
 .PP
 References \fBREDIS_UNEXPECTED_RESP\fP, \fBredisxCheckDestroyRESP()\fP, \fBredisxDestroyRESP()\fP, \fBredisxRequest()\fP, \fBRESP_BULK_STRING\fP, \fBRESP_SIMPLE_STRING\fP, \fBRESP::value\fP, \fBx_error()\fP, and \fBX_SUCCESS\fP\&.
+.SS "void redisxPrintDelimited (const \fBRESP\fP * resp, const char * delim, const char * groupDelim)"
+Prints a \fBRESP\fP in raw form using delimiters only\&.
+.PP
+\fBParameters\fP
+.RS 4
+\fIresp\fP Pointer to a \fBRESP\fP (it may be NULL) 
+.br
+\fIdelim\fP delimiter between \fBRESP\fP array/map entries 
+.br
+\fIgroupDelim\fP group delimiter between arrays / maps 
+.RE
+.PP
+
+.PP
+References \fBRESP::n\fP, \fBredisxPrintDelimited()\fP, \fBRESP3_ATTRIBUTE\fP, \fBRESP3_BIG_NUMBER\fP, \fBRESP3_BLOB_ERROR\fP, \fBRESP3_DOUBLE\fP, \fBRESP3_MAP\fP, \fBRESP3_NULL\fP, \fBRESP3_PUSH\fP, \fBRESP3_SET\fP, \fBRESP3_VERBATIM_STRING\fP, \fBRESP_ARRAY\fP, \fBRESP_BULK_STRING\fP, \fBRESP_ERROR\fP, \fBRESP_INT\fP, \fBRESP_SIMPLE_STRING\fP, \fBRESP::type\fP, and \fBRESP::value\fP\&.
 .SS "int redisxPrintJSON (const char * name, const \fBRESP\fP * resp)"
 Prints a \fBRESP\fP in JSON format to the standard output with the specified name
 .PP
@@ -2014,6 +2032,8 @@ X_SUCCESS (0) if successful or else X_FAILURE if there was an error\&.
 .RE
 .PP
 
+.PP
+References \fBX_FAILURE\fP, and \fBX_SUCCESS\fP\&.
 .SS "int redisxPublish (\fBRedis\fP * redis, const char * channel, const char * data, int length)"
 Sends a generic \fBRedis\fP PUB/SUB message on the specified channel\&. \fBRedis\fP must be connected before attempting to send messages\&. It will send the message over the pipeline client if it is avaiable, or else over the interactive client\&.
 .PP

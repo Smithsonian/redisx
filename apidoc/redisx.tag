@@ -740,6 +740,13 @@
       <arglist>(Redis *redis, const char *message)</arglist>
     </member>
     <member kind="function">
+      <type>void</type>
+      <name>redisxPrintDelimited</name>
+      <anchorfile>redisx_8h.html</anchorfile>
+      <anchor>a964f3d72f790b38032326d9115a5f145</anchor>
+      <arglist>(const RESP *resp, const char *delim, const char *groupDelim)</arglist>
+    </member>
+    <member kind="function">
       <type>int</type>
       <name>redisxPrintJSON</name>
       <anchorfile>redisx_8h.html</anchorfile>
@@ -1744,6 +1751,13 @@
       <anchorfile>resp_8c.html</anchorfile>
       <anchor>a7fb3a83bc8345413eb1a722444386abd</anchor>
       <arglist>(const RESP *r)</arglist>
+    </member>
+    <member kind="function">
+      <type>void</type>
+      <name>redisxPrintDelimited</name>
+      <anchorfile>resp_8c.html</anchorfile>
+      <anchor>a964f3d72f790b38032326d9115a5f145</anchor>
+      <arglist>(const RESP *resp, const char *delim, const char *groupDelim)</arglist>
     </member>
     <member kind="function">
       <type>int</type>

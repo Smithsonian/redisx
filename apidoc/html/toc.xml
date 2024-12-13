@@ -217,6 +217,7 @@
           <topic label="redisxMultiSetAsync" href="redisx_8h.html#a750023f759dd5192dd3c802a542af770"/>
           <topic label="redisxNotify" href="redisx_8h.html#ace918fd1adb80e26cfae107685a314e0"/>
           <topic label="redisxPing" href="redisx_8h.html#afd19b1137e80ed26065d9e6e7039c8fe"/>
+          <topic label="redisxPrintDelimited" href="redisx_8h.html#a964f3d72f790b38032326d9115a5f145"/>
           <topic label="redisxPrintJSON" href="redisx_8h.html#a0c3e84681ddfeabf29bac807ff46160b"/>
           <topic label="redisxPrintRESP" href="redisx_8h.html#ae1691b2452bc3badd1cc8874b139b846"/>
           <topic label="redisxPublish" href="redisx_8h.html#a06262603a9a3153fb29d81628fee6a8e"/>
@@ -373,6 +374,7 @@
           <topic label="redisxIsMapType" href="resp_8c.html#a460822029ff730cd7a55d64797c329a3"/>
           <topic label="redisxIsScalarType" href="resp_8c.html#a944a623a34b5a6a7af064fc0d0cc35bf"/>
           <topic label="redisxIsStringType" href="resp_8c.html#a7fb3a83bc8345413eb1a722444386abd"/>
+          <topic label="redisxPrintDelimited" href="resp_8c.html#a964f3d72f790b38032326d9115a5f145"/>
           <topic label="redisxPrintJSON" href="resp_8c.html#a0c3e84681ddfeabf29bac807ff46160b"/>
           <topic label="redisxPrintRESP" href="resp_8c.html#ae1691b2452bc3badd1cc8874b139b846"/>
           <topic label="redisxRESP2JSON" href="resp_8c.html#a7f4e74ee03cebf38eb9c1fb873784a35"/>
@@ -387,7 +389,9 @@
         <topic label="r" href="globals_r.html"/>
         <topic label="s" href="globals_s.html"/>
       </topic>
-      <topic label="Functions" href="globals_func.html"/>
+      <topic label="Functions" href="globals_func.html">
+        <topic label="r" href="globals_func.html"/>
+      </topic>
       <topic label="Typedefs" href="globals_type.html"/>
       <topic label="Enumerations" href="globals_enum.html"/>
       <topic label="Enumerator" href="globals_eval.html"/>
