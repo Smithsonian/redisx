@@ -74,8 +74,8 @@ Before then the API may undergo slight changes and tweaks. Use the repository as
  | configurable socket buffer size   |  __yes__   |                                                              |
  | socket error handling             |  __yes__   | user-defined callback                                        |
  | authentication (user/password)    |  __yes__   | via `HELLO` if protocol is set, otherwise via `AUTH`         |
- | `HELLO`                           |  __yes__   | optional (if specific protocol is set)                       |
  | RESP3 support                     |  __yes__   |                                                              |
+ | `HELLO`                           |  __yes__   | optional (if specific protocol is set)                       |
  | thread safe (MT-safe)             |  __yes__   | both synchronized, and async calls with locking              |
  | push messages                     |  __yes__   | user-defined callback                                        |
  | attributes                        |  __yes__   | on demand                                                    |
