@@ -24,7 +24,7 @@ A free, simple, and light-weight C/C++ Redis / Valkey client library.
  
 Author: Attila Kovacs
 
-Last Updated: 10 December 2024
+Last Updated: 13 December 2024
 
 ## Table of Contents
 
@@ -77,6 +77,38 @@ Before then the API may undergo slight changes and tweaks. Use the repository as
    * [Smithsonian/smax-clib](https://github.com/Smithsonian/smax-clib) -- A C/C++ client library and toolkit to SMA-X,
      based on __RedisX__
    * [Smithsonian/smax-python](https://github.com/Smithsonian/smax-python) -- A Python 3 client library to SMA-X
+
+
+### Features overview
+
+ | Feature                           | supported  | comments                                                     |
+ | --------------------------------- |:----------:| -------------------------------------------------------------|
+ | concurrent Redis instances        |  __yes__   | You can manage and use multiple Redis servers simultaneously |
+ | connect over TCP                  |  __yes__   |                                                              |
+ | connect over UDP                  |    no      | (why would you, really?)                                     |
+ | connect / disconnect hooks        |  __yes__   |                                                              |
+ | configurable socket timeout       |  __yes__   |                                                              |
+ | configurable socket buffer size   |  __yes__   |                                                              |
+ | socket error handling             |  __yes__   | user-defined callback                                        |
+ | authentication (user/password)    |  __yes__   | via `HELLO` if protocol is set, otherwise via `AUTH`         |
+ | RESP3 support                     |  __yes__   |                                                              |
+ | `HELLO`                           |  __yes__   | optional (if specific protocol is set)                       |
+ | thread safe (MT-safe)             |  __yes__   | both synchronized, and async calls with locking              |
+ | push messages                     |  __yes__   | user-defined callback                                        |
+ | attributes                        |  __yes__   | on demand                                                    |
+ | interactive queries               |  __yes__   | dedicated (low-latency) client                               |
+ | pipelined (batch) processing      |  __yes__   | dedicated (high-bandwidth) client / user-defined callback    |
+ | PUB/SUB support                   |  __yes__   | dedicated client / user callbacks / subscription management  |
+ | Redis Sentinel                    |  __yes__   | _help me test it_                                            |
+ | Redis cluster support             |    no      | _coming soon..._                                             |
+ | TLS support                       |    no      | _coming soon..._                                             |
+ | resubscribe on reconnect          |    no      | _in the not too distance future..._                          |
+ | command-line client               |  __yes__   | `redisx-cli`                                                 |
+ | RESP to JSON                      |  __yes__   | via `xchange` library                                        |
+ | RESP to structured data           |  __yes__   | via `xchange` library                                        |
+ | debug error tracing               |  __yes__   | via `xSetDebug()`                                            |
+
+ 
 
 -----------------------------------------------------------------------------
 
@@ -484,9 +516,9 @@ There are some things to look out for in your `RedisPushProcessor` implementatio
   extensive processing is required, you should place a copy of the PUSH notification onto a queue and let an 
   asynchronous thread take it from there.
 - The call should not attempt to alter or destroy the push message. If needed it can copy parts or the whole.
-- You should not attempt to lock or release clients from the call. If you need access to a client, it's best to put a 
-  copy of the RESP notification onto a queue and let an asynchronous thread deal with it.
-- You should
+- You should not attempt to lock or release clients from the call. If you need access to a client (e.g. to submit a
+  new Redis request), it's best to put a copy of the RESP notification onto a queue and let an asynchronous thread 
+  deal with it.
 
 
 <a name="resp-data-type"></a>
