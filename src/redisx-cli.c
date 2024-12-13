@@ -42,7 +42,7 @@ static void process(Redis *redis, const char *prefix, const char **cmdargs, int 
 static void PushProcessor(RedisClient *cl, RESP *resp, void *ptr) {
   (void) cl;
   (void) ptr;
-  printRESP("[PUSH]", resp);
+  printRESP("PUSH", resp);
 }
 
 static int interactive(Redis *redis) {
@@ -64,7 +64,7 @@ static int interactive(Redis *redis) {
 
     if(args) {
       if(nargs > 0) {
-        process(redis, "[REPLY]", (const char **) args, nargs);
+        process(redis, "REPLY", (const char **) args, nargs);
         add_history(line);
       }
       free(args);
@@ -216,7 +216,7 @@ int main(int argc, const char *argv[]) {
       nanosleep(&sleeptime, NULL);
     }
 
-    if(nargs) process(redis, "[REPLY]", (const char **) cmdargs, nargs);
+    if(nargs) process(redis, "REPLY", (const char **) cmdargs, nargs);
   }
 
   redisxDisconnect(redis);
