@@ -167,10 +167,10 @@ will print:
 ```
 
 provided it successfully connected to the Redis / Valkey server on localhost. (Otherwise it will print an error and a 
-trace). It can also be used in interatice mode if no Redis command arguments are supplied. And, you can run 
+trace). It can also be used in interactive mode if no Redis command arguments are supplied. And, you can run 
 `redisx-cli --help` to see what options are available, and you can also consult the 
 [redis-cli](https://redis.io/docs/latest/develop/tools/cli/) documentation for the same general description and usage 
-(so far as the implementation allows).
+(so far as our implementation supports it).
 
 -----------------------------------------------------------------------------
 
@@ -1260,7 +1260,8 @@ Some obvious ways the library could evolve and grow in the not too distant futur
 
  - Automated regression testing and coverage tracking.
  - Keep track of subscription patterns, and automatically resubscribe to them on reconnecting.
- - TLS support (perhaps...)
+ - TLS support.
+ - Redis cluster support.
  - Add high-level support for managing and calling custom Redis functions.
  - Add more high-level [Redis commands](https://redis.io/docs/latest/commands/), e.g. for lists, streams, etc.
 
