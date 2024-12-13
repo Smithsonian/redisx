@@ -458,8 +458,7 @@ Push notifications</h3>
 <ul>
 <li>The call should not block (except perhaps for a quick mutex lock) and should return quickly. If blocking calls, or extensive processing is required, you should place a copy of the PUSH notification onto a queue and let an asynchronous thread take it from there.</li>
 <li>The call should not attempt to alter or destroy the push message. If needed it can copy parts or the whole.</li>
-<li>You should not attempt to lock or release clients from the call. If you need access to a client, it's best to put a copy of the <a class="el" href="structRESP.html" title="Structure that represents a Redis response (RESP format).">RESP</a> notification onto a queue and let an asynchronous thread deal with it.</li>
-<li>You should</li>
+<li>You should not attempt to lock or release clients from the call. If you need access to a client (e.g. to submit a new <a class="el" href="structRedis.html" title="Structure that represents a Redis database instance, with one or more RedisClient connections.">Redis</a> request), it's best to put a copy of the <a class="el" href="structRESP.html" title="Structure that represents a Redis response (RESP format).">RESP</a> notification onto a queue and let an asynchronous thread deal with it.</li>
 </ul>
 <p><a class="anchor" id="resp-data-type"></a> </p>
 <h3><a class="anchor" id="autotoc_md26"></a>

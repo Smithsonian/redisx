@@ -499,9 +499,9 @@ There are some things to look out for in your `RedisPushProcessor` implementatio
   extensive processing is required, you should place a copy of the PUSH notification onto a queue and let an 
   asynchronous thread take it from there.
 - The call should not attempt to alter or destroy the push message. If needed it can copy parts or the whole.
-- You should not attempt to lock or release clients from the call. If you need access to a client, it's best to put a 
-  copy of the RESP notification onto a queue and let an asynchronous thread deal with it.
-- You should
+- You should not attempt to lock or release clients from the call. If you need access to a client (e.g. to submit a
+  new Redis request), it's best to put a copy of the RESP notification onto a queue and let an asynchronous thread 
+  deal with it.
 
 
 <a name="resp-data-type"></a>
