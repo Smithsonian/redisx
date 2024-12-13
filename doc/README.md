@@ -51,6 +51,36 @@ repository on GitHub.
 There are no official releases of __RedisX__ yet. An initial 1.0.0 release is expected in late 2024 or early 2025. 
 Before then the API may undergo slight changes and tweaks. Use the repository as is at your own risk for now.
 
+### Feature overview
+
+ | Feature                           | supported  | comments                                                     |
+ | --------------------------------- |:----------:| -------------------------------------------------------------|
+ | Concurrent Redis instances        |  __yes__   | You can manage and use multiple Redis servers simultaneously |
+ | connect over TCP                  |  __yes__   |                                                              |
+ | connect over UDP                  |    no      | (why would you, really?)                                     |
+ | Configurable socket timeout       |  __yes__   |                                                              |
+ | Configurable socket buffer size   |  __yes__   |                                                              |
+ | Socket error handling             |  __yes__   | user-defined callback                                        |
+ | Authentication (user/password)    |  __yes__   | via `HELLO` if protocol is set, otherwise via `AUTH`         |
+ | Connection / Disconnection hooks  |  __yes__   |                                                              |
+ | `HELLO`                           |  __yes__   | optional (if specific protocol is set)                       |
+ | RESP3 support                     |  __yes__   |                                                              |
+ | Thread safe (MT-safe)             |  __yes__   | both synchronized, and async calls with locking              |
+ | Push messages                     |  __yes__   | user-defined callback                                        |
+ | Attributes                        |  __yes__   | on demand                                                    |
+ | Interactive queries               |  __yes__   | dedicated (low-latency) client                               |
+ | Pipelined (batch) processing      |  __yes__   | dedicated (high-bandwidth) client / user-defined callback    |
+ | PUB/SUB support                   |  __yes__   | dedicated client / user callbacks / subscription management  |
+ | Sentinel                          |  __yes__   |                                                              |
+ | Cluster support                   |    no      | coming soon...                                               |
+ | TLS support                       |    no      | coming soon...                                               |
+ | Resubscribe on reconnect          |    no      | in the not too distance future...                            |
+ | command-line client               |  __yes__   | `redisx-cli`                                                 |
+ | RESP to JSON                      |  __yes__   | via `xchange` library                                        |
+ | RESP to structured data           |  __yes__   | via `xchange` library                                        |
+ | Debug error tracing               |  __yes__   | via `xSetDebug()`                                            |
+
+ 
 ### Related links
 
  - [Redis commands](https://redis.io/docs/latest/commands/) (reference documentation)
