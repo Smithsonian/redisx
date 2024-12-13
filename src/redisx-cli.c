@@ -162,8 +162,6 @@ int main(int argc, const char *argv[]) {
   int verbose = 0;
   int debug = 0;
 
-
-
   struct poptOption options[] = { //
           {"host",       'h', POPT_ARG_STRING | POPT_ARGFLAG_SHOW_DEFAULT,    &host,     0, "Server hostname.", "<hostname>"}, //
           {"port",       'p', POPT_ARG_INT    | POPT_ARGFLAG_SHOW_DEFAULT,    &port,     0, "Server port.", "<port>"}, //
@@ -224,9 +222,8 @@ int main(int argc, const char *argv[]) {
     }
   }
 
-
-  delim = xjsonUnescapeString(delim);
-  groupDelim = xjsonUnescapeString(groupDelim);
+  delim = xjsonUnescape(delim);
+  groupDelim = xjsonUnescape(groupDelim);
 
   cmdargs = (char **) poptGetArgs(optcon);
 
