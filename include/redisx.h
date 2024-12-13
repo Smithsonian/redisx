@@ -438,6 +438,7 @@ XField *redisxRESP2XField(const char *name, const RESP *resp);
 char *redisxRESP2JSON(const char *name, const RESP *resp);
 int redisxPrintRESP(const RESP *resp);
 int redisxPrintJSON(const char *name, const RESP *resp);
+void redisxPrintDelimited(const RESP *resp, const char *delim, const char *groupDelim);
 
 RedisMapEntry *redisxGetMapEntry(const RESP *map, const RESP *key);
 RedisMapEntry *redisxGetKeywordEntry(const RESP *map, const char *key);

@@ -17,6 +17,7 @@
 #include <bsd/readpassphrase.h>
 
 #include "redisx-priv.h"
+#include <xjson.h>
 
 #define FORMAT_JSON 1
 #define FORMAT_RAW  2
@@ -24,6 +25,8 @@
 static char *host = "127.0.0.1";
 static int port = 6379;
 static int format = 0;
+static char *delim = "\\n";
+static char *groupDelim = "\\n";
 
 static void printVersion(const char *name) {
   printf("%s %s\n", name, REDISX_VERSION_STRING);
@@ -32,6 +35,7 @@ static void printVersion(const char *name) {
 
 static void printRESP(const char *prefix, const RESP *resp) {
   if(format == FORMAT_JSON) redisxPrintJSON(prefix, resp);
+  if(format == FORMAT_RAW) redisxPrintDelimited(resp, delim, groupDelim);
   else redisxPrintRESP(resp);
 }
 
@@ -153,32 +157,39 @@ int main(int argc, const char *argv[]) {
   int dbIndex = 0;
   int protocol = -1;
   int input = 0;
-  char *push = "y";
+  char *push = "yes";
   const char *eval = NULL;
   int verbose = 0;
   int debug = 0;
 
 
+
   struct poptOption options[] = { //
-          {NULL,         'h', POPT_ARG_STRING | POPT_ARGFLAG_SHOW_DEFAULT,    &host,     0, "Server hostname.", "<hostname>"}, //
-          {NULL,         'p', POPT_ARG_INT    | POPT_ARGFLAG_SHOW_DEFAULT,    &port,     0, "Server port.", "<port>"}, //
-          {NULL,         't', POPT_ARG_DOUBLE, &timeout,    0, "Server connection timeout in seconds (decimals allowed).", "<timeout>"}, //
+          {"host",       'h', POPT_ARG_STRING | POPT_ARGFLAG_SHOW_DEFAULT,    &host,     0, "Server hostname.", "<hostname>"}, //
+          {"port",       'p', POPT_ARG_INT    | POPT_ARGFLAG_SHOW_DEFAULT,    &port,     0, "Server port.", "<port>"}, //
+          {"timeout",    't', POPT_ARG_DOUBLE, &timeout,    0, "Server connection timeout in seconds (decimals allowed).", "<timeout>"}, //
           {"pass",       'a', POPT_ARG_STRING, &password,   0, "Password to use when connecting to the server.", "<password>"}, //
           {"user",        0, POPT_ARG_STRING, &user,       0, "Used to send ACL style 'AUTH username pass'. Needs -a.", "<username>"}, //
           {"askpass",     0, POPT_ARG_NONE,   &askpass,    0, "Force user to input password with mask from STDIN.  " //
                   "If this argument is used, '-a' will be ignored.", NULL //
           }, //
-          {NULL,        'r', POPT_ARG_INT,    &repeat,     0, "Execute specified command N times.", "<repeat>"}, //
-          {NULL,        'i', POPT_ARG_DOUBLE | POPT_ARGFLAG_SHOW_DEFAULT, &interval, 0, "When -r is used, waits <interval> seconds per command.  " //
+          {"repeat",    'r', POPT_ARG_INT,    &repeat,     0, "Execute specified command N times.", "<repeat>"}, //
+          {"interval",  'i', POPT_ARG_DOUBLE | POPT_ARGFLAG_SHOW_DEFAULT, &interval, 0, "When -r is used, waits <interval> seconds per command.  " //
                   "It is possible to specify sub-second times like -i 0.1.", "<interval>" //
           }, //
-          {NULL,        'n', POPT_ARG_INT,    &dbIndex,    0, "Database number.", "<db>"}, //
-          {NULL,        '2', POPT_ARG_VAL,    &protocol,   2, "Start session in RESP2 protocol mode.", NULL}, //
-          {NULL,        '3', POPT_ARG_VAL,    &protocol,   3, "Start session in RESP3 protocol mode.", NULL}, //
-          {NULL,        'x', POPT_ARG_VAL,    &input,      0, "Read last argument from STDIN", NULL}, //
+          {"db",        'n', POPT_ARG_INT,    &dbIndex,    0, "Database number.", "<db>"}, //
+          {"RESP2",     '2', POPT_ARG_VAL,    &protocol,   2, "Start session in RESP2 protocol mode.", NULL}, //
+          {"RESP3",     '3', POPT_ARG_VAL,    &protocol,   3, "Start session in RESP3 protocol mode.", NULL}, //
+          {"stdin",     'x', POPT_ARG_VAL,    &input,      0, "Read last argument from STDIN", NULL}, //
           {"json",        0, POPT_ARG_NONE,   NULL,      'j', "Output in JSON format", NULL}, //
-          {"show-pushes", 0, POPT_ARG_STRING, &push,       0, "Whether to print RESP3 PUSH messages.  Enabled by default when STDOUT " //
-                  "is a tty but can be overridden with --show-pushes no.", "<yes|no>" //
+          {"raw",         0, POPT_ARG_NONE,   NULL,      'r', "Use raw formatting for replies (with delimiters).", NULL}, //
+          {"delim",     'd', POPT_ARG_STRING  | POPT_ARGFLAG_SHOW_DEFAULT, &delim,      0, "delimiter between elements for raw format.  " //
+                  "You can use JSON convention for escaping special characters.", "<string>" //
+          },
+          {"group",     'D', POPT_ARG_STRING  | POPT_ARGFLAG_SHOW_DEFAULT, &groupDelim, 0, "delimiter between groups for raw format.  " //
+                  "You can use JSON convention for escaping special characters.", "<string>" //
+          },
+          {"show-pushes", 0, POPT_ARG_STRING  | POPT_ARGFLAG_SHOW_DEFAULT, &push,       0, "Whether to print RESP3 PUSH messages.", "<yes|no>" //
           }, //
           {"eval",        0, POPT_ARG_STRING, &push,       0, "Send an EVAL command using the Lua script at <file>.  " //
                   "The keyword and other arguments should be separated with a standalone comma on the command-line, such as: 'key1 key2 , arg1 arg2 ...'", "<file>" //
@@ -212,6 +223,10 @@ int main(int argc, const char *argv[]) {
       case 'v': printVersion(fn); return 0;
     }
   }
+
+
+  delim = xjsonUnescapeString(delim);
+  groupDelim = xjsonUnescapeString(groupDelim);
 
   cmdargs = (char **) poptGetArgs(optcon);
 

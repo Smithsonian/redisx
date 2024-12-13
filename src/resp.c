@@ -861,6 +861,78 @@ static int rPrintRESP(int indent, const RESP *resp) {
 }
 
 /**
+ * Prints a RESP in raw form using delimiters only.
+ *
+ * @param resp        Pointer to a RESP (it may be NULL)
+ * @param delim       delimiter between RESP array/map entries
+ * @param groupDelim  group delimiter between arrays / maps
+ */
+void redisxPrintDelimited(const RESP *resp, const char *delim, const char *groupDelim) {
+
+  if(!resp || resp->type == RESP3_NULL) {
+    printf("%s", delim);
+    return;
+  }
+
+  switch(resp->type) {
+
+    case RESP_INT:
+      printf("%d%s", resp->n, delim);
+      break;
+
+    case RESP3_DOUBLE:
+      printf("%g%s", *(double *) resp->value, delim);
+      break;
+
+    case RESP3_BIG_NUMBER:
+    case RESP_SIMPLE_STRING:
+    case RESP_ERROR:
+    case RESP_BULK_STRING:
+    case RESP3_BLOB_ERROR:
+    case RESP3_VERBATIM_STRING:
+      printf("%s%s", (char *) resp->value, delim);
+      break;
+
+    case RESP_ARRAY:
+    case RESP3_SET:
+    case RESP3_PUSH: {
+      RESP **component = (RESP **) resp->value;
+
+      if(resp->value) {
+        int i;
+        if(resp->n > 1) printf("%s", groupDelim);
+        for(i = 0; i < resp->n; i++) {
+          redisxPrintDelimited(component[i], delim, groupDelim);
+        }
+      }
+      else printf("%s", delim);
+
+      break;
+    }
+
+    case RESP3_MAP:
+    case RESP3_ATTRIBUTE: {
+      const RedisMapEntry *component = (RedisMapEntry *) resp->value;
+
+      if(resp->value) {
+        int i;
+        if(resp->n > 1) printf("%s", groupDelim);
+        for(i = 0; i < resp->n; i++) {
+          redisxPrintDelimited(component[i].key, delim, groupDelim);
+          redisxPrintDelimited(component[i].key, delim, groupDelim);
+        }
+      }
+      else printf("%s", delim);
+      break;
+    }
+
+    default:
+      printf("%s", delim);
+  }
+}
+
+
+/**
  * Prints a RESP to the standard output, in a format that is similar to the one used by the standard
  * redis-cli tool.
  *
