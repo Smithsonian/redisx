@@ -72,9 +72,9 @@ Before then the API may undergo slight changes and tweaks. Use the repository as
  | pipelined (batch) processing      |  __yes__   | dedicated (high-bandwidth) client / user-defined callback    |
  | PUB/SUB support                   |  __yes__   | dedicated client / user callbacks / subscription management  |
  | Redis Sentinel                    |  __yes__   |                                                              |
- | Redis cluster support             |    no      | coming soon...                                               |
- | TLS support                       |    no      | coming soon...                                               |
- | resubscribe on reconnect          |    no      | in the not too distance future...                            |
+ | Redis cluster support             |    no      | _coming soon..._                                             |
+ | TLS support                       |    no      | _coming soon..._                                             |
+ | resubscribe on reconnect          |    no      | _in the not too distance future..._                          |
  | command-line client               |  __yes__   | `redisx-cli`                                                 |
  | RESP to JSON                      |  __yes__   | via `xchange` library                                        |
  | RESP to structured data           |  __yes__   | via `xchange` library                                        |
