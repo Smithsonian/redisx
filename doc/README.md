@@ -51,7 +51,7 @@ repository on GitHub.
 There are no official releases of __RedisX__ yet. An initial 1.0.0 release is expected in late 2024 or early 2025. 
 Before then the API may undergo slight changes and tweaks. Use the repository as is at your own risk for now.
 
-### Feature overview
+### Features overview
 
  | Feature                           | supported  | comments                                                     |
  | --------------------------------- |:----------:| -------------------------------------------------------------|
