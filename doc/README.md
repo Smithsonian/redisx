@@ -175,7 +175,7 @@ Or, to stage the installation (to `/usr`) under a 'build root':
 ## Command-line interface (`redisx-cli`)
 
 The __RedisX__ library provides its own command-line tool, called `redisx-cli`. It works very similar to `redis-cli`,
-except that it supports a subset of the options (so far...).
+except that our client has somewhat fewer bells and whistles.
 
 ```bash
  $ redisx-cli ping "Hello World"
