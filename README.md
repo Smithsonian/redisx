@@ -77,9 +77,9 @@ Before then the API may undergo slight changes and tweaks. Use the repository as
  | concurrent Redis instances        |  __yes__   | You can manage and use multiple Redis servers simultaneously |
  | connect over TCP                  |  __yes__   |                                                              |
  | connect over UDP                  |    no      | (why would you, really?)                                     |
- | connect / disconnect hooks        |  __yes__   |                                                              |
- | socket level configuration        |  __yes__   | user-defined timeout and buffer size and/or callback         |
- | socket error handling             |  __yes__   | user-defined callback                                        |
+ | connect / disconnect hooks        |  __yes__   | user-defined callbacks                                       |
+ | custom socket setup               |  __yes__   | user-defined timeout and buffer size and/or callback         |
+ | custom socket error handling      |  __yes__   | user-defined callback                                        |
  | RESP to JSON                      |  __yes__   | via `xchange` library                                        |
  | RESP to structured data           |  __yes__   | via `xchange` library                                        |
  | debug error tracing               |  __yes__   | via `xSetDebug()`                                            |
@@ -91,16 +91,16 @@ Before then the API may undergo slight changes and tweaks. Use the repository as
  | --------------------------------- |:----------:| -------------------------------------------------------------|
  | user authentication               |  __yes__   | via `HELLO` if protocol is set, otherwise via `AUTH`         |
  | RESP3 / `HELLO` support           |  __yes__   | optional (if specific protocol is set)                       |
- | thread safe (MT-safe)             |  __yes__   | both synchronized, and async calls with locking              |
+ | thread safe (MT-safe)             |  __yes__   | synchronized + async calls with locking                      |
  | push messages                     |  __yes__   | user-defined callback                                        |
  | attributes                        |  __yes__   | on demand                                                    |
  | interactive queries               |  __yes__   | dedicated (low-latency) client                               |
  | pipelined (batch) processing      |  __yes__   | dedicated (high-bandwidth) client / user-defined callback    |
  | PUB/SUB support                   |  __yes__   | dedicated client / user callbacks / subscription management  |
- | Redis Sentinel                    |  __yes__   | _help me test it_                                            |
- | Redis cluster support             |    no      | _coming soon..._                                             |
+ | Sentinel support                  |  __yes__   | _help me test it_                                            |
+ | cluster support                   |    no      | _coming soon..._                                             |
  | TLS support                       |    no      | _coming soon..._                                             |
- | resubscribe on reconnect          |    no      | _in the not too distance future..._                          |
+ | resubscribe on reconnect          |    no      | _coming soon..._                                             |
  | command-line client               |  __yes__   | `redisx-cli`                                                 |
  
 
@@ -192,7 +192,7 @@ Or, to stage the installation (to `/usr`) under a 'build root':
 ## Command-line interface (`redisx-cli`)
 
 The __RedisX__ library provides its own command-line tool, called `redisx-cli`. It works very similar to `redis-cli`,
-except that it supports a subset of the options (so far...).
+except that our client has somewhat fewer bells and whistles.
 
 ```bash
  $ redisx-cli ping "Hello World"
@@ -284,7 +284,7 @@ using with a set of [Redis Sentinel](https://redis.io/docs/latest/develop/refere
 ```
 
 After successful initialization, you may proceed with the configuration the same way as for the regular standalone
-server connection above.
+server connection.
 
 
 <a name="configuring"></a>
@@ -310,9 +310,9 @@ You can also set the RESP protocol to use (provided your server is compatible wi
 ```
 
 The above call will use the `HELLO` command (since Redis 6) upon connecting. If you do not set the protocol, `HELLO` 
-will not be used, and RESP2 will be assumed -- which is best for older servers. (Note, that you can always check the 
-actual protocol used after connecting, using `redisxGetProtocol()`). Note, that after connecting, you may retrieve 
-the set of server properties sent in response to `HELLO` using `redisxGetHelloData()`.
+will not be used, and RESP2 will be assumed -- which is best for older servers (Redis &lt;6). (Note, that you can 
+always check the actual protocol used after connecting, using `redisxGetProtocol()`). Note, that after connecting, 
+you may retrieve the set of server properties sent in response to `HELLO` using `redisxGetHelloData()`.
 
 Optionally, you can select the database index to use now (or later, after connecting), if not the default (index 
 0):

@@ -220,7 +220,6 @@ typedef struct RedisClient {
   /// \endcond
 } RedisClient;
 
-
 /**
  * \brief Structure that represents a Redis database instance, with one or more RedisClient connections.
  *
@@ -288,7 +287,6 @@ typedef void (*RedisSubscriberCall)(const char *pattern, const char *channel, co
  */
 typedef void (*RedisErrorHandler)(Redis *redis, enum redisx_channel channel, const char *op);
 
-
 /**
  * A user-defined function for consuming responses from a Redis pipeline connection. The implementation
  * should follow a set of simple rules:
@@ -340,8 +338,6 @@ typedef void (*RedisPipelineProcessor)(RESP *response);
  * @sa redisxSetPushProcessor()
  */
 typedef void (*RedisPushProcessor)(RedisClient *cl, RESP *message, void *ptr);
-
-
 
 /**
  * User callback function allowing additional customization of the client socket before connection.
@@ -471,7 +467,6 @@ const RESP *redisxGetAttributesAsync(const RedisClient *cl);
 int redisxIgnoreReplyAsync(RedisClient *cl);
 int redisxSkipReplyAsync(RedisClient *cl);
 int redisxPublishAsync(Redis *redis, const char *channel, const char *data, int length);
-
 
 // Error generation with stderr message...
 int redisxError(const char *func, int errorCode);
