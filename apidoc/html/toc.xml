@@ -13,39 +13,41 @@
     <topic label="Managing Redis server connections" href="index.html#autotoc_md18">
       <topic label="Initializing" href="index.html#autotoc_md19">
         <topic label="Sentinel" href="index.html#autotoc_md20"/>
-        <topic label="Socket-level configuration" href="index.html#autotoc_md21"/>
       </topic>
-      <topic label="Connecting" href="index.html#autotoc_md22"/>
-      <topic label="Disconnecting" href="index.html#autotoc_md23"/>
-      <topic label="Connection hooks" href="index.html#autotoc_md24"/>
+      <topic label="Configuring" href="index.html#autotoc_md21">
+        <topic label="Socket-level configuration" href="index.html#autotoc_md22"/>
+      </topic>
+      <topic label="Connecting" href="index.html#autotoc_md23"/>
+      <topic label="Disconnecting" href="index.html#autotoc_md24"/>
+      <topic label="Connection hooks" href="index.html#autotoc_md25"/>
     </topic>
-    <topic label="Simple Redis queries" href="index.html#autotoc_md26">
-      <topic label="Interactive transactions" href="index.html#autotoc_md27"/>
-      <topic label="Bundled Attributes" href="index.html#autotoc_md28"/>
-      <topic label="Push notifications" href="index.html#autotoc_md29"/>
-      <topic label="RESP data type" href="index.html#autotoc_md30"/>
+    <topic label="Simple Redis queries" href="index.html#autotoc_md27">
+      <topic label="Interactive transactions" href="index.html#autotoc_md28"/>
+      <topic label="Bundled Attributes" href="index.html#autotoc_md29"/>
+      <topic label="Push notifications" href="index.html#autotoc_md30"/>
+      <topic label="RESP data type" href="index.html#autotoc_md31"/>
     </topic>
-    <topic label="Accessing key / value data" href="index.html#autotoc_md32">
-      <topic label="Getting and setting keyed values" href="index.html#autotoc_md33"/>
-      <topic label="Listing and Scanning" href="index.html#autotoc_md34"/>
+    <topic label="Accessing key / value data" href="index.html#autotoc_md33">
+      <topic label="Getting and setting keyed values" href="index.html#autotoc_md34"/>
+      <topic label="Listing and Scanning" href="index.html#autotoc_md35"/>
     </topic>
-    <topic label="Publish / subscribe (PUB/SUB) support" href="index.html#autotoc_md36">
-      <topic label="Broadcasting messages" href="index.html#autotoc_md37"/>
-      <topic label="Subscriptions" href="index.html#autotoc_md38"/>
+    <topic label="Publish / subscribe (PUB/SUB) support" href="index.html#autotoc_md37">
+      <topic label="Broadcasting messages" href="index.html#autotoc_md38"/>
+      <topic label="Subscriptions" href="index.html#autotoc_md39"/>
     </topic>
-    <topic label="Atomic execution blocks and LUA scripts" href="index.html#autotoc_md40">
-      <topic label="Execution blocks" href="index.html#autotoc_md41"/>
-      <topic label="LUA script loading and execution" href="index.html#autotoc_md42"/>
-      <topic label="Custom Redis functions" href="index.html#autotoc_md43"/>
+    <topic label="Atomic execution blocks and LUA scripts" href="index.html#autotoc_md41">
+      <topic label="Execution blocks" href="index.html#autotoc_md42"/>
+      <topic label="LUA script loading and execution" href="index.html#autotoc_md43"/>
+      <topic label="Custom Redis functions" href="index.html#autotoc_md44"/>
     </topic>
-    <topic label="Advanced queries and pipelining" href="index.html#autotoc_md45">
-      <topic label="Asynchronous client processing" href="index.html#autotoc_md46"/>
-      <topic label="Bundled Attributes" href="index.html#autotoc_md47"/>
-      <topic label="Pipelined transactions" href="index.html#autotoc_md48"/>
+    <topic label="Advanced queries and pipelining" href="index.html#autotoc_md46">
+      <topic label="Asynchronous client processing" href="index.html#autotoc_md47"/>
+      <topic label="Bundled Attributes" href="index.html#autotoc_md48"/>
+      <topic label="Pipelined transactions" href="index.html#autotoc_md49"/>
     </topic>
-    <topic label="Error handling" href="index.html#autotoc_md50"/>
-    <topic label="Debug support" href="index.html#autotoc_md52"/>
-    <topic label="Future plans" href="index.html#autotoc_md54"/>
+    <topic label="Error handling" href="index.html#autotoc_md51"/>
+    <topic label="Debug support" href="index.html#autotoc_md53"/>
+    <topic label="Future plans" href="index.html#autotoc_md55"/>
   </topic>
   <topic label="Changelog" href="md_CHANGELOG.html">
     <topic label="[Unreleased]" href="md_CHANGELOG.html#autotoc_md1"/>

@@ -1,8 +1,8 @@
 var searchData=
 [
   ['redis_0',['Redis',['../structRedis.html',1,'']]],
-  ['redis_20functions_1',['Custom Redis functions',['../index.html#autotoc_md43',1,'']]],
-  ['redis_20queries_2',['Simple Redis queries',['../index.html#autotoc_md26',1,'']]],
+  ['redis_20functions_1',['Custom Redis functions',['../index.html#autotoc_md44',1,'']]],
+  ['redis_20queries_2',['Simple Redis queries',['../index.html#autotoc_md27',1,'']]],
   ['redis_20server_20connections_3',['Managing Redis server connections',['../index.html#autotoc_md18',1,'']]],
   ['redis_20valkey_20features_4',['Redis / Valkey Features',['../index.html#autotoc_md7',1,'']]],
   ['redis_5ferror_5',['REDIS_ERROR',['../redisx_8h.html#aad063b5d1f8eaeadc0c70f8568113034',1,'redisx.h']]],
@@ -158,7 +158,7 @@ var searchData=
   ['redisxvalidatesentinel_155',['redisxvalidatesentinel',['../redisx_8h.html#ace7dcf75a6f60817e1b3be00fb15658b',1,'redisxValidateSentinel(const char *serviceName, const RedisServer *serverList, int nServers):&#160;redisx-net.c'],['../redisx-net_8c.html#ace7dcf75a6f60817e1b3be00fb15658b',1,'redisxValidateSentinel(const char *serviceName, const RedisServer *serverList, int nServers):&#160;redisx-net.c']]],
   ['related_20links_156',['Related links',['../index.html#autotoc_md8',1,'']]],
   ['resp_157',['RESP',['../structRESP.html',1,'']]],
-  ['resp_20data_20type_158',['RESP data type',['../index.html#autotoc_md30',1,'']]],
+  ['resp_20data_20type_158',['RESP data type',['../index.html#autotoc_md31',1,'']]],
   ['resp_2ec_159',['resp.c',['../resp_8c.html',1,'']]],
   ['resp3_5fattribute_160',['RESP3_ATTRIBUTE',['../redisx_8h.html#afa5c90630d37c2f77e5d7985932941a0a2da22ebb851ace110ab55425d2fe19fd',1,'redisx.h']]],
   ['resp3_5fbig_5fnumber_161',['RESP3_BIG_NUMBER',['../redisx_8h.html#afa5c90630d37c2f77e5d7985932941a0a6584ded22b188e62c73ef63c4221333c',1,'redisx.h']]],

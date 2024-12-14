@@ -217,6 +217,7 @@ to linking.
 ## Managing Redis server connections
 
  - [Initializing](#initializing)
+ - [Configuring](#configuring)
  - [Connecting](#connecting)
  - [Disconnecting](#disconnecting)
  - [Connection hooks](#connection-hooks)
@@ -243,6 +244,35 @@ The first step is to create a `Redis` object, with the server name or IP address
   // (optional) configure a non-standard port number to use
   redisxSetPort(redis, 7089);
 ```
+
+#### Sentinel
+
+Alternatively, instead of `redisxInit()` above you may initialize the client for a high-availability configuration 
+using with a set of [Redis Sentinel](https://redis.io/docs/latest/develop/reference/sentinel-clients/) servers, using 
+`redisxInitSentinel()`, e.g.:
+
+```c
+  // An array defining N sentinel servers and ports to use.
+  // A port number 0 or negative will use the default Redis port of 6379.
+  RedisServer sentinels[N] = { { "server1", 0 }, { "server2", 7024 } ... };
+  
+  // Configure a Redis client instance for the Sentinel servers and "my-service" service name
+  Redis *redis = redisxInitSentinel(sentinels, N, "my-service");
+  if (redis == NULL) {
+    // Abort: something did not got to plan...
+    return;
+  }
+
+  // (optional) set a sentinel discovery timeout in ms...
+  redisxSetSentinelTimeout(redis, 30);
+```
+
+After successful initialization, you may proceed with the configuration the same way as for the regular standalone
+server connection above.
+
+
+<a name="configuring"></a>
+### Configuring
 
 Before connecting to the Redis server, you may configure the database authentication (if any):
 
@@ -278,31 +308,6 @@ Optionally, you can select the database index to use now (or later, after connec
 
 Note, that you can switch the database index any time, with the caveat that it's not possible to change it for the 
 subscription client when there are active subscriptions.
-
-#### Sentinel
-
-Alternatively, instead of `redisxInit()` above you may initialize the client for a high-availability configuration 
-using with a set of [Redis Sentinel](https://redis.io/docs/latest/develop/reference/sentinel-clients/) servers, using 
-`redisxInitSentinel()`, e.g.:
-
-```c
-  // An array defining N sentinel servers and ports to use.
-  // A port number 0 or negative will use the default Redis port of 6379.
-  RedisServer sentinels[N] = { { "server1", 0 }, { "server2", 7024 } ... };
-  
-  // Configure a Redis client instance for the Sentinel servers and "my-service" service name
-  Redis *redis = redisxInitSentinel(sentinels, N, "my-service");
-  if (redis == NULL) {
-    // Abort: something did not got to plan...
-    return;
-  }
-
-  // (optional) set a sentinel discovery timeout in ms...
-  redisxSetSentinelTimeout(redis, 30);
-```
-
-After successful initialization, you may proceed with the configuration the same way as for the regular standalone
-server connection above.
 
 
 #### Socket-level configuration
