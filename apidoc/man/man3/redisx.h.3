@@ -131,6 +131,9 @@ include/redisx.h
 .RI "typedef void(* \fBRedisPushProcessor\fP) (\fBRedisClient\fP *cl, \fBRESP\fP *message, void *ptr)"
 .br
 .ti -1c
+.RI "typedef int(* \fBRedisSocketConfigurator\fP) (int socket, enum \fBredisx_channel\fP channel)"
+.br
+.ti -1c
 .RI "typedef void(* \fBRedisSubscriberCall\fP) (const char *pattern, const char *channel, const char *msg, long length)"
 .br
 .in -1c
@@ -403,13 +406,16 @@ include/redisx.h
 .RI "int \fBredisxSetSentinelTimeout\fP (\fBRedis\fP *redis, int millis)"
 .br
 .ti -1c
+.RI "int \fBredisxSetSocketConfigurator\fP (\fBRedis\fP *redis, \fBRedisSocketConfigurator\fP func)"
+.br
+.ti -1c
+.RI "int \fBredisxSetSocketErrorHandler\fP (\fBRedis\fP *redis, \fBRedisErrorHandler\fP f)"
+.br
+.ti -1c
 .RI "int \fBredisxSetSocketTimeout\fP (\fBRedis\fP *redis, int millis)"
 .br
 .ti -1c
-.RI "void \fBredisxSetTcpBuf\fP (int size)"
-.br
-.ti -1c
-.RI "int \fBredisxSetTransmitErrorHandler\fP (\fBRedis\fP *redis, \fBRedisErrorHandler\fP f)"
+.RI "int \fBredisxSetTcpBuf\fP (\fBRedis\fP *redis, int size)"
 .br
 .ti -1c
 .RI "int \fBredisxSetUser\fP (\fBRedis\fP *redis, const char *username)"
@@ -534,6 +540,22 @@ The client on which the push notification originated will be locked when this fu
 \fBSee also\fP
 .RS 4
 \fBredisxSetPushProcessor()\fP 
+.RE
+.PP
+
+.SS "typedef int(* RedisSocketConfigurator) (int socket, enum \fBredisx_channel\fP channel)"
+User callback function allowing additional customization of the client socket before connection\&.
+.PP
+\fBParameters\fP
+.RS 4
+\fIsocket\fP The socket descriptor 
+.br
+\fIchannel\fP REDISX_INTERACTIVE_CHANNEL, REDISX_PIPELINE_CHANNEL, REDISX_SUBSCRIPTION_CHANNEL 
+.RE
+.PP
+\fBReturns\fP
+.RS 4
+X_SUCCESS (0) if the socket may be used as is after the return\&. Any other value will indicate that the socket should not be used and that the caller itself should fail with an error\&. 
 .RE
 .PP
 
@@ -1584,7 +1606,7 @@ X_SUCCESS or X_FAILURE if the IP address is invalid\&. X_NULL if the IP address 
 .PP
 
 .PP
-References \fBFALSE\fP, \fBRedis::interactive\fP, \fBRedis::pipeline\fP, \fBREDISX_CHANNELS\fP, \fBREDISX_DEFAULT_TIMEOUT_MILLIS\fP, \fBREDISX_INTERACTIVE_CHANNEL\fP, \fBREDISX_PIPELINE_CHANNEL\fP, \fBREDISX_RESP2\fP, \fBREDISX_SUBSCRIPTION_CHANNEL\fP, \fBRedis::subscription\fP, \fBTRUE\fP, \fBx_error()\fP, and \fBx_trace_null()\fP\&.
+References \fBFALSE\fP, \fBRedis::interactive\fP, \fBRedis::pipeline\fP, \fBREDISX_CHANNELS\fP, \fBREDISX_DEFAULT_TIMEOUT_MILLIS\fP, \fBREDISX_INTERACTIVE_CHANNEL\fP, \fBREDISX_PIPELINE_CHANNEL\fP, \fBREDISX_RESP2\fP, \fBREDISX_SUBSCRIPTION_CHANNEL\fP, \fBREDISX_TCP_BUF_SIZE\fP, \fBRedis::subscription\fP, \fBTRUE\fP, \fBx_error()\fP, and \fBx_trace_null()\fP\&.
 .SS "\fBRedis\fP * redisxInitSentinel (const char * serviceName, const \fBRedisServer\fP * serverList, int nServers)"
 Initializes a \fBRedis\fP client with a Sentinel configuration of alternate servers, and the default sentinel node connection timeout\&.
 .PP
@@ -2633,6 +2655,52 @@ X_SUCCESS (0) if successfully set sentinel connection timeout, or else X_NULL if
 
 .PP
 References \fBREDISX_DEFAULT_SENTINEL_TIMEOUT_MILLIS\fP, \fBx_error()\fP, \fBX_NO_INIT\fP, and \fBX_SUCCESS\fP\&.
+.SS "int redisxSetSocketConfigurator (\fBRedis\fP * redis, \fBRedisSocketConfigurator\fP func)"
+Sets a user-defined callback for additioan custom configuring of client sockets
+.PP
+\fBParameters\fP
+.RS 4
+\fIredis\fP The \fBRedis\fP server instance 
+.br
+\fIfunc\fP The user-defined callback function, which performs the additional socket configuration 
+.RE
+.PP
+\fBReturns\fP
+.RS 4
+X_SUCCESS (0) if successful, or or X_NULL if the redis argument in NULL, X_NO_INIT if the redis instance was not initialized\&.
+.RE
+.PP
+\fBSee also\fP
+.RS 4
+\fBredisxSetSocketErrorHandler()\fP 
+.RE
+.PP
+
+.PP
+References \fBTRUE\fP, and \fBX_SUCCESS\fP\&.
+.SS "int redisxSetSocketErrorHandler (\fBRedis\fP * redis, \fBRedisErrorHandler\fP f)"
+Sets the user-specific error handler to call if a socket level trasmit error occurs\&. It replaces any prior handlers set earlier\&.
+.PP
+\fBParameters\fP
+.RS 4
+\fIredis\fP The \fBRedis\fP instance to configure\&. 
+.br
+\fIf\fP The error handler function, which is called with the pointer to the redis instance that had the errror, the redis channel index (e\&.g\&. REDIS_INTERACTIVE_CHANNEL) and the operation (e\&.g\&. 'send' or 'read') that failed\&. Note, that the call may be made with the affected \fBRedis\fP channel being in a locked state\&. As such the handler should not directly attempt to change the connection state of the \fBRedis\fP instance\&. Any calls that require exlusive access to the affected channel should instead be spawn off into a separate thread, which can obtain the necessary lock when it is released\&.
+.RE
+.PP
+\fBReturns\fP
+.RS 4
+X_SUCCESS if the handler was successfully configured, or X_NULL if the \fBRedis\fP instance is NULL\&.
+.RE
+.PP
+\fBSee also\fP
+.RS 4
+\fBredisxSetSocketConfigurator()\fP 
+.RE
+.PP
+
+.PP
+References \fBX_SUCCESS\fP\&.
 .SS "int redisxSetSocketTimeout (\fBRedis\fP * redis, int millis)"
 Sets a socket timeout for future client connections on a \fBRedis\fP instance\&. If not set (or set to zero or a negative value), then the timeout will not be configured for sockets, and the system default timeout values will apply\&.
 .PP
@@ -2651,30 +2719,19 @@ X_SUCCESS (0) if successful, or else X_NULL if the redis instance is NULL, or X_
 
 .PP
 References \fBREDISX_DEFAULT_TIMEOUT_MILLIS\fP, and \fBX_SUCCESS\fP\&.
-.SS "void redisxSetTcpBuf (int size)"
+.SS "int redisxSetTcpBuf (\fBRedis\fP * redis, int size)"
 Set the size of the TCP/IP buffers (send and receive) for future client connections\&.
 .PP
 \fBParameters\fP
 .RS 4
-\fIsize\fP (bytes) requested buffer size, or <= 0 to use default value 
-.RE
-.PP
-
-.PP
-References \fBxvprintf\fP\&.
-.SS "int redisxSetTransmitErrorHandler (\fBRedis\fP * redis, \fBRedisErrorHandler\fP f)"
-Sets the user-specific error handler to call if a socket level trasmit error occurs\&. It replaces any prior handlers set earlier\&.
-.PP
-\fBParameters\fP
-.RS 4
-\fIredis\fP The \fBRedis\fP instance to configure\&. 
+\fIredis\fP Pointer to a \fBRedis\fP instance\&. 
 .br
-\fIf\fP The error handler function, which is called with the pointer to the redis instance that had the errror, the redis channel index (e\&.g\&. REDIS_INTERACTIVE_CHANNEL) and the operation (e\&.g\&. 'send' or 'read') that failed\&. Note, that the call may be made with the affected \fBRedis\fP channel being in a locked state\&. As such the handler should not directly attempt to change the connection state of the \fBRedis\fP instance\&. Any calls that require exlusive access to the affected channel should instead be spawn off into a separate thread, which can obtain the necessary lock when it is released\&.
+\fIsize\fP (bytes) requested buffer size, or <= 0 to use default value 
 .RE
 .PP
 \fBReturns\fP
 .RS 4
-X_SUCCESS if the handler was successfully configured, or X_NULL if the \fBRedis\fP instance is NULL\&. 
+X_SUCCESS (0) if successful, or else X_NULL if the redis instance is NULL, or X_NO_INIT if the redis instance is not initialized, or X_FAILURE if \fBRedis\fP was initialized in Sentinel configuration\&. 
 .RE
 .PP
 

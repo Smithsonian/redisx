@@ -71,7 +71,10 @@ src/redisx.c \- A \fBRedis\fP client library that compiles on older and newer pl
 .RI "int \fBredisxSetPushProcessor\fP (\fBRedis\fP *redis, \fBRedisPushProcessor\fP func, void *arg)"
 .br
 .ti -1c
-.RI "int \fBredisxSetTransmitErrorHandler\fP (\fBRedis\fP *redis, \fBRedisErrorHandler\fP f)"
+.RI "int \fBredisxSetSocketConfigurator\fP (\fBRedis\fP *redis, \fBRedisSocketConfigurator\fP func)"
+.br
+.ti -1c
+.RI "int \fBredisxSetSocketErrorHandler\fP (\fBRedis\fP *redis, \fBRedisErrorHandler\fP f)"
 .br
 .ti -1c
 .RI "int \fBredisxSetUser\fP (\fBRedis\fP *redis, const char *username)"
@@ -553,7 +556,30 @@ X_SUCCESS (0) if successful, or else X_NULL (errno set to EINVAL) if the client 
 
 .PP
 References \fBX_SUCCESS\fP\&.
-.SS "int redisxSetTransmitErrorHandler (\fBRedis\fP * redis, \fBRedisErrorHandler\fP f)"
+.SS "int redisxSetSocketConfigurator (\fBRedis\fP * redis, \fBRedisSocketConfigurator\fP func)"
+Sets a user-defined callback for additioan custom configuring of client sockets
+.PP
+\fBParameters\fP
+.RS 4
+\fIredis\fP The \fBRedis\fP server instance 
+.br
+\fIfunc\fP The user-defined callback function, which performs the additional socket configuration 
+.RE
+.PP
+\fBReturns\fP
+.RS 4
+X_SUCCESS (0) if successful, or or X_NULL if the redis argument in NULL, X_NO_INIT if the redis instance was not initialized\&.
+.RE
+.PP
+\fBSee also\fP
+.RS 4
+\fBredisxSetSocketErrorHandler()\fP 
+.RE
+.PP
+
+.PP
+References \fBTRUE\fP, and \fBX_SUCCESS\fP\&.
+.SS "int redisxSetSocketErrorHandler (\fBRedis\fP * redis, \fBRedisErrorHandler\fP f)"
 Sets the user-specific error handler to call if a socket level trasmit error occurs\&. It replaces any prior handlers set earlier\&.
 .PP
 \fBParameters\fP
@@ -565,7 +591,12 @@ Sets the user-specific error handler to call if a socket level trasmit error occ
 .PP
 \fBReturns\fP
 .RS 4
-X_SUCCESS if the handler was successfully configured, or X_NULL if the \fBRedis\fP instance is NULL\&. 
+X_SUCCESS if the handler was successfully configured, or X_NULL if the \fBRedis\fP instance is NULL\&.
+.RE
+.PP
+\fBSee also\fP
+.RS 4
+\fBredisxSetSocketConfigurator()\fP 
 .RE
 .PP
 

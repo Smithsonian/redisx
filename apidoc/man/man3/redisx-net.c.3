@@ -43,7 +43,7 @@ src/redisx-net.c
 .RI "int \fBredisxSetSocketTimeout\fP (\fBRedis\fP *redis, int millis)"
 .br
 .ti -1c
-.RI "void \fBredisxSetTcpBuf\fP (int size)"
+.RI "int \fBredisxSetTcpBuf\fP (\fBRedis\fP *redis, int size)"
 .br
 .ti -1c
 .RI "int \fBredisxValidateSentinel\fP (const char *serviceName, const \fBRedisServer\fP *serverList, int nServers)"
@@ -159,7 +159,7 @@ X_SUCCESS or X_FAILURE if the IP address is invalid\&. X_NULL if the IP address 
 .PP
 
 .PP
-References \fBFALSE\fP, \fBRedis::interactive\fP, \fBRedis::pipeline\fP, \fBREDISX_CHANNELS\fP, \fBREDISX_DEFAULT_TIMEOUT_MILLIS\fP, \fBREDISX_INTERACTIVE_CHANNEL\fP, \fBREDISX_PIPELINE_CHANNEL\fP, \fBREDISX_RESP2\fP, \fBREDISX_SUBSCRIPTION_CHANNEL\fP, \fBRedis::subscription\fP, \fBTRUE\fP, \fBx_error()\fP, and \fBx_trace_null()\fP\&.
+References \fBFALSE\fP, \fBRedis::interactive\fP, \fBRedis::pipeline\fP, \fBREDISX_CHANNELS\fP, \fBREDISX_DEFAULT_TIMEOUT_MILLIS\fP, \fBREDISX_INTERACTIVE_CHANNEL\fP, \fBREDISX_PIPELINE_CHANNEL\fP, \fBREDISX_RESP2\fP, \fBREDISX_SUBSCRIPTION_CHANNEL\fP, \fBREDISX_TCP_BUF_SIZE\fP, \fBRedis::subscription\fP, \fBTRUE\fP, \fBx_error()\fP, and \fBx_trace_null()\fP\&.
 .SS "\fBRedis\fP * redisxInitSentinel (const char * serviceName, const \fBRedisServer\fP * serverList, int nServers)"
 Initializes a \fBRedis\fP client with a Sentinel configuration of alternate servers, and the default sentinel node connection timeout\&.
 .PP
@@ -289,17 +289,24 @@ X_SUCCESS (0) if successful, or else X_NULL if the redis instance is NULL, or X_
 
 .PP
 References \fBREDISX_DEFAULT_TIMEOUT_MILLIS\fP, and \fBX_SUCCESS\fP\&.
-.SS "void redisxSetTcpBuf (int size)"
+.SS "int redisxSetTcpBuf (\fBRedis\fP * redis, int size)"
 Set the size of the TCP/IP buffers (send and receive) for future client connections\&.
 .PP
 \fBParameters\fP
 .RS 4
+\fIredis\fP Pointer to a \fBRedis\fP instance\&. 
+.br
 \fIsize\fP (bytes) requested buffer size, or <= 0 to use default value 
+.RE
+.PP
+\fBReturns\fP
+.RS 4
+X_SUCCESS (0) if successful, or else X_NULL if the redis instance is NULL, or X_NO_INIT if the redis instance is not initialized, or X_FAILURE if \fBRedis\fP was initialized in Sentinel configuration\&. 
 .RE
 .PP
 
 .PP
-References \fBxvprintf\fP\&.
+References \fBX_SUCCESS\fP\&.
 .SS "int redisxValidateSentinel (const char * serviceName, const \fBRedisServer\fP * serverList, int nServers)"
 Validates a Sentinel configuration\&.
 .PP

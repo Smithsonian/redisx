@@ -179,6 +179,13 @@
       <arglist>)(RedisClient *cl, RESP *message, void *ptr)</arglist>
     </member>
     <member kind="typedef">
+      <type>int(*</type>
+      <name>RedisSocketConfigurator</name>
+      <anchorfile>redisx_8h.html</anchorfile>
+      <anchor>a356281f9b55b794cb988b44761bbd0ba</anchor>
+      <arglist>)(int socket, enum redisx_channel channel)</arglist>
+    </member>
+    <member kind="typedef">
       <type>void(*</type>
       <name>RedisSubscriberCall</name>
       <anchorfile>redisx_8h.html</anchorfile>
@@ -916,24 +923,31 @@
     </member>
     <member kind="function">
       <type>int</type>
+      <name>redisxSetSocketConfigurator</name>
+      <anchorfile>redisx_8h.html</anchorfile>
+      <anchor>a085da763bc6a656c649a33dfd296d33f</anchor>
+      <arglist>(Redis *redis, RedisSocketConfigurator func)</arglist>
+    </member>
+    <member kind="function">
+      <type>int</type>
+      <name>redisxSetSocketErrorHandler</name>
+      <anchorfile>redisx_8h.html</anchorfile>
+      <anchor>ad3aaa3b6fb5353a52a7013421baa9b89</anchor>
+      <arglist>(Redis *redis, RedisErrorHandler f)</arglist>
+    </member>
+    <member kind="function">
+      <type>int</type>
       <name>redisxSetSocketTimeout</name>
       <anchorfile>redisx_8h.html</anchorfile>
       <anchor>aaa87635d37e5d348b7dbb12952b39183</anchor>
       <arglist>(Redis *redis, int millis)</arglist>
     </member>
     <member kind="function">
-      <type>void</type>
+      <type>int</type>
       <name>redisxSetTcpBuf</name>
       <anchorfile>redisx_8h.html</anchorfile>
-      <anchor>a83fce113d042490e77efdc574e64d76f</anchor>
-      <arglist>(int size)</arglist>
-    </member>
-    <member kind="function">
-      <type>int</type>
-      <name>redisxSetTransmitErrorHandler</name>
-      <anchorfile>redisx_8h.html</anchorfile>
-      <anchor>ae060c9e745fe25f8cb742d7e82cf586e</anchor>
-      <arglist>(Redis *redis, RedisErrorHandler f)</arglist>
+      <anchor>a648557774b354ff99e279d3dcf94d240</anchor>
+      <arglist>(Redis *redis, int size)</arglist>
     </member>
     <member kind="function">
       <type>int</type>
@@ -1266,11 +1280,11 @@
       <arglist>(Redis *redis, int millis)</arglist>
     </member>
     <member kind="function">
-      <type>void</type>
+      <type>int</type>
       <name>redisxSetTcpBuf</name>
       <anchorfile>redisx-net_8c.html</anchorfile>
-      <anchor>a83fce113d042490e77efdc574e64d76f</anchor>
-      <arglist>(int size)</arglist>
+      <anchor>a648557774b354ff99e279d3dcf94d240</anchor>
+      <arglist>(Redis *redis, int size)</arglist>
     </member>
     <member kind="function">
       <type>int</type>
@@ -1630,9 +1644,16 @@
     </member>
     <member kind="function">
       <type>int</type>
-      <name>redisxSetTransmitErrorHandler</name>
+      <name>redisxSetSocketConfigurator</name>
       <anchorfile>redisx_8c.html</anchorfile>
-      <anchor>ae060c9e745fe25f8cb742d7e82cf586e</anchor>
+      <anchor>a085da763bc6a656c649a33dfd296d33f</anchor>
+      <arglist>(Redis *redis, RedisSocketConfigurator func)</arglist>
+    </member>
+    <member kind="function">
+      <type>int</type>
+      <name>redisxSetSocketErrorHandler</name>
+      <anchorfile>redisx_8c.html</anchorfile>
+      <anchor>ad3aaa3b6fb5353a52a7013421baa9b89</anchor>
       <arglist>(Redis *redis, RedisErrorHandler f)</arglist>
     </member>
     <member kind="function">
