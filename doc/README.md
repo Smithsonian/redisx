@@ -53,18 +53,27 @@ Before then the API may undergo slight changes and tweaks. Use the repository as
 
 ### Features overview
 
+#### Generic API Features
+
  | Feature                           | supported  | comments                                                     |
  | --------------------------------- |:----------:| -------------------------------------------------------------|
  | concurrent Redis instances        |  __yes__   | You can manage and use multiple Redis servers simultaneously |
  | connect over TCP                  |  __yes__   |                                                              |
  | connect over UDP                  |    no      | (why would you, really?)                                     |
  | connect / disconnect hooks        |  __yes__   |                                                              |
- | configurable socket timeout       |  __yes__   |                                                              |
- | configurable socket buffer size   |  __yes__   |                                                              |
+ | socket level configuration        |  __yes__   | User adjustable timeout and buffer size                      |
  | socket error handling             |  __yes__   | user-defined callback                                        |
- | authentication (user/password)    |  __yes__   | via `HELLO` if protocol is set, otherwise via `AUTH`         |
- | RESP3 support                     |  __yes__   |                                                              |
- | `HELLO`                           |  __yes__   | optional (if specific protocol is set)                       |
+ | RESP to JSON                      |  __yes__   | via `xchange` library                                        |
+ | RESP to structured data           |  __yes__   | via `xchange` library                                        |
+ | debug error tracing               |  __yes__   | via `xSetDebug()`                                            |
+ 
+
+#### Redis / Valkey Features
+ 
+ | Redis / Valkey Feature            | supported  | comments                                                     |
+ | --------------------------------- |:----------:| -------------------------------------------------------------|
+ | user authentication               |  __yes__   | via `HELLO` if protocol is set, otherwise via `AUTH`         |
+ | RESP3 / `HELLO` support           |  __yes__   | optional (if specific protocol is set)                       |
  | thread safe (MT-safe)             |  __yes__   | both synchronized, and async calls with locking              |
  | push messages                     |  __yes__   | user-defined callback                                        |
  | attributes                        |  __yes__   | on demand                                                    |
@@ -76,10 +85,7 @@ Before then the API may undergo slight changes and tweaks. Use the repository as
  | TLS support                       |    no      | _coming soon..._                                             |
  | resubscribe on reconnect          |    no      | _in the not too distance future..._                          |
  | command-line client               |  __yes__   | `redisx-cli`                                                 |
- | RESP to JSON                      |  __yes__   | via `xchange` library                                        |
- | RESP to structured data           |  __yes__   | via `xchange` library                                        |
- | debug error tracing               |  __yes__   | via `xSetDebug()`                                            |
-
+ 
 
 ### Related links
 

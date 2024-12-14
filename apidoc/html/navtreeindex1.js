@@ -1,5 +1,7 @@
 var NAVTREEINDEX1 =
 {
+"redisx_8h.html#acd72a7be15e670c865e46d6755618f2d":[3,0,0,0,43],
+"redisx_8h.html#ace7dcf75a6f60817e1b3be00fb15658b":[3,0,0,0,131],
 "redisx_8h.html#ace918fd1adb80e26cfae107685a314e0":[3,0,0,0,91],
 "redisx_8h.html#ad71822356ffd40ed4b1c71d065f48809":[3,0,0,0,46],
 "redisx_8h.html#adc3981d6b06cc87e563e77584765eb19":[3,0,0,0,22],
