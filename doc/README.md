@@ -61,7 +61,7 @@ Before then the API may undergo slight changes and tweaks. Use the repository as
  | connect over TCP                  |  __yes__   |                                                              |
  | connect over UDP                  |    no      | (why would you, really?)                                     |
  | connect / disconnect hooks        |  __yes__   |                                                              |
- | socket level configuration        |  __yes__   | user-defined timeout and buffer size + callback              |
+ | socket level configuration        |  __yes__   | user-defined timeout and buffer size and/or callback         |
  | socket error handling             |  __yes__   | user-defined callback                                        |
  | RESP to JSON                      |  __yes__   | via `xchange` library                                        |
  | RESP to structured data           |  __yes__   | via `xchange` library                                        |
