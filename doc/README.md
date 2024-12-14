@@ -220,7 +220,6 @@ to linking.
  - [Configuring](#configuring)
  - [Connecting](#connecting)
  - [Disconnecting](#disconnecting)
- - [Connection hooks](#connection-hooks)
 
 The library maintains up to three separate connections (channels) for each separate Redis server instance used: (1) an 
 interactive client for sequential round-trip transactions, (2) a pipeline client for bulk queries and asynchronous 
@@ -340,6 +339,32 @@ which you can then apply to your Redis instance as:
   redisxSetSocketConfigurator(my_socket_config);
 ```
 
+<a name="connection-hooks"></a>
+#### Connection hooks
+
+The user of the __RedisX__ library might want to know when connections to the server are established, or when 
+disconnections happen, and may want to perform some configuration or clean-up accordingly. For this reason, the 
+library provides support for connection 'hooks' -- that is custom functions that are called in the even of connecting 
+to or disconnecting from a Redis server.
+
+Here is an example of a connection hook, which simply prints a message about the connection to the console.
+
+```c
+  void my_connect_hook(Redis *redis) {
+     printf("Connected to Redis server: %s\n", redis->id);
+  }
+```
+
+And, it can be added to a Redis instance, between the `redisxInit()` and the `redisxConnect()` calls.
+
+```c
+  Redis *redis = ...
+  
+  redisxAddConnectHook(redis, my_connect_hook);
+```
+
+The same goes for disconnect hooks, using `redisxAddDisconnectHook()` instead.
+
 
 <a name="connecting"></a>
 ### Connecting
@@ -387,32 +412,6 @@ And then to free up all resources used by the `Redis` instance, you might also c
   redis = NULL;
 ```
 
-
-<a name="connection-hooks"></a>
-### Connection hooks
-
-The user of the __RedisX__ library might want to know when connections to the server are established, or when 
-disconnections happen, and may want to perform some configuration or clean-up accordingly. For this reason, the 
-library provides support for connection 'hooks' -- that is custom functions that are called in the even of connecting 
-to or disconnecting from a Redis server.
-
-Here is an example of a connection hook, which simply prints a message about the connection to the console.
-
-```c
-  void my_connect_hook(Redis *redis) {
-     printf("Connected to Redis server: %s\n", redis->id);
-  }
-```
-
-And, it can be added to a Redis instance, between the `redisxInit()` and the `redisxConnect()` calls.
-
-```c
-  Redis *redis = ...
-  
-  redisxAddConnectHook(redis, my_connect_hook);
-```
-
-The same goes for disconnect hooks, using `redisxAddDisconnectHook()` instead.
 
 -----------------------------------------------------------------------------
 

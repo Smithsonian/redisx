@@ -1951,9 +1951,9 @@
     <docanchor file="index.html">managing-redis-server-connections</docanchor>
     <docanchor file="index.html">initializing</docanchor>
     <docanchor file="index.html">configuring</docanchor>
+    <docanchor file="index.html">connection-hooks</docanchor>
     <docanchor file="index.html">connecting</docanchor>
     <docanchor file="index.html">disconnecting</docanchor>
-    <docanchor file="index.html">connection-hooks</docanchor>
     <docanchor file="index.html">simple-redis-queries</docanchor>
     <docanchor file="index.html">interactive-transactions</docanchor>
     <docanchor file="index.html">attributes</docanchor>

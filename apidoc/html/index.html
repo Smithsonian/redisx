@@ -277,7 +277,6 @@ Managing Redis server connections</h2>
 <li><a class="el" href="index.html#configuring">Configuring</a></li>
 <li><a class="el" href="index.html#connecting">Connecting</a></li>
 <li><a class="el" href="index.html#disconnecting">Disconnecting</a></li>
-<li><a class="el" href="index.html#connection-hooks">Connection hooks</a></li>
 </ul>
 <p>The library maintains up to three separate connections (channels) for each separate <a class="el" href="structRedis.html" title="Structure that represents a Redis database instance, with one or more RedisClient connections.">Redis</a> server instance used: (1) an interactive client for sequential round-trip transactions, (2) a pipeline client for bulk queries and asynchronous background processing, and (3) a subscription client for PUB/SUB requests and notifications. The interactive client is always connected, the pipeline client is connected only if explicitly requested at the time of establishing the server connection, while the subscription client is connected only as needed.</p>
 <p><a class="anchor" id="initializing"></a> </p>
@@ -361,8 +360,22 @@ Socket-level configuration</h4>
 </div><!-- fragment --><p>which you can then apply to your <a class="el" href="structRedis.html" title="Structure that represents a Redis database instance, with one or more RedisClient connections.">Redis</a> instance as:</p>
 <div class="fragment"><div class="line"><a class="code hl_function" href="redisx_8c.html#a085da763bc6a656c649a33dfd296d33f">redisxSetSocketConfigurator</a>(my_socket_config);</div>
 <div class="ttc" id="aredisx_8c_html_a085da763bc6a656c649a33dfd296d33f"><div class="ttname"><a href="redisx_8c.html#a085da763bc6a656c649a33dfd296d33f">redisxSetSocketConfigurator</a></div><div class="ttdeci">int redisxSetSocketConfigurator(Redis *redis, RedisSocketConfigurator func)</div><div class="ttdef"><b>Definition</b> redisx.c:244</div></div>
-</div><!-- fragment --><p><a class="anchor" id="connecting"></a> </p>
-<h3><a class="anchor" id="autotoc_md23"></a>
+</div><!-- fragment --><p><a class="anchor" id="connection-hooks"></a> </p>
+<h4><a class="anchor" id="autotoc_md23"></a>
+Connection hooks</h4>
+<p>The user of the <b>RedisX</b> library might want to know when connections to the server are established, or when disconnections happen, and may want to perform some configuration or clean-up accordingly. For this reason, the library provides support for connection 'hooks' &ndash; that is custom functions that are called in the even of connecting to or disconnecting from a <a class="el" href="structRedis.html" title="Structure that represents a Redis database instance, with one or more RedisClient connections.">Redis</a> server.</p>
+<p>Here is an example of a connection hook, which simply prints a message about the connection to the console.</p>
+<div class="fragment"><div class="line"><span class="keywordtype">void</span> my_connect_hook(<a class="code hl_struct" href="structRedis.html">Redis</a> *redis) {</div>
+<div class="line">   printf(<span class="stringliteral">&quot;Connected to Redis server: %s\n&quot;</span>, redis-&gt;<a class="code hl_variable" href="structRedis.html#aecb3b0d045ada529257a2fbf8f829599">id</a>);</div>
+<div class="line">}</div>
+<div class="ttc" id="astructRedis_html_aecb3b0d045ada529257a2fbf8f829599"><div class="ttname"><a href="structRedis.html#aecb3b0d045ada529257a2fbf8f829599">Redis::id</a></div><div class="ttdeci">char * id</div><div class="ttdoc">The string ID of the Redis server. Default is IP, e.g. &quot;127.0.0.1&quot;.</div><div class="ttdef"><b>Definition</b> redisx.h:231</div></div>
+</div><!-- fragment --><p>And, it can be added to a <a class="el" href="structRedis.html" title="Structure that represents a Redis database instance, with one or more RedisClient connections.">Redis</a> instance, between the <code><a class="el" href="redisx-net_8c.html#a5c78c2189a76a077231016564a0cecd5">redisxInit()</a></code> and the <code><a class="el" href="redisx-net_8c.html#ad71822356ffd40ed4b1c71d065f48809">redisxConnect()</a></code> calls.</p>
+<div class="fragment"><div class="line"><a class="code hl_struct" href="structRedis.html">Redis</a> *redis = ...</div>
+<div class="line"> </div>
+<div class="line">redisxAddConnectHook(redis, my_connect_hook);</div>
+</div><!-- fragment --><p>The same goes for disconnect hooks, using <code><a class="el" href="redisx-hooks_8c.html#a37d95c69831058865b078f0f0f20d540">redisxAddDisconnectHook()</a></code> instead.</p>
+<p><a class="anchor" id="connecting"></a> </p>
+<h3><a class="anchor" id="autotoc_md24"></a>
 Connecting</h3>
 <p>Once configured, you can connect to the server as:</p>
 <div class="fragment"><div class="line"><a class="code hl_struct" href="structRedis.html">Redis</a> *redis = ...</div>
@@ -380,7 +393,7 @@ Connecting</h3>
 <div class="ttc" id="aredisx-net_8c_html_ad71822356ffd40ed4b1c71d065f48809"><div class="ttname"><a href="redisx-net_8c.html#ad71822356ffd40ed4b1c71d065f48809">redisxConnect</a></div><div class="ttdeci">int redisxConnect(Redis *redis, boolean usePipeline)</div><div class="ttdef"><b>Definition</b> redisx-net.c:1106</div></div>
 </div><!-- fragment --><p>The above will establish both an interactive connection and a pipelined connection client, for processing both synchronous and asynchronous requests (and responses). For <a href="https://redis.io/docs/latest/develop/reference/sentinel-clients/">Sentinel</a> configurations, it will return with <code>X_SUCCESS</code> only after having located and connected to the master server, and confirmed that it is indeed the master.</p>
 <p><a class="anchor" id="disconnecting"></a> </p>
-<h3><a class="anchor" id="autotoc_md24"></a>
+<h3><a class="anchor" id="autotoc_md25"></a>
 Disconnecting</h3>
 <p>When you are done with a specific <a class="el" href="structRedis.html" title="Structure that represents a Redis database instance, with one or more RedisClient connections.">Redis</a> server, you should disconnect from it:</p>
 <div class="fragment"><div class="line"><a class="code hl_struct" href="structRedis.html">Redis</a> *redis = ...</div>
@@ -392,21 +405,7 @@ Disconnecting</h3>
 <div class="line"> </div>
 <div class="line"><span class="comment">// Set the destroyed Redis instance pointer to NULL, as best practice.</span></div>
 <div class="line">redis = NULL;</div>
-</div><!-- fragment --><p><a class="anchor" id="connection-hooks"></a> </p>
-<h3><a class="anchor" id="autotoc_md25"></a>
-Connection hooks</h3>
-<p>The user of the <b>RedisX</b> library might want to know when connections to the server are established, or when disconnections happen, and may want to perform some configuration or clean-up accordingly. For this reason, the library provides support for connection 'hooks' &ndash; that is custom functions that are called in the even of connecting to or disconnecting from a <a class="el" href="structRedis.html" title="Structure that represents a Redis database instance, with one or more RedisClient connections.">Redis</a> server.</p>
-<p>Here is an example of a connection hook, which simply prints a message about the connection to the console.</p>
-<div class="fragment"><div class="line"><span class="keywordtype">void</span> my_connect_hook(<a class="code hl_struct" href="structRedis.html">Redis</a> *redis) {</div>
-<div class="line">   printf(<span class="stringliteral">&quot;Connected to Redis server: %s\n&quot;</span>, redis-&gt;<a class="code hl_variable" href="structRedis.html#aecb3b0d045ada529257a2fbf8f829599">id</a>);</div>
-<div class="line">}</div>
-<div class="ttc" id="astructRedis_html_aecb3b0d045ada529257a2fbf8f829599"><div class="ttname"><a href="structRedis.html#aecb3b0d045ada529257a2fbf8f829599">Redis::id</a></div><div class="ttdeci">char * id</div><div class="ttdoc">The string ID of the Redis server. Default is IP, e.g. &quot;127.0.0.1&quot;.</div><div class="ttdef"><b>Definition</b> redisx.h:231</div></div>
-</div><!-- fragment --><p>And, it can be added to a <a class="el" href="structRedis.html" title="Structure that represents a Redis database instance, with one or more RedisClient connections.">Redis</a> instance, between the <code><a class="el" href="redisx-net_8c.html#a5c78c2189a76a077231016564a0cecd5">redisxInit()</a></code> and the <code><a class="el" href="redisx-net_8c.html#ad71822356ffd40ed4b1c71d065f48809">redisxConnect()</a></code> calls.</p>
-<div class="fragment"><div class="line"><a class="code hl_struct" href="structRedis.html">Redis</a> *redis = ...</div>
-<div class="line"> </div>
-<div class="line">redisxAddConnectHook(redis, my_connect_hook);</div>
-</div><!-- fragment --><p>The same goes for disconnect hooks, using <code><a class="el" href="redisx-hooks_8c.html#a37d95c69831058865b078f0f0f20d540">redisxAddDisconnectHook()</a></code> instead.</p>
-<hr  />
+</div><!-- fragment --><hr  />
 <p><a class="anchor" id="simple-redis-queries"></a> </p>
 <h2><a class="anchor" id="autotoc_md27"></a>
 Simple Redis queries</h2>

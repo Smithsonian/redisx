@@ -43,11 +43,11 @@ var NAVTREE =
           [ "Sentinel", "index.html#autotoc_md20", null ]
         ] ],
         [ "Configuring", "index.html#autotoc_md21", [
-          [ "Socket-level configuration", "index.html#autotoc_md22", null ]
+          [ "Socket-level configuration", "index.html#autotoc_md22", null ],
+          [ "Connection hooks", "index.html#autotoc_md23", null ]
         ] ],
-        [ "Connecting", "index.html#autotoc_md23", null ],
-        [ "Disconnecting", "index.html#autotoc_md24", null ],
-        [ "Connection hooks", "index.html#autotoc_md25", null ]
+        [ "Connecting", "index.html#autotoc_md24", null ],
+        [ "Disconnecting", "index.html#autotoc_md25", null ]
       ] ],
       [ "Simple Redis queries", "index.html#autotoc_md27", [
         [ "Interactive transactions", "index.html#autotoc_md28", null ],

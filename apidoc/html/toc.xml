@@ -16,10 +16,10 @@
       </topic>
       <topic label="Configuring" href="index.html#autotoc_md21">
         <topic label="Socket-level configuration" href="index.html#autotoc_md22"/>
+        <topic label="Connection hooks" href="index.html#autotoc_md23"/>
       </topic>
-      <topic label="Connecting" href="index.html#autotoc_md23"/>
-      <topic label="Disconnecting" href="index.html#autotoc_md24"/>
-      <topic label="Connection hooks" href="index.html#autotoc_md25"/>
+      <topic label="Connecting" href="index.html#autotoc_md24"/>
+      <topic label="Disconnecting" href="index.html#autotoc_md25"/>
     </topic>
     <topic label="Simple Redis queries" href="index.html#autotoc_md27">
       <topic label="Interactive transactions" href="index.html#autotoc_md28"/>
