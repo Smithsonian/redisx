@@ -78,7 +78,7 @@ Before then the API may undergo slight changes and tweaks. Use the repository as
  | connect over TCP                  |  __yes__   |                                                              |
  | connect over UDP                  |    no      | (why would you, really?)                                     |
  | connect / disconnect hooks        |  __yes__   |                                                              |
- | socket level configuration        |  __yes__   | User adjustable timeout and buffer size                      |
+ | socket level configuration        |  __yes__   | user-defined timeout and buffer size and/or callback         |
  | socket error handling             |  __yes__   | user-defined callback                                        |
  | RESP to JSON                      |  __yes__   | via `xchange` library                                        |
  | RESP to structured data           |  __yes__   | via `xchange` library                                        |
@@ -234,9 +234,9 @@ to linking.
 ## Managing Redis server connections
 
  - [Initializing](#initializing)
+ - [Configuring](#configuring)
  - [Connecting](#connecting)
  - [Disconnecting](#disconnecting)
- - [Connection hooks](#connection-hooks)
 
 The library maintains up to three separate connections (channels) for each separate Redis server instance used: (1) an 
 interactive client for sequential round-trip transactions, (2) a pipeline client for bulk queries and asynchronous 
@@ -261,8 +261,10 @@ The first step is to create a `Redis` object, with the server name or IP address
   redisxSetPort(redis, 7089);
 ```
 
-Alternatively, you may initialize the client for a high-availability configuration using with a set of 
-[Redis Sentinel](https://redis.io/docs/latest/develop/reference/sentinel-clients/) servers, using 
+#### Sentinel
+
+Alternatively, instead of `redisxInit()` above you may initialize the client for a high-availability configuration 
+using with a set of [Redis Sentinel](https://redis.io/docs/latest/develop/reference/sentinel-clients/) servers, using 
 `redisxInitSentinel()`, e.g.:
 
 ```c
@@ -280,6 +282,13 @@ Alternatively, you may initialize the client for a high-availability configurati
   // (optional) set a sentinel discovery timeout in ms...
   redisxSetSentinelTimeout(redis, 30);
 ```
+
+After successful initialization, you may proceed with the configuration the same way as for the regular standalone
+server connection above.
+
+
+<a name="configuring"></a>
+### Configuring
 
 Before connecting to the Redis server, you may configure the database authentication (if any):
 
@@ -305,30 +314,73 @@ will not be used, and RESP2 will be assumed -- which is best for older servers. 
 actual protocol used after connecting, using `redisxGetProtocol()`). Note, that after connecting, you may retrieve 
 the set of server properties sent in response to `HELLO` using `redisxGetHelloData()`.
 
-You might also tweak the socket options used for clients, if you find the socket defaults sub-optimal for your 
-application (note, that this setting is common to all `Redis` instances managed by the library):
-
-```c
-   // (optional) Set 1000 ms socket read/write timeout for future connections.
-   redisxSetSocketTimeout(redis, 1000);
-
-   // (optional) Set the TCP send/rcv buffer sizes to use if not default values.
-   //            This setting applies to all new connections after...
-   redisxSetTcpBuf(65536);
-```
-
 Optionally, you can select the database index to use now (or later, after connecting), if not the default (index 
 0):
 
 ```c
-  Redis *redis = ...
-  
   // (optional) Select the database index 2
   redisxSelectDB(redis, 2); 
 ```
 
 Note, that you can switch the database index any time, with the caveat that it's not possible to change it for the 
 subscription client when there are active subscriptions.
+
+
+#### Socket-level configuration
+
+You might also tweak the socket options used for clients, if you find the socket defaults sub-optimal for your 
+application:
+
+```c
+   // (optional) Set 1000 ms socket read/write timeout for future connections.
+   redisxSetSocketTimeout(redis, 1000);
+
+   // (optional) Set the TCP send/rcv buffer sizes to use if not default values.
+   redisxSetTcpBuf(redis, 65536);
+```
+
+If you want, you can perform further customization of the client sockets via a user-defined callback function, e.g.:
+
+```c
+  int my_socket_config(int sock, enum redisx_channel channel) {
+     // Set up the socket any way you like...
+     ...
+     
+     return X_SUCCESS;
+  }
+```
+
+which you can then apply to your Redis instance as:
+
+```c
+  redisxSetSocketConfigurator(my_socket_config);
+```
+
+<a name="connection-hooks"></a>
+#### Connection hooks
+
+The user of the __RedisX__ library might want to know when connections to the server are established, or when 
+disconnections happen, and may want to perform some configuration or clean-up accordingly. For this reason, the 
+library provides support for connection 'hooks' -- that is custom functions that are called in the even of connecting 
+to or disconnecting from a Redis server.
+
+Here is an example of a connection hook, which simply prints a message about the connection to the console.
+
+```c
+  void my_connect_hook(Redis *redis) {
+     printf("Connected to Redis server: %s\n", redis->id);
+  }
+```
+
+And, it can be added to a Redis instance, between the `redisxInit()` and the `redisxConnect()` calls.
+
+```c
+  Redis *redis = ...
+  
+  redisxAddConnectHook(redis, my_connect_hook);
+```
+
+The same goes for disconnect hooks, using `redisxAddDisconnectHook()` instead.
 
 
 <a name="connecting"></a>
@@ -377,32 +429,6 @@ And then to free up all resources used by the `Redis` instance, you might also c
   redis = NULL;
 ```
 
-
-<a name="connection-hooks"></a>
-### Connection hooks
-
-The user of the __RedisX__ library might want to know when connections to the server are established, or when 
-disconnections happen, and may want to perform some configuration or clean-up accordingly. For this reason, the 
-library provides support for connection 'hooks' -- that is custom functions that are called in the even of connecting 
-to or disconnecting from a Redis server.
-
-Here is an example of a connection hook, which simply prints a message about the connection to the console.
-
-```c
-  void my_connect_hook(Redis *redis) {
-     printf("Connected to Redis server: %s\n", redis->id);
-  }
-```
-
-And, it can be added to a Redis instance, between the `redisxInit()` and the `redisxConnect()` calls.
-
-```c
-  Redis *redis = ...
-  
-  redisxAddConnectHook(redis, my_connect_hook);
-```
-
-The same goes for disconnect hooks, using `redisxAddDisconnectHook()` instead.
 
 -----------------------------------------------------------------------------
 
@@ -1259,7 +1285,7 @@ Then activate it as:
 ```c
   Redis *redis = ...
   
-  redisxSetTransmitErrorHandler(redis, my_error_handler);
+  redisxSetSocketErrorHandler(redis, my_error_handler);
 ```
 
 After that, every time there is an error with sending or receiving packets over the network to any of the Redis

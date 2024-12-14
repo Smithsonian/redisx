@@ -69,7 +69,7 @@ int rCheckClient(const RedisClient *cl) {
  * @param op    The operation that failed, e.g. 'send' or 'read'.
  * @return      X_NO_SERVICE
  *
- * @sa redisxSetTransmitErrorHandler()
+ * @sa redisxSetSocketErrorHandler()
  */
 static int rTransmitError(ClientPrivate *cp, const char *op) {
   if(cp->isEnabled) {

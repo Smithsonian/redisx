@@ -231,6 +231,31 @@ enum redisx_protocol redisxGetProtocol(Redis *redis) {
 }
 
 /**
+ * Sets a user-defined callback for additioan custom configuring of client sockets
+ *
+ *
+ * @param redis     The Redis server instance
+ * @param func      The user-defined callback function, which performs the additional socket configuration
+ * @return          X_SUCCESS (0) if successful, or or X_NULL if the redis argument in NULL, X_NO_INIT
+ *                  if the redis instance was not initialized.
+ *
+ * @sa redisxSetSocketErrorHandler()
+ */
+int redisxSetSocketConfigurator(Redis *redis, RedisSocketConfigurator func) {
+  static const char *fn = "redisxSetSocketConfigurator";
+
+  RedisPrivate *p;
+
+  prop_error(fn, rConfigLock(redis));
+  p = (RedisPrivate *) redis->priv;
+  p->hello = TRUE;
+  p->socketConf = func;
+  rConfigUnlock(redis);
+
+  return X_SUCCESS;
+}
+
+/**
  * Sets the user-specific error handler to call if a socket level trasmit error occurs.
  * It replaces any prior handlers set earlier.
  *
@@ -247,9 +272,11 @@ enum redisx_protocol redisxGetProtocol(Redis *redis) {
  *
  * \return          X_SUCCESS if the handler was successfully configured, or X_NULL if the
  *                  Redis instance is NULL.
+ *
+ * @sa redisxSetSocketConfigurator()
  */
-int redisxSetTransmitErrorHandler(Redis *redis, RedisErrorHandler f) {
-  static const char *fn = "redisxSetTransmitErrorHandler";
+int redisxSetSocketErrorHandler(Redis *redis, RedisErrorHandler f) {
+  static const char *fn = "redisxSetSocketErrorHandler";
 
   RedisPrivate *p;
 

@@ -49,7 +49,6 @@ typedef struct ServerLink {
 static ServerLink *serverList;
 static pthread_mutex_t serverLock = PTHREAD_MUTEX_INITIALIZER;
 
-static int tcpBufSize = REDISX_TCP_BUF_SIZE;
 
 
 /**
@@ -113,11 +112,12 @@ static int rSetServerAsync(Redis *redis, const char *desc, const char *hostname,
  * Configure the Redis client sockets for optimal performance...
  *
  * \param socket          The socket file descriptor.
- * \param timeoutMillis   [ms] Socket read/write timeout, or &lt;0 to no set.
+ * \param timeoutMillis   [ms] Socket read/write timeout, or &lt;=0 to no set.
+ * \param tcpBufSize      [bytes] Socket read / write buffer sizes, or &lt;=0 to not set;
  * \param lowLatency      TRUE (non-zero) if socket is to be configured for low latency, or else FALSE (0).
  *
  */
-static void rConfigSocket(int socket, int timeoutMillis, boolean lowLatency) {
+static void rConfigSocket(int socket, int timeoutMillis, int tcpBufSize, boolean lowLatency) {
   const boolean enable = TRUE;
 
   if(timeoutMillis > 0) {
@@ -716,7 +716,11 @@ int rConnectClient(Redis *redis, enum redisx_channel channel) {
   if((sock = socket(PF_INET, SOCK_STREAM, IPPROTO_TCP)) < 0)
     return x_error(X_NO_SERVICE, errno, fn, "client %d socket creation failed", channel);
 
-  rConfigSocket(sock, p->timeoutMillis, rIsLowLatency(cp));
+  rConfigSocket(sock, p->timeoutMillis, p->tcpBufSize, rIsLowLatency(cp));
+
+  if(p->socketConf) {
+    prop_error(fn, p->socketConf(sock, channel));
+  }
 
   while(connect(sock, (struct sockaddr *) &serverAddress, sizeof(serverAddress)) != 0) {
     close(sock);
@@ -827,6 +831,7 @@ Redis *redisxInit(const char *server) {
 
   p->protocol = REDISX_RESP2;     // Default
   p->timeoutMillis = REDISX_DEFAULT_TIMEOUT_MILLIS;
+  p->tcpBufSize = REDISX_TCP_BUF_SIZE;
 
   // Create clients...
   p->clients = (RedisClient *) calloc(3, sizeof(RedisClient));
@@ -1010,11 +1015,21 @@ void redisxDestroy(Redis *redis) {
 /**
  * Set the size of the TCP/IP buffers (send and receive) for future client connections.
  *
+ * @param redis     Pointer to a Redis instance.
  * @param size      (bytes) requested buffer size, or <= 0 to use default value
+ * @return          X_SUCCESS (0) if successful, or else X_NULL if the redis instance is NULL,
+ *                  or X_NO_INIT if the redis instance is not initialized, or X_FAILURE
+ *                  if Redis was initialized in Sentinel configuration.
  */
-void redisxSetTcpBuf(int size) {
-  xvprintf("Redis-X> Setting TCP buffer to %d\n.", size);
-  tcpBufSize = size;
+int redisxSetTcpBuf(Redis *redis, int size) {
+  RedisPrivate *p;
+
+  prop_error("redisxSetTcpBuf", rConfigLock(redis));
+  p = (RedisPrivate *) redis->priv;
+  p->tcpBufSize = size;
+  rConfigUnlock(redis);
+
+  return X_SUCCESS;
 }
 
 /**

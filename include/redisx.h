@@ -343,14 +343,26 @@ typedef void (*RedisPushProcessor)(RedisClient *cl, RESP *message, void *ptr);
 
 
 
+/**
+ * User callback function allowing additional customization of the client socket before connection.
+ *
+ * @param socket      The socket descriptor
+ * @param channel     REDISX_INTERACTIVE_CHANNEL, REDISX_PIPELINE_CHANNEL, REDISX_SUBSCRIPTION_CHANNEL
+ * @return            X_SUCCESS (0) if the socket may be used as is after the return. Any other value
+ *                    will indicate that the socket should not be used and that the caller itself should
+ *                    fail with an error.
+ */
+typedef int (*RedisSocketConfigurator)(int socket, enum redisx_channel channel);
+
 void redisxSetVerbose(boolean value);
 boolean redisxIsVerbose();
 void redisxDebugTraffic(boolean value);
 
-void redisxSetTcpBuf(int size);
 int redisxSetSocketTimeout(Redis *redis, int millis);
+int redisxSetTcpBuf(Redis *redis, int size);
 int redisxSetSentinelTimeout(Redis *redis, int millis);
-int redisxSetTransmitErrorHandler(Redis *redis, RedisErrorHandler f);
+int redisxSetSocketConfigurator(Redis *redis, RedisSocketConfigurator func);
+int redisxSetSocketErrorHandler(Redis *redis, RedisErrorHandler f);
 
 int redisxSetPort(Redis *redis, int port);
 int redisxSetUser(Redis *redis, const char *username);

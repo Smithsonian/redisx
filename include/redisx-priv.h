@@ -70,9 +70,11 @@ typedef struct {
   char *password;               ///< Redis password (if any)
 
   int timeoutMillis;            ///< [ms] Socket read/write timeout
+  int tcpBufSize;               ///< [bytes] TCP read/write buffer sizes to use
   int protocol;                 ///< RESP version to use
   boolean hello;                ///< whether to use HELLO (introduced in Redis 6.0.0 only)
   RESP *helloData;              ///< RESP data received from server during last connection.
+  RedisSocketConfigurator socketConf;   ///< Additional user configuration of client sockets
 
   RedisClient *clients;
 
