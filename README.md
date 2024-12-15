@@ -977,11 +977,16 @@ atomically. Such an execution block in __RedisX__ may look something like:
   ...
 
   // Execute the block of commands above atomically, and get the resulting RESP
-  result = redisxExecBlockAsync(cl);
+  result = redisxExecBlockAsync(cl, &status);
   // -------------------------------------------------------------------------
   
   // Release exlusive access to the client
   redisxUnlockClient(cl);
+  
+  if(status != X_SUCCESS) {
+    // Oops, the block execition failed...
+    return status;
+  }
   
   // Inspect the RESP, etc...
   ... 
@@ -1026,8 +1031,15 @@ its SHA1 sum, a set of Redis keys the script may use, and a set of other paramet
   char *keyArgs[] = { "my-redis-key-argument", NULL }; // NULL-terminated array of keyword arguments
   char *params[] = { "some-string", "-1.11", NULL };   // NULL-terminated array of extra parameters
   
+  int status;     // We will return error status in this variable
+  
   // Execute the script, with the specified keyword arguments and parameters
-  RESP *reply = redisxRunScript(redis, scriptSHA1, keyArgs, params);
+  RESP *reply = redisxRunScript(redis, scriptSHA1, keyArgs, params, &status);
+
+  if(status != X_SUCCESS) {
+     // Oops, failed to run script...
+     ...
+  }
 
   // Check and inspect the reply
   ...
@@ -1095,7 +1107,11 @@ while we have exclusive access to the client, might look something like this:
   
   if(status == X_SUCCESS) {
     // Read the response
-    RESP *reply = redisxReadReplyAsync(cl);
+    RESP *reply = redisxReadReplyAsync(cl, &status);
+    if(status != X_SUCCESS) {
+      // Ooops, not the reply what we expected...
+      ...
+    }
     
     // check and process the response
     if(redisxCheckRESP(reply, ...) != X_SUCCESS) {
@@ -1334,8 +1350,8 @@ above mentioned methods.
     client's socket. The error handler callback function is called while the affected client is still locked and 
     nominally in a 'functioning' state. That means you are free to use any `Async` call on the affected client as 
     appropriate, but the error handler should not attempt to release the exclusive lock on the client or call
-    synchronized functions. The background processing of replies (on the pipeline and/or subscription clients) is 
-    still active at this stage.
+    synchronized functions on the Redis instance or the affected client. The background processing of replies (on 
+    the pipeline and/or subscription clients) is still active at this stage.
     
  2. If the error is caused by a timeout (`errno` being `EAGAIN` or `EWOULDBLOCK`), nothing changes at this stage.
     However, if the error is persistent, the client will be disabled and reset, and subsequent read or write calls 
@@ -1343,8 +1359,8 @@ above mentioned methods.
     processing of server replies (on the pipeline and subscriptions channels) will stop soon after the disconnection
     is initiated.
     
- 3. The __RedisX__ call return either `X_NO_SERVICE`, or `X_TIMEDOUT`, or else `NULL`. The application should check 
-    return values (and `errno`) as appropriate.
+ 3. The __RedisX__ call returns either `X_NO_SERVICE`, or `X_TIMEDOUT`, or else `NULL`. The application should check 
+    return values (and/or `errno`) as appropriate.
 
 
 -----------------------------------------------------------------------------
