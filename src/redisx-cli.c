@@ -34,18 +34,26 @@ static void printVersion(const char *name) {
 }
 
 static void printRESP(const RESP *resp) {
-  if(format == FORMAT_JSON) {
-    const char *type = "REPLY";
+  switch(format) {
+    case FORMAT_JSON: {
+      const char *type = "REPLY";
 
-    if(resp) {
-      if(resp->type == RESP3_PUSH) type = "PUSH";
-      else if(resp->type == RESP3_ATTRIBUTE) type = "ATTRIBUTES";
+      if(resp) {
+        if(resp->type == RESP3_PUSH) type = "PUSH";
+        else if(resp->type == RESP3_ATTRIBUTE) type = "ATTRIBUTES";
+      }
+
+      redisxPrintJSON(type, resp);
+      break;
     }
 
-    redisxPrintJSON(type, resp);
+    case FORMAT_RAW:
+      redisxPrintDelimited(resp, delim, groupDelim);
+      break;
+
+    default:
+      redisxPrintRESP(resp);
   }
-  if(format == FORMAT_RAW) redisxPrintDelimited(resp, delim, groupDelim);
-  else redisxPrintRESP(resp);
 }
 
 static void process(Redis *redis, const char **cmdargs, int nargs) {
