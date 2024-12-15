@@ -13,7 +13,7 @@ src/redisx-script.c
 .RI "int \fBredisxLoadScript\fP (\fBRedis\fP *redis, const char *script, char **sha1)"
 .br
 .ti -1c
-.RI "\fBRESP\fP * \fBredisxRunScript\fP (\fBRedis\fP *redis, const char *sha1, const char **keys, const char **params)"
+.RI "\fBRESP\fP * \fBredisxRunScript\fP (\fBRedis\fP *redis, const char *sha1, const char **keys, const char **params, int *status)"
 .br
 .ti -1c
 .RI "int \fBredisxRunScriptAsync\fP (\fBRedisClient\fP *cl, const char *sha1, const char **keys, const char **params)"
@@ -56,7 +56,7 @@ X_SUCCESS (0) if the script has been successfully loaded into \fBRedis\fP, or X_
 
 .PP
 References \fBredisxCheckDestroyRESP()\fP, \fBredisxDestroyRESP()\fP, \fBredisxRequest()\fP, \fBRESP_BULK_STRING\fP, \fBRESP::value\fP, \fBx_error()\fP, \fBX_NULL\fP, and \fBX_SUCCESS\fP\&.
-.SS "\fBRESP\fP * redisxRunScript (\fBRedis\fP * redis, const char * sha1, const char ** keys, const char ** params)"
+.SS "\fBRESP\fP * redisxRunScript (\fBRedis\fP * redis, const char * sha1, const char ** keys, const char ** params, int * status)"
 Runs a LUA script that has been loaded into the \fBRedis\fP database, returning the response received, or NULL if there was an error\&.
 .PP
 \fBParameters\fP
@@ -68,6 +68,8 @@ Runs a LUA script that has been loaded into the \fBRedis\fP database, returning 
 \fIkeys\fP A NULL-terminated array of \fBRedis\fP keywords, or NULL if the script does not take any keyword argument\&. 
 .br
 \fIparams\fP A NULL-terminated array of additional parameters to pass onto the script, or NULL if the script does not take any parameters\&. 
+.br
+\fIstatus\fP Pointer to int in which to return status, or NULL if not required\&. 
 .RE
 .PP
 \fBReturns\fP

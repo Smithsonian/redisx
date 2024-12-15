@@ -44,38 +44,41 @@ var NAVTREE =
         ] ],
         [ "Configuring", "index.html#autotoc_md21", [
           [ "Socket-level configuration", "index.html#autotoc_md22", null ],
-          [ "Connection hooks", "index.html#autotoc_md23", null ]
+          [ "Connection & disconnection hooks", "index.html#autotoc_md23", null ]
         ] ],
         [ "Connecting", "index.html#autotoc_md24", null ],
-        [ "Disconnecting", "index.html#autotoc_md25", null ]
+        [ "Disconnecting", "index.html#autotoc_md25", null ],
+        [ "Reconnecting", "index.html#autotoc_md26", null ]
       ] ],
-      [ "Simple Redis queries", "index.html#autotoc_md27", [
-        [ "Interactive transactions", "index.html#autotoc_md28", null ],
-        [ "Bundled Attributes", "index.html#autotoc_md29", null ],
-        [ "Push notifications", "index.html#autotoc_md30", null ],
-        [ "RESP data type", "index.html#autotoc_md31", null ]
+      [ "Simple Redis queries", "index.html#autotoc_md28", [
+        [ "Interactive transactions", "index.html#autotoc_md29", null ],
+        [ "Bundled Attributes", "index.html#autotoc_md30", null ],
+        [ "Push notifications", "index.html#autotoc_md31", null ],
+        [ "RESP data type", "index.html#autotoc_md32", null ]
       ] ],
-      [ "Accessing key / value data", "index.html#autotoc_md33", [
-        [ "Getting and setting keyed values", "index.html#autotoc_md34", null ],
-        [ "Listing and Scanning", "index.html#autotoc_md35", null ]
+      [ "Accessing key / value data", "index.html#autotoc_md34", [
+        [ "Getting and setting keyed values", "index.html#autotoc_md35", null ],
+        [ "Listing and Scanning", "index.html#autotoc_md36", null ]
       ] ],
-      [ "Publish / subscribe (PUB/SUB) support", "index.html#autotoc_md37", [
-        [ "Broadcasting messages", "index.html#autotoc_md38", null ],
-        [ "Subscriptions", "index.html#autotoc_md39", null ]
+      [ "Publish / subscribe (PUB/SUB) support", "index.html#autotoc_md38", [
+        [ "Broadcasting messages", "index.html#autotoc_md39", null ],
+        [ "Subscriptions", "index.html#autotoc_md40", null ]
       ] ],
-      [ "Atomic execution blocks and LUA scripts", "index.html#autotoc_md41", [
-        [ "Execution blocks", "index.html#autotoc_md42", null ],
-        [ "LUA script loading and execution", "index.html#autotoc_md43", null ],
-        [ "Custom Redis functions", "index.html#autotoc_md44", null ]
+      [ "Atomic execution blocks and LUA scripts", "index.html#autotoc_md42", [
+        [ "Execution blocks", "index.html#autotoc_md43", null ],
+        [ "LUA script loading and execution", "index.html#autotoc_md44", null ],
+        [ "Custom Redis functions", "index.html#autotoc_md45", null ]
       ] ],
-      [ "Advanced queries and pipelining", "index.html#autotoc_md46", [
-        [ "Asynchronous client processing", "index.html#autotoc_md47", null ],
-        [ "Bundled Attributes", "index.html#autotoc_md48", null ],
-        [ "Pipelined transactions", "index.html#autotoc_md49", null ]
+      [ "Advanced queries and pipelining", "index.html#autotoc_md47", [
+        [ "Asynchronous client processing", "index.html#autotoc_md48", null ],
+        [ "Bundled Attributes", "index.html#autotoc_md49", null ],
+        [ "Pipelined transactions", "index.html#autotoc_md50", null ]
       ] ],
-      [ "Error handling", "index.html#autotoc_md51", null ],
-      [ "Debug support", "index.html#autotoc_md53", null ],
-      [ "Future plans", "index.html#autotoc_md55", null ],
+      [ "Error handling", "index.html#autotoc_md52", [
+        [ "Socket-level errors", "index.html#autotoc_md53", null ]
+      ] ],
+      [ "Debug support", "index.html#autotoc_md55", null ],
+      [ "Future plans", "index.html#autotoc_md57", null ],
       [ "[Unreleased]", "../../xchange/apidoc/html/md_CHANGELOG.html#autotoc_md1", null ]
     ] ],
     [ "Contributing to RedisX", "../../xchange/apidoc/html/md_CONTRIBUTING.html", null ],
@@ -104,7 +107,7 @@ var NAVTREE =
 var NAVTREEINDEX =
 [
 "annotated.html",
-"redisx_8h.html#ac819fe43d592df70e8bbc6b25f4d090b"
+"redisx_8h.html#ac0f30d62044638a2ead07583ad723fdf"
 ];
 
 var SYNCONMSG = 'click to disable panel synchronisation';

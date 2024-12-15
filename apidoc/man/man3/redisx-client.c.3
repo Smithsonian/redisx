@@ -24,7 +24,7 @@ src/redisx-client.c
 .RI "int \fBredisxClearAttributesAsync\fP (\fBRedisClient\fP *cl)"
 .br
 .ti -1c
-.RI "\fBRESP\fP * \fBredisxExecBlockAsync\fP (\fBRedisClient\fP *cl)"
+.RI "\fBRESP\fP * \fBredisxExecBlockAsync\fP (\fBRedisClient\fP *cl, int *pStatus)"
 .br
 .ti -1c
 .RI "const \fBRESP\fP * \fBredisxGetAttributesAsync\fP (const \fBRedisClient\fP *cl)"
@@ -45,7 +45,7 @@ src/redisx-client.c
 .RI "int \fBredisxLockConnected\fP (\fBRedisClient\fP *cl)"
 .br
 .ti -1c
-.RI "\fBRESP\fP * \fBredisxReadReplyAsync\fP (\fBRedisClient\fP *cl)"
+.RI "\fBRESP\fP * \fBredisxReadReplyAsync\fP (\fBRedisClient\fP *cl, int *pStatus)"
 .br
 .ti -1c
 .RI "int \fBredisxResetClient\fP (\fBRedisClient\fP *cl)"
@@ -131,12 +131,14 @@ X_SUCCESS (0) if successful, or else X_NULL if the client is NULL\&.
 
 .PP
 References \fBX_SUCCESS\fP\&.
-.SS "\fBRESP\fP * redisxExecBlockAsync (\fBRedisClient\fP * cl)"
+.SS "\fBRESP\fP * redisxExecBlockAsync (\fBRedisClient\fP * cl, int * pStatus)"
 Finish and execute an atomic transaction block\&. It sends \fCEXEC\fP, skips through all \fCOK\fP and \fCQUEUED\fP acknowledgements, and returns the reply to the transaction block itself\&.
 .PP
 \fBParameters\fP
 .RS 4
-\fIcl\fP Pointer to a \fBRedis\fP client
+\fIcl\fP Pointer to a \fBRedis\fP client 
+.br
+\fIpStatus\fP Pointer to int in which to return error status\&. or NULL if not required\&.
 .RE
 .PP
 \fBReturns\fP
@@ -304,22 +306,24 @@ X_SUCCESS (0) if an excusive lock to the channel has been granted, or X_FAILURE 
 
 .PP
 References \fBredisxLockClient()\fP, \fBredisxUnlockClient()\fP, \fBx_error()\fP, \fBX_NO_INIT\fP, \fBX_NO_SERVICE\fP, and \fBX_SUCCESS\fP\&.
-.SS "\fBRESP\fP * redisxReadReplyAsync (\fBRedisClient\fP * cl)"
+.SS "\fBRESP\fP * redisxReadReplyAsync (\fBRedisClient\fP * cl, int * pStatus)"
 Reads a response from \fBRedis\fP and returns it\&.
 .PP
 \fBParameters\fP
 .RS 4
-\fIcl\fP Pointer to a \fBRedis\fP channel
+\fIcl\fP Pointer to a \fBRedis\fP channel 
+.br
+\fIpStatus\fP Pointer to int in which to return an error status, or NULL if not required\&.
 .RE
 .PP
 \fBReturns\fP
 .RS 4
-The \fBRESP\fP structure for the reponse received from \fBRedis\fP, or NULL if an error was encountered (errno will be set to describe the error, which may either be an errno produced by recv() or EBADMSG if the message was corrupted and/or unparseable\&. 
+The \fBRESP\fP structure for the reponse received from \fBRedis\fP, or NULL if an error was encountered (errno will be set to describe the error, which may either be an errno produced by recv() or EBADMSG if the message was corrupted and/or unparseable\&. If the error is irrecoverable i\&.e\&., other than a timeout, the client will be disabled\&.) 
 .RE
 .PP
 
 .PP
-References \fBFALSE\fP, \fBRedisMapEntry::key\fP, \fBRESP::n\fP, \fBREDIS_INCOMPLETE_TRANSFER\fP, \fBREDIS_SIMPLE_STRING_SIZE\fP, \fBREDIS_UNEXPECTED_RESP\fP, \fBredisxAppendRESP()\fP, \fBredisxDestroyRESP()\fP, \fBredisxHasComponents()\fP, \fBredisxReadReplyAsync()\fP, \fBRESP3_ATTRIBUTE\fP, \fBRESP3_BIG_NUMBER\fP, \fBRESP3_BLOB_ERROR\fP, \fBRESP3_BOOLEAN\fP, \fBRESP3_CONTINUED\fP, \fBRESP3_DOUBLE\fP, \fBRESP3_MAP\fP, \fBRESP3_NULL\fP, \fBRESP3_PUSH\fP, \fBRESP3_SET\fP, \fBRESP3_VERBATIM_STRING\fP, \fBRESP_ARRAY\fP, \fBRESP_BULK_STRING\fP, \fBRESP_ERROR\fP, \fBRESP_INT\fP, \fBRESP_SIMPLE_STRING\fP, \fBTRUE\fP, \fBRESP::type\fP, \fBRESP::value\fP, \fBRedisMapEntry::value\fP, \fBx_error()\fP, \fBX_FAILURE\fP, \fBX_PARSE_ERROR\fP, \fBX_SUCCESS\fP, \fBx_trace_null()\fP, \fBxParseDouble()\fP, and \fBxStringCopyOf()\fP\&.
+References \fBFALSE\fP, \fBRedisMapEntry::key\fP, \fBRESP::n\fP, \fBrCloseClientAsync()\fP, \fBREDIS_INCOMPLETE_TRANSFER\fP, \fBREDIS_SIMPLE_STRING_SIZE\fP, \fBREDIS_UNEXPECTED_RESP\fP, \fBredisxAppendRESP()\fP, \fBredisxDestroyRESP()\fP, \fBredisxHasComponents()\fP, \fBredisxReadReplyAsync()\fP, \fBRESP3_ATTRIBUTE\fP, \fBRESP3_BIG_NUMBER\fP, \fBRESP3_BLOB_ERROR\fP, \fBRESP3_BOOLEAN\fP, \fBRESP3_CONTINUED\fP, \fBRESP3_DOUBLE\fP, \fBRESP3_MAP\fP, \fBRESP3_NULL\fP, \fBRESP3_PUSH\fP, \fBRESP3_SET\fP, \fBRESP3_VERBATIM_STRING\fP, \fBRESP_ARRAY\fP, \fBRESP_BULK_STRING\fP, \fBRESP_ERROR\fP, \fBRESP_INT\fP, \fBRESP_SIMPLE_STRING\fP, \fBTRUE\fP, \fBRESP::type\fP, \fBRESP::value\fP, \fBRedisMapEntry::value\fP, \fBx_error()\fP, \fBX_FAILURE\fP, \fBX_NO_INIT\fP, \fBX_NO_SERVICE\fP, \fBX_PARSE_ERROR\fP, \fBX_SUCCESS\fP, \fBx_trace_null()\fP, \fBxParseDouble()\fP, and \fBxStringCopyOf()\fP\&.
 .SS "int redisxResetClient (\fBRedisClient\fP * cl)"
 Sends a \fCRESET\fP request to the specified \fBRedis\fP client\&. The server will perform a reset as if the client disconnected and reconnected again\&.
 .PP

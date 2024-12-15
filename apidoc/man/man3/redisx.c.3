@@ -115,12 +115,13 @@ Returns the result of the most generic type of \fBRedis\fP request with any numb
 .br
 \fIn\fP Number of string arguments\&. 
 .br
-\fIstatus\fP Pointer to the return error status, which is either 
+\fIstatus\fP Pointer to the return error status\&. If not NULL, it will be populated with one of: 
 .PP
 .nf
                  X_SUCCESS       on success\&.
                  X_NO_INIT       if the Redis client librarywas not initialized via initRedis\&.
                  X_NULL          if the argument is NULL or n<1\&.
+                 X_TIMEDOUT      if the reading of the response timed out\&.
                  X_NO_SERVICE    if not connected to Redis\&.
                  X_FAILURE       If there was a socket level error\&.
 

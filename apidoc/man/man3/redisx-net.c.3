@@ -10,6 +10,9 @@ src/redisx-net.c
 
 .in +1c
 .ti -1c
+.RI "void \fBrCloseClientAsync\fP (\fBRedisClient\fP *cl)"
+.br
+.ti -1c
 .RI "void * \fBRedisPipelineListener\fP (void *pRedis)"
 .br
 .ti -1c
@@ -66,6 +69,15 @@ Attila Kovacs
 Network layer management functions for the RedisX library\&. 
 .SH "Function Documentation"
 .PP 
+.SS "void rCloseClientAsync (\fBRedisClient\fP * cl)"
+Closes the \fBRedis\fP client on the specified communication channel\&. This call assumes that the caller has an exlusive lock on the client\&.
+.PP
+\fBParameters\fP
+.RS 4
+\fIcl\fP Pointer to the \fBRedis\fP client instance\&. 
+.RE
+.PP
+
 .SS "void * RedisPipelineListener (void * pRedis)"
 The listener function that processes pipelined responses in the background\&. It is started when \fBRedis\fP is connected with the pipeline enabled\&.
 .PP

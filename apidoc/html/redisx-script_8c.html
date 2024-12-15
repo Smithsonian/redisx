@@ -122,8 +122,8 @@ $(document).ready(function(){initNavTree('redisx-script_8c.html',''); initResiza
 Functions</h2></td></tr>
 <tr class="memitem:ae8930592b8f927a154508669132bebab" id="r_ae8930592b8f927a154508669132bebab"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="redisx-script_8c.html#ae8930592b8f927a154508669132bebab">redisxLoadScript</a> (<a class="el" href="structRedis.html">Redis</a> *redis, const char *script, char **sha1)</td></tr>
 <tr class="separator:ae8930592b8f927a154508669132bebab"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a36374ac4afaaca0a72be2fb95a909869" id="r_a36374ac4afaaca0a72be2fb95a909869"><td class="memItemLeft" align="right" valign="top"><a class="el" href="structRESP.html">RESP</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="redisx-script_8c.html#a36374ac4afaaca0a72be2fb95a909869">redisxRunScript</a> (<a class="el" href="structRedis.html">Redis</a> *redis, const char *sha1, const char **keys, const char **params)</td></tr>
-<tr class="separator:a36374ac4afaaca0a72be2fb95a909869"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aebd84c84082d2367d8cbe233cfe14535" id="r_aebd84c84082d2367d8cbe233cfe14535"><td class="memItemLeft" align="right" valign="top"><a class="el" href="structRESP.html">RESP</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="redisx-script_8c.html#aebd84c84082d2367d8cbe233cfe14535">redisxRunScript</a> (<a class="el" href="structRedis.html">Redis</a> *redis, const char *sha1, const char **keys, const char **params, int *status)</td></tr>
+<tr class="separator:aebd84c84082d2367d8cbe233cfe14535"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a711d6ba68a67ab814ddda0adc998a2ce" id="r_a711d6ba68a67ab814ddda0adc998a2ce"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="redisx-script_8c.html#a711d6ba68a67ab814ddda0adc998a2ce">redisxRunScriptAsync</a> (<a class="el" href="structRedisClient.html">RedisClient</a> *cl, const char *sha1, const char **keys, const char **params)</td></tr>
 <tr class="separator:a711d6ba68a67ab814ddda0adc998a2ce"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
@@ -178,8 +178,8 @@ Functions</h2></td></tr>
 
 </div>
 </div>
-<a id="a36374ac4afaaca0a72be2fb95a909869" name="a36374ac4afaaca0a72be2fb95a909869"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a36374ac4afaaca0a72be2fb95a909869">&#9670;&#160;</a></span>redisxRunScript()</h2>
+<a id="aebd84c84082d2367d8cbe233cfe14535" name="aebd84c84082d2367d8cbe233cfe14535"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aebd84c84082d2367d8cbe233cfe14535">&#9670;&#160;</a></span>redisxRunScript()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -206,7 +206,13 @@ Functions</h2></td></tr>
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype">const char **&#160;</td>
-          <td class="paramname"><em>params</em>&#160;</td>
+          <td class="paramname"><em>params</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">int *&#160;</td>
+          <td class="paramname"><em>status</em>&#160;</td>
         </tr>
         <tr>
           <td></td>
@@ -222,6 +228,7 @@ Functions</h2></td></tr>
     <tr><td class="paramname">sha1</td><td>The SHA1 sum of the script that was previously loaded into the <a class="el" href="structRedis.html" title="Structure that represents a Redis database instance, with one or more RedisClient connections.">Redis</a> DB. </td></tr>
     <tr><td class="paramname">keys</td><td>A NULL-terminated array of <a class="el" href="structRedis.html" title="Structure that represents a Redis database instance, with one or more RedisClient connections.">Redis</a> keywords, or NULL if the script does not take any keyword argument. </td></tr>
     <tr><td class="paramname">params</td><td>A NULL-terminated array of additional parameters to pass onto the script, or NULL if the script does not take any parameters. </td></tr>
+    <tr><td class="paramname">status</td><td>Pointer to int in which to return status, or NULL if not required. </td></tr>
   </table>
   </dd>
 </dl>
@@ -230,7 +237,7 @@ Functions</h2></td></tr>
 <dd>
 <a class="el" href="redisx-script_8c.html#ae8930592b8f927a154508669132bebab">redisxLoadScript()</a> </dd></dl>
 
-<p class="reference">References <a class="el" href="structRedis.html#af51011d99955d6f036a9f2c291577749">Redis::interactive</a>, <a class="el" href="redisx_8c.html#a0cdebfd895ab4c61c0fc9e0863a66419">redisxCheckValid()</a>, <a class="el" href="redisx-client_8c.html#aad864c08ef9365c264c30bbacb0b77b2">redisxLockConnected()</a>, <a class="el" href="redisx-client_8c.html#abc855133c2af4f5d929a05292aa634d1">redisxReadReplyAsync()</a>, <a class="el" href="redisx-script_8c.html#a711d6ba68a67ab814ddda0adc998a2ce">redisxRunScriptAsync()</a>, <a class="el" href="redisx-client_8c.html#a87efe53c80fcff3fcf189362cbc602f7">redisxUnlockClient()</a>, <a class="elRef" href="../../xchange/apidoc/html/xchange_8c.html#ae73aaf705dc4e7d58dfb0fd81f4805c7">x_error()</a>, <a class="elRef" href="../../xchange/apidoc/html/xchange_8h.html#a7b2679c964ea5f2160380ed55654b873">X_SUCCESS</a>, and <a class="elRef" href="../../xchange/apidoc/html/xchange_8c.html#ac39ae03ca89b115d49a12f633522dc31">x_trace_null()</a>.</p>
+<p class="reference">References <a class="el" href="structRedis.html#af51011d99955d6f036a9f2c291577749">Redis::interactive</a>, <a class="el" href="redisx_8c.html#a0cdebfd895ab4c61c0fc9e0863a66419">redisxCheckValid()</a>, <a class="el" href="redisx-client_8c.html#aad864c08ef9365c264c30bbacb0b77b2">redisxLockConnected()</a>, <a class="el" href="redisx-client_8c.html#a06c5b62c7b92c83af8f080dd1bb91b17">redisxReadReplyAsync()</a>, <a class="el" href="redisx-script_8c.html#a711d6ba68a67ab814ddda0adc998a2ce">redisxRunScriptAsync()</a>, <a class="el" href="redisx-client_8c.html#a87efe53c80fcff3fcf189362cbc602f7">redisxUnlockClient()</a>, <a class="elRef" href="../../xchange/apidoc/html/xchange_8c.html#ae73aaf705dc4e7d58dfb0fd81f4805c7">x_error()</a>, <a class="elRef" href="../../xchange/apidoc/html/xchange_8h.html#a7b2679c964ea5f2160380ed55654b873">X_SUCCESS</a>, and <a class="elRef" href="../../xchange/apidoc/html/xchange_8c.html#ac39ae03ca89b115d49a12f633522dc31">x_trace_null()</a>.</p>
 
 </div>
 </div>
@@ -282,7 +289,7 @@ Functions</h2></td></tr>
   </dd>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>X_SUCCESS (0) if successful or else X_NULL if the <code>redis</code> or <code>sha1</code> parameters are NULL, or else an error code (&lt;0) from <a class="el" href="redisx-client_8c.html#a17de2c4323d3da4b3a3d386d85c12d8e">redisxSendArrayRequestAsync()</a>.</dd></dl>
-<dl class="section see"><dt>See also</dt><dd><a class="el" href="redisx-script_8c.html#a36374ac4afaaca0a72be2fb95a909869">redisxRunScript()</a> </dd>
+<dl class="section see"><dt>See also</dt><dd><a class="el" href="redisx-script_8c.html#aebd84c84082d2367d8cbe233cfe14535">redisxRunScript()</a> </dd>
 <dd>
 <a class="el" href="redisx-script_8c.html#ae8930592b8f927a154508669132bebab">redisxLoadScript()</a> </dd>
 <dd>

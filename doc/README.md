@@ -66,7 +66,7 @@ Before then the API may undergo slight changes and tweaks. Use the repository as
  | RESP to JSON                      |  __yes__   | via `xchange` library                                        |
  | RESP to structured data           |  __yes__   | via `xchange` library                                        |
  | debug error tracing               |  __yes__   | via `xSetDebug()`                                            |
- 
+ | command-line client               |  __yes__   | `redisx-cli`                                                 | 
 
 #### Redis / Valkey Features
  
@@ -83,9 +83,8 @@ Before then the API may undergo slight changes and tweaks. Use the repository as
  | Sentinel support                  |  __yes__   | _help me test it_                                            |
  | cluster support                   |    no      | _coming soon..._                                             |
  | TLS support                       |    no      | _coming soon..._                                             |
- | resubscribe on reconnect          |    no      | _coming soon..._                                             |
- | command-line client               |  __yes__   | `redisx-cli`                                                 |
- 
+ | resubscribe on reconnect          |    no      |                                                              |
+
 
 ### Related links
 
@@ -267,7 +266,12 @@ using with a set of [Redis Sentinel](https://redis.io/docs/latest/develop/refere
 ```
 
 After successful initialization, you may proceed with the configuration the same way as for the regular standalone
-server connection.
+server connection. 
+
+One thing to keep in mind about Sentinel is that once the connection to the master is established, it works just like
+a regular server connection, including the possibility of that connection being broken. It is up to the application
+to initiate reconnection and recovery as appropriate in case of errors. (See more in on [Reconnecting](#reconnecting)
+further below).
 
 
 <a name="configuring"></a>
@@ -308,7 +312,7 @@ Optionally, you can select the database index to use now (or later, after connec
 Note, that you can switch the database index any time, with the caveat that it's not possible to change it for the 
 subscription client when there are active subscriptions.
 
-
+<a name="socket-configuration"></a>
 #### Socket-level configuration
 
 You might also tweak the socket options used for clients, if you find the socket defaults sub-optimal for your 
@@ -340,12 +344,12 @@ which you can then apply to your Redis instance as:
 ```
 
 <a name="connection-hooks"></a>
-#### Connection hooks
+#### Connection &amp; disconnection hooks
 
-The user of the __RedisX__ library might want to know when connections to the server are established, or when 
-disconnections happen, and may want to perform some configuration or clean-up accordingly. For this reason, the 
-library provides support for connection 'hooks' -- that is custom functions that are called in the even of connecting 
-to or disconnecting from a Redis server.
+The user of the __RedisX__ library might want to know when connections to the server are established, or when clients
+get disconnected (either as intended or as a result of errors), and may want to perform some configuration or clean-up 
+accordingly. For this reason, the library provides support for connection 'hooks' -- that is custom functions that are 
+called in the even of connecting to or disconnecting from a Redis server.
 
 Here is an example of a connection hook, which simply prints a message about the connection to the console.
 
@@ -363,7 +367,11 @@ And, it can be added to a Redis instance, between the `redisxInit()` and the `re
   redisxAddConnectHook(redis, my_connect_hook);
 ```
 
-The same goes for disconnect hooks, using `redisxAddDisconnectHook()` instead.
+You may add multiple callbacks. All of them will be called (in the same order as added) when connection is 
+established. You may also remove specific connection callbacks via `redisxRemoveConnectHook()` if you now longer want
+a particular function to be called any more in the even.
+
+The same goes for disconnect hooks, using `redisxAddDisconnectHook()` / `redisxRemoveDisconnectHook()` instead.
 
 
 <a name="connecting"></a>
@@ -412,6 +420,19 @@ And then to free up all resources used by the `Redis` instance, you might also c
   redis = NULL;
 ```
 
+<a name="reconnecting"></a>
+### Reconnecting
+
+Reconnections to the Redis servers are never automatic, and there is no automatic failover for __RedisX__ clients
+(there are good reasons for that). It is up to you to decide when to reconnect and how exactly. For example, the 
+application may reconnect to the same or different server (including Sentinel), and perform a set of necessary 
+recovery steps, to continue where things were left off on the previous connection, such as:
+
+ - reload LUA scripts
+ - reinstate subscriptions
+ - re-submit any request for which no replies have been received before the connection was broken.
+ - re-publish any notifications on PUB/SUB, which may not have been delivered.
+ 
 
 -----------------------------------------------------------------------------
 
@@ -939,11 +960,16 @@ atomically. Such an execution block in __RedisX__ may look something like:
   ...
 
   // Execute the block of commands above atomically, and get the resulting RESP
-  result = redisxExecBlockAsync(cl);
+  result = redisxExecBlockAsync(cl, &status);
   // -------------------------------------------------------------------------
   
   // Release exlusive access to the client
   redisxUnlockClient(cl);
+  
+  if(status != X_SUCCESS) {
+    // Oops, the block execition failed...
+    return status;
+  }
   
   // Inspect the RESP, etc...
   ... 
@@ -988,8 +1014,10 @@ its SHA1 sum, a set of Redis keys the script may use, and a set of other paramet
   char *keyArgs[] = { "my-redis-key-argument", NULL }; // NULL-terminated array of keyword arguments
   char *params[] = { "some-string", "-1.11", NULL };   // NULL-terminated array of extra parameters
   
+  int status;     // We will return error status in this variable
+  
   // Execute the script, with the specified keyword arguments and parameters
-  RESP *reply = redisxRunScript(redis, scriptSHA1, keyArgs, params);
+  RESP *reply = redisxRunScript(redis, scriptSHA1, keyArgs, params, &status);
 
   // Check and inspect the reply
   ...
@@ -1057,7 +1085,11 @@ while we have exclusive access to the client, might look something like this:
   
   if(status == X_SUCCESS) {
     // Read the response
-    RESP *reply = redisxReadReplyAsync(cl);
+    RESP *reply = redisxReadReplyAsync(cl, &status);
+    if(status != X_SUCCESS) {
+      // Ooops, not the reply what we expected...
+      ...
+    }
     
     // check and process the response
     if(redisxCheckRESP(reply, ...) != X_SUCCESS) {
@@ -1273,6 +1305,41 @@ Then activate it as:
 
 After that, every time there is an error with sending or receiving packets over the network to any of the Redis
 clients used, your handler will report it the way you want it.
+
+### Socket-level errors
+
+There are multiple ways the user may get informed when errors happen at the socket read / write level:
+
+ - __RedisX__ will propagate and report errors from failed socket reads and writes, both via return values to its 
+   functions (via `X_NO_SERVICE` error code or `NULL` returns, plus `errno`), and
+   
+ - __RedisX__ will call the configured socket error handler callback function (see above) as soon as the error is 
+   encountered.
+   
+ - __RedisX__ will call all disconnect hooks configured if the client disconnects (either as intended or 
+   unexpectedly as a result of a persistent socket-level error).
+
+It is up to you to decide which of the following method(s) you wish to rely on to detect broken connections and
+act as appropriate. To help with your decisions, below is a step-by-step outline of how __RedisX__ handles errors
+originating from the socket level of clients, indicating also the points at which users are notified by each of the
+above mentioned methods.
+
+ 1. The socket error handler (if configured) callback is immediately after a read or write error is detected on a 
+    client's socket. The error handler callback function is called while the affected client is still locked and 
+    nominally in a 'functioning' state. That means you are free to use any `Async` call on the affected client as 
+    appropriate, but the error handler should not attempt to release the exclusive lock on the client or call
+    synchronized functions. The background processing of replies (on the pipeline and/or subscription clients) is 
+    still active at this stage.
+    
+ 2. If the error is caused by a timeout (`errno` being `EAGAIN` or `EWOULDBLOCK`), nothing changes at this stage.
+    However, if the error is persistent, the client will be disabled and reset, and subsequent read or write calls 
+    will fail immediately. Any disconnection hooks will be called also as the client is disconnected. The background 
+    processing of server replies (on the pipeline and subscriptions channels) will stop soon after the disconnection
+    is initiated.
+    
+ 3. The __RedisX__ call return either `X_NO_SERVICE`, or `X_TIMEDOUT`, or else `NULL`. The application should check 
+    return values (and `errno`) as appropriate.
+
 
 -----------------------------------------------------------------------------
 

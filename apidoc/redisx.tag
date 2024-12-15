@@ -498,8 +498,8 @@
       <type>RESP *</type>
       <name>redisxExecBlockAsync</name>
       <anchorfile>redisx_8h.html</anchorfile>
-      <anchor>a6fed65f9413569c771d5165a0194477a</anchor>
-      <arglist>(RedisClient *cl)</arglist>
+      <anchor>a766ad80d9b84f4ca16be3da08e1968c9</anchor>
+      <arglist>(RedisClient *cl, int *pStatus)</arglist>
     </member>
     <member kind="function">
       <type>RESP *</type>
@@ -785,8 +785,8 @@
       <type>RESP *</type>
       <name>redisxReadReplyAsync</name>
       <anchorfile>redisx_8h.html</anchorfile>
-      <anchor>abc855133c2af4f5d929a05292aa634d1</anchor>
-      <arglist>(RedisClient *cl)</arglist>
+      <anchor>a06c5b62c7b92c83af8f080dd1bb91b17</anchor>
+      <arglist>(RedisClient *cl, int *pStatus)</arglist>
     </member>
     <member kind="function">
       <type>int</type>
@@ -836,6 +836,13 @@
       <anchorfile>redisx_8h.html</anchorfile>
       <anchor>adc7235cd1b6be038b9f3c7beb11a13ef</anchor>
       <arglist>(const char *name, const RESP *resp)</arglist>
+    </member>
+    <member kind="function">
+      <type>RESP *</type>
+      <name>redisxRunScript</name>
+      <anchorfile>redisx_8h.html</anchorfile>
+      <anchor>aebd84c84082d2367d8cbe233cfe14535</anchor>
+      <arglist>(Redis *redis, const char *sha1, const char **keys, const char **params, int *status)</arglist>
     </member>
     <member kind="function">
       <type>char **</type>
@@ -1056,8 +1063,8 @@
       <type>RESP *</type>
       <name>redisxExecBlockAsync</name>
       <anchorfile>redisx-client_8c.html</anchorfile>
-      <anchor>a6fed65f9413569c771d5165a0194477a</anchor>
-      <arglist>(RedisClient *cl)</arglist>
+      <anchor>a766ad80d9b84f4ca16be3da08e1968c9</anchor>
+      <arglist>(RedisClient *cl, int *pStatus)</arglist>
     </member>
     <member kind="function">
       <type>const RESP *</type>
@@ -1105,8 +1112,8 @@
       <type>RESP *</type>
       <name>redisxReadReplyAsync</name>
       <anchorfile>redisx-client_8c.html</anchorfile>
-      <anchor>abc855133c2af4f5d929a05292aa634d1</anchor>
-      <arglist>(RedisClient *cl)</arglist>
+      <anchor>a06c5b62c7b92c83af8f080dd1bb91b17</anchor>
+      <arglist>(RedisClient *cl, int *pStatus)</arglist>
     </member>
     <member kind="function">
       <type>int</type>
@@ -1202,6 +1209,13 @@
     <name>redisx-net.c</name>
     <path>src/</path>
     <filename>redisx-net_8c.html</filename>
+    <member kind="function">
+      <type>void</type>
+      <name>rCloseClientAsync</name>
+      <anchorfile>redisx-net_8c.html</anchorfile>
+      <anchor>abc9dd988935375c5459bcaa09c17fa47</anchor>
+      <arglist>(RedisClient *cl)</arglist>
+    </member>
     <member kind="function">
       <type>void *</type>
       <name>RedisPipelineListener</name>
@@ -1309,8 +1323,8 @@
       <type>RESP *</type>
       <name>redisxRunScript</name>
       <anchorfile>redisx-script_8c.html</anchorfile>
-      <anchor>a36374ac4afaaca0a72be2fb95a909869</anchor>
-      <arglist>(Redis *redis, const char *sha1, const char **keys, const char **params)</arglist>
+      <anchor>aebd84c84082d2367d8cbe233cfe14535</anchor>
+      <arglist>(Redis *redis, const char *sha1, const char **keys, const char **params, int *status)</arglist>
     </member>
     <member kind="function">
       <type>int</type>
@@ -1951,9 +1965,11 @@
     <docanchor file="index.html">managing-redis-server-connections</docanchor>
     <docanchor file="index.html">initializing</docanchor>
     <docanchor file="index.html">configuring</docanchor>
+    <docanchor file="index.html">socket-configuration</docanchor>
     <docanchor file="index.html">connection-hooks</docanchor>
     <docanchor file="index.html">connecting</docanchor>
     <docanchor file="index.html">disconnecting</docanchor>
+    <docanchor file="index.html">reconnecting</docanchor>
     <docanchor file="index.html">simple-redis-queries</docanchor>
     <docanchor file="index.html">interactive-transactions</docanchor>
     <docanchor file="index.html">attributes</docanchor>
