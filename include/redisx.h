@@ -279,7 +279,24 @@ typedef struct Redis {
 typedef void (*RedisSubscriberCall)(const char *pattern, const char *channel, const char *msg, long length);
 
 /**
- * User-specified callback function for handling RedisX errors.
+ * User-specified callback function for handling RedisX errors from socket-level read / write calls.
+ * It's mainly there for the application to perform any cleanup as necessary or to report the error. However,
+ * it can also interacti with the Redis instance in limited ways. The implementation should follow a set of
+ * basic rules:
+ *
+ * <ul>
+ * <li>It should not call synchronized functions on the affected client, including attempts to connect,
+ * disconnect, or reconnect the client.</li>
+ * <li>It may call `Async` functions for the client (the client is in a locked state when the handler is
+ * called).</li>
+ * <li>It should not attempt to lock or unlock the affected client.</li>
+ * <li>It may use `errno` to gather information about the source of the error, and may even change or reset
+ * `errno`, to change behavior (e.g. re-setting to `EAGAIN` or `EWOULBLOCK` will keep the client connected
+ * and the return status of the failed call will become X_TIMEDOUT; or setting it to any other value will
+ * disconnect the client and the failed call will return X_NO_SERVICE instead.).</li>
+ * <li>The limitations can by bypassed by placing the error on a queue and let an asynchronous thread
+ * take it from there.</li>
+ * </ul>
  *
  * @param redis     Pointer to the RedisX instance
  * @param channel   the channel over which the error occurred
