@@ -1329,10 +1329,10 @@ act as appropriate. To help with your decisions, below is a step-by-step outline
 originating from the socket level of clients, indicating also the points at which users are notified by each of the
 above mentioned methods.
 
- 1. The socket error handler (if configured) callback is immediately after a read or write error is detected on a 
-    client's socket. The error handler callback function is called while the affected client is still locked and 
-    nominally in a 'functioning' state. That means you are free to use any `Async` call on the affected client as 
-    appropriate, but the error handler should not attempt to release the exclusive lock on the client or call
+ 1. The socket error handler (if configured) callback function is called is immediately after a read or write error 
+    is detected on a client's socket. The error handler callback function is called while the affected client is still 
+    locked and nominally in a 'functioning' state. That means you are free to use any `Async` call on the affected 
+    client as appropriate, but the error handler should not attempt to release the exclusive lock on the client or call
     synchronized functions on the Redis instance or the affected client. The background processing of replies (on 
     the pipeline and/or subscription clients) is still active at this stage.
     
