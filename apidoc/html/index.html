@@ -831,6 +831,11 @@ LUA script loading and execution</h3>
 <div class="line"><span class="comment">// Execute the script, with the specified keyword arguments and parameters</span></div>
 <div class="line"><a class="code hl_struct" href="structRESP.html">RESP</a> *reply = <a class="code hl_function" href="redisx-script_8c.html#aebd84c84082d2367d8cbe233cfe14535">redisxRunScript</a>(redis, scriptSHA1, keyArgs, params, &amp;status);</div>
 <div class="line"> </div>
+<div class="line"><span class="keywordflow">if</span>(status != X_SUCCESS) {</div>
+<div class="line">   <span class="comment">// Oops, failed to run script...</span></div>
+<div class="line">   ...</div>
+<div class="line">}</div>
+<div class="line"> </div>
 <div class="line"><span class="comment">// Check and inspect the reply</span></div>
 <div class="line">...</div>
 <div class="ttc" id="aredisx-script_8c_html_aebd84c84082d2367d8cbe233cfe14535"><div class="ttname"><a href="redisx-script_8c.html#aebd84c84082d2367d8cbe233cfe14535">redisxRunScript</a></div><div class="ttdeci">RESP * redisxRunScript(Redis *redis, const char *sha1, const char **keys, const char **params, int *status)</div><div class="ttdef"><b>Definition</b> redisx-script.c:122</div></div>
@@ -1022,7 +1027,7 @@ Socket-level errors</h3>
 </ul>
 <p>It is up to you to decide which of the following method(s) you wish to rely on to detect broken connections and act as appropriate. To help with your decisions, below is a step-by-step outline of how <b>RedisX</b> handles errors originating from the socket level of clients, indicating also the points at which users are notified by each of the above mentioned methods.</p>
 <ol type="1">
-<li>The socket error handler (if configured) callback is immediately after a read or write error is detected on a client's socket. The error handler callback function is called while the affected client is still locked and nominally in a 'functioning' state. That means you are free to use any <code>Async</code> call on the affected client as appropriate, but the error handler should not attempt to release the exclusive lock on the client or call synchronized functions. The background processing of replies (on the pipeline and/or subscription clients) is still active at this stage.</li>
+<li>The socket error handler (if configured) callback is immediately after a read or write error is detected on a client's socket. The error handler callback function is called while the affected client is still locked and nominally in a 'functioning' state. That means you are free to use any <code>Async</code> call on the affected client as appropriate, but the error handler should not attempt to release the exclusive lock on the client or call synchronized functions on the <a class="el" href="structRedis.html" title="Structure that represents a Redis database instance, with one or more RedisClient connections.">Redis</a> instance or the affected client. The background processing of replies (on the pipeline and/or subscription clients) is still active at this stage.</li>
 <li>If the error is caused by a timeout (<code>errno</code> being <code>EAGAIN</code> or <code>EWOULDBLOCK</code>), nothing changes at this stage. However, if the error is persistent, the client will be disabled and reset, and subsequent read or write calls will fail immediately. Any disconnection hooks will be called also as the client is disconnected. The background processing of server replies (on the pipeline and subscriptions channels) will stop soon after the disconnection is initiated.</li>
 <li>The <b>RedisX</b> call return either <code>X_NO_SERVICE</code>, or <code>X_TIMEDOUT</code>, or else <code>NULL</code>. The application should check return values (and <code>errno</code>) as appropriate.</li>
 </ol>
