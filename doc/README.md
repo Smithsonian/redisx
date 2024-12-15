@@ -1343,7 +1343,7 @@ above mentioned methods.
     is initiated.
     
  3. The __RedisX__ call returns either `X_NO_SERVICE`, or `X_TIMEDOUT`, or else `NULL`. The application should check 
-    return values (and `errno`) as appropriate.
+    return values (and/or `errno`) as appropriate.
 
 
 -----------------------------------------------------------------------------
