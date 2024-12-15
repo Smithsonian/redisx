@@ -478,7 +478,20 @@ The version string for this library
 .SH "Typedef Documentation"
 .PP 
 .SS "typedef void(* RedisErrorHandler) (\fBRedis\fP *redis, enum \fBredisx_channel\fP channel, const char *op)"
-User-specified callback function for handling RedisX errors\&.
+User-specified callback function for handling RedisX errors from socket-level read / write calls\&. It's mainly there for the application to perform any cleanup as necessary or to report the error\&. However, it can also interacti with the \fBRedis\fP instance in limited ways\&. The implementation should follow a set of basic rules:
+.PP
+.PD 0
+.IP "\(bu" 2
+It should not call synchronized functions on the affected client, including attempts to connect, disconnect, or reconnect the client\&. 
+.IP "\(bu" 2
+It may call \fCAsync\fP functions for the client (the client is in a locked state when the handler is called)\&. 
+.IP "\(bu" 2
+It should not attempt to lock or unlock the affected client\&. 
+.IP "\(bu" 2
+It may use \fCerrno\fP to gather information about the source of the error, and may even change or reset \fCerrno\fP, to change behavior (e\&.g\&. re-setting to \fCEAGAIN\fP or \fCEWOULBLOCK\fP will keep the client connected and the return status of the failed call will become X_TIMEDOUT; or setting it to any other value will disconnect the client and the failed call will return X_NO_SERVICE instead\&.)\&. 
+.IP "\(bu" 2
+The limitations can by bypassed by placing the error on a queue and let an asynchronous thread take it from there\&. 
+.PP
 .PP
 \fBParameters\fP
 .RS 4

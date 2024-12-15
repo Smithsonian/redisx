@@ -521,7 +521,19 @@ Functions</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
-<p>User-specified callback function for handling RedisX errors.</p>
+<p>User-specified callback function for handling RedisX errors from socket-level read / write calls. It's mainly there for the application to perform any cleanup as necessary or to report the error. However, it can also interacti with the <a class="el" href="structRedis.html" title="Structure that represents a Redis database instance, with one or more RedisClient connections.">Redis</a> instance in limited ways. The implementation should follow a set of basic rules:</p>
+<ul>
+<li>
+It should not call synchronized functions on the affected client, including attempts to connect, disconnect, or reconnect the client. </li>
+<li>
+It may call <code>Async</code> functions for the client (the client is in a locked state when the handler is called). </li>
+<li>
+It should not attempt to lock or unlock the affected client. </li>
+<li>
+It may use <code>errno</code> to gather information about the source of the error, and may even change or reset <code>errno</code>, to change behavior (e.g. re-setting to <code>EAGAIN</code> or <code>EWOULBLOCK</code> will keep the client connected and the return status of the failed call will become X_TIMEDOUT; or setting it to any other value will disconnect the client and the failed call will return X_NO_SERVICE instead.). </li>
+<li>
+The limitations can by bypassed by placing the error on a queue and let an asynchronous thread take it from there. </li>
+</ul>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">redis</td><td>Pointer to the RedisX instance </td></tr>

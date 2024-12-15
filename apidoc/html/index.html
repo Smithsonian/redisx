@@ -707,7 +707,7 @@ Broadcasting messages</h3>
 <div class="line"> </div>
 <div class="line"><span class="comment">// publish a message to the &quot;hello_channel&quot; subscribers.</span></div>
 <div class="line">int status = <a class="code hl_function" href="redisx-sub_8c.html#a3ae6a78cececda6a1a495eebefbd57e9">redisxPublish</a>(redis, <span class="stringliteral">&quot;hello_channel&quot;</span>, <span class="stringliteral">&quot;Hello world!&quot;</span>, 0);</div>
-<div class="ttc" id="aredisx-sub_8c_html_a3ae6a78cececda6a1a495eebefbd57e9"><div class="ttname"><a href="redisx-sub_8c.html#a3ae6a78cececda6a1a495eebefbd57e9">redisxPublish</a></div><div class="ttdeci">int redisxPublish(Redis *redis, const char *channel, const char *data, int length)</div><div class="ttdef"><b>Definition</b> redisx-sub.c:142</div></div>
+<div class="ttc" id="aredisx-sub_8c_html_a3ae6a78cececda6a1a495eebefbd57e9"><div class="ttname"><a href="redisx-sub_8c.html#a3ae6a78cececda6a1a495eebefbd57e9">redisxPublish</a></div><div class="ttdeci">int redisxPublish(Redis *redis, const char *channel, const char *data, int length)</div><div class="ttdef"><b>Definition</b> redisx-sub.c:145</div></div>
 </div><!-- fragment --><p>The last argument is an optional string length, if readily available, or if sending a byte sequence that is not null-terminated. If zero is used for the length, as in the example above, it will automatically determine the length of the 0-terminated string message using <code>strlen()</code>.</p>
 <p>Alternatively, you may use the <code><a class="el" href="redisx-sub_8c.html#a89b6c2128548882616c081553ea2436c">redisxPublishAsync()</a></code> instead if you want to publish on a subscription client to which you have already have exclusive access (e.g. after an appropriate <code><a class="el" href="redisx-client_8c.html#aad864c08ef9365c264c30bbacb0b77b2">redisxLockConnected()</a></code> call).</p>
 <p><a class="anchor" id="subscriptions"></a> </p>
@@ -729,7 +729,7 @@ Subscriptions</h3>
 <div class="line">  <span class="comment">// Oops, something went wrong...</span></div>
 <div class="line">  ...</div>
 <div class="line">}</div>
-<div class="ttc" id="aredisx-sub_8c_html_a4c268c33f23438af67117b09c26ec615"><div class="ttname"><a href="redisx-sub_8c.html#a4c268c33f23438af67117b09c26ec615">redisxAddSubscriber</a></div><div class="ttdeci">int redisxAddSubscriber(Redis *redis, const char *channelStem, RedisSubscriberCall f)</div><div class="ttdef"><b>Definition</b> redisx-sub.c:208</div></div>
+<div class="ttc" id="aredisx-sub_8c_html_a4c268c33f23438af67117b09c26ec615"><div class="ttname"><a href="redisx-sub_8c.html#a4c268c33f23438af67117b09c26ec615">redisxAddSubscriber</a></div><div class="ttdeci">int redisxAddSubscriber(Redis *redis, const char *channelStem, RedisSubscriberCall f)</div><div class="ttdef"><b>Definition</b> redisx-sub.c:211</div></div>
 </div><!-- fragment --><p>We should also start subscribing to specific channels and/or channel patterns.</p>
 <div class="fragment"><div class="line"><a class="code hl_struct" href="structRedis.html">Redis</a> *redis = ...</div>
 <div class="line"> </div>
@@ -739,7 +739,7 @@ Subscriptions</h3>
 <div class="line">  <span class="comment">// Oops, something went wrong...</span></div>
 <div class="line">  ...</div>
 <div class="line">}</div>
-<div class="ttc" id="aredisx-sub_8c_html_a0aa27b4fce0d0986cae75dfe7fa12f19"><div class="ttname"><a href="redisx-sub_8c.html#a0aa27b4fce0d0986cae75dfe7fa12f19">redisxSubscribe</a></div><div class="ttdeci">int redisxSubscribe(Redis *redis, const char *pattern)</div><div class="ttdef"><b>Definition</b> redisx-sub.c:353</div></div>
+<div class="ttc" id="aredisx-sub_8c_html_a0aa27b4fce0d0986cae75dfe7fa12f19"><div class="ttname"><a href="redisx-sub_8c.html#a0aa27b4fce0d0986cae75dfe7fa12f19">redisxSubscribe</a></div><div class="ttdeci">int redisxSubscribe(Redis *redis, const char *pattern)</div><div class="ttdef"><b>Definition</b> redisx-sub.c:356</div></div>
 </div><!-- fragment --><p>The <code><a class="el" href="redisx-sub_8c.html#a0aa27b4fce0d0986cae75dfe7fa12f19">redisxSubscribe()</a></code> function will translate to either a <a class="el" href="structRedis.html" title="Structure that represents a Redis database instance, with one or more RedisClient connections.">Redis</a> <code>PSUBSCRIBE</code> or <code>SUBSCRIBE</code> command, depending on whether the <code>pattern</code> argument contains globbing patterns or not (respectively).</p>
 <p>Now, we are capturing and processing all messages published to channels whose name begins with <code>"event:"</code>, using our custom <code>my_event_processor</code> function.</p>
 <p>To end the subscription, we trace back the same steps by calling <code><a class="el" href="redisx-sub_8c.html#accafa9bf1ced851cc2e95c2d9fa1e9f8">redisxUnsubscribe()</a></code> to stop receiving further messages to the subscription channel or pattern, and by removing the <code>my_event_procesor</code> subscriber function as appropriate (provided no other subscription needs it) via <code>redisxRemoveSubscriber()</code>.</p>
