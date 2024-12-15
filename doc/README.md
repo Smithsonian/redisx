@@ -1333,8 +1333,8 @@ above mentioned methods.
     client's socket. The error handler callback function is called while the affected client is still locked and 
     nominally in a 'functioning' state. That means you are free to use any `Async` call on the affected client as 
     appropriate, but the error handler should not attempt to release the exclusive lock on the client or call
-    synchronized functions on the Redis instance or the affected client. The background processing of replies (on 
-    the pipeline and/or subscription clients) is still active at this stage.
+    synchronized functions. The background processing of replies (on the pipeline and/or subscription clients) is 
+    still active at this stage.
     
  2. If the error is caused by a timeout (`errno` being `EAGAIN` or `EWOULDBLOCK`), nothing changes at this stage.
     However, if the error is persistent, the client will be disabled and reset, and subsequent read or write calls 
