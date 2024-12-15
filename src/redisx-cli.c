@@ -190,35 +190,35 @@ int main(int argc, const char *argv[]) {
   struct poptOption options[] = { //
           {"host",       'h', POPT_ARG_STRING | POPT_ARGFLAG_SHOW_DEFAULT,    &host,     0, "Server hostname.", "<hostname>"}, //
           {"port",       'p', POPT_ARG_INT    | POPT_ARGFLAG_SHOW_DEFAULT,    &port,     0, "Server port.", "<port>"}, //
-          {"timeout",    't', POPT_ARG_DOUBLE, &timeout,    0, "Server connection timeout (decimals allowed).", "<seconds>"}, //
-          {"pass",       'a', POPT_ARG_STRING, &password,   0, "Password to use when connecting to the server.", "<password>"}, //
-          {"user",        0, POPT_ARG_STRING, &user,       0, "Used to send ACL style 'AUTH username pass'. Needs -a.", "<username>"}, //
-          {"askpass",     0, POPT_ARG_NONE,   &askpass,    0, "Force user to input password with mask from STDIN.  " //
+          {"timeout",    't', POPT_ARG_DOUBLE, &timeout,   0, "Server connection timeout (decimals allowed).", "<seconds>"}, //
+          {"pass",       'a', POPT_ARG_STRING, &password,  0, "Password to use when connecting to the server.", "<password>"}, //
+          {"user",         0, POPT_ARG_STRING, &user,      0, "Used to send ACL style 'AUTH username pass'. Needs -a.", "<username>"}, //
+          {"askpass",      0, POPT_ARG_NONE,   &askpass,   0, "Force user to input password with mask from STDIN.  " //
                   "If this argument is used, '-a' will be ignored.", NULL //
           }, //
-          {"repeat",    'r', POPT_ARG_INT,    &repeat,     0, "Execute specified command N times.", "<times>"}, //
-          {"interval",  'i', POPT_ARG_DOUBLE | POPT_ARGFLAG_SHOW_DEFAULT, &interval, 0, "When -r is used, waits <interval> seconds per command.  " //
+          {"repeat",    'r', POPT_ARG_INT,    &repeat,     0, "Execute specified command this many times.", "<times>"}, //
+          {"interval",  'i', POPT_ARG_DOUBLE | POPT_ARGFLAG_SHOW_DEFAULT, &interval,     0, "When -r is used, waits this many seconds before repeating.  " //
                   "It is possible to specify sub-second times like -i 0.1.", "<seconds>" //
           }, //
-          {"db",        'n', POPT_ARG_INT,    &dbIndex,    0, "Database number.", "<index>"}, //
+          {"db",        'n', POPT_ARG_INT     | POPT_ARGFLAG_SHOW_DEFAULT, &dbIndex,     0, "Database number.", "<index>"}, //
           {"RESP2",     '2', POPT_ARG_VAL,    &protocol,   2, "Start session in RESP2 protocol mode.", NULL}, //
           {"RESP3",     '3', POPT_ARG_VAL,    &protocol,   3, "Start session in RESP3 protocol mode.", NULL}, //
           {"stdin",     'x', POPT_ARG_VAL,    &input,      0, "Read last argument from STDIN", NULL}, //
           {"json",        0, POPT_ARG_NONE,   NULL,      'j', "Output in JSON format", NULL}, //
           {"raw",         0, POPT_ARG_NONE,   NULL,      'r', "Use raw formatting for replies (with delimiters).", NULL}, //
-          {"delim",     'd', POPT_ARG_STRING  | POPT_ARGFLAG_SHOW_DEFAULT, &delim,      0, "delimiter between elements for raw format.  " //
+          {"delim",     'd', POPT_ARG_STRING  | POPT_ARGFLAG_SHOW_DEFAULT, &delim,       0, "Delimiter between elements for raw format.  " //
                   "You can use JSON convention for escaping special characters.", "<string>" //
           },
-          {"group",     'D', POPT_ARG_STRING  | POPT_ARGFLAG_SHOW_DEFAULT, &groupDelim, 0, "group prefix for raw format.  " //
+          {"group",     'D', POPT_ARG_STRING  | POPT_ARGFLAG_SHOW_DEFAULT, &groupDelim,  0, "Group prefix for raw format.  " //
                   "You can use JSON convention for escaping special characters.", "<string>" //
           },
-          {"show-pushes", 0, POPT_ARG_STRING  | POPT_ARGFLAG_SHOW_DEFAULT, &push,       0, "Whether to print RESP3 PUSH messages.", "yes|no" }, //
+          {"show-pushes", 0, POPT_ARG_STRING  | POPT_ARGFLAG_SHOW_DEFAULT, &push,        0, "Whether to print RESP3 PUSH messages.", "yes|no" }, //
           {"attributes",  0, POPT_ARG_NONE,   &attrib,     0, "Show RESP3 attributes also, if available.", NULL}, //
           {"eval",        0, POPT_ARG_STRING, &push,       0, "Send an EVAL command using the Lua script at <file>.  " //
                   "The keyword and other arguments should be separated with a standalone comma on the command-line, such as: 'key1 key2 , arg1 arg2 ...'", "<file>" //
           },
           {"verbose",     0, POPT_ARG_NONE,   &verbose,    0, "Verbose mode.", NULL }, //
-          {"debug",       0, POPT_ARG_NONE   | POPT_ARGFLAG_DOC_HIDDEN,   &debug  ,    0, "Debug mode. Prints all network traffic.", NULL }, //
+          {"debug",       0, POPT_ARG_NONE   | POPT_ARGFLAG_DOC_HIDDEN,   &debug,       0, "Debug mode. Prints all network traffic.", NULL }, //
           {"version",     0, POPT_ARG_NONE,   NULL,      'v', "Output version and exit.", NULL }, //
 
           POPT_AUTOHELP POPT_TABLEEND //

@@ -145,7 +145,7 @@ INSTALL_PROGRAM ?= install
 INSTALL_DATA ?= install -m 644
 
 .PHONY: install
-install: install-libs install-bin install-headers install-html
+install: install-libs install-bin install-man install-headers install-html
 
 .PHONY: install-libs
 install-libs:
@@ -166,6 +166,13 @@ ifneq ($(wildcard $(BIN)/*),)
 else
 	@echo "WARNING! Skipping bins install: needs 'tools'"
 endif
+
+.PHONY: install-man
+install-man:
+	@echo "installing man pages under $(DESTDIR)$(mandir)."
+	@install -d $(DESTDIR)$(mandir)/man1
+	$(INSTALL_DATA) -D man/man1/* $(DESTDIR)$(mandir)/man1
+
 
 .PHONY: install-headers
 install-headers:
