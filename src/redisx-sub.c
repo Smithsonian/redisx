@@ -550,17 +550,10 @@ void *RedisSubscriptionListener(void *pRedis) {
     if(reply) redisxDestroyRESP(reply);
 
     // Get the new response...
-    reply = redisxReadReplyAsync(cl);
+    reply = redisxReadReplyAsync(cl, NULL);
+    if(!reply) continue;
 
     counter++;
-
-    // In case client was closed while waiting for response, break out...
-    if(!cp->isEnabled) break;
-
-    if(reply == NULL) {
-      fprintf(stderr, "WARNING! Redis-X : invalid subscriber response, errno = %d.\n", errno);
-      continue;
-    }
 
     if(reply->n < 0) {
       if(reply->n != lastError) fprintf(stderr, "ERROR! Redis-X : subscriber parse error: %d.\n", reply->n);

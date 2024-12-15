@@ -109,6 +109,7 @@ int rConfigUnlock(Redis *redis);
 // in redisx-net.c ------------------------>
 int rConnectClient(Redis *redis, enum redisx_channel channel);
 void rCloseClient(RedisClient *cl);
+void rCloseClientAsync(RedisClient *cl);
 boolean rIsLowLatency(const ClientPrivate *cp);
 int rCheckClient(const RedisClient *cl);
 

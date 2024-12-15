@@ -46,7 +46,7 @@ extern int debugTraffic;            ///< Whether to print excerpts of all traffi
  */
 int redisxCheckValid(const Redis *redis) {
   static const char *fn = "rCheckRedis";
-  if(!redis) return x_error(X_NULL, EINVAL, fn, "Redis instamce is NULL");
+  if(!redis) return x_error(X_NULL, EINVAL, fn, "Redis instance is NULL");
   if(!redis->priv) return x_error(X_NO_INIT, EAGAIN, fn, "Redis instance is not initialized");
   return X_SUCCESS;
 }
@@ -396,8 +396,12 @@ static int redisxSelectDBAsync(RedisClient *cl, int idx, boolean confirm) {
   prop_error(fn, redisxSendRequestAsync(cl, "SELECT", sval, NULL, NULL));
 
   if(confirm) {
-    RESP *reply = redisxReadReplyAsync(cl);
-    int status = redisxCheckRESP(reply, RESP_SIMPLE_STRING, 0);
+    int status = X_SUCCESS;
+    RESP *reply = redisxReadReplyAsync(cl, &status);
+
+    prop_error(fn, status);
+
+    status = redisxCheckRESP(reply, RESP_SIMPLE_STRING, 0);
     if(!status) if(strcmp("OK", (char *) reply->value) != 0)
       status = x_error(REDIS_UNEXPECTED_RESP, ENOMSG, fn, "expected 'OK', got '%s'", (char *) reply->value);
     redisxDestroyRESP(reply);
@@ -617,11 +621,12 @@ RESP *redisxRequest(Redis *redis, const char *command, const char *arg1, const c
  *                  and the length argument itself may be NULL to determine the lengths of all
  *                  string arguments automatically.
  * \param n         Number of string arguments.
- * \param status    Pointer to the return error status, which is either
+ * \param status    Pointer to the return error status. If not NULL, it will be populated with one of:
  *
  *                      X_SUCCESS       on success.
  *                      X_NO_INIT       if the Redis client librarywas not initialized via initRedis.
  *                      X_NULL          if the argument is NULL or n<1.
+ *                      X_TIMEDOUT      if the reading of the response timed out.
  *                      X_NO_SERVICE    if not connected to Redis.
  *                      X_FAILURE       If there was a socket level error.
  *
@@ -637,27 +642,39 @@ RESP *redisxArrayRequest(Redis *redis, const char **args, const int *lengths, in
   static const char *fn = "redisxArrayRequest";
   RESP *reply = NULL;
   RedisClient *cl;
+  int s = X_SUCCESS;
 
-  if(redisxCheckValid(redis) != X_SUCCESS) return x_trace_null(fn, NULL);
+  if(status) *status = X_SUCCESS;
 
-  if(args == NULL || n < 1 || status == NULL) {
-    x_error(0, EINVAL, fn, "invalid parameter: args=%p, n=%d, status=%p", args, n, status);
+  if(args == NULL || n < 1) {
+    x_error(0, EINVAL, fn, "invalid parameter: args=%p, n=%d", args, n);
     if(status) *status = X_NULL;
     return NULL;
   }
-  else *status = X_SUCCESS;
+
+  s = redisxCheckValid(redis);
+  if(s != X_SUCCESS) {
+    if(status) *status = s;
+    return x_trace_null(fn, NULL);
+  }
 
   cl = redis->interactive;
-  *status = redisxLockConnected(cl);
-  if(*status) return x_trace_null(fn, NULL);
+  s = redisxLockConnected(cl);
+  if(s) {
+    if(status) *status = s;
+    return x_trace_null(fn, NULL);
+  }
 
   redisxClearAttributesAsync(cl);
 
-  *status = redisxSendArrayRequestAsync(cl, args, lengths, n);
-  if(!(*status)) reply = redisxReadReplyAsync(cl);
+  s = redisxSendArrayRequestAsync(cl, args, lengths, n);
+  if(s == X_SUCCESS) reply = redisxReadReplyAsync(cl, &s);
   redisxUnlockClient(cl);
 
-  if(*status) x_trace_null(fn, NULL);
+  if(s != X_SUCCESS) {
+    if(status) *status = s;
+    x_trace_null(fn, NULL);
+  }
 
   return reply;
 }

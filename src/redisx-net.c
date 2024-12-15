@@ -193,7 +193,9 @@ static int rAuthAsync(RedisClient *cl) {
   int status = p->username ? redisxSendRequestAsync(cl, "AUTH", p->username, p->password, NULL) : redisxSendRequestAsync(cl, "AUTH", p->password, NULL, NULL);
   prop_error(fn, status);
 
-  reply = redisxReadReplyAsync(cl);
+  reply = redisxReadReplyAsync(cl, &status);
+  prop_error(fn, status);
+
   status = redisxCheckRESP(reply, RESP_SIMPLE_STRING, -1);
   redisxDestroyRESP(reply);
 
@@ -412,7 +414,7 @@ static void rDisconnectClientAsync(RedisClient *cl) {
   shutdown(sock, SHUT_RD);
   status = close(sock);
 
-  if(status) fprintf(stderr, "WARNING! Redis-X: client %d close socket error %d.\n", cp->idx, status);
+  if(status) xdprintf("WARNING! Redis-X: client %d close socket error %d.\n", cp->idx, status);
 }
 
 /**
@@ -435,14 +437,13 @@ static void rResetClientAsync(RedisClient *cl) {
 }
 
 /**
- * Closes the Redis client on the specified communication channel. It is assused the caller
- * has an exclusive lock on the Redis configuration to which the client belongs. This
- * call assumes that the caller has an exlusive lock on the client's configuration settings.
+ * Closes the Redis client on the specified communication channel. This call assumes that
+ * the caller has an exlusive lock on the client.
  *
  * \param cl        Pointer to the Redis client instance.
  *
  */
-static void rCloseClientAsync(RedisClient *cl) {
+void rCloseClientAsync(RedisClient *cl) {
   rDisconnectClientAsync(cl);
   rResetClientAsync(cl);
   return;
@@ -657,8 +658,9 @@ static int rHelloAsync(RedisClient *cl, char *clientID) {
   status = redisxSendArrayRequestAsync(cl, args, NULL, k);
   if(status != X_SUCCESS) return status;
 
-  reply = redisxReadReplyAsync(cl);
-  status = redisxCheckRESP(reply, RESP3_MAP, 0);
+  reply = redisxReadReplyAsync(cl, &status);
+  if(!status) status = redisxCheckRESP(reply, RESP3_MAP, 0);
+
   if(status == X_SUCCESS) {
     RedisMapEntry *e = redisxGetKeywordEntry(reply, "proto");
     if(e && e->value->type == RESP_INT) {
@@ -1165,22 +1167,10 @@ void *RedisPipelineListener(void *pRedis) {
     if(reply) redisxDestroyRESP(reply);
 
     // Get a new response...
-    reply = redisxReadReplyAsync(cl);
+    reply = redisxReadReplyAsync(cl, NULL);
+    if(!reply) continue;
 
     counter++;
-
-    // If client was disabled while waiting for response, then break out.
-    if(!cp->isEnabled) {
-      pthread_mutex_lock(&cp->pendingLock);
-      if(cp->pendingRequests > 0) xvprintf("WARNING! pipeline disabled with %d pending requests in queue.\n", cp->pendingRequests);
-      pthread_mutex_unlock(&cp->pendingLock);
-      break;
-    }
-
-    if(reply == NULL) {
-      fprintf(stderr, "WARNING! Redis-X: pipeline null response.\n");
-      continue;
-    }
 
     if(reply->n < 0) {
       if(reply->n != lastError) fprintf(stderr, "ERROR! Redis-X: pipeline parse error: %d.\n", reply->n);
@@ -1202,6 +1192,10 @@ void *RedisPipelineListener(void *pRedis) {
   } // <-- End of listener loop...
 
   xvprintf("Redis-X> Stopped processing pipeline responses (%ld processed)...\n", counter);
+
+  pthread_mutex_lock(&cp->pendingLock);
+  if(cp->pendingRequests > 0) xvprintf("WARNING! pipeline disabled with %d pending requests in queue.\n", cp->pendingRequests);
+  pthread_mutex_unlock(&cp->pendingLock);
 
   rConfigLock(redis);
   // If we are the current listener thread, then mark the listener as disabled.

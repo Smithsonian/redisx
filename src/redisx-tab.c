@@ -173,7 +173,9 @@ int redisxSetValueAsync(RedisClient *cl, const char *table, const char *key, con
   xvprintf("Redis-X> set %s = %s on %s\n", key, value, table);
 
   if(confirm) {
-    RESP *reply = redisxReadReplyAsync(cl);
+    RESP *reply = redisxReadReplyAsync(cl, &status);
+    prop_error(fn, status);
+
     status = redisxCheckRESP(reply, RESP_INT, 0);
     redisxDestroyRESP(reply);
     prop_error(fn, status);
@@ -366,9 +368,11 @@ int redisxMultiSet(Redis *redis, const char *table, const RedisEntry *entries, i
   prop_error(fn, redisxLockConnected(redis->interactive));
   status = redisxMultiSetAsync(redis->interactive, table, entries, n, confirm);
   if(status == X_SUCCESS && confirm) {
-    RESP *reply = redisxReadReplyAsync(redis->interactive);
-    status = redisxCheckRESP(reply, RESP_SIMPLE_STRING, 0);
-    if(!status) if(strcmp(reply->value, "OK")) status = REDIS_ERROR;
+    RESP *reply = redisxReadReplyAsync(redis->interactive, &status);
+    if(!status) {
+      status = redisxCheckRESP(reply, RESP_SIMPLE_STRING, 0);
+      if(!status) if(strcmp(reply->value, "OK")) status = REDIS_ERROR;
+    }
     redisxDestroyRESP(reply);
   }
   redisxUnlockClient(redis->interactive);

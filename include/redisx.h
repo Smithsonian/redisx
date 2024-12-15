@@ -425,8 +425,9 @@ int redisxEndSubscription(Redis *redis);
 
 int redisxStartBlockAsync(RedisClient *cl);
 int redisxAbortBlockAsync(RedisClient *cl);
-RESP *redisxExecBlockAsync(RedisClient *cl);
+RESP *redisxExecBlockAsync(RedisClient *cl, int *pStatus);
 int redisxLoadScript(Redis *redis, const char *script, char **sha1);
+RESP *redisxRunScript(Redis *redis, const char *sha1, const char **keys, const char **params, int *status);
 
 int redisxGetTime(Redis *redis, struct timespec *t);
 int redisxIsGlobPattern(const char *str);
@@ -461,7 +462,7 @@ int redisxSendRequestAsync(RedisClient *cl, const char *command, const char *arg
 int redisxSendArrayRequestAsync(RedisClient *cl, const char **args, const int *length, int n);
 int redisxSetValueAsync(RedisClient *cl, const char *table, const char *key, const char *value, boolean confirm);
 int redisxMultiSetAsync(RedisClient *cl, const char *table, const RedisEntry *entries, int n, boolean confirm);
-RESP *redisxReadReplyAsync(RedisClient *cl);
+RESP *redisxReadReplyAsync(RedisClient *cl, int *pStatus);
 int redisxClearAttributesAsync(RedisClient *cl);
 const RESP *redisxGetAttributesAsync(const RedisClient *cl);
 int redisxIgnoreReplyAsync(RedisClient *cl);

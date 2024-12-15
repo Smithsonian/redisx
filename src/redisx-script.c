@@ -112,13 +112,14 @@ int redisxRunScriptAsync(RedisClient *cl, const char *sha1, const char **keys, c
  *                  any keyword argument.
  * @param params    A NULL-terminated array of additional parameters to pass onto the script, or
  *                  NULL if the script does not take any parameters.
+ * @param status    Pointer to int in which to return status, or NULL if not required.
  * @return          The response received from the script or the EVALSHA request, or NULL if
  *                  there was an error.
  *
  * @sa redisxRunScriptAsync()
  * @sa redisxLoadScript()
  */
-RESP *redisxRunScript(Redis *redis, const char *sha1, const char **keys, const char **params) {
+RESP *redisxRunScript(Redis *redis, const char *sha1, const char **keys, const char **params, int *status) {
   static const char *fn = "redisxRunScript";
 
   RESP *reply = NULL;
@@ -133,7 +134,7 @@ RESP *redisxRunScript(Redis *redis, const char *sha1, const char **keys, const c
   if(redisxLockConnected(redis->interactive) != X_SUCCESS) return x_trace_null(fn, NULL);
 
   if(redisxRunScriptAsync(redis->interactive, sha1, keys, params) == X_SUCCESS)
-    reply = redisxReadReplyAsync(redis->interactive);
+    reply = redisxReadReplyAsync(redis->interactive, status);
 
   redisxUnlockClient(redis->interactive);
 

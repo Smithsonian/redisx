@@ -67,18 +67,26 @@ int rCheckClient(const RedisClient *cl) {
  *
  * @param cp    Pointer to the client's private data structure on which the error occurred.
  * @param op    The operation that failed, e.g. 'send' or 'read'.
- * @return      X_NO_SERVICE
+ * @return      X_NO_SERVICE if the client cannot read / write any data, or else X_TIMEDOUT if the operation
+ *              simply timed out but the client is still usable in principle.
  *
  * @sa redisxSetSocketErrorHandler()
  */
-static int rTransmitError(ClientPrivate *cp, const char *op) {
+static int rTransmitErrorAsync(ClientPrivate *cp, const char *op) {
+  int status = X_NO_SERVICE;
+
   if(cp->isEnabled) {
     RedisPrivate *p = (RedisPrivate *) cp->redis->priv;
     // Let the handler disconnect, if it wants to....
-    fprintf(stderr, "RedisX : WARNING! %s failed on %s channel %d: %s\n", op, cp->redis->id, cp->idx, strerror(errno));
-    if(p->transmitErrorFunc) p->transmitErrorFunc(cp->redis, cp->idx, op);
+    if(p->transmitErrorFunc) {
+      p->transmitErrorFunc(cp->redis, cp->idx, op);
+      if(cp->isEnabled) {
+        if(errno == EAGAIN || errno == EWOULDBLOCK) status = x_error(X_TIMEDOUT, errno, "rTransmitErrorAsync", "%s timed out on %s channel %d\n", op, cp->redis->id, cp->idx);
+        else status = x_error(X_NO_SERVICE, errno, "rTransmitErrorAsync", "%s failed on %s channel %d\n", op, cp->redis->id, cp->idx);
+      }
+    }
   }
-  return X_NO_SERVICE;
+  return status;
 }
 
 /**
@@ -92,12 +100,17 @@ static int rReadChunkAsync(ClientPrivate *cp) {
 
   if(sock < 0) return x_error(X_NO_INIT, ENOTCONN, "rReadChunkAsync", "client %d: not connected", cp->idx);
 
+  // Reset errno prior to the call.
+  errno = 0;
+
   cp->next = 0;
   cp->available = recv(sock, cp->in, REDISX_RCVBUF_SIZE, 0);
   trprintf(" ... read %d bytes from client %d socket.\n", cp->available, cp->idx);
   if(cp->available <= 0) {
+    int status = rTransmitErrorAsync(cp, "read");
     if(cp->available == 0) errno = ECONNRESET;        // 0 return is remote cleared connection. So set ECONNRESET...
-    return rTransmitError(cp, "read");
+    if(cp->isEnabled) x_trace("rReadChunkAsync", NULL, status);
+    return status;
   }
   return X_SUCCESS;
 }
@@ -213,7 +226,7 @@ static int rReadBytes(ClientPrivate *cp, char *buf, int length) {
       int status = rReadChunkAsync(cp);
       if(status) {
         pthread_mutex_unlock(&cp->readLock);
-        return x_trace(fn, NULL, status);
+        if(cp->isEnabled) return x_trace(fn, NULL, status);
       }
     }
 
@@ -270,7 +283,12 @@ static int rSendBytesAsync(ClientPrivate *cp, const char *buf, int length, boole
     n = send(sock, from, length, 0);
 #endif
 
-    if(n < 0) return rTransmitError(cp, "send");
+    if(n < 0) {
+      int status = rTransmitErrorAsync(cp, "send");
+      if(cp->isEnabled) x_trace(fn, NULL, status);
+      cp->isEnabled = FALSE;
+      return status;
+    }
 
     from += n;
     length -= n;
@@ -512,7 +530,8 @@ int redisxAbortBlockAsync(RedisClient *cl) {
  * <code>OK</code> and <code>QUEUED</code> acknowledgements, and returns the reply to the transaction
  * block itself.
  *
- * \param cl    Pointer to a Redis client
+ * \param cl        Pointer to a Redis client
+ * \param pStatus   Pointer to int in which to return error status. or NULL if not required.
  *
  * \return      The array RESP returned by EXEC, or NULL if there was an error.
  *
@@ -520,7 +539,7 @@ int redisxAbortBlockAsync(RedisClient *cl) {
  * @sa redisxAbortBlockAsync()
  *
  */
-RESP *redisxExecBlockAsync(RedisClient *cl) {
+RESP *redisxExecBlockAsync(RedisClient *cl, int *pStatus) {
   static const char *fn = "redisxExecBlockAsync";
   static const char cmd[] = "*1\r\n$4\r\nEXEC\r\n";
 
@@ -534,13 +553,19 @@ RESP *redisxExecBlockAsync(RedisClient *cl) {
   }
 
   status = redisxSkipReplyAsync(cl);
-  if(status) return x_trace_null(fn, NULL);
+  if(status) {
+    if(pStatus) *pStatus = status;
+    return x_trace_null(fn, NULL);
+  }
 
   status = rSendBytesAsync((ClientPrivate *) cl->priv, cmd, sizeof(cmd) - 1, TRUE);
-  if(status) return x_trace_null(fn, NULL);
+  if(status) {
+    if(pStatus) *pStatus = status;
+    return x_trace_null(fn, NULL);
+  }
 
   for(;;) {
-    RESP *reply = redisxReadReplyAsync(cl);
+    RESP *reply = redisxReadReplyAsync(cl, pStatus);
     if(!reply) return x_trace_null(fn, NULL);
 
     if(reply->type == RESP_ARRAY) return reply;
@@ -690,12 +715,14 @@ int redisxIgnoreReplyAsync(RedisClient *cl) {
   static const char *fn = "redisxIgnoreReplyAsync";
   RESP *resp;
 
+  int status = X_SUCCESS;
+
   prop_error(fn, rCheckClient(cl));
 
-  resp = redisxReadReplyAsync(cl);
+  resp = redisxReadReplyAsync(cl, &status);
   if(resp == NULL) return x_trace(fn, NULL, REDIS_NULL);
   else redisxDestroyRESP(resp);
-  return X_SUCCESS;
+  return status;
 }
 
 static int rTypeIsParametrized(char type) {
@@ -729,13 +756,19 @@ static void rPushMessageAsync(RedisClient *cl, RESP *resp) {
   array = (RESP **) calloc(resp->n, sizeof(RESP *));
   if(!array) fprintf(stderr, "WARNING! Redis-X : not enough memory for push message (%d elements). Skipping.\n", resp->n);
 
+  resp->value = array;
+
   for(i = 0; i < resp->n; i++) {
-    RESP *r = redisxReadReplyAsync(cl);
+    int status = X_SUCCESS;
+    RESP *r = redisxReadReplyAsync(cl, &status);
+    if(status) {
+      redisxDestroyRESP(resp);
+      x_trace_null("rPushMessageAsync", NULL);
+      return;
+    }
     if(array) array[i] = r;
     else redisxDestroyRESP(r);
   }
-
-  resp->value = array;
 
   if(p->pushConsumer) p->pushConsumer(cl, resp, p->pushArg);
 
@@ -810,13 +843,15 @@ int redisxClearAttributesAsync(RedisClient *cl) {
 /**
  * Reads a response from Redis and returns it.
  *
- * \param cl    Pointer to a Redis channel
+ * \param cl        Pointer to a Redis channel
+ * \param pStatus    Pointer to int in which to return an error status, or NULL if not required.
  *
  * \return      The RESP structure for the reponse received from Redis, or NULL if an error was encountered
  *              (errno will be set to describe the error, which may either be an errno produced by recv()
- *              or EBADMSG if the message was corrupted and/or unparseable.
+ *              or EBADMSG if the message was corrupted and/or unparseable. If the error is irrecoverable
+ *              i.e., other than a timeout, the client will be disabled.)
  */
-RESP *redisxReadReplyAsync(RedisClient *cl) {
+RESP *redisxReadReplyAsync(RedisClient *cl, int *pStatus) {
   static const char *fn = "redisxReadReplyAsync";
 
   ClientPrivate *cp;
@@ -831,10 +866,12 @@ RESP *redisxReadReplyAsync(RedisClient *cl) {
 
   if(cp == NULL) {
     x_error(0, ENOTCONN, fn, "client is not initialized");
+    if(pStatus) *pStatus = X_NO_INIT;
     return NULL;
   }
   if(!cp->isEnabled) {
     x_error(0, ENOTCONN, fn, "client is not connected");
+    if(pStatus) *pStatus = X_NO_SERVICE;
     return NULL;
   }
 
@@ -843,9 +880,15 @@ RESP *redisxReadReplyAsync(RedisClient *cl) {
     if(size < 0) {
       // Either read/recv had an error, or we got garbage...
       if(cp->isEnabled) x_trace_null(fn, NULL);
-      cp->isEnabled = FALSE;  // Disable this client so we don't attempt to read from it again...
+
+      // If persistent error disable this client so we don't attempt to read from it again...
+      if(size == X_NO_SERVICE) rCloseClientAsync(cl);
+
+      if(pStatus) *pStatus = size;
       return NULL;
     }
+
+    if(pStatus) *pStatus = X_SUCCESS;
 
     resp = (RESP *) calloc(1, sizeof(RESP));
     x_check_alloc(resp);
@@ -857,7 +900,7 @@ RESP *redisxReadReplyAsync(RedisClient *cl) {
       if(buf[1] == '?') {
         // Streaming RESP in parts...
         for(;;) {
-          RESP *r = redisxReadReplyAsync(cl);
+          RESP *r = redisxReadReplyAsync(cl, pStatus);
           if(r->type != RESP3_CONTINUED) {
             int type = r->type;
             redisxDestroyRESP(r);
@@ -944,7 +987,7 @@ RESP *redisxReadReplyAsync(RedisClient *cl) {
 
 
       for(i = 0; i < resp->n; i++) {
-        RESP *r = redisxReadReplyAsync(cl);     // Always read RESP even if we don't have storage for it...
+        RESP *r = redisxReadReplyAsync(cl, pStatus);     // Always read RESP even if we don't have storage for it...
         if(component) component[i] = r;
         else redisxDestroyRESP(r);
       }
@@ -973,8 +1016,8 @@ RESP *redisxReadReplyAsync(RedisClient *cl) {
 
       for(i = 0; i < resp->n; i++) {
         RedisMapEntry *e = &dict[i];
-        e->key = redisxReadReplyAsync(cl);
-        e->value = redisxReadReplyAsync(cl);
+        e->key = redisxReadReplyAsync(cl, pStatus);
+        e->value = redisxReadReplyAsync(cl, pStatus);
       }
       resp->value = dict;
 
@@ -996,6 +1039,8 @@ RESP *redisxReadReplyAsync(RedisClient *cl) {
       size = rReadBytes(cp, (char *) resp->value, resp->n + 2);
 
       if(size < 0) {
+        // Either read/recv had an error, or we got garbage...
+        if(cp->isEnabled) x_trace_null(fn, NULL);
         if(!status) status = size;
       }
       else if(resp->value) {
@@ -1037,7 +1082,10 @@ RESP *redisxReadReplyAsync(RedisClient *cl) {
   // Check for errors, and return NULL if there were any.
   if(status) {
     redisxDestroyRESP(resp);
-    return x_trace_null(fn, NULL);
+    // If persistent error disable this client so we don't attempt to read from it again...
+    if(status == X_NO_SERVICE) rCloseClientAsync(cl);
+    if(pStatus) *pStatus = status;
+    return NULL;
   }
 
   pthread_mutex_lock(&cp->pendingLock);
@@ -1064,10 +1112,12 @@ int redisxResetClient(RedisClient *cl) {
 
   status = redisxSendRequestAsync(cl, "RESET", NULL, NULL, NULL);
   if(!status) {
-    RESP *reply = redisxReadReplyAsync(cl);
-    status = redisxCheckRESP(reply, RESP_SIMPLE_STRING, 0);
-    if(!status) if(strcmp("RESET", (char *) reply->value) != 0)
-      status = x_error(REDIS_UNEXPECTED_RESP, ENOMSG, fn, "expected 'RESET', got '%s'", (char *) reply->value);
+    RESP *reply = redisxReadReplyAsync(cl, &status);
+    if(!status) {
+      status = redisxCheckRESP(reply, RESP_SIMPLE_STRING, 0);
+      if(!status) if(strcmp("RESET", (char *) reply->value) != 0)
+        status = x_error(REDIS_UNEXPECTED_RESP, ENOMSG, fn, "expected 'RESET', got '%s'", (char *) reply->value);
+    }
     redisxDestroyRESP(reply);
   }
 
