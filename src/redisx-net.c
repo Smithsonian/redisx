@@ -358,7 +358,7 @@ static int rConnectAsync(Redis *redis, boolean usePipeline) {
 
     if(status) {
       if(!warnedInteractive) {
-        fprintf(stderr, "ERROR! Redis-X : interactive client connection failed: %s\n", redisxErrorDescription(status));
+        xvprintf("WARNING! Redis-X : interactive client connection failed: %s\n", redisxErrorDescription(status));
         warnedInteractive = TRUE;
       }
       return x_trace(fn, "interactive", X_NO_SERVICE);
@@ -379,7 +379,7 @@ static int rConnectAsync(Redis *redis, boolean usePipeline) {
 
       if(status) {
         if(!warnedPipeline) {
-          fprintf(stderr, "ERROR! Redis-X : pipeline client connection failed: %s\n", redisxErrorDescription(status));
+          xvprintf("WARNING! Redis-X : pipeline client connection failed: %s\n", redisxErrorDescription(status));
           warnedPipeline = TRUE;
         }
         return x_trace(fn, "pipeline", X_NO_SERVICE);

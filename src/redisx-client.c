@@ -843,7 +843,7 @@ int redisxClearAttributesAsync(RedisClient *cl) {
 /**
  * Reads a response from Redis and returns it.
  *
- * \param cl        Pointer to a Redis channel
+ * \param cl         Pointer to a Redis channel
  * \param pStatus    Pointer to int in which to return an error status, or NULL if not required.
  *
  * \return      The RESP structure for the reponse received from Redis, or NULL if an error was encountered
