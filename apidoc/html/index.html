@@ -164,9 +164,9 @@ Generic API Features</h4>
 <tr class="markdownTableRowEven">
 <td class="markdownTableBodyNone">connect / disconnect hooks   </td><td class="markdownTableBodyCenter"><b>yes</b>   </td><td class="markdownTableBodyNone">user-defined callbacks    </td></tr>
 <tr class="markdownTableRowOdd">
-<td class="markdownTableBodyNone">custom socket setup   </td><td class="markdownTableBodyCenter"><b>yes</b>   </td><td class="markdownTableBodyNone">user-defined timeout and buffer size and/or callback    </td></tr>
+<td class="markdownTableBodyNone">socket customization   </td><td class="markdownTableBodyCenter"><b>yes</b>   </td><td class="markdownTableBodyNone">(optional) user-defined timeout, buffer size and/or callback    </td></tr>
 <tr class="markdownTableRowEven">
-<td class="markdownTableBodyNone">custom socket error handling   </td><td class="markdownTableBodyCenter"><b>yes</b>   </td><td class="markdownTableBodyNone">user-defined callback    </td></tr>
+<td class="markdownTableBodyNone">custom socket error handling   </td><td class="markdownTableBodyCenter"><b>yes</b>   </td><td class="markdownTableBodyNone">(optional) user-defined callback    </td></tr>
 <tr class="markdownTableRowOdd">
 <td class="markdownTableBodyNone"><a class="el" href="structRESP.html" title="Structure that represents a Redis response (RESP format).">RESP</a> to JSON   </td><td class="markdownTableBodyCenter"><b>yes</b>   </td><td class="markdownTableBodyNone">via <code>xchange</code> library    </td></tr>
 <tr class="markdownTableRowEven">
@@ -184,13 +184,13 @@ Redis / Valkey Features</h4>
 <tr class="markdownTableRowOdd">
 <td class="markdownTableBodyNone">user authentication   </td><td class="markdownTableBodyCenter"><b>yes</b>   </td><td class="markdownTableBodyNone">via <code>HELLO</code> if protocol is set, otherwise via <code>AUTH</code>    </td></tr>
 <tr class="markdownTableRowEven">
-<td class="markdownTableBodyNone">RESP3 / <code>HELLO</code> support   </td><td class="markdownTableBodyCenter"><b>yes</b>   </td><td class="markdownTableBodyNone">optional (if specific protocol is set)    </td></tr>
+<td class="markdownTableBodyNone">RESP3 / <code>HELLO</code> support   </td><td class="markdownTableBodyCenter"><b>yes</b>   </td><td class="markdownTableBodyNone">(optional) if specific protocol is set    </td></tr>
 <tr class="markdownTableRowOdd">
 <td class="markdownTableBodyNone">thread safe (MT-safe)   </td><td class="markdownTableBodyCenter"><b>yes</b>   </td><td class="markdownTableBodyNone">synchronized + async calls with locking    </td></tr>
 <tr class="markdownTableRowEven">
-<td class="markdownTableBodyNone">push messages   </td><td class="markdownTableBodyCenter"><b>yes</b>   </td><td class="markdownTableBodyNone">user-defined callback    </td></tr>
+<td class="markdownTableBodyNone">push messages   </td><td class="markdownTableBodyCenter"><b>yes</b>   </td><td class="markdownTableBodyNone">(optional) user-defined callback    </td></tr>
 <tr class="markdownTableRowOdd">
-<td class="markdownTableBodyNone">attributes   </td><td class="markdownTableBodyCenter"><b>yes</b>   </td><td class="markdownTableBodyNone">on demand    </td></tr>
+<td class="markdownTableBodyNone">attributes   </td><td class="markdownTableBodyCenter"><b>yes</b>   </td><td class="markdownTableBodyNone">(optional) on demand    </td></tr>
 <tr class="markdownTableRowEven">
 <td class="markdownTableBodyNone">interactive queries   </td><td class="markdownTableBodyCenter"><b>yes</b>   </td><td class="markdownTableBodyNone">dedicated (low-latency) client    </td></tr>
 <tr class="markdownTableRowOdd">

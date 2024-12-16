@@ -564,7 +564,7 @@ User callback function allowing additional customization of the client socket be
 .PP
 \fBParameters\fP
 .RS 4
-\fIsocket\fP The socket descriptor 
+\fIsocket\fP The socket descriptor\&. 
 .br
 \fIchannel\fP REDISX_INTERACTIVE_CHANNEL, REDISX_PIPELINE_CHANNEL, REDISX_SUBSCRIPTION_CHANNEL 
 .RE
@@ -2037,7 +2037,7 @@ Prints a \fBRESP\fP in raw form using delimiters only\&.
 .PP
 References \fBRESP::n\fP, \fBredisxPrintDelimited()\fP, \fBRESP3_ATTRIBUTE\fP, \fBRESP3_BIG_NUMBER\fP, \fBRESP3_BLOB_ERROR\fP, \fBRESP3_DOUBLE\fP, \fBRESP3_MAP\fP, \fBRESP3_NULL\fP, \fBRESP3_PUSH\fP, \fBRESP3_SET\fP, \fBRESP3_VERBATIM_STRING\fP, \fBRESP_ARRAY\fP, \fBRESP_BULK_STRING\fP, \fBRESP_ERROR\fP, \fBRESP_INT\fP, \fBRESP_SIMPLE_STRING\fP, \fBRESP::type\fP, and \fBRESP::value\fP\&.
 .SS "int redisxPrintJSON (const char * name, const \fBRESP\fP * resp)"
-Prints a \fBRESP\fP in JSON format to the standard output with the specified name
+Prints a \fBRESP\fP as a JSON fragmen to the standard output with the specified name
 .PP
 \fBParameters\fP
 .RS 4
