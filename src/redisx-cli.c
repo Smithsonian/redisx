@@ -58,17 +58,34 @@ static void printRESP(const RESP *resp) {
 
 static void process(Redis *redis, const char **cmdargs, int nargs) {
   int status = X_SUCCESS;
-  RESP *reply = redisxArrayRequest(redis, cmdargs, NULL, nargs, &status);
-  if(!status) printRESP(reply);
-  redisxDestroyRESP(reply);
+  RESP *reply, *attr = NULL;
 
-  if(attrib) {
-    reply = redisxGetAttributes(redis);
-    if(reply) {
-      printRESP(reply);
-      redisxDestroyRESP(reply);
+  reply = redisxArrayRequest(redis, cmdargs, NULL, nargs, &status);
+  if(!status && attrib) attr = redisxGetAttributes(redis);
+
+  if(format == FORMAT_JSON) {
+    // Bundle reply and attributes into one JSON document.
+    XStructure *s = xCreateStruct();
+    char *json;
+
+    if(attr) xSetField(s, redisxRESP2XField("ATTRIBUTES", attr));
+    xSetField(s, redisxRESP2XField("REPLY", reply));
+    json = xjsonToString(s);
+    xDestroyStruct(s);
+
+    if(json) {
+      printf("%s", json);
+      free(json);
     }
+    else printf("{}\n");
   }
+  else {
+    if(!status) printRESP(reply);
+    if(attr) printRESP(attr);
+  }
+
+  redisxDestroyRESP(attr);
+  redisxDestroyRESP(reply);
 }
 
 // cppcheck-suppress constParameterCallback

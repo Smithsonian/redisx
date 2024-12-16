@@ -751,7 +751,7 @@ char *redisxRESP2JSON(const char *name, const RESP *resp) {
 }
 
 /**
- * Prints a RESP in JSON format to the standard output with the specified name
+ * Prints a RESP as a JSON fragmen to the standard output with the specified name
  *
  * @param name    The name/ID to assign to the RESP
  * @param resp    The RESP data to print
