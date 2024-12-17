@@ -490,9 +490,8 @@ int redisxPublishAsync(Redis *redis, const char *channel, const char *data, int 
 int redisxError(const char *func, int errorCode);
 const char* redisxErrorDescription(int code);
 
-// The following is not available on prior to the POSIX.1-2008 standard
-// We'll use the __STDC_VERSION__ constant as a proxy to see if fnmatch is available
-#if __STDC_VERSION__ > 201112L
+// The following is not available on prior to the POSIX.1-2001 standard
+#if _POSIX_C_SOURCE >= 200112L
 int redisxDeleteEntries(Redis *redis, const char *pattern);
 #endif
 

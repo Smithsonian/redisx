@@ -157,9 +157,8 @@ int main() {
   free(e);
 
 
-#if __STDC_VERSION__ > 201112L
-  // The following is not available on prior to the POSIX.1-2008 standard
-  // We'll use the __STDC_VERSION__ constant as a proxy to see if fnmatch is available
+#if _POSIX_C_SOURCE >= 200112L
+  // The following is not available on prior to the POSIX.1-2001 standard
 
   n1 = redisxDeleteEntries(redis, "_*:_extra_");
   if(n1 < 0) {

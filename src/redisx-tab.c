@@ -896,9 +896,8 @@ void redisxDestroyKeys(char **keys, int count) {
   free(keys);
 }
 
-// The following is not available on prior to the POSIX.1-2008 standard
-// We'll use the __STDC_VERSION__ constant as a proxy to see if fnmatch is available
-#if __STDC_VERSION__ > 201112L
+// The following is not available on prior to the POSIX.1-2001 standard
+#if _POSIX_C_SOURCE >= 200112L
 
 /**
  * Removes all Redis entries that match the specified table:field name pattern.
