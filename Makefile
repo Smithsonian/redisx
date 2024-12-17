@@ -137,7 +137,9 @@ includedir ?= $(prefix)/include
 datarootdir ?= $(prefix)/share
 datadir ?= $(datarootdir)
 mydatadir ?= $(datadir)/redisx
+mandir ?= $(datarootdir)/man
 docdir ?= $(datarootdir)/doc/redisx
+mandir ?= $(datarootdir)/doc/redisx
 htmldir ?= $(docdir)/html
 
 # Standard install commands
