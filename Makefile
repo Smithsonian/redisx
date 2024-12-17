@@ -206,6 +206,7 @@ help:
 	@echo
 	@echo "  shared        Builds the shared 'libredisx.so' (linked to versioned)."
 	@echo "  static        Builds the static 'lib/libredisx.a' library."
+	@echo "  tools         Builds redisx-cli application."
 	@echo "  local-dox     Compiles local HTML API documentation using 'doxygen'."
 	@echo "  analyze       Performs static analysis with 'cppcheck'."
 	@echo "  all           All of the above."
