@@ -931,13 +931,14 @@ Bundled Attributes</h3>
 <div class="line">  <a class="code hl_struct" href="structRESP.html">RESP</a> *reply = <a class="code hl_function" href="redisx-client_8c.html#a06c5b62c7b92c83af8f080dd1bb91b17">redisxReadReplyAsync</a>(cl);</div>
 <div class="line">  </div>
 <div class="line">  <span class="comment">// Retrieve the attributes (if any) that were sent with the response.</span></div>
-<div class="line">  <a class="code hl_struct" href="structRESP.html">RESP</a> *attributes = <a class="code hl_function" href="redisx_8c.html#a48b6b8949276f59cd2f13d6b13384996">redisxGetAttributes</a>(cl);</div>
+<div class="line">  <a class="code hl_struct" href="structRESP.html">RESP</a> *attributes = <a class="code hl_function" href="redisx-client_8c.html#a6c9d4ce9babbcaac35e45f536d47858d">redisxGetAttributesAsync</a>(cl);</div>
 <div class="line">  </div>
 <div class="line">  ...</div>
 <div class="line">  </div>
 <div class="line">  <a class="code hl_function" href="redisx-client_8c.html#a87efe53c80fcff3fcf189362cbc602f7">redisxUnlockClient</a>(cl);</div>
 <div class="line">}</div>
 <div class="ttc" id="aredisx-client_8c_html_a576bb47774aaf4d5d735a5ef18253048"><div class="ttname"><a href="redisx-client_8c.html#a576bb47774aaf4d5d735a5ef18253048">redisxClearAttributesAsync</a></div><div class="ttdeci">int redisxClearAttributesAsync(RedisClient *cl)</div><div class="ttdef"><b>Definition</b> redisx-client.c:836</div></div>
+<div class="ttc" id="aredisx-client_8c_html_a6c9d4ce9babbcaac35e45f536d47858d"><div class="ttname"><a href="redisx-client_8c.html#a6c9d4ce9babbcaac35e45f536d47858d">redisxGetAttributesAsync</a></div><div class="ttdeci">const RESP * redisxGetAttributesAsync(const RedisClient *cl)</div><div class="ttdef"><b>Definition</b> redisx-client.c:804</div></div>
 </div><!-- fragment --><p><a class="anchor" id="pipelined-transactions"></a> </p>
 <h3><a class="anchor" id="autotoc_md50"></a>
 Pipelined transactions</h3>

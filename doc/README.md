@@ -1162,7 +1162,7 @@ discarded with `redisxClearAttributesAsync()`. For example,
     RESP *reply = redisxReadReplyAsync(cl);
     
     // Retrieve the attributes (if any) that were sent with the response.
-    RESP *attributes = redisxGetAttributes(cl);
+    RESP *attributes = redisxGetAttributesAsync(cl);
     
     ...
     
