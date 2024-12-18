@@ -76,7 +76,7 @@ Before then the API may undergo slight changes and tweaks. Use the repository as
  | --------------------------------- |:----------:| -------------------------------------------------------------|
  | concurrent Redis instances        |  __yes__   | You can manage and use multiple Redis servers simultaneously |
  | connect over TCP                  |  __yes__   |                                                              |
- | connect over UDP                  |    no      | (why would you, really?)                                     |
+ | connect over UDP                  |    no      |                                                              |
  | connect / disconnect hooks        |  __yes__   | user-defined callbacks                                       |
  | socket customization              |  __yes__   | (optional) user-defined timeout, buffer size and/or callback |
  | custom socket error handling      |  __yes__   | (optional) user-defined callback                             |
