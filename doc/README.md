@@ -70,7 +70,7 @@ for errors, and handling them -- in this case by printing informative error mess
   
   // Connect to redis
   if(redis != NULL && redisxConnect(redis, FALSE) == X_SUCCESS) {
-    // Run 'GET my-key' query on the server 
+    // Execute 'PING "Hello World!"' on the server 
     RESP *reply = redisxRequest(redis, "PING", "Hello World!", NULL, NULL, NULL);
     
     // Check that we got a response of the expected type (bulk string of any length)

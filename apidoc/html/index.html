@@ -164,7 +164,7 @@ A simple example</h3>
 <div class="line"> </div>
 <div class="line"><span class="comment">// Connect to redis</span></div>
 <div class="line"><span class="keywordflow">if</span>(redis != NULL &amp;&amp; <a class="code hl_function" href="redisx-net_8c.html#ad71822356ffd40ed4b1c71d065f48809">redisxConnect</a>(redis, FALSE) == X_SUCCESS) {</div>
-<div class="line">  <span class="comment">// Run &#39;GET my-key&#39; query on the server </span></div>
+<div class="line">  <span class="comment">// Execute &#39;PING &quot;Hello World!&quot;&#39; on the server </span></div>
 <div class="line">  <a class="code hl_struct" href="structRESP.html">RESP</a> *reply = <a class="code hl_function" href="redisx_8c.html#a09092bd97eead5c5fa73fa0d9241018c">redisxRequest</a>(redis, <span class="stringliteral">&quot;PING&quot;</span>, <span class="stringliteral">&quot;Hello World!&quot;</span>, NULL, NULL, NULL);</div>
 <div class="line">  </div>
 <div class="line">  <span class="comment">// Check that we got a response of the expected type (bulk string of any length)</span></div>
