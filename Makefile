@@ -32,13 +32,15 @@ endif
 # Link against thread lib
 LDFLAGS += -pthread
 
+export
+
 # Build for distribution
 .PHONY: distro
 distro: shared tools $(DOC_TARGETS)
 
 # Build everything...
 .PHONY: all
-all: shared static $(DOC_TARGETS) check
+all: shared static tools examples $(DOC_TARGETS) check
 
 # Shared libraries (versioned and unversioned)
 .PHONY: shared
@@ -52,6 +54,11 @@ static: $(LIB)/libredisx.a
 .PHONY: tools
 tools: shared
 	make -f tools.mk
+
+# Examples
+.PHONY: examples
+examples: shared
+	make -f examples.mk
 
 # Run regression tests
 .PHONY: test
@@ -147,7 +154,7 @@ INSTALL_PROGRAM ?= install
 INSTALL_DATA ?= install -m 644
 
 .PHONY: install
-install: install-libs install-bin install-man install-headers install-html
+install: install-libs install-bin install-man install-headers install-examples install-html
 
 .PHONY: install-libs
 install-libs:
@@ -175,12 +182,17 @@ install-man:
 	@install -d $(DESTDIR)$(mandir)/man1
 	$(INSTALL_DATA) -D man/man1/* $(DESTDIR)$(mandir)/man1
 
-
 .PHONY: install-headers
 install-headers:
 	@echo "installing headers to $(DESTDIR)$(includedir)"
 	install -d $(DESTDIR)$(includedir)
 	$(INSTALL_DATA) -D include/* $(DESTDIR)$(includedir)/
+
+.PHONY: install-examples
+install-examples:
+	@echo "installing examples to $(DESTDIR)$(docdir)"
+	install -d $(DESTDIR)$(docdir)
+	$(INSTALL_DATA) -D examples/* $(DESTDIR)$(docdir)/
 
 .PHONY: install-html
 install-html:
@@ -211,6 +223,7 @@ help:
 	@echo "  analyze       Performs static analysis with 'cppcheck'."
 	@echo "  all           All of the above."
 	@echo "  distro        shared libs and documentation (default target)."
+	@echo "  examples      Build example programs."
 	@echo "  install       Install components (e.g. 'make prefix=<path> install')"
 	@echo "  clean         Removes intermediate products."
 	@echo "  distclean     Deletes all generated files."
