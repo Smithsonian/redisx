@@ -113,7 +113,7 @@ that allow you to customize your interactions with a Redis / Valkey server. But 
 follow the same pattern in general:
 
  1. [Initialize](#initializing) a Redis instance.
- 2. [Configure](#configuring) the server properties: port, authentication, socket parameters etc. (not shown in above example).
+ 2. [Configure](#configuring) the server properties: port, authentication, protocol, socket parameters etc. (not shown in above example).
  3. [Connect](#connecting) to the Redis / Valkey server.
  4. Interact with the server: run queries [interactively](#simple-redis-queries) or in [batch mode](#pipelined-transactions), process [push notifications](#push-notifications), [publish](#broadcasting-messages) or [subscribe](#subscriptions)...
  5. [Disconnect](#disconnecting) from the server.
