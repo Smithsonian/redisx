@@ -74,7 +74,7 @@ for errors, and handling them -- in this case by printing informative error mess
     RESP *reply = redisxRequest(redis, "GET", "my-key", NULL, NULL, NULL);
     
     // Check that we got a response of the expected type (bulk string of any length)
-    if(redisxCheckRESP(reply, REDIS_BULK_STRING, 0) == X_SUCCESS)
+    if(redisxCheckRESP(reply, RESP_BULK_STRING, 0) == X_SUCCESS)
       printf("the value is: %s\n", (char *) reply->value);
     else
       fprintf(stderr, "ERROR! bad response\n"); 
