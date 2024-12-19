@@ -1958,6 +1958,9 @@
     <filename>index.html</filename>
     <docanchor file="index.html">md_README-redisx</docanchor>
     <docanchor file="index.html">introduction</docanchor>
+    <docanchor file="index.html">example</docanchor>
+    <docanchor file="index.html">features</docanchor>
+    <docanchor file="index.html">related-links</docanchor>
     <docanchor file="index.html">prerequisites</docanchor>
     <docanchor file="index.html">building-redisx</docanchor>
     <docanchor file="index.html">redisx-cli</docanchor>
