@@ -33,6 +33,7 @@ Last Updated: 13 December 2024
  - [Building RedisX](#building-redisx)
  - [Command-line interface (`redisx-cli`)](#redisx-cli)
  - [Linking your application against RedisX](#linking)
+ - [A simple example](#example)
  - [Managing Redis server connections](#managing-redis-server-connections)
  - [Simple Redis queries](#simple-redis-queries)
  - [Accessing key / value data](#accessing-key-value-data)
@@ -226,6 +227,56 @@ myprog: ...
 the __RedisX__ and/or __xchange__ libraries elsewhere, you can simply add their location(s) to `LD_LIBRARY_PATH` prior 
 to linking.
 
+
+-----------------------------------------------------------------------------
+
+<a name="example"></a>
+## A simple example
+
+Below is a minimal example of a program snippet, which connects to a Redis server (without authentication) and runs a 
+simple `GET` query, printing out the result on the console, while also following best practices of checking
+for errors, and handling them -- in this case by printing informative error messages:
+
+```c
+  #include <redisx.h>
+
+  // Initialize for Redis server at 'my-server.com'.
+  Redis *redis = redisxInit("my-server.com");
+  
+  // Connect to redis
+  if(redis != NULL && redisxConnect(redis, FALSE) == X_SUCCESS) {
+    // Run 'GET my-key' query on the server 
+    RESP *reply = redisxRequest(redis, "GET", "my-key", NULL, NULL, NULL);
+    
+    // Check that we got a response of the expected type (bulk string of any length)
+    if(redisxCheckRESP(reply, REDIS_BULK_STRING, 0) == X_SUCCESS)
+      printf("the value is: %s\n", (char *) reply->value);
+    else
+      fprintf(stderr, "ERROR! bad response\n"); 
+    
+    // Clean up
+    redisxDestroyRESP(reply);
+    redisxDisconnect(redis);
+  }
+  else {
+    perror("ERROR! could not connect");
+  }
+  
+  // Free up the resources used by the 'redis' instance.
+  redisxDestroy(redis);
+```
+
+You may find more details about each step further below. And, of course there are a lot more options and features,
+that allow you to customize your interactions with a Redis / Valkey server. But the basic principle, and the steps,
+follow the same pattern in general:
+
+ 1. [Initialize](#initializing) a Redis instance.
+ 2. [Configure](#configuring) the server properties: port, authentication, socket parameters etc. (not shown in above example).
+ 3. [Connect](#connecting) to the Redis / Valkey server.
+ 4. Interact with the server: run queries [interactively](#simple-redis-queries) or in [batch mode](#pipelined-transactions), process [push notifications](#push-notifications), [publish](#broadcasting-messages) or [subscribe](#subscriptions)...
+ 5. [Disconnect](#disconnecting) from the server.
+ 
+And at every step, you should check for and [handle errors](#error-handling) as appropriate.
 
 -----------------------------------------------------------------------------
 
