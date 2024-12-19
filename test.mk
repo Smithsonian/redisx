@@ -1,14 +1,9 @@
-# Use the parent directories for libraries and headers.
-LIB = ../lib
-INC = ../include
-BUILD_MODE = debug
+SRC := test
 
-ifdef XCHANGE
- XCHANGE := ../$(XCHANGE)
-endif
+include config.mk
 
-# Load the common Makefile definitions...
-include ../config.mk
+LDFLAGS += -L$(LIB) -lredisx
+LD_LIBRARY_PATH := $(LIB):$(LD_LIBRARY_PATH)
 
 .PHONY: all
 all: tests run
@@ -33,6 +28,4 @@ clean-test:
 
 clean: clean-test
 
-# Finally, the standard generic rules and targets...
-include ../build.mk
-
+include build.mk

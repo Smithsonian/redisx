@@ -62,8 +62,8 @@ examples: shared
 
 # Run regression tests
 .PHONY: test
-test:
-	make -C test
+test: shared
+	make -f test.mk
 
 # 'test' + 'analyze'
 .PHONY: check
@@ -216,13 +216,13 @@ help:
 	@echo
 	@echo "The following targets are available:"
 	@echo
+	@echo "  distro        shared libs and documentation (default target)."
 	@echo "  shared        Builds the shared 'libredisx.so' (linked to versioned)."
 	@echo "  static        Builds the static 'lib/libredisx.a' library."
 	@echo "  tools         Builds redisx-cli application."
 	@echo "  local-dox     Compiles local HTML API documentation using 'doxygen'."
 	@echo "  analyze       Performs static analysis with 'cppcheck'."
 	@echo "  all           All of the above."
-	@echo "  distro        shared libs and documentation (default target)."
 	@echo "  examples      Build example programs."
 	@echo "  install       Install components (e.g. 'make prefix=<path> install')"
 	@echo "  clean         Removes intermediate products."
