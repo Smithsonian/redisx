@@ -59,7 +59,7 @@ Before then the API may undergo slight changes and tweaks. Use the repository as
 ### A simple example
 
 Below is a minimal example of a program snippet, which connects to a Redis server (without authentication) and runs a 
-simple `GET` query, printing out the result on the console, while also following best practices of checking
+simple `PING` comand with a message, printing out the result on the console, while also following best practices of checking
 for errors, and handling them -- in this case by printing informative error messages:
 
 ```c
@@ -71,11 +71,11 @@ for errors, and handling them -- in this case by printing informative error mess
   // Connect to redis
   if(redis != NULL && redisxConnect(redis, FALSE) == X_SUCCESS) {
     // Run 'GET my-key' query on the server 
-    RESP *reply = redisxRequest(redis, "GET", "my-key", NULL, NULL, NULL);
+    RESP *reply = redisxRequest(redis, "PING", "Hello World!", NULL, NULL, NULL);
     
     // Check that we got a response of the expected type (bulk string of any length)
     if(redisxCheckRESP(reply, RESP_BULK_STRING, 0) == X_SUCCESS)
-      printf("the value is: %s\n", (char *) reply->value);
+      printf("%s\n", (char *) reply->value);
     else
       fprintf(stderr, "ERROR! bad response\n"); 
     

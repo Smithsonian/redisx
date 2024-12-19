@@ -156,7 +156,7 @@ Introduction</h2>
 <p><a class="anchor" id="example"></a> </p>
 <h3><a class="anchor" id="autotoc_md5"></a>
 A simple example</h3>
-<p>Below is a minimal example of a program snippet, which connects to a <a class="el" href="structRedis.html" title="Structure that represents a Redis database instance, with one or more RedisClient connections.">Redis</a> server (without authentication) and runs a simple <code>GET</code> query, printing out the result on the console, while also following best practices of checking for errors, and handling them &ndash; in this case by printing informative error messages:</p>
+<p>Below is a minimal example of a program snippet, which connects to a <a class="el" href="structRedis.html" title="Structure that represents a Redis database instance, with one or more RedisClient connections.">Redis</a> server (without authentication) and runs a simple <code>PING</code> comand with a message, printing out the result on the console, while also following best practices of checking for errors, and handling them &ndash; in this case by printing informative error messages:</p>
 <div class="fragment"><div class="line"><span class="preprocessor">#include &lt;<a class="code" href="redisx_8h.html">redisx.h</a>&gt;</span></div>
 <div class="line"> </div>
 <div class="line"><span class="comment">// Initialize for Redis server at &#39;my-server.com&#39;.</span></div>
@@ -165,11 +165,11 @@ A simple example</h3>
 <div class="line"><span class="comment">// Connect to redis</span></div>
 <div class="line"><span class="keywordflow">if</span>(redis != NULL &amp;&amp; <a class="code hl_function" href="redisx-net_8c.html#ad71822356ffd40ed4b1c71d065f48809">redisxConnect</a>(redis, FALSE) == X_SUCCESS) {</div>
 <div class="line">  <span class="comment">// Run &#39;GET my-key&#39; query on the server </span></div>
-<div class="line">  <a class="code hl_struct" href="structRESP.html">RESP</a> *reply = <a class="code hl_function" href="redisx_8c.html#a09092bd97eead5c5fa73fa0d9241018c">redisxRequest</a>(redis, <span class="stringliteral">&quot;GET&quot;</span>, <span class="stringliteral">&quot;my-key&quot;</span>, NULL, NULL, NULL);</div>
+<div class="line">  <a class="code hl_struct" href="structRESP.html">RESP</a> *reply = <a class="code hl_function" href="redisx_8c.html#a09092bd97eead5c5fa73fa0d9241018c">redisxRequest</a>(redis, <span class="stringliteral">&quot;PING&quot;</span>, <span class="stringliteral">&quot;Hello World!&quot;</span>, NULL, NULL, NULL);</div>
 <div class="line">  </div>
 <div class="line">  <span class="comment">// Check that we got a response of the expected type (bulk string of any length)</span></div>
 <div class="line">  <span class="keywordflow">if</span>(<a class="code hl_function" href="resp_8c.html#a4b5674d08da07250c0ca6116a4c48ccf">redisxCheckRESP</a>(reply, <a class="code hl_enumvalue" href="redisx_8h.html#afa5c90630d37c2f77e5d7985932941a0a36dd81166f9ba91db70b1571b25fec9f">RESP_BULK_STRING</a>, 0) == X_SUCCESS)</div>
-<div class="line">    printf(<span class="stringliteral">&quot;the value is: %s\n&quot;</span>, (<span class="keywordtype">char</span> *) reply-&gt;<a class="code hl_variable" href="structRESP.html#a0f61d63b009d0880a89c843bd50d8d76">value</a>);</div>
+<div class="line">    printf(<span class="stringliteral">&quot;%s\n&quot;</span>, (<span class="keywordtype">char</span> *) reply-&gt;<a class="code hl_variable" href="structRESP.html#a0f61d63b009d0880a89c843bd50d8d76">value</a>);</div>
 <div class="line">  <span class="keywordflow">else</span></div>
 <div class="line">    fprintf(stderr, <span class="stringliteral">&quot;ERROR! bad response\n&quot;</span>); </div>
 <div class="line">  </div>
