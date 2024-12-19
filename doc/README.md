@@ -16,7 +16,6 @@ Last Updated: 13 December 2024
  - [Building RedisX](#building-redisx)
  - [Command-line interface (`redisx-cli`)](#redisx-cli)
  - [Linking your application against RedisX](#linking)
- - [A simple example](#example)
  - [Managing Redis server connections](#managing-redis-server-connections)
  - [Simple Redis queries](#simple-redis-queries)
  - [Accessing key / value data](#accessing-key-value-data)
