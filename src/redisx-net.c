@@ -89,7 +89,7 @@ static int hostnameToIP(const char *hostName, char *ip) {
 static int rSetServerAsync(Redis *redis, const char *desc, const char *hostname, int port) {
   static const char *fn = "rSetServer";
 
-  RedisPrivate *p = (RedisPrivate *) redis;
+  RedisPrivate *p = (RedisPrivate *) redis->priv;
   char ipAddress[IP_ADDRESS_LENGTH] = {'\0'};
   int status;
 
@@ -100,7 +100,7 @@ static int rSetServerAsync(Redis *redis, const char *desc, const char *hostname,
   if(status) return x_trace(fn, desc, status);
 
   p->addr = inet_addr((char *) ipAddress);
-  p->port = port > 0 ? port : 0;
+  p->port = port > 0 ? port : REDISX_TCP_PORT;
 
   if(redis->id) free(redis->id);
   redis->id = xStringCopyOf(ipAddress);
@@ -703,6 +703,7 @@ int rConnectClient(Redis *redis, enum redisx_channel channel) {
   const char *channelID;
   char host[200], *id;
   int status = X_SUCCESS;
+  uint16_t port;
   int sock;
 
   cl = redisxGetClient(redis, channel);
@@ -710,10 +711,12 @@ int rConnectClient(Redis *redis, enum redisx_channel channel) {
   p = (RedisPrivate *) redis->priv;
   cp = (ClientPrivate *) cl->priv;
 
+  port = p->port > 0 ? p->port : REDISX_TCP_PORT;
+
   serverAddress.sin_family      = AF_INET;
-  serverAddress.sin_port        = htons(p->port > 0 ? p->port : REDISX_TCP_PORT);
+  serverAddress.sin_port        = htons(port);
   serverAddress.sin_addr.s_addr = p->addr;
-  memset(serverAddress.sin_zero, '\0', sizeof(serverAddress.sin_zero));
+  memset(serverAddress.sin_zero, 0, sizeof(serverAddress.sin_zero));
 
   if((sock = socket(PF_INET, SOCK_STREAM, IPPROTO_TCP)) < 0)
     return x_error(X_NO_SERVICE, errno, fn, "client %d socket creation failed", channel);
@@ -724,9 +727,9 @@ int rConnectClient(Redis *redis, enum redisx_channel channel) {
     prop_error(fn, p->socketConf(sock, channel));
   }
 
-  while(connect(sock, (struct sockaddr *) &serverAddress, sizeof(serverAddress)) != 0) {
+  if(connect(sock, (struct sockaddr *) &serverAddress, sizeof(serverAddress)) < 0) {
     close(sock);
-    return x_error(X_NO_INIT, errno, fn, "failed to connect");
+    return x_error(X_NO_INIT, errno, fn, "failed to connect to %s:%hu: %s", redis->id, port, strerror(errno));
   }
 
   xvprintf("Redis-X> client %d assigned socket fd %d.\n", channel, sock);
@@ -820,8 +823,7 @@ Redis *redisxInit(const char *server) {
   redis->priv = p;
 
   // Try set server...
-  i = rSetServerAsync(redis, "server", server, 0);
-  if(i) {
+  if(rSetServerAsync(redis, "server", server, 0) != X_SUCCESS) {
     free(redis->priv);
     free(redis);
     return x_trace_null(fn, NULL);
