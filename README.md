@@ -124,7 +124,7 @@ And at every step, you should check for and [handle errors](#error-handling) as 
 <a name="features"></a>
 ### Features overview
 
-#### Generic API Features
+#### General Features
 
  | Feature                           | supported  | comments                                                     |
  | --------------------------------- |:----------:| -------------------------------------------------------------|
@@ -549,15 +549,15 @@ sequential queries. In cases where 3 parameters are not sufficient, you may use 
 
 ```c
   ...
-  char *args[] = { "my_table", "my_key" };  // parameters as an array...
+  char *cmd[] = { "HGET", "my_table", "my_key" };  // command and parameters as an array...
 
-  // Send "HGET my_table my_key" request with an array of 2 parameters...
-  resp = redisxArrayRequest(redis, "HGET", args, NULL, 2, &status);
+  // Send "HGET my_table my_key" request with an array of 3 components...
+  resp = redisxArrayRequest(redis, cmd, NULL, 3, &status);
   ...
 
 ```
 
-The 4th argument in the list is an optional `int[]` array defining the individual string lengths of the parameters (if 
+The 3rd argument in the list is an optional `int[]` array defining the individual string lengths of the parameters (if 
 need be, or else readily available). Here, we used `NULL` instead, which will use `strlen()` on each supplied 
 string-terminated parameter to determine its length automatically. Specifying the length may be necessary if the 
 individual parameters are not 0-terminated strings.
