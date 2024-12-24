@@ -30,7 +30,7 @@ var NAVTREE =
       [ "Introduction", "index.html#autotoc_md4", [
         [ "A simple example", "index.html#autotoc_md5", null ],
         [ "Features overview", "index.html#autotoc_md6", [
-          [ "Generic API Features", "index.html#autotoc_md7", null ],
+          [ "General Features", "index.html#autotoc_md7", null ],
           [ "Redis / Valkey Features", "index.html#autotoc_md8", null ]
         ] ],
         [ "Related links", "index.html#autotoc_md9", null ]

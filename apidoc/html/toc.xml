@@ -3,7 +3,7 @@
     <topic label="Introduction" href="index.html#autotoc_md4">
       <topic label="A simple example" href="index.html#autotoc_md5"/>
       <topic label="Features overview" href="index.html#autotoc_md6">
-        <topic label="Generic API Features" href="index.html#autotoc_md7"/>
+        <topic label="General Features" href="index.html#autotoc_md7"/>
         <topic label="Redis / Valkey Features" href="index.html#autotoc_md8"/>
       <topic label="Related links" href="index.html#autotoc_md9"/>
     </topic>
