@@ -32,7 +32,7 @@ $(BIN)/%: $(OBJ)/%.o
 
 # Create sub-directories for build targets
 dep $(OBJ) $(LIB) $(BIN) apidoc:
-	mkdir $@
+	mkdir -p $@
 
 # Remove intermediate files locally
 .PHONY: clean-local
