@@ -1,6 +1,6 @@
 include config.mk
 
-LDFLAGS += -L$(LIB) -lredisx -lpopt -lreadline -lbsd
+LDFLAGS := -lpopt -lreadline -lbsd -L$(LIB) -lredisx $(LDFLAGS)
 LD_LIBRARY_PATH := $(LIB):$(LD_LIBRARY_PATH)
 
 # Top level make targets...

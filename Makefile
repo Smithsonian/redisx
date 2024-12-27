@@ -28,15 +28,12 @@ else
   $(info WARNING! Doxygen is not available. Will skip 'dox' target) 
 endif
 
-
 # Link against thread lib
 LDFLAGS += -pthread
 
-export
-
 # Build for distribution
 .PHONY: distro
-distro: shared tools $(DOC_TARGETS)
+distro: tools $(DOC_TARGETS)
 
 # Build everything...
 .PHONY: all
@@ -52,8 +49,16 @@ static: $(LIB)/libredisx.a
 
 # Command-line tools
 .PHONY: tools
-tools: shared
+tools:
 	make -f tools.mk
+
+# Link tools against the static or shared libs
+ifeq ($(STATICLINK),1)
+tools: static
+else
+tools: shared
+endif
+
 
 # Examples
 .PHONY: examples
