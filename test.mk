@@ -19,7 +19,7 @@ run: tests
 	$(BIN)/test-tab
 
 $(BIN)/test-%: $(OBJ)/test-%.o $(LIB)/libredisx.a
-	make $(BIN)
+	$(MAKE) $(BIN)
 	$(CC) -o $@ $^ $(LDFLAGS) -lredisx
 
 .PHONY: clean-test

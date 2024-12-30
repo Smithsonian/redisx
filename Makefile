@@ -50,7 +50,7 @@ static: $(LIB)/libredisx.a
 # Command-line tools
 .PHONY: tools
 tools:
-	make -f tools.mk
+	$(MAKE) -f tools.mk
 
 # Link tools against the static or shared libs
 ifeq ($(STATICLINK),1)
@@ -63,12 +63,12 @@ endif
 # Examples
 .PHONY: examples
 examples: shared
-	make -f examples.mk
+	$(MAKE) -f examples.mk
 
 # Run regression tests
 .PHONY: test
 test: shared
-	make -f test.mk
+	$(MAKE) -f test.mk
 
 # 'test' + 'analyze'
 .PHONY: check
@@ -77,7 +77,7 @@ check: test analyze
 # Static code analysis via Facebook's infer
 .PHONY: infer
 infer: clean
-	infer run -- make shared
+	infer run -- $(MAKE) shared
 
 # Remove intermediates
 .PHONY: clean
