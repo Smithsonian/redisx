@@ -24,7 +24,7 @@
 <link rel="icon" type="image/png" sizes="192x192" href="/redisx/resources/android-chrome-192x192.png" />
 <link rel="icon" type="image/png" sizes="512x512" href="/redisx/resources/android-chrome-512x512.png" />
 <link rel="apple-touch-icon" type="image/png" href="/redisx/resources/apple-touch-icon.png" />
-<title>RedisX: Data Fields - Variables</title>
+<title>RedisX: RedisMap Struct Reference</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
@@ -86,7 +86,7 @@ $(function() {
 </div>
 <script type="text/javascript">
 /* @license magnet:?xt=urn:btih:d3d9a9a6595521f9666a5e94cc830dab83b65699&amp;dn=expat.txt MIT */
-$(document).ready(function(){initNavTree('functions_vars.html',''); initResizable(); });
+$(document).ready(function(){initNavTree('structRedisMap.html',''); initResizable(); });
 /* @license-end */
 </script>
 <div id="doc-content">
@@ -111,25 +111,42 @@ $(document).ready(function(){initNavTree('functions_vars.html',''); initResizabl
 </div>
 </div>
 
+<div class="header">
+  <div class="summary">
+<a href="#pub-attribs">Data Fields</a>  </div>
+  <div class="headertitle"><div class="title">RedisMap Struct Reference</div></div>
+</div><!--header-->
 <div class="contents">
-<div class="textblock">Here is a list of all documented variables with links to the struct/union documentation for each field:</div><ul>
-<li>host&#160;:&#160;<a class="el" href="structRedisServer.html#a1c2046dcb30a629d6d9f45ff8f403f12">RedisServer</a></li>
-<li>id&#160;:&#160;<a class="el" href="structRedis.html#aecb3b0d045ada529257a2fbf8f829599">Redis</a></li>
-<li>interactive&#160;:&#160;<a class="el" href="structRedis.html#af51011d99955d6f036a9f2c291577749">Redis</a></li>
-<li>key&#160;:&#160;<a class="el" href="structRedisEntry.html#a5892a9181e6a332f84d27aecd41dcd12">RedisEntry</a>, <a class="el" href="structRedisMap.html#ab48749655da556e91b5286bb4d196eb1">RedisMap</a></li>
-<li>length&#160;:&#160;<a class="el" href="structRedisEntry.html#a9f59b34b1f25fe00023291b678246bcc">RedisEntry</a></li>
-<li>n&#160;:&#160;<a class="el" href="structRESP.html#a76f11d9a0a47b94f72c2d0e77fb32240">RESP</a></li>
-<li>pipeline&#160;:&#160;<a class="el" href="structRedis.html#a59d367a240bf9c00366465d842402de8">Redis</a></li>
-<li>port&#160;:&#160;<a class="el" href="structRedisServer.html#a63c89c04d1feae07ca35558055155ffb">RedisServer</a></li>
-<li>subscription&#160;:&#160;<a class="el" href="structRedis.html#aa4878fb8cef61468ee8e7426a973a75c">Redis</a></li>
-<li>type&#160;:&#160;<a class="el" href="structRESP.html#a93869a69154ac2297800b0afff64d600">RESP</a></li>
-<li>value&#160;:&#160;<a class="el" href="structRedisEntry.html#a4e9aec275e566b978a3ccb4e043d8c61">RedisEntry</a>, <a class="el" href="structRedisMap.html#a449b0c7dacd31c5e7edf071da3bda96a">RedisMap</a>, <a class="el" href="structRESP.html#a0f61d63b009d0880a89c843bd50d8d76">RESP</a></li>
+
+<p><code>#include &lt;redisx.h&gt;</code></p>
+<table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="pub-attribs" name="pub-attribs"></a>
+Data Fields</h2></td></tr>
+<tr class="memitem:ab48749655da556e91b5286bb4d196eb1" id="r_ab48749655da556e91b5286bb4d196eb1"><td class="memItemLeft" align="right" valign="top"><a id="ab48749655da556e91b5286bb4d196eb1" name="ab48749655da556e91b5286bb4d196eb1"></a>
+<a class="el" href="structRESP.html">RESP</a> *&#160;</td><td class="memItemRight" valign="bottom"><b>key</b></td></tr>
+<tr class="memdesc:ab48749655da556e91b5286bb4d196eb1"><td class="mdescLeft">&#160;</td><td class="mdescRight">The keyword component. <br /></td></tr>
+<tr class="separator:ab48749655da556e91b5286bb4d196eb1"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a449b0c7dacd31c5e7edf071da3bda96a" id="r_a449b0c7dacd31c5e7edf071da3bda96a"><td class="memItemLeft" align="right" valign="top"><a id="a449b0c7dacd31c5e7edf071da3bda96a" name="a449b0c7dacd31c5e7edf071da3bda96a"></a>
+<a class="el" href="structRESP.html">RESP</a> *&#160;</td><td class="memItemRight" valign="bottom"><b>value</b></td></tr>
+<tr class="memdesc:a449b0c7dacd31c5e7edf071da3bda96a"><td class="mdescLeft">&#160;</td><td class="mdescRight">The associated value component. <br /></td></tr>
+<tr class="separator:a449b0c7dacd31c5e7edf071da3bda96a"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table>
+<a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
+<div class="textblock"><p>Structure that represents a key/value mapping in RESP3.</p>
+<dl class="section see"><dt>See also</dt><dd><a class="el" href="resp_8c.html#a460822029ff730cd7a55d64797c329a3">redisxIsMapType()</a> </dd>
+<dd>
+<a class="el" href="redisx_8h.html#afa5c90630d37c2f77e5d7985932941a0a84ed8b97007ad57425cec2cb9b12e89b" title="RESP3 dictionary of key / value.">RESP3_MAP</a> </dd>
+<dd>
+<a class="el" href="redisx_8h.html#afa5c90630d37c2f77e5d7985932941a0a2da22ebb851ace110ab55425d2fe19fd" title="RESP3 dictionary of attributes (metadata)">RESP3_ATTRIBUTE</a> </dd></dl>
+</div><hr/>The documentation for this struct was generated from the following file:<ul>
+<li>include/<a class="el" href="redisx_8h.html">redisx.h</a></li>
 </ul>
 </div><!-- contents -->
 </div><!-- doc-content -->
 <!-- start footer part -->
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
+    <li class="navelem"><a class="el" href="structRedisMap.html">RedisMap</a></li>
     <li class="footer">Generated by <a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.8 </li>
   </ul>
 </div>

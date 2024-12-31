@@ -71,9 +71,9 @@
         <topic label="length" href="structRedisEntry.html#a9f59b34b1f25fe00023291b678246bcc"/>
         <topic label="value" href="structRedisEntry.html#a4e9aec275e566b978a3ccb4e043d8c61"/>
       </topic>
-      <topic label="RedisMapEntry" href="structRedisMapEntry.html">
-        <topic label="key" href="structRedisMapEntry.html#ab48749655da556e91b5286bb4d196eb1"/>
-        <topic label="value" href="structRedisMapEntry.html#a449b0c7dacd31c5e7edf071da3bda96a"/>
+      <topic label="RedisMap" href="structRedisMap.html">
+        <topic label="key" href="structRedisMap.html#ab48749655da556e91b5286bb4d196eb1"/>
+        <topic label="value" href="structRedisMap.html#a449b0c7dacd31c5e7edf071da3bda96a"/>
       </topic>
       <topic label="RedisServer" href="structRedisServer.html">
         <topic label="host" href="structRedisServer.html#a1c2046dcb30a629d6d9f45ff8f403f12"/>
@@ -107,9 +107,9 @@
             <topic label="length" href="structRedisEntry.html#a9f59b34b1f25fe00023291b678246bcc"/>
             <topic label="value" href="structRedisEntry.html#a4e9aec275e566b978a3ccb4e043d8c61"/>
           </topic>
-          <topic label="RedisMapEntry" href="structRedisMapEntry.html">
-            <topic label="key" href="structRedisMapEntry.html#ab48749655da556e91b5286bb4d196eb1"/>
-            <topic label="value" href="structRedisMapEntry.html#a449b0c7dacd31c5e7edf071da3bda96a"/>
+          <topic label="RedisMap" href="structRedisMap.html">
+            <topic label="key" href="structRedisMap.html#ab48749655da556e91b5286bb4d196eb1"/>
+            <topic label="value" href="structRedisMap.html#a449b0c7dacd31c5e7edf071da3bda96a"/>
           </topic>
           <topic label="RedisServer" href="structRedisServer.html">
             <topic label="host" href="structRedisServer.html#a1c2046dcb30a629d6d9f45ff8f403f12"/>
@@ -202,9 +202,9 @@
           <topic label="redisxGetHelloData" href="redisx_8h.html#a89fd65118ba731931fe281c83f6fa8ba"/>
           <topic label="redisxGetInfo" href="redisx_8h.html#a1693736dbc3d9a3ba17a31cf2bb4246d"/>
           <topic label="redisxGetKeys" href="redisx_8h.html#aaa45af252b10e19c647d2cd5b51d7c05"/>
-          <topic label="redisxGetKeywordEntry" href="redisx_8h.html#af158bd99f4f6733037846979423b6af6"/>
+          <topic label="redisxGetKeywordEntry" href="redisx_8h.html#a69c888c16bb7a74acba44414e18d61ff"/>
           <topic label="redisxGetLockedConnectedClient" href="redisx_8h.html#a19d2fb18f2f939edfdc412d064741f9f"/>
-          <topic label="redisxGetMapEntry" href="redisx_8h.html#a698cffbe2fb664d79fc702aac7028ca9"/>
+          <topic label="redisxGetMapEntry" href="redisx_8h.html#ad499956b192f4fe313a918f266ce1943"/>
           <topic label="redisxGetProtocol" href="redisx_8h.html#af756044530dd5b424ec64e89e22eb0a0"/>
           <topic label="redisxGetScanCount" href="redisx_8h.html#af3167ceaaedaf0a005da22e28521440e"/>
           <topic label="redisxGetStringValue" href="redisx_8h.html#afc875f142146282860b6a8a3ac2f0fc8"/>
@@ -384,8 +384,8 @@
           <topic label="redisxCheckRESP" href="resp_8c.html#a4b5674d08da07250c0ca6116a4c48ccf"/>
           <topic label="redisxCopyOfRESP" href="resp_8c.html#af093c487ee72ade826ce894f59691475"/>
           <topic label="redisxDestroyRESP" href="resp_8c.html#aa4e23a7454f7055711915ec430599011"/>
-          <topic label="redisxGetKeywordEntry" href="resp_8c.html#af158bd99f4f6733037846979423b6af6"/>
-          <topic label="redisxGetMapEntry" href="resp_8c.html#a698cffbe2fb664d79fc702aac7028ca9"/>
+          <topic label="redisxGetKeywordEntry" href="resp_8c.html#a69c888c16bb7a74acba44414e18d61ff"/>
+          <topic label="redisxGetMapEntry" href="resp_8c.html#ad499956b192f4fe313a918f266ce1943"/>
           <topic label="redisxHasComponents" href="resp_8c.html#a39055bb1b469883dabfaf1b8efe3b6fe"/>
           <topic label="redisxIsArrayType" href="resp_8c.html#af7d1a91b1d89fb11e6b16db04653a871"/>
           <topic label="redisxIsEqualRESP" href="resp_8c.html#ac84b780fd0c2ed709d4edd5789e522aa"/>

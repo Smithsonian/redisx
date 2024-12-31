@@ -3,7 +3,7 @@ var annotated_dup =
     [ "Redis", "structRedis.html", "structRedis" ],
     [ "RedisClient", "structRedisClient.html", null ],
     [ "RedisEntry", "structRedisEntry.html", "structRedisEntry" ],
-    [ "RedisMapEntry", "structRedisMapEntry.html", "structRedisMapEntry" ],
+    [ "RedisMap", "structRedisMap.html", "structRedisMap" ],
     [ "RedisServer", "structRedisServer.html", "structRedisServer" ],
     [ "RESP", "structRESP.html", "structRESP" ]
 ];

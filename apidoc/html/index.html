@@ -121,7 +121,7 @@ $(document).ready(function(){initNavTree('index.html',''); initResizable(); });
 <li><a href="https://smithsonian.github.io/redisx">Project page</a> on github.io</li>
 </ul>
 <p>Author: Attila Kovacs</p>
-<p>Last Updated: 13 December 2024</p>
+<p>Last Updated: 31 December 2024</p>
 <h2><a class="anchor" id="autotoc_md3"></a>
 Table of Contents</h2>
 <ul>
@@ -301,6 +301,7 @@ Building RedisX</h2>
 <li><code>LDFLAGS</code>: Extra linker flags (default is <em>not set</em>). Note, <code>-lm -lxchange</code> will be added automatically.</li>
 <li><code>CHECKEXTRA</code>: Extra options to pass to <code>cppcheck</code> for the <code>make check</code> target</li>
 <li><code>XCHANGE</code>: If the <a href="https://github.com/Smithsonian/xchange">Smithsonian/xchange</a> library is not installed on your system (e.g. under <code>/usr</code>) set <code>XCHANGE</code> to where the distribution can be found. The build will expect to find <code><a class="elRef" href="../../xchange/apidoc/html/xchange_8h.html">xchange.h</a></code> under <code>$(XCHANGE)/include</code> and <code>libxchange.so</code> / <code>libxchange.a</code> under <code>$(XCHANGE)/lib</code> or else in the default <code>LD_LIBRARY_PATH</code>.</li>
+<li><code>STATICLINK</code>: Set to 1 to prefer linking tools statically against <code>libredisx.a</code>. (It may still link dynamically if <code>libredisx.so</code> is also available.</li>
 </ul>
 <p>After configuring, you can simply run <code>make</code>, which will build the <code>shared</code> (<code>lib/libredisx.so[.1]</code>) and <code>static</code> (<code>lib/libredisx.a</code>) libraries, local HTML documentation (provided <code>doxygen</code> is available), and performs static analysis via the <code>check</code> target. Or, you may build just the components you are interested in, by specifying the desired <code>make</code> target(s). (You can use <code>make help</code> to get a summary of the available <code>make</code> targets).</p>
 <p>After building the library you can install the above components to the desired locations on your system. For a system-wide install you may simply run:</p>
@@ -587,9 +588,9 @@ RESP data type</h3>
 <tr class="markdownTableRowEven">
 <td class="markdownTableBodyNone"><code>RESP3_SET</code>   </td><td class="markdownTableBodyNone"><code>~</code>   </td><td class="markdownTableBodyNone">number of <code><a class="el" href="structRESP.html" title="Structure that represents a Redis response (RESP format).">RESP</a> *</code> pointers   </td><td class="markdownTableBodyNone"><code>(<a class="el" href="structRESP.html" title="Structure that represents a Redis response (RESP format).">RESP</a> *)</code>    </td></tr>
 <tr class="markdownTableRowOdd">
-<td class="markdownTableBodyNone"><code>RESP3_MAP</code>   </td><td class="markdownTableBodyNone"><code>%</code>   </td><td class="markdownTableBodyNone">number of key / value pairs   </td><td class="markdownTableBodyNone"><code>(<a class="el" href="structRedisMapEntry.html">RedisMapEntry</a> *)</code>    </td></tr>
+<td class="markdownTableBodyNone"><code>RESP3_MAP</code>   </td><td class="markdownTableBodyNone"><code>%</code>   </td><td class="markdownTableBodyNone">number of key / value pairs   </td><td class="markdownTableBodyNone"><code>(<a class="el" href="structRedisMap.html">RedisMap</a> *)</code>    </td></tr>
 <tr class="markdownTableRowEven">
-<td class="markdownTableBodyNone"><code>RESP3_ATTRIBUTE</code>   </td><td class="markdownTableBodyNone"><code>\|</code>   </td><td class="markdownTableBodyNone">number of key / value pairs   </td><td class="markdownTableBodyNone"><code>(<a class="el" href="structRedisMapEntry.html">RedisMapEntry</a> *)</code>    </td></tr>
+<td class="markdownTableBodyNone"><code>RESP3_ATTRIBUTE</code>   </td><td class="markdownTableBodyNone"><code>\|</code>   </td><td class="markdownTableBodyNone">number of key / value pairs   </td><td class="markdownTableBodyNone"><code>(<a class="el" href="structRedisMap.html">RedisMap</a> *)</code>    </td></tr>
 <tr class="markdownTableRowOdd">
 <td class="markdownTableBodyNone"><code>RESP3_PUSH</code>   </td><td class="markdownTableBodyNone"><code>&gt;</code>   </td><td class="markdownTableBodyNone">number of <code><a class="el" href="structRESP.html" title="Structure that represents a Redis response (RESP format).">RESP</a> *</code> pointers   </td><td class="markdownTableBodyNone"><code>(<a class="el" href="structRESP.html" title="Structure that represents a Redis response (RESP format).">RESP</a> **)</code>   </td></tr>
 </table>

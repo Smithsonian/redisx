@@ -7,7 +7,7 @@
     <class kind="struct">Redis</class>
     <class kind="struct">RedisClient</class>
     <class kind="struct">RedisEntry</class>
-    <class kind="struct">RedisMapEntry</class>
+    <class kind="struct">RedisMap</class>
     <class kind="struct">RedisServer</class>
     <class kind="struct">RESP</class>
     <member kind="define">
@@ -544,10 +544,10 @@
       <arglist>(Redis *redis, const char *table, int *n)</arglist>
     </member>
     <member kind="function">
-      <type>RedisMapEntry *</type>
+      <type>RedisMap *</type>
       <name>redisxGetKeywordEntry</name>
       <anchorfile>redisx_8h.html</anchorfile>
-      <anchor>af158bd99f4f6733037846979423b6af6</anchor>
+      <anchor>a69c888c16bb7a74acba44414e18d61ff</anchor>
       <arglist>(const RESP *map, const char *key)</arglist>
     </member>
     <member kind="function">
@@ -558,10 +558,10 @@
       <arglist>(Redis *redis, enum redisx_channel channel)</arglist>
     </member>
     <member kind="function">
-      <type>RedisMapEntry *</type>
+      <type>RedisMap *</type>
       <name>redisxGetMapEntry</name>
       <anchorfile>redisx_8h.html</anchorfile>
-      <anchor>a698cffbe2fb664d79fc702aac7028ca9</anchor>
+      <anchor>ad499956b192f4fe313a918f266ce1943</anchor>
       <arglist>(const RESP *map, const RESP *key)</arglist>
     </member>
     <member kind="function">
@@ -1732,17 +1732,17 @@
       <arglist>(RESP *resp)</arglist>
     </member>
     <member kind="function">
-      <type>RedisMapEntry *</type>
+      <type>RedisMap *</type>
       <name>redisxGetKeywordEntry</name>
       <anchorfile>resp_8c.html</anchorfile>
-      <anchor>af158bd99f4f6733037846979423b6af6</anchor>
+      <anchor>a69c888c16bb7a74acba44414e18d61ff</anchor>
       <arglist>(const RESP *map, const char *key)</arglist>
     </member>
     <member kind="function">
-      <type>RedisMapEntry *</type>
+      <type>RedisMap *</type>
       <name>redisxGetMapEntry</name>
       <anchorfile>resp_8c.html</anchorfile>
-      <anchor>a698cffbe2fb664d79fc702aac7028ca9</anchor>
+      <anchor>ad499956b192f4fe313a918f266ce1943</anchor>
       <arglist>(const RESP *map, const RESP *key)</arglist>
     </member>
     <member kind="function">
@@ -1892,19 +1892,19 @@
     </member>
   </compound>
   <compound kind="struct">
-    <name>RedisMapEntry</name>
-    <filename>structRedisMapEntry.html</filename>
+    <name>RedisMap</name>
+    <filename>structRedisMap.html</filename>
     <member kind="variable">
       <type>RESP *</type>
       <name>key</name>
-      <anchorfile>structRedisMapEntry.html</anchorfile>
+      <anchorfile>structRedisMap.html</anchorfile>
       <anchor>ab48749655da556e91b5286bb4d196eb1</anchor>
       <arglist></arglist>
     </member>
     <member kind="variable">
       <type>RESP *</type>
       <name>value</name>
-      <anchorfile>structRedisMapEntry.html</anchorfile>
+      <anchorfile>structRedisMap.html</anchorfile>
       <anchor>a449b0c7dacd31c5e7edf071da3bda96a</anchor>
       <arglist></arglist>
     </member>

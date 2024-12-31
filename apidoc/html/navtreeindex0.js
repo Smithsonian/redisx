@@ -214,7 +214,7 @@ var NAVTREEINDEX0 =
 "redisx_8h.html#a63c29262670cf34d06fc30e684878819":[3,0,0,0,129],
 "redisx_8h.html#a648557774b354ff99e279d3dcf94d240":[3,0,0,0,123],
 "redisx_8h.html#a67dd05115ae75dac9637ac04220d73b6":[3,0,0,0,108],
-"redisx_8h.html#a698cffbe2fb664d79fc702aac7028ca9":[3,0,0,0,67],
+"redisx_8h.html#a69c888c16bb7a74acba44414e18d61ff":[3,0,0,0,65],
 "redisx_8h.html#a6c9d4ce9babbcaac35e45f536d47858d":[3,0,0,0,60],
 "redisx_8h.html#a750023f759dd5192dd3c802a542af770":[3,0,0,0,91],
 "redisx_8h.html#a766ad80d9b84f4ca16be3da08e1968c9":[3,0,0,0,58],

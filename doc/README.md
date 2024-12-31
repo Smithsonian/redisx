@@ -7,7 +7,7 @@ A free, simple, and light-weight C/C++ Redis / Valkey client library.
  
 Author: Attila Kovacs
 
-Last Updated: 13 December 2024
+Last Updated: 31 December 2024
 
 ## Table of Contents
 
@@ -197,6 +197,9 @@ prior to invoking `make`. The following build variables can be configured:
    system (e.g. under `/usr`) set `XCHANGE` to where the distribution can be found. The build will expect to find 
    `xchange.h` under `$(XCHANGE)/include` and `libxchange.so` / `libxchange.a` under `$(XCHANGE)/lib` or else in the 
    default `LD_LIBRARY_PATH`.
+   
+ - `STATICLINK`: Set to 1 to prefer linking tools statically against `libredisx.a`. (It may still link dynamically if 
+   `libredisx.so` is also available.
  
 After configuring, you can simply run `make`, which will build the `shared` (`lib/libredisx.so[.1]`) and `static` 
 (`lib/libredisx.a`) libraries, local HTML documentation (provided `doxygen` is available), and performs static
@@ -642,8 +645,8 @@ whose contents are:
  | `RESP3_BLOB_ERROR`      |   `!`    | total string length           | `(char *)`            | 
  | `RESP3_VERBATIM_TEXT`   |   `=`    | text length (incl. type)      | `(char *)`            |
  | `RESP3_SET`             |   `~`    | number of `RESP *` pointers   | `(RESP *)`            |
- | `RESP3_MAP`             |   `%`    | number of key / value pairs   | `(RedisMapEntry *)`   |
- | `RESP3_ATTRIBUTE`       |   `\|`   | number of key / value pairs   | `(RedisMapEntry *)`   |
+ | `RESP3_MAP`             |   `%`    | number of key / value pairs   | `(RedisMap *)`   |
+ | `RESP3_ATTRIBUTE`       |   `\|`   | number of key / value pairs   | `(RedisMap *)`   |
  | `RESP3_PUSH`            |   `>`    | number of `RESP *` pointers   | `(RESP **)`           | 
  
 

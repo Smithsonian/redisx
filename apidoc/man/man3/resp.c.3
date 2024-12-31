@@ -33,10 +33,10 @@ src/resp.c
 .RI "void \fBredisxDestroyRESP\fP (\fBRESP\fP *resp)"
 .br
 .ti -1c
-.RI "\fBRedisMapEntry\fP * \fBredisxGetKeywordEntry\fP (const \fBRESP\fP *map, const char *key)"
+.RI "\fBRedisMap\fP * \fBredisxGetKeywordEntry\fP (const \fBRESP\fP *map, const char *key)"
 .br
 .ti -1c
-.RI "\fBRedisMapEntry\fP * \fBredisxGetMapEntry\fP (const \fBRESP\fP *map, const \fBRESP\fP *key)"
+.RI "\fBRedisMap\fP * \fBredisxGetMapEntry\fP (const \fBRESP\fP *map, const \fBRESP\fP *key)"
 .br
 .ti -1c
 .RI "\fBboolean\fP \fBredisxHasComponents\fP (const \fBRESP\fP *r)"
@@ -170,7 +170,7 @@ A copy of the original, with no shared references\&.
 .PP
 
 .PP
-References \fBRedisMapEntry::key\fP, \fBRESP::n\fP, \fBredisxCopyOfRESP()\fP, \fBRESP3_ATTRIBUTE\fP, \fBRESP3_BIG_NUMBER\fP, \fBRESP3_BLOB_ERROR\fP, \fBRESP3_DOUBLE\fP, \fBRESP3_MAP\fP, \fBRESP3_PUSH\fP, \fBRESP3_SET\fP, \fBRESP3_VERBATIM_STRING\fP, \fBRESP_ARRAY\fP, \fBRESP_BULK_STRING\fP, \fBRESP_ERROR\fP, \fBRESP_SIMPLE_STRING\fP, \fBRESP::type\fP, \fBRESP::value\fP, and \fBRedisMapEntry::value\fP\&.
+References \fBRedisMap::key\fP, \fBRESP::n\fP, \fBredisxCopyOfRESP()\fP, \fBRESP3_ATTRIBUTE\fP, \fBRESP3_BIG_NUMBER\fP, \fBRESP3_BLOB_ERROR\fP, \fBRESP3_DOUBLE\fP, \fBRESP3_MAP\fP, \fBRESP3_PUSH\fP, \fBRESP3_SET\fP, \fBRESP3_VERBATIM_STRING\fP, \fBRESP_ARRAY\fP, \fBRESP_BULK_STRING\fP, \fBRESP_ERROR\fP, \fBRESP_SIMPLE_STRING\fP, \fBRESP::type\fP, \fBRESP::value\fP, and \fBRedisMap::value\fP\&.
 .SS "void redisxDestroyRESP (\fBRESP\fP * resp)"
 Frees up the resources used by a \fBRESP\fP structure that was dynamically allocated\&. The call will segfault if the same \fBRESP\fP is destroyed twice or if the argument is a static allocation\&.
 .PP
@@ -181,8 +181,8 @@ Frees up the resources used by a \fBRESP\fP structure that was dynamically alloc
 .PP
 
 .PP
-References \fBRedisMapEntry::key\fP, \fBRESP::n\fP, \fBredisxDestroyRESP()\fP, \fBRESP3_ATTRIBUTE\fP, \fBRESP3_MAP\fP, \fBRESP3_PUSH\fP, \fBRESP3_SET\fP, \fBRESP_ARRAY\fP, \fBRESP::type\fP, \fBRESP::value\fP, and \fBRedisMapEntry::value\fP\&.
-.SS "\fBRedisMapEntry\fP * redisxGetKeywordEntry (const \fBRESP\fP * map, const char * key)"
+References \fBRedisMap::key\fP, \fBRESP::n\fP, \fBredisxDestroyRESP()\fP, \fBRESP3_ATTRIBUTE\fP, \fBRESP3_MAP\fP, \fBRESP3_PUSH\fP, \fBRESP3_SET\fP, \fBRESP_ARRAY\fP, \fBRESP::type\fP, \fBRESP::value\fP, and \fBRedisMap::value\fP\&.
+.SS "\fBRedisMap\fP * redisxGetKeywordEntry (const \fBRESP\fP * map, const char * key)"
 Retrieves a entry, by its string keyword, from a map-type \fBRESP\fP data structure\&.
 .PP
 \fBParameters\fP
@@ -208,8 +208,8 @@ The matching map entry or NULL if the map contains no such entry\&.
 .PP
 
 .PP
-References \fBRedisMapEntry::key\fP, \fBRESP::n\fP, \fBredisxIsMapType()\fP, \fBredisxIsStringType()\fP, and \fBRESP::value\fP\&.
-.SS "\fBRedisMapEntry\fP * redisxGetMapEntry (const \fBRESP\fP * map, const \fBRESP\fP * key)"
+References \fBRedisMap::key\fP, \fBRESP::n\fP, \fBredisxIsMapType()\fP, \fBredisxIsStringType()\fP, and \fBRESP::value\fP\&.
+.SS "\fBRedisMap\fP * redisxGetMapEntry (const \fBRESP\fP * map, const \fBRESP\fP * key)"
 Retrieves a keyed entry from a map-type \fBRESP\fP data structure\&.
 .PP
 \fBParameters\fP
@@ -235,7 +235,7 @@ The matching map entry or NULL if the map contains no such entry\&.
 .PP
 
 .PP
-References \fBRedisMapEntry::key\fP, \fBRESP::n\fP, \fBredisxIsMapType()\fP, \fBRESP::type\fP, and \fBRESP::value\fP\&.
+References \fBRedisMap::key\fP, \fBRESP::n\fP, \fBredisxIsMapType()\fP, \fBRESP::type\fP, and \fBRESP::value\fP\&.
 .SS "\fBboolean\fP redisxHasComponents (const \fBRESP\fP * r)"
 Checks if a \fBRESP\fP has subcomponents, such as arrays or maps (dictionaries)\&.
 .PP
@@ -313,7 +313,7 @@ TRUE (1) if the two \fBRESP\fP structures match, or else FALSE (0)\&.
 .PP
 References \fBFALSE\fP, \fBRESP::n\fP, \fBTRUE\fP, \fBRESP::type\fP, and \fBRESP::value\fP\&.
 .SS "\fBboolean\fP redisxIsMapType (const \fBRESP\fP * r)"
-Checks if a \fBRESP\fP holds a dictionary, and whose \fCvalue\fP can be cast to \fC(\fBRedisMapEntry\fP *)\fP to use\&.
+Checks if a \fBRESP\fP holds a dictionary, and whose \fCvalue\fP can be cast to \fC(\fBRedisMap\fP *)\fP to use\&.
 .PP
 \fBParameters\fP
 .RS 4
@@ -322,7 +322,7 @@ Checks if a \fBRESP\fP holds a dictionary, and whose \fCvalue\fP can be cast to 
 .PP
 \fBReturns\fP
 .RS 4
-TRUE (1) if the data holds a dictionary (a \fBRedisMapEntry\fP array), or else FALSE (0)\&.
+TRUE (1) if the data holds a dictionary (a \fBRedisMap\fP array), or else FALSE (0)\&.
 .RE
 .PP
 \fBSee also\fP
