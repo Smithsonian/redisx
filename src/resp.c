@@ -48,9 +48,9 @@ void redisxDestroyRESP(RESP *resp) {
     }
     case RESP3_MAP:
     case RESP3_ATTRIBUTE: {
-      RedisMapEntry *component = (RedisMapEntry *) resp->value;
+      RedisMap *component = (RedisMap *) resp->value;
       while(--resp->n >= 0) {
-        RedisMapEntry *e = &component[resp->n];
+        RedisMap *e = &component[resp->n];
         redisxDestroyRESP(e->key);
         redisxDestroyRESP(e->value);
       }
@@ -100,8 +100,8 @@ RESP *redisxCopyOfRESP(const RESP *resp) {
 
     case RESP3_MAP:
     case RESP3_ATTRIBUTE: {
-      const RedisMapEntry *from = (RedisMapEntry *) resp->value;
-      RedisMapEntry *to = (RedisMapEntry *) calloc(resp->n, sizeof(RedisMapEntry));
+      const RedisMap *from = (RedisMap *) resp->value;
+      RedisMap *to = (RedisMap *) calloc(resp->n, sizeof(RedisMap));
       int i;
 
       x_check_alloc(to);
@@ -344,10 +344,10 @@ boolean redisxIsArrayType(const RESP *r) {
 }
 
 /**
- * Checks if a RESP holds a dictionary, and whose `value` can be cast to `(RedisMapEntry *)` to use.
+ * Checks if a RESP holds a dictionary, and whose `value` can be cast to `(RedisMap *)` to use.
  *
  * @param r   Pointer to a RESP data structure
- * @return    TRUE (1) if the data holds a dictionary (a RedisMapEntry array), or else FALSE (0).
+ * @return    TRUE (1) if the data holds a dictionary (a RedisMap array), or else FALSE (0).
  *
  * @sa redisxIsScalarType()
  * @sa redisxIsStringType()
@@ -416,7 +416,7 @@ int redisxAppendRESP(RESP *resp, RESP *part) {
   if(redisxIsArrayType(resp))
     eSize = sizeof(RESP *);
   else if(redisxIsMapType(resp))
-    eSize = sizeof(RedisMapEntry);
+    eSize = sizeof(RedisMap);
   else
     eSize = 1;
 
@@ -468,18 +468,18 @@ boolean redisxIsEqualRESP(const RESP *a, const RESP *b) {
  *
  * @sa redisxGetKeywordEntry()
  */
-RedisMapEntry *redisxGetMapEntry(const RESP *map, const RESP *key) {
-  RedisMapEntry *entries;
+RedisMap *redisxGetMapEntry(const RESP *map, const RESP *key) {
+  RedisMap *entries;
   int i;
 
   if(!key) return NULL;
   if(!redisxIsMapType(map)) return NULL;
   if(!map->value) return NULL;
 
-  entries = (RedisMapEntry *) map->value;
+  entries = (RedisMap *) map->value;
 
   for(i = 0; i < map->n; i++) {
-    RedisMapEntry *e = &entries[i];
+    RedisMap *e = &entries[i];
 
     if(e->key->type != key->type) continue;
     if(e->key->n != key->n) continue;
@@ -506,18 +506,18 @@ RedisMapEntry *redisxGetMapEntry(const RESP *map, const RESP *key) {
  *
  * @sa redisxGetMapEntry()
  */
-RedisMapEntry *redisxGetKeywordEntry(const RESP *map, const char *key) {
-  RedisMapEntry *entries;
+RedisMap *redisxGetKeywordEntry(const RESP *map, const char *key) {
+  RedisMap *entries;
   int i;
 
   if(!key) return NULL;
   if(!redisxIsMapType(map)) return NULL;
   if(!map->value) return NULL;
 
-  entries = (RedisMapEntry *) map->value;
+  entries = (RedisMap *) map->value;
 
   for(i = 0; i < map->n; i++) {
-    RedisMapEntry *e = &entries[i];
+    RedisMap *e = &entries[i];
 
     if(!redisxIsStringType(e->key)) continue;
     if(strcmp(e->key->value, key) == 0) return e;
@@ -633,12 +633,12 @@ static XField *respArrayToXField(const char *name, const RESP **component, int n
   return f;
 }
 
-static XField *respMap2XField(const char *name, const RedisMapEntry *map, int n) {
+static XField *respMap2XField(const char *name, const RedisMap *map, int n) {
   XStructure *s = xCreateStruct(), *nonstring = NULL;
   int nNonString = 0;
 
   while(--n >= 0) {
-    const RedisMapEntry *e = &map[n];
+    const RedisMap *e = &map[n];
 
     if(redisxIsStringType(e->key)) {
       XField *fi = redisxRESP2XField((char *) e->key->value, e->value);
@@ -725,7 +725,7 @@ XField *redisxRESP2XField(const char *name, const RESP *resp) {
 
     case RESP3_MAP:
     case RESP3_ATTRIBUTE: {
-      XField *f = respMap2XField(name, (const RedisMapEntry *) resp->value, resp->n);
+      XField *f = respMap2XField(name, (const RedisMap *) resp->value, resp->n);
       if(!f) return NULL;
       rSetRESPType(f, resp->type);
       return f;
@@ -831,7 +831,7 @@ static int rPrintRESP(int indent, const RESP *resp) {
 
     case RESP3_MAP:
     case RESP3_ATTRIBUTE: {
-      const RedisMapEntry *component = (RedisMapEntry *) resp->value;
+      const RedisMap *component = (RedisMap *) resp->value;
 
       if(!resp->value) printf("(empty map)");
       else {
@@ -913,7 +913,7 @@ void redisxPrintDelimited(const RESP *resp, const char *delim, const char *group
 
     case RESP3_MAP:
     case RESP3_ATTRIBUTE: {
-      const RedisMapEntry *component = (RedisMapEntry *) resp->value;
+      const RedisMap *component = (RedisMap *) resp->value;
 
       if(resp->value) {
         int i;

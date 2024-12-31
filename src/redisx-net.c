@@ -662,7 +662,7 @@ static int rHelloAsync(RedisClient *cl, char *clientID) {
   if(!status) status = redisxCheckRESP(reply, RESP3_MAP, 0);
 
   if(status == X_SUCCESS) {
-    RedisMapEntry *e = redisxGetKeywordEntry(reply, "proto");
+    RedisMap *e = redisxGetKeywordEntry(reply, "proto");
     if(e && e->value->type == RESP_INT) {
       p->protocol = e->value->n;
       xvprintf("Confirmed protocol %d\n", p->protocol);

@@ -172,7 +172,7 @@ typedef struct RESP {
   int n;                       ///< Either the integer value of a RESP_INT or a RESP3_BOOLEAN response, or the
                                 ///< dimension of the value field.
   void *value;                  ///< Pointer to text (char *) content or to an array of components
-                                ///< (RESP**) or (RedisMapEntry *), or else a pointer to a `double`, depending
+                                ///< (RESP**) or (RedisMap *), or else a pointer to a `double`, depending
                                 ///< on `type`.
 } RESP;
 
@@ -187,7 +187,7 @@ typedef struct RESP {
 typedef struct {
   RESP *key;                    ///< The keyword component
   RESP *value;                  ///< The associated value component
-} RedisMapEntry;
+} RedisMap;
 
 
 /**
@@ -466,8 +466,8 @@ int redisxPrintRESP(const RESP *resp);
 int redisxPrintJSON(const char *name, const RESP *resp);
 void redisxPrintDelimited(const RESP *resp, const char *delim, const char *groupPrefix);
 
-RedisMapEntry *redisxGetMapEntry(const RESP *map, const RESP *key);
-RedisMapEntry *redisxGetKeywordEntry(const RESP *map, const char *key);
+RedisMap *redisxGetMapEntry(const RESP *map, const RESP *key);
+RedisMap *redisxGetKeywordEntry(const RESP *map, const char *key);
 
 // Locks for async calls
 int redisxLockClient(RedisClient *cl);

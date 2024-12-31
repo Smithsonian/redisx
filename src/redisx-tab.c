@@ -78,7 +78,7 @@ RedisEntry *redisxGetTable(Redis *redis, const char *table, int *n) {
   *n = reply->n;
 
   if(*n > 0) {
-    RedisMapEntry *dict = (RedisMapEntry *) reply->value;
+    RedisMap *dict = (RedisMap *) reply->value;
     entries = (RedisEntry *) calloc(*n, sizeof(RedisEntry));
 
     if(entries == NULL) {
@@ -89,7 +89,7 @@ RedisEntry *redisxGetTable(Redis *redis, const char *table, int *n) {
 
       for(i = 0; i < reply->n; i += 2) {
         RedisEntry *e = &entries[i];
-        RedisMapEntry *component = &dict[i];
+        RedisMap *component = &dict[i];
         e->key = component->key->value;
         e->value = component->value->value;
 

@@ -1006,16 +1006,16 @@ RESP *redisxReadReplyAsync(RedisClient *cl, int *pStatus) {
 
     case RESP3_MAP:
     case RESP3_ATTRIBUTE: {
-      RedisMapEntry *dict;
+      RedisMap *dict;
       int i;
 
       if(resp->n <= 0) break;
 
-      dict = (RedisMapEntry *) calloc(resp->n, sizeof(RedisMapEntry));
+      dict = (RedisMap *) calloc(resp->n, sizeof(RedisMap));
       x_check_alloc(dict);
 
       for(i = 0; i < resp->n; i++) {
-        RedisMapEntry *e = &dict[i];
+        RedisMap *e = &dict[i];
         e->key = redisxReadReplyAsync(cl, pStatus);
         e->value = redisxReadReplyAsync(cl, pStatus);
       }
