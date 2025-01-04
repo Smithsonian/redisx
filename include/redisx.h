@@ -200,6 +200,10 @@ typedef struct RedisEntry {
   int length;                   ///< Bytes in value.
 } RedisEntry;
 
+
+
+
+
 /**
  * Redis server host and port specification.
  *
@@ -209,6 +213,16 @@ typedef struct RedisServer {
   char *host;                   ///< The hostname or IP address of the server
   int port;                     ///< The port number or &lt;=0 to use the default 6379
 } RedisServer;
+
+
+
+/**
+ * A Redis cluster configuration
+ *
+ */
+typedef struct {
+  void *priv;                   ///< Private data not exposed to users.
+} RedisCluster;
 
 /**
  * \brief Structure that represents a single Redis client connection instance.
@@ -392,6 +406,12 @@ void redisxDestroy(Redis *redis);
 int redisxConnect(Redis *redis, boolean usePipeline);
 void redisxDisconnect(Redis *redis);
 int redisxReconnect(Redis *redis, boolean usePipeline);
+
+RedisCluster *redisxClusterInit(Redis *node);
+Redis *redisxClusterGetShard(RedisCluster *cluster, const char *key);
+int redisxClusterConnect(RedisCluster *cluster);
+int redisxClusterDisconnect(RedisCluster *cluster);
+void redisxClusterDestroy(RedisCluster *cluster);
 
 int redisxPing(Redis *redis, const char *message);
 enum redisx_protocol redisxGetProtocol(Redis *redis);

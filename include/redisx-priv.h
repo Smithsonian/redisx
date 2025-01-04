@@ -60,26 +60,44 @@ typedef struct {
   int timeoutMillis;            ///< [ms] Connection timeout for sentinel nodes.
 } RedisSentinel;
 
-
+/**
+ * A set of configuration settings for a Redis server connection.
+ *
+ */
 typedef struct {
-  RedisSentinel *sentinel;      ///< Sentinel (high-availability) server configuration.
-  uint32_t addr;                ///< The 32-bit inet address
-  int port;                     ///< port number (usually 6379)
   int dbIndex;                  ///< the zero-based database index
   char *username;               ///< Redis user name (if any)
   char *password;               ///< Redis password (if any)
-
   int timeoutMillis;            ///< [ms] Socket read/write timeout
   int tcpBufSize;               ///< [bytes] TCP read/write buffer sizes to use
   int protocol;                 ///< RESP version to use
   boolean hello;                ///< whether to use HELLO (introduced in Redis 6.0.0 only)
-  RESP *helloData;              ///< RESP data received from server during last connection.
   RedisSocketConfigurator socketConf;   ///< Additional user configuration of client sockets
 
-  RedisClient *clients;
+  Hook *firstCleanupCall;       ///< Linked list of cleanup calls
+  Hook *firstConnectCall;       ///< Linked list of connection calls
 
+  void (*pipelineConsumerFunc)(RESP *response);   ///< Callback function to process pipelined responses
+  RedisErrorHandler transmitErrorFunc;            ///< Callback function to process socket-level errors
+
+  RedisPushProcessor pushConsumer; ///< User-defined function to consume RESP3 push messages.
+  void *pushArg;                ///< User-defined argument to pass along with push messages.
+} RedisConfig;
+
+typedef struct {
+  char *hostname;               ///< Server host name or IP address
+  int port;                     ///< port number (usually 6379)
+
+  RedisSentinel *sentinel;      ///< Sentinel (high-availability) server configuration.
+  RedisCluster *cluster;        ///< Cluster, in which this instance is a member
+  uint32_t addr;                ///< The 32-bit inet address
+
+  RedisConfig config;
   pthread_mutex_t configLock;
 
+  RESP *helloData;              ///< RESP data received from server during last connection.
+
+  RedisClient *clients;
   int scanCount;                ///< Count argument to use in SCAN commands, or <= 0 for default
 
   pthread_t pipelineListenerTID;
@@ -88,19 +106,14 @@ typedef struct {
   boolean isPipelineListenerEnabled;
   boolean isSubscriptionListenerEnabled;
 
-  Hook *firstCleanupCall;
-  Hook *firstConnectCall;
-
-  void (*pipelineConsumerFunc)(RESP *response);
-  RedisErrorHandler transmitErrorFunc;
-
   pthread_mutex_t subscriberLock;
   MessageConsumer *subscriberList;
 
-  RedisPushProcessor pushConsumer; ///< User-defined function to consume RESP3 push messages.
-  void *pushArg;                ///< User-defined argument to pass along with push messages.
 } RedisPrivate;
 
+// in redisx.c ---------------------------->
+int rCopyConfig(const RedisConfig *src, Redis *dst);
+void rDestroyConfig(RedisConfig *config);
 
 // in redisx-sub.c ------------------------>
 int rConfigLock(Redis *redis);
@@ -114,6 +127,14 @@ boolean rIsLowLatency(const ClientPrivate *cp);
 int rCheckClient(const RedisClient *cl);
 int rSetServerAsync(Redis *redis, const char *desc, const char *hostname, int port);
 
+
+// in redisx-hooks.c ---------------------->
+Hook *rCopyHooks(const Hook *list, Redis *owner);
+void rClearHooks(Hook *first);
+
+// in redisx-cluster.c -------------------->
+int rClusterRefresh(RedisCluster *cluster);
+uint16_t rCalcHash(const char *key);
 
 // in resp.c ------------------------------>
 int redisxAppendRESP(RESP *resp, RESP *part);

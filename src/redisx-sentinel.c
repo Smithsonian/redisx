@@ -50,6 +50,56 @@ static int rTryConnectSentinel(Redis *redis, int serverIndex) {
  * Verifies that a given Redis instance is in the master role. It is assumed that we have a live
  * interactive connection to the server.
  *
+ * @param redis     A Redis server instance
+ * @return          X_SUCCESS (0) if successful, or else an error code &lt;0.
+ */
+int rDiscoverSentinel(Redis *redis) {
+  static const char *fn = "rConnectSentinel";
+
+  RedisPrivate *p = (RedisPrivate *) redis->priv;
+  RedisConfig *config = &p->config;
+
+  const RedisSentinel *s = p->sentinel;
+  int i, savedTimeout = config->timeoutMillis;
+
+  config->timeoutMillis = s->timeoutMillis > 0 ? s->timeoutMillis : REDISX_DEFAULT_SENTINEL_TIMEOUT_MILLIS;
+
+  for(i = 0; i < s->nServers; i++) if(rTryConnectSentinel(redis, i) == X_SUCCESS) {
+    RESP *reply;
+    int status;
+
+    // Get the name of the master...
+    reply = redisxRequest(redis, "SENTINEL", "get-master-addr-by-name", s->serviceName, NULL, &status);
+    rCloseClientAsync(redis->interactive);
+
+    if(status) continue;
+
+    if(redisxCheckDestroyRESP(reply, RESP_ARRAY, 2) == X_SUCCESS) {
+      RESP **component = (RESP **) reply->value;
+      int port = (int) strtol((char *) component[1]->value, NULL, 10);
+
+      status = rSetServerAsync(redis, "sentinel master", (char *) component[0]->value, port);
+
+      redisxDestroyRESP(reply);
+      config->timeoutMillis = savedTimeout;
+
+      prop_error(fn, status);
+
+      // TODO update sentinel server list...
+
+      return X_SUCCESS;
+    }
+  }
+
+  config->timeoutMillis = savedTimeout;
+  return x_error(X_NO_SERVICE, ENOTCONN, fn, "no Sentinel server available");
+}
+
+/**
+ * Verifies that a given Redis instance is in the master role. User's should always communicate
+ * to the master, not to replicas.
+>>>>>>> 805e5f2 (Initial cluster support)
+ *
  * @param redis     A redis server instance
  * @return          X_SUCCESS (0) if the server is confirmed to be the master, or else an error
  *                  code &lt;0.

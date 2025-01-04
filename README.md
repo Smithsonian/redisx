@@ -569,10 +569,9 @@ with that response (or `NULL` if there was an error).
 ### Bundled Attributes
 
 Redis 6 introduced the possibility of sending optional attributes along with responses, using the RESP3 protocol. 
-These attributes are not included in the responses sent to users, in accordance with RESP3 protocol. Rather, they are 
-made available to users on demand, when needed, after the response to a request is received. You may retrieve the 
-attributes to interactive requests _after_ the `redisxRequest()` or `redisxArrayRequest()` queries, using 
-`redisxGetAttributes()`, e.g.:
+These attributes are not returned to users by default, in line with the RESP3 protocol specification. Rather, they 
+are available on demand, after the response to a request is received. You may retrieve the attributes to interactive 
+requests _after_ the `redisxRequest()` or `redisxArrayRequest()` queries, using `redisxGetAttributes()`, e.g.:
 
 ```c
   ...
