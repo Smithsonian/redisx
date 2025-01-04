@@ -115,12 +115,14 @@ void redisxClearConnectHooks(Redis *redis) {
   if(rConfigLock(redis) != X_SUCCESS) return;
   p = (RedisPrivate *) redis->priv;
   c = p->firstConnectCall;
+  p->firstConnectCall = NULL;
 
   while(c != NULL) {
     Hook *next = c->next;
     free(c);
     c = next;
   }
+
   rConfigUnlock(redis);
 }
 
@@ -219,12 +221,15 @@ void redisxClearDisconnectHooks(Redis *redis) {
   if(rConfigLock(redis) != X_SUCCESS) return;
   p = (RedisPrivate *) redis->priv;
   c = p->firstCleanupCall;
+  p->firstCleanupCall = NULL;
 
   while(c != NULL) {
     Hook *next = c->next;
     free(c);
     c = next;
   }
+
+
   rConfigUnlock(redis);
 }
 
