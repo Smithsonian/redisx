@@ -136,8 +136,16 @@ static void rDiscardShardsAsync(RedisCluster *cluster) {
   p->n_shards = 0;
 }
 
-
-static RedisShard *rClusterDiscoverAsync(Redis *redis, int *n_shards, RedisCluster *cluster) {
+/**
+ * Returns the current cluster configuration obtained from the specified node
+ *
+ * @param cluster           Pointer to cluster to set as the parent to the discovered shards
+ * @param redis             The node to use for discovery. It need not be in a connected state.
+ * @param[out] n_shards     Pointer to integer in which to return the number of shards discovered
+ *                          or else an error code &lt;0.
+ * @return                  Array containing the discovered shards or NULL if there was an error.
+ */
+static RedisShard *rClusterDiscoverAsync(const RedisCluster *cluster, Redis *redis, int *n_shards) {
   static const char *fn = "rClusterDiscoverAsync";
 
   RESP *reply;
@@ -186,7 +194,7 @@ static RedisShard *rClusterDiscoverAsync(Redis *redis, int *n_shards, RedisClust
 
         s->redis[m] = redisxInit((char *) node[0]->value);
         redisxSetPort(s->redis[m], node[1]->n);
-        p->cluster = cluster;
+        p->cluster = (RedisCluster *) cluster;
 
         rCopyConfig(&((RedisPrivate *) redis->priv)->config, s->redis[m]);
       }
@@ -220,7 +228,7 @@ void *ClusterRefreshThread(void *pCluster) {
 
     for(m = 0; m < s->n_servers; m++) {
       int n_shards = 0;
-      RedisShard *shard = rClusterDiscoverAsync(s->redis[m], &n_shards, cluster);
+      RedisShard *shard = rClusterDiscoverAsync(cluster, s->redis[m], &n_shards);
 
       if(n_shards >= 0) {
         rDiscardShardsAsync(cluster);
@@ -257,15 +265,21 @@ int rClusterRefresh(RedisCluster *cluster) {
   p = (ClusterPrivate *) cluster->priv;
   if(!p) return x_error(X_NO_INIT, ENXIO, fn, "cluster is not initialized");
 
+  // Return immediately if the cluster is being reconfigured at present.
+  // This is important so we may process all pending MOVED responses while
+  // the reconfiguration takes place.
   if(p->reconfiguring) return X_SUCCESS;
 
   pthread_mutex_lock(&p->mutex);
 
+  // After obtaining the exclusive lock, check again that no other thread has
+  // begun reconfiguration.
   if(p->reconfiguring) {
     pthread_mutex_unlock(&p->mutex);
     return X_SUCCESS;
   }
 
+  // We are now officially in charge of reconfiguring the cluster...
   p->reconfiguring = TRUE;
 
   errno = 0;
@@ -283,10 +297,14 @@ int rClusterRefresh(RedisCluster *cluster) {
  * Returns the Redis server in a cluster which is to be used for queries relating to the
  * specified Redis keyword. In Redis cluster configurations, the database is distributed in
  * a way that each cluster node serves only a subset of the Redis keys. Thus, this function
- * allows to identify the node that serves a given key.
+ * allows to identify the node that serves a given key. The function supports Redish hashes
+ * according to the specification.
  *
  * @param cluster     Pointer to a Redis cluster configuration
- * @param key         The Redis keyword of interest
+ * @param key         The Redis keyword of interest. It may use hashes (i.e., if the keyword
+ *                    contains a segment enclosed in {} brackets, then the hash will be
+ *                    calculated on the bracketed segment only. E.g. `{user:1000}.name` and
+ *                    `{user:1000}.address` will both return the same hash for `user:1000` only.
  * @return            A connected Redis server (cluster shard), which can be used for
  *                    queries on the given keyword, or NULL if either input pointer is NULL
  *                    (errno = EINVAL), or the cluster has not been initialized (errno = ENXIO),
@@ -395,7 +413,7 @@ RedisCluster *redisxClusterInit(Redis *node) {
 
   pthread_mutex_init(&p->mutex, NULL);
 
-  p->shard = rClusterDiscoverAsync(node, &p->n_shards, cluster);
+  p->shard = rClusterDiscoverAsync(cluster, node, &p->n_shards);
   if(p->n_shards <= 0) {
     redisxClusterDestroy(cluster);
     return x_trace_null(fn, NULL);
