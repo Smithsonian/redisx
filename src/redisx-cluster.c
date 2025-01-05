@@ -115,7 +115,6 @@ static void rDiscardShardsAsync(RedisShard *shards, int n_shards) {
 
   if(!shards) return;
 
-
   for(i = 0; i < n_shards; i++) {
     RedisShard *s = &shards[i];
     int m;
@@ -125,8 +124,11 @@ static void rDiscardShardsAsync(RedisShard *shards, int n_shards) {
       redisxDisconnect(r);
       redisxDestroy(r);
     }
-    free(shards);
+
+    if(s->redis) free(s->redis);
   }
+
+  free(shards);
 }
 
 /**
@@ -195,9 +197,9 @@ static RedisShard *rClusterDiscoverAsync(Redis *redis, int *n_shards) {
         rCopyConfig(&((RedisPrivate *) redis->priv)->config, s->redis[m]);
       }
     }
-
-    redisxDestroyRESP(reply);
   }
+
+  redisxDestroyRESP(reply);
 
   if(!isConnected) redisxDisconnect(redis);
 
