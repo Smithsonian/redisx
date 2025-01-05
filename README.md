@@ -129,8 +129,6 @@ And at every step, you should check for and [handle errors](#error-handling) as 
  | Feature                           | supported  | comments                                                     |
  | --------------------------------- |:----------:| -------------------------------------------------------------|
  | concurrent Redis instances        |  __yes__   | You can manage and use multiple Redis servers simultaneously |
- | connect over TCP                  |  __yes__   |                                                              |
- | connect over UDP                  |    no      |                                                              |
  | connect / disconnect hooks        |  __yes__   | user-defined callbacks                                       |
  | socket customization              |  __yes__   | (optional) user-defined timeout, buffer size and/or callback |
  | custom socket error handling      |  __yes__   | (optional) user-defined callback                             |
@@ -154,7 +152,6 @@ And at every step, you should check for and [handle errors](#error-handling) as 
  | Sentinel support                  |  __yes__   | _help me test it_                                            |
  | cluster support                   |    no      | _coming soon..._                                             |
  | TLS support                       |    no      | _coming soon..._                                             |
- | resubscribe on reconnect          |    no      |                                                              |
 
 
 <a name="related-links"></a>
