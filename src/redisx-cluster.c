@@ -132,13 +132,14 @@ static void rDiscardShardsAsync(RedisShard *shards, int n_shards) {
 /**
  * Returns the current cluster configuration obtained from the specified node
  *
- * @param cluster           Pointer to cluster to set as the parent to the discovered shards
  * @param redis             The node to use for discovery. It need not be in a connected state.
  * @param[out] n_shards     Pointer to integer in which to return the number of shards discovered
  *                          or else an error code &lt;0.
  * @return                  Array containing the discovered shards or NULL if there was an error.
+ *
+ * @sa rClusterSetShardsAsync()
  */
-static RedisShard *rClusterDiscoverAsync(const RedisCluster *cluster, Redis *redis, int *n_shards) {
+static RedisShard *rClusterDiscoverAsync(Redis *redis, int *n_shards) {
   static const char *fn = "rClusterDiscoverAsync";
 
   RESP *reply;
@@ -188,12 +189,9 @@ static RedisShard *rClusterDiscoverAsync(const RedisCluster *cluster, Redis *red
 
       for(m = 0; m < s->n_servers; s++) {
         RESP **node = (RESP **) desc[2]->value;
-        RedisPrivate *p = (RedisPrivate *) s->redis[m]->priv;
 
         s->redis[m] = redisxInit((char *) node[0]->value);
         redisxSetPort(s->redis[m], node[1]->n);
-        p->cluster = (RedisCluster *) cluster;
-
         rCopyConfig(&((RedisPrivate *) redis->priv)->config, s->redis[m]);
       }
     }
@@ -207,6 +205,40 @@ static RedisShard *rClusterDiscoverAsync(const RedisCluster *cluster, Redis *red
 
   return shards;
 }
+
+/**
+ * Sets a new set of shards for a cluster. All servers in the shards will have the cluster registered
+ * as a parent, so they may all initiate reconfiguration if the hashes have `MOVED`. Normally this
+ * should be called after rClusterDiscoverAsync()
+ *
+ * @param cluster     Pointer to a Redis cluster configuration
+ * @param shard       New array of shards to set
+ * @param n_shards    Number of shards in the array
+ *
+ * @sa rClusterDiscoverAsync()
+ */
+static void rClusterSetShardsAsync(RedisCluster *cluster, RedisShard *shard, int n_shards) {
+  ClusterPrivate *p = (ClusterPrivate *) cluster->priv;
+  int k;
+
+  // Destroy any different prior shards.
+  if(p->shard && p->shard != shard) rDiscardShardsAsync(p->shard, p->n_shards);
+
+  // Register the cluster as the parent to all shard servers
+  for(k = 0; k < n_shards; k++) {
+    RedisShard *s = &shard[k];
+    int m;
+    for(m = 0; m < s->n_servers; m++) {
+      RedisPrivate *np = (RedisPrivate *) s->redis[m]->priv;
+      np->cluster = cluster;
+    }
+  }
+
+  // Assign the new shards to the cluster.
+  p->shard = shard;
+  p->n_shards = n_shards;
+}
+
 
 /// \cond PRIVATE
 
@@ -226,12 +258,10 @@ void *ClusterRefreshThread(void *pCluster) {
 
     for(m = 0; m < s->n_servers; m++) {
       int n_shards = 0;
-      RedisShard *shard = rClusterDiscoverAsync(cluster, s->redis[m], &n_shards);
+      RedisShard *shard = rClusterDiscoverAsync(s->redis[m], &n_shards);
 
       if(n_shards >= 0) {
-        rDiscardShardsAsync(p->shard, p->n_shards);
-        p->shard = shard;
-        p->n_shards = n_shards;
+        rClusterSetShardsAsync(cluster, shard, n_shards);
         break;
       }
     }
@@ -390,15 +420,8 @@ RedisCluster *redisxClusterInit(Redis *node) {
 
   RedisCluster *cluster;
   ClusterPrivate *p;
-  boolean isConnected;
 
-  isConnected = redisxIsConnected(node);
-  if(!isConnected) if(redisxConnect(node, FALSE) != X_SUCCESS) return x_trace_null(fn, NULL);
-
-  if(!rConfigLock(node)) {
-    if(!isConnected) redisxDisconnect(node);
-    return x_trace_null(fn, NULL);
-  }
+  if(!rConfigLock(node)) return x_trace_null(fn, NULL);
 
   cluster = (RedisCluster *) calloc(1, sizeof(RedisCluster));
   x_check_alloc(cluster);
@@ -411,15 +434,15 @@ RedisCluster *redisxClusterInit(Redis *node) {
 
   pthread_mutex_init(&p->mutex, NULL);
 
-  p->shard = rClusterDiscoverAsync(cluster, node, &p->n_shards);
+  p->shard = rClusterDiscoverAsync(node, &p->n_shards);
+  rClusterSetShardsAsync(cluster, p->shard, p->n_shards);
+
+  rConfigUnlock(node);
+
   if(p->n_shards <= 0) {
     redisxClusterDestroy(cluster);
     return x_trace_null(fn, NULL);
   }
-
-  rConfigUnlock(node);
-
-  if(!isConnected) redisxDisconnect(node);
 
   return cluster;
 }
