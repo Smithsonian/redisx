@@ -113,7 +113,7 @@ typedef struct {
 
 // in redisx.c ---------------------------->
 int rCopyConfig(const RedisConfig *src, Redis *dst);
-void rDestroyConfig(RedisConfig *config);
+void rClearConfig(RedisConfig *config);
 
 // in redisx-sub.c ------------------------>
 int rConfigLock(Redis *redis);

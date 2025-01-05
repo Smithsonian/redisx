@@ -371,10 +371,10 @@ Redis *redisxClusterGetShard(RedisCluster *cluster, const char *key) {
  * The caller may try multiple nodes from a list of known cluster nodes, until a valid (non-NULL)
  * configuration is returned.
  *
- * The cluster will inherit configuration from the node, including user authentication, socket
- * configuration, connection / disconnection hooks, and asynchronous processing functions. Thus
- * you may configure the node as usual prior to this call, knowing that the nodes in the cluster
- * will be configured the same way also.
+ * The returned cluster will inherit configuration from the node, including user authentication,
+ * socket configuration, connection / disconnection hooks, and asynchronous processing functions.
+ * Thus, you may configure the node as usual prior to this call, knowing that the nodes in the
+ * cluster will be configured the same way also.
  *
  * @param node      A known cluster node (connected or not). It's configuration will be used
  *                  for all cluster nodes discovered also.
@@ -505,7 +505,7 @@ int redisxClusterConnect(RedisCluster *cluster) {
 /**
  * Disconnects from all shards of a Redis cluster. Note, that a cluster can still be used even
  * after it is disconnected, since each call to redisxClusterGetShard() will automatically
- * reconnect the requested shard on demand as needed.
+ * reconnect the requested shard as needed.
  *
  * @param cluster   Pointer to a Redis cluster configuration
  * @return          X_SUCCESS (0) if successful, or else a RedisX error code &lt;0 (errno

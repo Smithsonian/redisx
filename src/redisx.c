@@ -582,7 +582,7 @@ int rCopyConfig(const RedisConfig *config, Redis *dst) {
   return X_SUCCESS;
 }
 
-void rDestroyConfig(RedisConfig *config) {
+void rClearConfig(RedisConfig *config) {
   if(!config) return;
 
   if(config->username) free(config->username);
@@ -591,7 +591,7 @@ void rDestroyConfig(RedisConfig *config) {
   rClearHooks(config->firstConnectCall);
   rClearHooks(config->firstCleanupCall);
 
-  free(config);
+  memset(config, 0, sizeof(*config));
 }
 
 /// \endcond

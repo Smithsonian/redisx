@@ -809,7 +809,7 @@ void redisxDestroy(Redis *redis) {
   redisxDestroyRESP(p->helloData);
   redisxClearSubscribers(redis);
 
-  rDestroyConfig(&p->config);
+  rClearConfig(&p->config);
 
   if(p->clients) free(p->clients);
 
