@@ -110,30 +110,23 @@ uint16_t rCalcHash(const char *key) {
 }
 /// \endcond
 
-static void rDiscardShardsAsync(RedisCluster *cluster) {
-  ClusterPrivate *p;
+static void rDiscardShardsAsync(RedisShard *shards, int n_shards) {
+  int i;
 
-  if(!cluster) return;
+  if(!shards) return;
 
-  p = (ClusterPrivate *) cluster->priv;
-  if(!p) return;
 
-  if(p->shard) {
-    int i;
-    for(i = 0; i < p->n_shards; i++) {
-      RedisShard *s = &p->shard[i];
-      int m;
+  for(i = 0; i < n_shards; i++) {
+    RedisShard *s = &shards[i];
+    int m;
 
-      for(m = 0; m < s->n_servers; m++) {
-        Redis *r = s->redis[m];
-        redisxDisconnect(r);
-        redisxDestroy(r);
-      }
+    for(m = 0; m < s->n_servers; m++) {
+      Redis *r = s->redis[m];
+      redisxDisconnect(r);
+      redisxDestroy(r);
     }
-    free(p->shard);
+    free(shards);
   }
-
-  p->n_shards = 0;
 }
 
 /**
@@ -183,9 +176,14 @@ static RedisShard *rClusterDiscoverAsync(const RedisCluster *cluster, Redis *red
       s->start = desc[0]->n;
       s->end = desc[1]->n;
       s->n_servers = array[k]->n - 2;
-      s->redis =(Redis **) calloc(s->n_servers, sizeof(Redis *));
+      s->redis = (Redis **) calloc(s->n_servers, sizeof(Redis *));
+
       if(!s->redis) {
-        // TODO
+        s->n_servers = 0;
+        x_error(0, errno, fn, "alloc error (%d servers)\n", s->n_servers);
+        rDiscardShardsAsync(shards, *n_shards);
+        *n_shards = X_FAILURE;
+        return NULL;
       }
 
       for(m = 0; m < s->n_servers; s++) {
@@ -231,7 +229,7 @@ void *ClusterRefreshThread(void *pCluster) {
       RedisShard *shard = rClusterDiscoverAsync(cluster, s->redis[m], &n_shards);
 
       if(n_shards >= 0) {
-        rDiscardShardsAsync(cluster);
+        rDiscardShardsAsync(p->shard, p->n_shards);
         p->shard = shard;
         p->n_shards = n_shards;
         break;
@@ -297,11 +295,11 @@ int rClusterRefresh(RedisCluster *cluster) {
  * Returns the Redis server in a cluster which is to be used for queries relating to the
  * specified Redis keyword. In Redis cluster configurations, the database is distributed in
  * a way that each cluster node serves only a subset of the Redis keys. Thus, this function
- * allows to identify the node that serves a given key. The function supports Redish hashes
+ * allows to identify the node that serves a given key. The function supports Redish hashtags
  * according to the specification.
  *
  * @param cluster     Pointer to a Redis cluster configuration
- * @param key         The Redis keyword of interest. It may use hashes (i.e., if the keyword
+ * @param key         The Redis keyword of interest. It may use hashtags (i.e., if the keyword
  *                    contains a segment enclosed in {} brackets, then the hash will be
  *                    calculated on the bracketed segment only. E.g. `{user:1000}.name` and
  *                    `{user:1000}.address` will both return the same hash for `user:1000` only.
@@ -445,7 +443,7 @@ void redisxClusterDestroy(RedisCluster *cluster) {
   if(p) {
     pthread_mutex_lock(&p->mutex);
 
-    rDiscardShardsAsync(cluster);
+    rDiscardShardsAsync(p->shard, p->n_shards);
 
     pthread_mutex_unlock(&p->mutex);
     pthread_mutex_destroy(&p->mutex);

@@ -1378,7 +1378,7 @@ authentication, socket configuration, callbacks etc.:
   ...
 ```
 
-Next, you can use the known node to obtain the cluster configuration and thus initialize a cluster configuration:
+Next, you can use the known node to obtain the cluster configuration:
 
 ```c
   // Try obtain the cluster configuration from the known node.
@@ -1396,8 +1396,8 @@ The above will query the cluster configuration from the node (the node need not 
 initialization, and will be returned in the same connection state as before). The cluster will inherit the configuration
 of the node, such as pipelining, socket configuration authentication, protocol, and callbacks, from the configuring node.
 If the initialization fails on a particular node, you might try other known nodes until one of then succeeds. (You
-might use `redisxSetHostName()` and `redisxSetPort()` on the original node to update the address of the configuring node,
-while leaving other configuration settings intact.)
+might use `redisxSetHostName()` and `redisxSetPort()` on the configured `Redis` instance to update the address of the 
+configuring node, while leaving other configuration settings intact.)
 
 Once the cluster is configured, you may discard the configuring node instance, unless you need it specifically for other
 reasons.
@@ -1406,7 +1406,8 @@ You can start using the cluster right away. You can obtain a connected `Redis` i
 `redisxClusterGetShard()`, e.g.:
 
 ```c
-  const char *key = "my-key";   // The Redis keyword of interest, can use Redis hashes
+  RedisCluster *cluster = ...   // The initialized cluster configuration
+  const char *key = "my-key";   // The Redis keyword of interest, can use Redis hashtags also
 
   // Get the connected Redis server instance that serves the given key
   Redis *shard = redisxClusterGetShard(cluster, key);
@@ -1421,8 +1422,7 @@ You can start using the cluster right away. You can obtain a connected `Redis` i
 ```
 
 As a matter a best practice you should never assume that a given keyword is persistently served by the same shard. 
-I.e., you should obtain the current shard for the key each time you want to use the cluster with a particular Redis
-key.
+I.e., you should obtain the current shard for the key each time you want to use it with the cluster.
 
 Finally, when you are done using the cluster, simply discard it:
 
@@ -1437,7 +1437,7 @@ Finally, when you are done using the cluster, simply discard it:
 The `redisxClusterGetShard()` will automatically connect the associated shard, if not already connected. Thus, you do
 not need to explicitly connect to the cluster. However, in some cases you might want to connect all shards before 
 running queries to eliminate the connection overhead during use. If so, you can call `redisxClusterConnect()` to 
-explicitly connect to all shards, before uisng the cluster. Similarly, you can also explicitly disconnect from all 
+explicitly connect to all shards, before using the cluster. Similarly, you can also explicitly disconnect from all 
 connected shards using `redisxClusterDisconnect()`, e.g. to close unnecessary sockets. You may continue to use the 
 cluster after calling `redisxClusterDisconnect()`, as successive calls to `redisxClusterGetShard()` will automatically 
 reconnect the shards as needed.
@@ -1566,10 +1566,9 @@ settings.
 
 Some obvious ways the library could evolve and grow in the not too distant future:
 
+ - TLS support.
  - Automated regression testing and coverage tracking.
  - Keep track of subscription patterns, and automatically resubscribe to them on reconnecting.
- - TLS support.
- - Redis cluster support.
  - Add high-level support for managing and calling custom Redis functions.
  - Add more high-level [Redis commands](https://redis.io/docs/latest/commands/), e.g. for lists, streams, etc.
 
