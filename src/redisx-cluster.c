@@ -284,6 +284,7 @@ void *ClusterRefreshThread(void *pCluster) {
  */
 int rClusterRefresh(RedisCluster *cluster) {
   static const char *fn = "rClusterRefresh";
+  static pthread_mutex_t lock = PTHREAD_MUTEX_INITIALIZER;
 
   ClusterPrivate *p;
   pthread_t tid;
@@ -293,22 +294,25 @@ int rClusterRefresh(RedisCluster *cluster) {
   p = (ClusterPrivate *) cluster->priv;
   if(!p) return x_error(X_NO_INIT, ENXIO, fn, "cluster is not initialized");
 
+  // Local mutex to prevent race to reconfiguring...
+  pthread_mutex_lock(&lock);
+
   // Return immediately if the cluster is being reconfigured at present.
   // This is important so we may process all pending MOVED responses while
   // the reconfiguration takes place.
-  if(p->reconfiguring) return X_SUCCESS;
-
-  pthread_mutex_lock(&p->mutex);
-
-  // After obtaining the exclusive lock, check again that no other thread has
-  // begun reconfiguration.
   if(p->reconfiguring) {
-    pthread_mutex_unlock(&p->mutex);
+    pthread_mutex_unlock(&lock);
     return X_SUCCESS;
   }
 
   // We are now officially in charge of reconfiguring the cluster...
   p->reconfiguring = TRUE;
+
+  // Release the reconfigure mutex
+  pthread_mutex_unlock(&lock);
+
+  // Get exclusive access to the cluster configuration
+  pthread_mutex_lock(&p->mutex);
 
   errno = 0;
   if(pthread_create(&tid, NULL, ClusterRefreshThread, (void *) cluster) != 0) {
@@ -494,7 +498,7 @@ void redisxClusterDestroy(RedisCluster *cluster) {
  * @sa redisxClusterGetShard()
  */
 int redisxClusterConnect(RedisCluster *cluster) {
-  static const char *fn = "redisxConnectCluster";
+  static const char *fn = "redisxClusterConnect";
 
   ClusterPrivate *p;
   int i, status = X_SUCCESS;
@@ -538,7 +542,7 @@ int redisxClusterConnect(RedisCluster *cluster) {
  * @sa redisxClusterConnect()
  */
 int redisxClusterDisconnect(RedisCluster *cluster) {
-  static const char *fn = "redisxDisconnectCluster";
+  static const char *fn = "redisxClusterDisconnect";
 
   ClusterPrivate *p;
   int i;
