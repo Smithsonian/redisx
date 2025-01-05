@@ -190,11 +190,13 @@ static RedisShard *rClusterDiscoverAsync(Redis *redis, int *n_shards) {
       }
 
       for(m = 0; m < s->n_servers; s++) {
+        Redis *r;
         RESP **node = (RESP **) desc[2]->value;
 
-        s->redis[m] = redisxInit((char *) node[0]->value);
+        r = s->redis[m] = redisxInit((char *) node[0]->value);
         redisxSetPort(s->redis[m], node[1]->n);
-        rCopyConfig(&((RedisPrivate *) redis->priv)->config, s->redis[m]);
+        rCopyConfig(&((RedisPrivate *) redis->priv)->config, r);
+        redisxSelectDB(r, 0); // Only DB 0 is allowed for clusters.
       }
     }
   }

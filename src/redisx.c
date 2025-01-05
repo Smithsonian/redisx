@@ -448,8 +448,8 @@ int redisxSelectDB(Redis *redis, int idx) {
 
   if(dbIdx == idx) return X_SUCCESS;
 
-  if(idx) redisxAddConnectHook(redis, rAffirmDB);
-  else redisxRemoveConnectHook(redis, rAffirmDB);
+  if(idx) redisxAddConnectHook(redis, rAffirmDB);   // Use SELECT to switch to non-zero DB
+  else redisxRemoveConnectHook(redis, rAffirmDB);   // Don't use SELECT for DB 0 (cluster safe)
 
   if(!redisxIsConnected(redis)) return X_SUCCESS;
 
