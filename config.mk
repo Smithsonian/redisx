@@ -23,6 +23,9 @@ BIN ?= bin
 # Compiler: use gcc by default
 CC ?= gcc
 
+# Whether to use OpenMP
+WITH_OPENMP ?= 1
+
 # Add include/ directory
 CPPFLAGS += -I$(INC)
 
@@ -63,6 +66,11 @@ CHECKOPTS += --inline-suppr $(CHECKEXTRA)
 
 # Link against math libs (for e.g. isnan()), and xchange dependency
 LDFLAGS += -lm -lxchange
+
+ifeq ($(WITH_OPENMP),1)
+  CFLAGS += -fopenmp
+  LDFLAGS += -fopenmp
+endif
 
 # Search for libraries under LIB
 ifneq ($(findstring $(LIB),$(LD_LIBRARY_PATH)),$LIB)

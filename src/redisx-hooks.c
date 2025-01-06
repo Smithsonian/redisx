@@ -21,6 +21,21 @@ static Hook *createHook(Redis *redis, void (*f)(Redis *)) {
   return h;
 }
 
+/// \cond PRIVATE
+Hook *rCopyHooks(const Hook *list, Redis *owner) {
+  Hook *copy, *from, *to;
+
+  if(!list) return NULL;
+
+  from = (Hook *) list;
+
+  copy = to = createHook(owner, from->call);
+  for(; from->next; from = from->next) to->next = createHook(owner, from->call);
+
+  return copy;
+}
+/// \endcond
+
 /**
  * Adds a connect call hook, provided it is not already part of the setup routine.
  *
@@ -44,10 +59,10 @@ int redisxAddConnectHook(Redis *redis, void (*setupCall)(Redis *)) {
   prop_error(fn, rConfigLock(redis));
   p = (RedisPrivate *) redis->priv;
 
-  if(p->firstConnectCall == NULL) p->firstConnectCall = createHook(redis, setupCall);
+  if(p->config.firstConnectCall == NULL) p->config.firstConnectCall = createHook(redis, setupCall);
   else {
     // Check if the specified hook is already added...
-    Hook *k = p->firstConnectCall;
+    Hook *k = p->config.firstConnectCall;
     while(k != NULL) {
       if(k->call == setupCall) break;
       if(k->next == NULL) k->next = createHook(redis, setupCall);
@@ -82,13 +97,13 @@ int redisxRemoveConnectHook(Redis *redis, void (*setupCall)(Redis *)) {
 
   prop_error(fn, rConfigLock(redis));
   p = (RedisPrivate *) redis->priv;
-  c = p->firstConnectCall;
+  c = p->config.firstConnectCall;
 
   while(c != NULL) {
     Hook *next = c->next;
 
     if(c->call == setupCall) {
-      if(last == NULL) p->firstConnectCall = next;
+      if(last == NULL) p->config.firstConnectCall = next;
       else last->next = next;
       free(c);
     }
@@ -100,28 +115,37 @@ int redisxRemoveConnectHook(Redis *redis, void (*setupCall)(Redis *)) {
   return X_SUCCESS;
 }
 
+/// \cond PRIVATE
 /**
- * Removes all connect hooks, that is no user callbacks will be made when the specifed
+ * Removes all connect hooks from a configuration.
+ *
+ * \param first         The head pointer of a list of hooks
+ */
+void rClearHooks(Hook *first) {
+  while(first != NULL) {
+    Hook *next = first->next;
+    free(first);
+    first = next;
+  }
+}
+/// \endcond
+
+/**
+ * Removes all connect hooks, that is no user callbacks will be made when the specified
  * Redis instance is connected.
  *
  * \param redis         Pointer to a Redis instance.
  */
 void redisxClearConnectHooks(Redis *redis) {
   RedisPrivate *p;
-  Hook *c;
 
   xvprintf("Redis-X> Clearing all connect callbacks.\n");
 
   if(rConfigLock(redis) != X_SUCCESS) return;
   p = (RedisPrivate *) redis->priv;
-  c = p->firstConnectCall;
-  p->firstConnectCall = NULL;
 
-  while(c != NULL) {
-    Hook *next = c->next;
-    free(c);
-    c = next;
-  }
+  rClearHooks(p->config.firstConnectCall);
+  p->config.firstConnectCall = NULL;
 
   rConfigUnlock(redis);
 }
@@ -151,10 +175,10 @@ int redisxAddDisconnectHook(Redis *redis, void (*cleanupCall)(Redis *)) {
   prop_error(fn, rConfigLock(redis));
   p = (RedisPrivate *) redis->priv;
 
-  if(p->firstCleanupCall == NULL) p->firstCleanupCall = createHook(redis, cleanupCall);
+  if(p->config.firstCleanupCall == NULL) p->config.firstCleanupCall = createHook(redis, cleanupCall);
   else {
     // Check if the specified hook is already added...
-    Hook *k = p->firstCleanupCall;
+    Hook *k = p->config.firstCleanupCall;
     while(k != NULL) {
       if(k->call == cleanupCall) break;
       if(k->next == NULL) k->next = createHook(redis, cleanupCall);
@@ -165,6 +189,8 @@ int redisxAddDisconnectHook(Redis *redis, void (*cleanupCall)(Redis *)) {
 
   return X_SUCCESS;
 }
+
+
 
 /**
  * Removes a cleanup call hook for when the Redis instance is disconnected.
@@ -188,13 +214,13 @@ int redisxRemoveDisconnectHook(Redis *redis, void (*cleanupCall)(Redis *)) {
 
   prop_error(fn, rConfigLock(redis));
   p = (RedisPrivate *) redis->priv;
-  c = p->firstCleanupCall;
+  c = p->config.firstCleanupCall;
 
   while(c != NULL) {
     Hook *next = c->next;
 
     if(c->call == cleanupCall) {
-      if(last == NULL) p->firstCleanupCall = next;
+      if(last == NULL) p->config.firstCleanupCall = next;
       else last->next = next;
       free(c);
     }
@@ -206,6 +232,9 @@ int redisxRemoveDisconnectHook(Redis *redis, void (*cleanupCall)(Redis *)) {
   return X_SUCCESS;
 }
 
+
+
+
 /**
  * Removes all disconnect hooks, that is no user-specified callbacks will be made when the
  * specified Redis instance is disconnected.
@@ -214,21 +243,14 @@ int redisxRemoveDisconnectHook(Redis *redis, void (*cleanupCall)(Redis *)) {
  */
 void redisxClearDisconnectHooks(Redis *redis) {
   RedisPrivate *p;
-  Hook *c;
 
   xvprintf("Redis-X> Clearing all disconnect callbacks.\n");
 
   if(rConfigLock(redis) != X_SUCCESS) return;
   p = (RedisPrivate *) redis->priv;
-  c = p->firstCleanupCall;
-  p->firstCleanupCall = NULL;
 
-  while(c != NULL) {
-    Hook *next = c->next;
-    free(c);
-    c = next;
-  }
-
+  rClearHooks(p->config.firstCleanupCall);
+  p->config.firstCleanupCall = NULL;
 
   rConfigUnlock(redis);
 }

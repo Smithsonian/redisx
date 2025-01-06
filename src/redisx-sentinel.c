@@ -7,13 +7,13 @@
  *  Functions to manage clients to high-availability Redis Sentinel server configurations.
  */
 
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <errno.h>
 
 #include "redisx-priv.h"
-
 
 /**
  * Attemps to connect to a given Redis sentinel server. If successful, the server is moved to the
@@ -44,12 +44,58 @@ static int rTryConnectSentinel(Redis *redis, int serverIndex) {
   return X_SUCCESS;
 }
 
-
 /// \cond PRIVATE
 
+
+static int rSetTopSentinel(RedisSentinel *s, int idx) {
+  RedisServer server;
+
+  if(idx == 0) return X_SUCCESS;
+
+  server = s->servers[idx];
+
+  // Move to the top of the list, so next time we try this one first...
+  memmove(&s->servers[1], s->servers, idx * sizeof(RedisServer));
+  s->servers[0] = server;
+
+  return X_SUCCESS;
+}
+
+static int rIncludeMasterAsync(RedisSentinel *s, char *hostname, int port) {
+  int i;
+  void *old = s->servers;
+
+  for(i = 0; i < s->nServers; i++) {
+    RedisServer *server = &s->servers[i];
+    int sport = server->port > 0 ? server->port : REDISX_TCP_PORT;
+    if(sport == port && strcmp(server->host, hostname) == 0) {
+      // Found master on server list, move it to the top...
+      rSetTopSentinel(s, i);
+      return X_SUCCESS;
+    }
+  }
+
+  // Current master does not seem to be on our list, so let's add it to the top.
+  s->servers = (RedisServer *) realloc(s->servers, (s->nServers + 1) * sizeof(RedisServer));
+  if(!s->servers) {
+    // Ouch realloc error, go on with the old server list...
+    s->servers = old;
+    return X_FAILURE;
+  }
+  else {
+    // Bump the existing list, and add the new master on top
+    memmove(&s->servers[1], s->servers, s->nServers * sizeof(RedisServer));
+    s->servers[0].host = hostname;
+    s->servers[0].port = port;
+    s->nServers++;
+  }
+
+  return X_SUCCESS;
+}
+
 /**
- * Verifies that a given Redis instance is in the master role. It is assumed that we have a live
- * interactive connection to the server.
+ * Verifies that a given Redis instance is in the master role. User's should always communicate
+ * to the master, not to replicas.
  *
  * @param redis     A redis server instance
  * @return          X_SUCCESS (0) if the server is confirmed to be the master, or else an error
@@ -92,6 +138,12 @@ int rConfirmMasterRole(Redis *redis) {
 
   if(status) return x_error(X_FAILURE, EAGAIN, fn, "Replica is not master");
 
+  // Make sure the current master is included at the top of the sentinels server list
+  if(rConfigLock(redis) == X_SUCCESS) {
+    RedisPrivate *p = (RedisPrivate *) redis->priv;
+    if(p->sentinel) rIncludeMasterAsync(p->sentinel, p->hostname, p->port);
+  }
+
   return X_SUCCESS;
 }
 
@@ -105,21 +157,15 @@ int rDiscoverSentinel(Redis *redis) {
   static const char *fn = "rConnectSentinel";
 
   RedisPrivate *p = (RedisPrivate *) redis->priv;
-  const RedisSentinel *s = p->sentinel;
-  int i, savedTimeout = p->timeoutMillis;
+  RedisConfig *config = &p->config;
+  RedisSentinel *s = p->sentinel;
+  int i, savedTimeout = config->timeoutMillis;
 
-  p->timeoutMillis = s->timeoutMillis > 0 ? s->timeoutMillis : REDISX_DEFAULT_SENTINEL_TIMEOUT_MILLIS;
+  config->timeoutMillis = s->timeoutMillis > 0 ? s->timeoutMillis : REDISX_DEFAULT_SENTINEL_TIMEOUT_MILLIS;
 
   for(i = 0; i < s->nServers; i++) if(rTryConnectSentinel(redis, i) == X_SUCCESS) {
-    RedisServer server = s->servers[i]; // A local copy of the server data
     RESP *reply;
     int status;
-
-    if(i > 0) {
-      // Move to the top of the list, so next time we try this one first...
-      memmove(&s->servers[1], s->servers, i * sizeof(RedisServer));
-      s->servers[0] = server;
-    }
 
     // Check if this is master...
     if(rConfirmMasterRole(redis)) goto success; // @suppress("Goto statement used")
@@ -137,19 +183,21 @@ int rDiscoverSentinel(Redis *redis) {
       redisxDestroyRESP(reply);
       prop_error(fn, status);
 
+      if(i > 0) rSetTopSentinel(s, i);
+
       // TODO update sentinel server list?...
 
       goto success; // @suppress("Goto statement used")
     }
   }
 
-  p->timeoutMillis = savedTimeout;
+  config->timeoutMillis = savedTimeout;
   return x_error(X_NO_SERVICE, ENOTCONN, fn, "no Sentinel server available");
 
   // --------------------------------------------------------------------------------------------------
   success:
 
-  p->timeoutMillis = savedTimeout;
+  config->timeoutMillis = savedTimeout;
   return X_SUCCESS;
 
 }
@@ -259,6 +307,7 @@ int redisxSetSentinelTimeout(Redis *redis, int millis) {
   return status;
 }
 
+
 /// \cond PRIVATE
 void rDestroySentinel(RedisSentinel *sentinel) {
   if(!sentinel) return;
@@ -270,3 +319,4 @@ void rDestroySentinel(RedisSentinel *sentinel) {
   if(sentinel->serviceName) free(sentinel->serviceName);
 }
 /// \endcond
+

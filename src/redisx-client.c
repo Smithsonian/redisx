@@ -48,13 +48,13 @@ int debugTraffic = FALSE;    ///< Whether to print excerpts of all traffic to/fr
  * Checks that a redis instance is valid.
  *
  * @param cl      The Redis client instance
- * @return        X_SUCCESS (0) if the client is valid, or X_NULL if the argument is NULL,
- *                or else X_NO_INIT if the redis instance is not initialized.
+ * @return        X_SUCCESS (0) if the client is valid, or X_NULL (errno = EINVAL) if the argument
+ *                is NULL, or else X_NO_INIT (errno = ENXIO) if the redis instance is not initialized.
  */
 int rCheckClient(const RedisClient *cl) {
   static const char *fn = "rCheckRedis";
   if(!cl) return x_error(X_NULL, EINVAL, fn, "Redis client is NULL");
-  if(!cl->priv) return x_error(X_NO_INIT, EAGAIN, fn, "Redis client is not initialized");
+  if(!cl->priv) return x_error(X_NO_INIT, ENXIO, fn, "Redis client is not initialized");
   return X_SUCCESS;
 }
 
@@ -78,8 +78,8 @@ static int rTransmitErrorAsync(ClientPrivate *cp, const char *op) {
   if(cp->isEnabled) {
     RedisPrivate *p = (RedisPrivate *) cp->redis->priv;
     // Let the handler disconnect, if it wants to....
-    if(p->transmitErrorFunc) {
-      p->transmitErrorFunc(cp->redis, cp->idx, op);
+    if(p->config.transmitErrorFunc) {
+      p->config.transmitErrorFunc(cp->redis, cp->idx, op);
       if(cp->isEnabled) {
         if(errno == EAGAIN || errno == EWOULDBLOCK) status = x_error(X_TIMEDOUT, errno, "rTransmitErrorAsync", "%s timed out on %s channel %d\n", op, cp->redis->id, cp->idx);
         else status = x_error(X_NO_SERVICE, errno, "rTransmitErrorAsync", "%s failed on %s channel %d\n", op, cp->redis->id, cp->idx);
@@ -98,7 +98,7 @@ static int rTransmitErrorAsync(ClientPrivate *cp, const char *op) {
 static int rReadChunkAsync(ClientPrivate *cp) {
   const int sock = cp->socket;      // Local copy of socket fd that won't possibly change mid-call.
 
-  if(sock < 0) return x_error(X_NO_INIT, ENOTCONN, "rReadChunkAsync", "client %d: not connected", cp->idx);
+  if(sock < 0) return x_error(X_NO_SERVICE, ENOTCONN, "rReadChunkAsync", "client %d: not connected", cp->idx);
 
   // Reset errno prior to the call.
   errno = 0;
@@ -266,8 +266,8 @@ static int rSendBytesAsync(ClientPrivate *cp, const char *buf, int length, boole
 
   trprintf(" >>> '%s'\n", buf);
 
-  if(!cp->isEnabled) return x_error(X_NO_INIT, ENOTCONN, fn, "client %d: disabled", cp->idx);
-  if(sock < 0) return x_error(X_NO_INIT, ENOTCONN, fn, "client %d: not connected", cp->idx);
+  if(!cp->isEnabled) return x_error(X_NO_SERVICE, ENOTCONN, fn, "client %d: disabled", cp->idx);
+  if(sock < 0) return x_error(X_NO_SERVICE, ENOTCONN, fn, "client %d: not connected", cp->idx);
 
   while(length > 0) {
     int n;
@@ -370,7 +370,6 @@ int redisxLockClient(RedisClient *cl) {
   prop_error(fn, rCheckClient(cl));
 
   cp = (ClientPrivate *) cl->priv;
-  if(cp == NULL) return x_error(X_NO_INIT, EINVAL, fn, "client is not initialized");
 
   status = pthread_mutex_lock(&cp->writeLock);
   if(status) return x_error(X_FAILURE, errno, fn, "mutex error");
@@ -399,7 +398,6 @@ int redisxLockConnected(RedisClient *cl) {
   prop_error(fn, redisxLockClient(cl));
 
   cp = (ClientPrivate *) cl->priv;
-  if(cp == NULL) return x_error(X_NO_INIT, EINVAL, fn, "client is not initialized");
 
   if(!cp->isEnabled) {
     redisxUnlockClient(cl);
@@ -430,7 +428,6 @@ int redisxUnlockClient(RedisClient *cl) {
   prop_error(fn, rCheckClient(cl));
 
   cp = (ClientPrivate *) cl->priv;
-  if(cp == NULL) return x_error(X_NO_INIT, EINVAL, fn, "client is not initialized");
 
   status = pthread_mutex_unlock(&cp->writeLock);
   if(status) return x_error(X_FAILURE, errno, fn, "mutex error");
@@ -456,9 +453,6 @@ int redisxSkipReplyAsync(RedisClient *cl) {
   static const char cmd[] = "*3\r\n$6\r\nCLIENT\r\n$5\r\nREPLY\r\n$4\r\nSKIP\r\n";
 
   prop_error(fn, rCheckClient(cl));
-
-  if(cl->priv == NULL) return x_error(X_NO_INIT, EINVAL, fn, "client is not initialized");
-
   prop_error(fn, rSendBytesAsync((ClientPrivate *) cl->priv, cmd, sizeof(cmd) - 1, TRUE));
 
   return X_SUCCESS;
@@ -490,9 +484,6 @@ int redisxStartBlockAsync(RedisClient *cl) {
   static const char cmd[] = "*1\r\n$5\r\nMULTI\r\n";
 
   prop_error(fn, rCheckClient(cl));
-
-  if(cl->priv == NULL) return x_error(X_NO_INIT, EINVAL, fn, "client is not initialized");
-
   prop_error(fn, rSendBytesAsync((ClientPrivate *) cl->priv, cmd, sizeof(cmd) - 1, TRUE));
 
   return X_SUCCESS;
@@ -515,9 +506,6 @@ int redisxAbortBlockAsync(RedisClient *cl) {
   static const char cmd[] = "*1\r\n$7\r\nDISCARD\r\n";
 
   prop_error(fn, rCheckClient(cl));
-
-  if(cl->priv == NULL) return x_error(X_NO_INIT, EINVAL, fn, "client is not initialized");
-
   prop_error(fn, rSendBytesAsync((ClientPrivate *) cl->priv, cmd, sizeof(cmd) - 1, TRUE));
 
   redisxIgnoreReplyAsync(cl);
@@ -638,7 +626,6 @@ int redisxSendArrayRequestAsync(RedisClient *cl, const char **args, const int *l
   prop_error(fn, rCheckClient(cl));
 
   cp = (ClientPrivate *) cl->priv;
-  if(cp == NULL) return x_error(X_NO_INIT, EINVAL, fn, "client is not initialized");
   if(!cp->isEnabled) return x_error(X_NO_SERVICE, ENOTCONN, fn, "client is not connected");
 
   // Send the number of string elements in the command...
@@ -770,7 +757,7 @@ static void rPushMessageAsync(RedisClient *cl, RESP *resp) {
     else redisxDestroyRESP(r);
   }
 
-  if(p->pushConsumer) p->pushConsumer(cl, resp, p->pushArg);
+  if(p->config.pushConsumer) p->config.pushConsumer(cl, resp, p->config.pushArg);
 
   redisxDestroyRESP(resp);
 }
@@ -1064,6 +1051,12 @@ RESP *redisxReadReplyAsync(RedisClient *cl, int *pStatus) {
       memcpy(resp->value, &buf[1], size-1);
       resp->n = size-1;
       ((char *)resp->value)[resp->n] = '\0';
+
+      if(redisxClusterMoved(resp)) {
+        // If cluster was reconfigured, refresh the cluster configuration automatically.
+        const RedisPrivate *p = (RedisPrivate *) cp->redis->priv;
+        rClusterRefresh(p->cluster);
+      }
 
       break;
 

@@ -94,8 +94,9 @@ distclean:
 # The nitty-gritty stuff below
 # ----------------------------------------------------------------------------
 
-SOURCES = $(SRC)/redisx.c $(SRC)/resp.c $(SRC)/redisx-net.c $(SRC)/redisx-hooks.c $(SRC)/redisx-client.c \
-          $(SRC)/redisx-sentinel.c $(SRC)/redisx-tab.c $(SRC)/redisx-sub.c $(SRC)/redisx-script.c
+SOURCES = $(SRC)/redisx.c $(SRC)/resp.c $(SRC)/redisx-net.c $(SRC)/redisx-hooks.c \
+          $(SRC)/redisx-client.c $(SRC)/redisx-sentinel.c $(SRC)/redisx-cluster.c \
+          $(SRC)/redisx-tab.c $(SRC)/redisx-sub.c $(SRC)/redisx-script.c
 
 # Generate a list of object (obj/*.o) files from the input sources
 OBJECTS := $(subst $(SRC),$(OBJ),$(SOURCES))

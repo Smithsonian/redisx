@@ -9,7 +9,7 @@ LD_LIBRARY_PATH := $(LIB):$(LD_LIBRARY_PATH)
 all: tests run
 
 .PHONY: tests
-tests: $(BIN)/test-ping $(BIN)/test-info $(BIN)/test-hello $(BIN)/test-tab
+tests: $(BIN)/test-ping $(BIN)/test-info $(BIN)/test-hello $(BIN)/test-tab $(BIN)/test-hash
 
 .PHONY: run
 run: tests
@@ -17,6 +17,7 @@ run: tests
 	$(BIN)/test-ping
 	$(BIN)/test-hello
 	$(BIN)/test-tab
+	$(BIN)/test-hash
 
 $(BIN)/test-%: $(OBJ)/test-%.o $(LIB)/libredisx.a
 	$(MAKE) $(BIN)

@@ -127,6 +127,7 @@ enum resp_type {
 #define REDIS_INCOMPLETE_TRANSFER   (-104)  ///< \hideinitializer The transfer to/from Redis is incomplete
 #define REDIS_UNEXPECTED_RESP       (-105)  ///< \hideinitializer Got a Redis response of a different type than expected
 #define REDIS_UNEXPECTED_ARRAY_SIZE (-106)  ///< \hideinitializer Got a Redis response with different number of elements than expected.
+#define REDIS_MOVED                 (-107)  ///< \hideinitializer The requested key has moved to another cluster shard.
 
 /**
  * RedisX channel IDs. RedisX uses up to three separate connections to the server: (1) an interactive client, in which
@@ -200,6 +201,10 @@ typedef struct RedisEntry {
   int length;                   ///< Bytes in value.
 } RedisEntry;
 
+
+
+
+
 /**
  * Redis server host and port specification.
  *
@@ -209,6 +214,16 @@ typedef struct RedisServer {
   char *host;                   ///< The hostname or IP address of the server
   int port;                     ///< The port number or &lt;=0 to use the default 6379
 } RedisServer;
+
+
+
+/**
+ * A Redis cluster configuration
+ *
+ */
+typedef struct {
+  void *priv;                   ///< Private data not exposed to users.
+} RedisCluster;
 
 /**
  * \brief Structure that represents a single Redis client connection instance.
@@ -392,6 +407,13 @@ void redisxDestroy(Redis *redis);
 int redisxConnect(Redis *redis, boolean usePipeline);
 void redisxDisconnect(Redis *redis);
 int redisxReconnect(Redis *redis, boolean usePipeline);
+
+RedisCluster *redisxClusterInit(Redis *node);
+Redis *redisxClusterGetShard(RedisCluster *cluster, const char *key);
+boolean redisxClusterMoved(const RESP *reply);
+int redisxClusterConnect(RedisCluster *cluster);
+int redisxClusterDisconnect(RedisCluster *cluster);
+void redisxClusterDestroy(RedisCluster *cluster);
 
 int redisxPing(Redis *redis, const char *message);
 enum redisx_protocol redisxGetProtocol(Redis *redis);

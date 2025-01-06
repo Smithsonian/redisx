@@ -39,6 +39,7 @@ Last Updated: 31 December 2024
  - [Publish / subscribe (PUB/SUB) support](#publish-subscribe-support)
  - [Atomic execution blocks and LUA scripts](#atomic-transaction-blocks-and-lua-scripts)
  - [Advanced queries and pipelining](#advanced-queries)
+ - [Redis clusters](#cluster-support)
  - [Error handling](#error-handling)
  - [Debug support](#debug-support)
  - [Future plans](#future-plans)
@@ -150,7 +151,7 @@ And at every step, you should check for and [handle errors](#error-handling) as 
  | push messages                     |  __yes__   | (optional) user-defined callback                             |
  | attributes                        |  __yes__   | (optional) on demand                                         |
  | Sentinel support                  |  __yes__   | _help me test it_                                            |
- | cluster support                   |    no      | _coming soon..._                                             |
+ | cluster support                   |  __yes__   | _help me test it_                                            |
  | TLS support                       |    no      | _coming soon..._                                             |
 
 
@@ -204,6 +205,10 @@ prior to invoking `make`. The following build variables can be configured:
  - `WEXTRA`: If set to 1, `-Wextra` is added to `CFLAGS` automatically.
    
  - `LDFLAGS`: Extra linker flags (default is _not set_). Note, `-lm -lxchange` will be added automatically.
+
+ - `WITH_OPENMP`: If set to 1 (default), we will compile and link with OpenMP (i.e., `-fopenmp` is added to both 
+   `CFLAGS` and `LDFLAGS` automatically). Since OpenMP is not available on all platforms / compilers, you may want
+   to explicitly set `WITH_OPENMP=0` prior to calling `make` to disable.
 
  - `CHECKEXTRA`: Extra options to pass to `cppcheck` for the `make check` target
  
@@ -569,10 +574,9 @@ with that response (or `NULL` if there was an error).
 ### Bundled Attributes
 
 Redis 6 introduced the possibility of sending optional attributes along with responses, using the RESP3 protocol. 
-These attributes are not included in the responses sent to users, in accordance with RESP3 protocol. Rather, they are 
-made available to users on demand, when needed, after the response to a request is received. You may retrieve the 
-attributes to interactive requests _after_ the `redisxRequest()` or `redisxArrayRequest()` queries, using 
-`redisxGetAttributes()`, e.g.:
+These attributes are not returned to users by default, in line with the RESP3 protocol specification. Rather, they 
+are available on demand, after the response to a request is received. You may retrieve the attributes to interactive 
+requests _after_ the `redisxRequest()` or `redisxArrayRequest()` queries, using `redisxGetAttributes()`, e.g.:
 
 ```c
   ...
@@ -1342,7 +1346,143 @@ practices to help deal with pipeline responses are summarized here:
   
 __RedisX__ optimizes the pipeline client for high throughput (bandwidth), whereas the interactive and subscription 
 clients are optimized for low-latency, at the socket level.
+
+-----------------------------------------------------------------------------
+
+<a name="cluster-support"></a>
+## Redis clusters
+
+ - [Cluster basics](#cluster-basics)
+ - [Detecting cluster reconfiguration](#cluster-reconfiguration)
+ - [Explicit connection management](#cluster-explicit-connect)
+
+__RedisX__ provides support for [Redis clusters](https://redis.io/docs/latest/operate/oss_and_stack/management/scaling/) 
+also. In cluster configuration the database is distributed over a collection of servers, each node of which serves
+only a subset of the Redis keys. 
+
+ 1. Configure a known cluster node as usual.
+ 2. Initialize a cluster using the known, configured node. (All shards in the cluster will inherit the configuration 
+    from the initializing node.)
+ 3. For every request, you must obtain the appropriate cluster node for the given key to process. (PUB/SUB may be 
+    processed on any cluster node.)
+ 4. Destroy the cluster resources when done using it.
   
+
+<a name="cluster-basics"></a>
+### Cluster basics 
+
+Specifically, start by configuring a known node of the cluster as usual for a single Redis server, setting 
+authentication, socket configuration, callbacks etc.:
+
+```c
+  // Initialize a known node of the cluster for obtaining the current cluster configuration
+  Redis *node = redisxInit(...);
+  ...
+```
+
+Next, you can use the known node to obtain the cluster configuration:
+
+```c
+  // Try obtain the cluster configuration from the known node.
+  RedisCluster *cluster = redisxClusterInit(node);
+  if(cluster == NULL) {
+    // Oops, that did not work. Perhaps try another node...
+    ...
+  }
+  
+  // Discard the configuring node if no longer needed...
+  redisxDestroy(node);
+```
+
+The above will query the cluster configuration from the node (the node need not be explicitly connected prior to the
+initialization, and will be returned in the same connection state as before). The cluster will inherit the configuration
+of the node, such as pipelining, socket configuration authentication, protocol, and callbacks, from the configuring node 
+-- all but the database index, which is always 0 for clusters.
+
+If the initialization fails on a particular node, you might try other known nodes until one of then succeeds. (You
+might use `redisxSetHostName()` and `redisxSetPort()` on the configured `Redis` instance to update the address of the 
+configuring node, while leaving other configuration settings intact.)
+
+Once the cluster is configured, you may discard the configuring node instance, unless you need it specifically for other
+reasons.
+
+You can start using the cluster right away. You can obtain a connected `Redis` instance for a given key using 
+`redisxClusterGetShard()`, e.g.:
+
+```c
+  const char *key = "my-key";   // The Redis keyword of interest, can use Redis hashtags also
+  int status;                   // We'll track error status here.
+
+  // Get the connected Redis server instance that serves the given key
+  Redis *shard = redisxClusterGetShard(cluster, key);
+  if(shard == NULL) {
+    // Oops, there seems to be no server for the given key currently. Perhaps try again later...
+    ...
+  }
+
+  // Run your query on using the given Redis key / keys.
+  RESP *reply = redisxRequest(shard, "GET", key, NULL, NULL, &status);
+  if(redisxClusterMoved(reply)) {
+    // The key is now served by another shard.
+    // You might want to obtain the new shard and try again...
+    ...
+  }
+  
+  ...
+```
+
+Finally, when you are done using the cluster, simply discard it:
+
+```c
+  // Disconnect all shards and free up all resources by the cluster
+  redisxClusterDestroy(cluster);
+```
+
+<a name="cluster-reconfiguration"></a>
+### Detecting cluster reconfiguration
+
+In the above example we have shown one way you might check for errors that result from cluster being reconfigured
+on-the-fly, using `redisxClusterMoved()` on the `RESP` reply obtained from the shard.
+
+Equivalently, you might use `redisxCheckRESP()` or `redisxCheckDestroyRESP()` also for detecting a cluster 
+reconfiguration. Both of these will return a designated `REDIS_MOVED` error code if the keyword is now served on 
+another shard:
+
+```c
+  ...
+  int s = redisxCheckRESP(reply, ...);
+  if(s == REDIS_MOVED) {
+    // The key is now served by another shard.
+    ...
+  }
+  if(s != X_SUCCESS) {
+    // The reply is no good for some other reason...
+    ...
+  }
+  ...
+```
+
+A `REDIS_MOVED` error code will be returned by higher-level functions also, which ingest the `RESP` replies from the 
+shard and return a digested error code. For example, `redisxGetStringValue()` will set the output `len` value to 
+`REDIS_MOVED` if the value could not be obtained because of a cluster reconfiguration.
+
+As a matter a best practice you should never assume that a given keyword is persistently served by the same shard. 
+Rather, you should obtain the current shard for the key each time you want to use it with the cluster, and always 
+check for errors on shard requests, and repeat failed requests on a newly obtained shard if necessary.
+
+
+<a name="cluster-explicit-connect"></a>
+### Manual connection management
+
+The `redisxClusterGetShard()` will automatically connect the associated shard, if not already connected. Thus, you do
+not need to explicitly connect to the cluster or its shards. However, in some cases you might want to connect all 
+shards before running queries to eliminate the connection overhead during use. If so, you can call 
+`redisxClusterConnect()` to explicitly connect to all shards before using the cluster. Similarly, you can also 
+explicitly disconnect from all connected shards using `redisxClusterDisconnect()`, e.g. to close unnecessary sockets. 
+You may continue to use the cluster after calling `redisxClusterDisconnect()`, as successive calls to 
+`redisxClusterGetShard()` will continue to reconnect the shards as needed automatically.
+
+
 -----------------------------------------------------------------------------
 
 <a name="error-handling"></a>
@@ -1447,10 +1587,9 @@ settings.
 
 Some obvious ways the library could evolve and grow in the not too distant future:
 
+ - TLS support.
  - Automated regression testing and coverage tracking.
  - Keep track of subscription patterns, and automatically resubscribe to them on reconnecting.
- - TLS support.
- - Redis cluster support.
  - Add high-level support for managing and calling custom Redis functions.
  - Add more high-level [Redis commands](https://redis.io/docs/latest/commands/), e.g. for lists, streams, etc.
 
