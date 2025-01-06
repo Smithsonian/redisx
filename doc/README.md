@@ -112,6 +112,7 @@ And at every step, you should check for and [handle errors](#error-handling) as 
  | Feature                           | supported  | comments                                                     |
  | --------------------------------- |:----------:| -------------------------------------------------------------|
  | concurrent Redis instances        |  __yes__   | You can manage and use multiple Redis servers simultaneously |
+ | thread safe (MT-safe)             |  __yes__   | synchronized + async calls with locking                      |
  | connect / disconnect hooks        |  __yes__   | user-defined callbacks                                       |
  | socket customization              |  __yes__   | (optional) user-defined timeout, buffer size and/or callback |
  | custom socket error handling      |  __yes__   | (optional) user-defined callback                             |
@@ -126,12 +127,11 @@ And at every step, you should check for and [handle errors](#error-handling) as 
  | --------------------------------- |:----------:| -------------------------------------------------------------|
  | user authentication               |  __yes__   | via `HELLO` if protocol is set, otherwise via `AUTH`         |
  | RESP3 / `HELLO` support           |  __yes__   | (optional) if specific protocol is set                       |
- | thread safe (MT-safe)             |  __yes__   | synchronized + async calls with locking                      |
- | push messages                     |  __yes__   | (optional) user-defined callback                             |
- | attributes                        |  __yes__   | (optional) on demand                                         |
  | interactive queries               |  __yes__   | dedicated (low-latency) client                               |
  | pipelined (batch) processing      |  __yes__   | dedicated (high-bandwidth) client / user-defined callback    |
  | PUB/SUB support                   |  __yes__   | dedicated client / user callbacks / subscription management  |
+ | push messages                     |  __yes__   | (optional) user-defined callback                             |
+ | attributes                        |  __yes__   | (optional) on demand                                         |
  | Sentinel support                  |  __yes__   | _help me test it_                                            |
  | cluster support                   |    no      | _coming soon..._                                             |
  | TLS support                       |    no      | _coming soon..._                                             |

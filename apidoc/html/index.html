@@ -183,10 +183,10 @@ A simple example</h3>
 <div class="line"> </div>
 <div class="line"><span class="comment">// Free up the resources used by the &#39;redis&#39; instance.</span></div>
 <div class="line"><a class="code hl_function" href="redisx-net_8c.html#ac54dd4c46d8615db4da02702c18f062b">redisxDestroy</a>(redis);</div>
-<div class="ttc" id="aredisx-net_8c_html_a5c78c2189a76a077231016564a0cecd5"><div class="ttname"><a href="redisx-net_8c.html#a5c78c2189a76a077231016564a0cecd5">redisxInit</a></div><div class="ttdeci">Redis * redisxInit(const char *server)</div><div class="ttdef"><b>Definition</b> redisx-net.c:797</div></div>
-<div class="ttc" id="aredisx-net_8c_html_ac54dd4c46d8615db4da02702c18f062b"><div class="ttname"><a href="redisx-net_8c.html#ac54dd4c46d8615db4da02702c18f062b">redisxDestroy</a></div><div class="ttdeci">void redisxDestroy(Redis *redis)</div><div class="ttdef"><b>Definition</b> redisx-net.c:977</div></div>
-<div class="ttc" id="aredisx-net_8c_html_acae5ab8af4db1c4ab13c4069aa744a44"><div class="ttname"><a href="redisx-net_8c.html#acae5ab8af4db1c4ab13c4069aa744a44">redisxDisconnect</a></div><div class="ttdeci">void redisxDisconnect(Redis *redis)</div><div class="ttdef"><b>Definition</b> redisx-net.c:512</div></div>
-<div class="ttc" id="aredisx-net_8c_html_ad71822356ffd40ed4b1c71d065f48809"><div class="ttname"><a href="redisx-net_8c.html#ad71822356ffd40ed4b1c71d065f48809">redisxConnect</a></div><div class="ttdeci">int redisxConnect(Redis *redis, boolean usePipeline)</div><div class="ttdef"><b>Definition</b> redisx-net.c:1110</div></div>
+<div class="ttc" id="aredisx-net_8c_html_a5c78c2189a76a077231016564a0cecd5"><div class="ttname"><a href="redisx-net_8c.html#a5c78c2189a76a077231016564a0cecd5">redisxInit</a></div><div class="ttdeci">Redis * redisxInit(const char *server)</div><div class="ttdef"><b>Definition</b> redisx-net.c:711</div></div>
+<div class="ttc" id="aredisx-net_8c_html_ac54dd4c46d8615db4da02702c18f062b"><div class="ttname"><a href="redisx-net_8c.html#ac54dd4c46d8615db4da02702c18f062b">redisxDestroy</a></div><div class="ttdeci">void redisxDestroy(Redis *redis)</div><div class="ttdef"><b>Definition</b> redisx-net.c:780</div></div>
+<div class="ttc" id="aredisx-net_8c_html_acae5ab8af4db1c4ab13c4069aa744a44"><div class="ttname"><a href="redisx-net_8c.html#acae5ab8af4db1c4ab13c4069aa744a44">redisxDisconnect</a></div><div class="ttdeci">void redisxDisconnect(Redis *redis)</div><div class="ttdef"><b>Definition</b> redisx-net.c:426</div></div>
+<div class="ttc" id="aredisx-net_8c_html_ad71822356ffd40ed4b1c71d065f48809"><div class="ttname"><a href="redisx-net_8c.html#ad71822356ffd40ed4b1c71d065f48809">redisxConnect</a></div><div class="ttdeci">int redisxConnect(Redis *redis, boolean usePipeline)</div><div class="ttdef"><b>Definition</b> redisx-net.c:913</div></div>
 <div class="ttc" id="aredisx_8c_html_a09092bd97eead5c5fa73fa0d9241018c"><div class="ttname"><a href="redisx_8c.html#a09092bd97eead5c5fa73fa0d9241018c">redisxRequest</a></div><div class="ttdeci">RESP * redisxRequest(Redis *redis, const char *command, const char *arg1, const char *arg2, const char *arg3, int *status)</div><div class="ttdef"><b>Definition</b> redisx.c:586</div></div>
 <div class="ttc" id="aredisx_8h_html"><div class="ttname"><a href="redisx_8h.html">redisx.h</a></div></div>
 <div class="ttc" id="aredisx_8h_html_afa5c90630d37c2f77e5d7985932941a0a36dd81166f9ba91db70b1571b25fec9f"><div class="ttname"><a href="redisx_8h.html#afa5c90630d37c2f77e5d7985932941a0a36dd81166f9ba91db70b1571b25fec9f">RESP_BULK_STRING</a></div><div class="ttdeci">@ RESP_BULK_STRING</div><div class="ttdoc">RESP bulk string type.</div><div class="ttdef"><b>Definition</b> redisx.h:107</div></div>
@@ -215,18 +215,20 @@ General Features</h4>
 <tr class="markdownTableRowOdd">
 <td class="markdownTableBodyNone">concurrent <a class="el" href="structRedis.html" title="Structure that represents a Redis database instance, with one or more RedisClient connections.">Redis</a> instances   </td><td class="markdownTableBodyCenter"><b>yes</b>   </td><td class="markdownTableBodyNone">You can manage and use multiple <a class="el" href="structRedis.html" title="Structure that represents a Redis database instance, with one or more RedisClient connections.">Redis</a> servers simultaneously    </td></tr>
 <tr class="markdownTableRowEven">
+<td class="markdownTableBodyNone">thread safe (MT-safe)   </td><td class="markdownTableBodyCenter"><b>yes</b>   </td><td class="markdownTableBodyNone">synchronized + async calls with locking    </td></tr>
+<tr class="markdownTableRowOdd">
 <td class="markdownTableBodyNone">connect / disconnect hooks   </td><td class="markdownTableBodyCenter"><b>yes</b>   </td><td class="markdownTableBodyNone">user-defined callbacks    </td></tr>
-<tr class="markdownTableRowOdd">
+<tr class="markdownTableRowEven">
 <td class="markdownTableBodyNone">socket customization   </td><td class="markdownTableBodyCenter"><b>yes</b>   </td><td class="markdownTableBodyNone">(optional) user-defined timeout, buffer size and/or callback    </td></tr>
-<tr class="markdownTableRowEven">
+<tr class="markdownTableRowOdd">
 <td class="markdownTableBodyNone">custom socket error handling   </td><td class="markdownTableBodyCenter"><b>yes</b>   </td><td class="markdownTableBodyNone">(optional) user-defined callback    </td></tr>
-<tr class="markdownTableRowOdd">
+<tr class="markdownTableRowEven">
 <td class="markdownTableBodyNone"><a class="el" href="structRESP.html" title="Structure that represents a Redis response (RESP format).">RESP</a> to JSON   </td><td class="markdownTableBodyCenter"><b>yes</b>   </td><td class="markdownTableBodyNone">via <code>xchange</code> library    </td></tr>
-<tr class="markdownTableRowEven">
-<td class="markdownTableBodyNone"><a class="el" href="structRESP.html" title="Structure that represents a Redis response (RESP format).">RESP</a> to structured data   </td><td class="markdownTableBodyCenter"><b>yes</b>   </td><td class="markdownTableBodyNone">via <code>xchange</code> library    </td></tr>
 <tr class="markdownTableRowOdd">
-<td class="markdownTableBodyNone">debug error tracing   </td><td class="markdownTableBodyCenter"><b>yes</b>   </td><td class="markdownTableBodyNone">via <code><a class="elRef" href="../../xchange/apidoc/html/xchange_8h.html#a6c1304b59a5882b2286e86c6837faead">xSetDebug()</a></code>    </td></tr>
+<td class="markdownTableBodyNone"><a class="el" href="structRESP.html" title="Structure that represents a Redis response (RESP format).">RESP</a> to structured data   </td><td class="markdownTableBodyCenter"><b>yes</b>   </td><td class="markdownTableBodyNone">via <code>xchange</code> library    </td></tr>
 <tr class="markdownTableRowEven">
+<td class="markdownTableBodyNone">debug error tracing   </td><td class="markdownTableBodyCenter"><b>yes</b>   </td><td class="markdownTableBodyNone">via <code><a class="elRef" href="../../xchange/apidoc/html/xchange_8h.html#a6c1304b59a5882b2286e86c6837faead">xSetDebug()</a></code>    </td></tr>
+<tr class="markdownTableRowOdd">
 <td class="markdownTableBodyNone">command-line client   </td><td class="markdownTableBodyCenter"><b>yes</b>   </td><td class="markdownTableBodyNone"><code>redisx-cli</code>   </td></tr>
 </table>
 <h4><a class="anchor" id="autotoc_md8"></a>
@@ -239,22 +241,20 @@ Redis / Valkey Features</h4>
 <tr class="markdownTableRowEven">
 <td class="markdownTableBodyNone">RESP3 / <code>HELLO</code> support   </td><td class="markdownTableBodyCenter"><b>yes</b>   </td><td class="markdownTableBodyNone">(optional) if specific protocol is set    </td></tr>
 <tr class="markdownTableRowOdd">
-<td class="markdownTableBodyNone">thread safe (MT-safe)   </td><td class="markdownTableBodyCenter"><b>yes</b>   </td><td class="markdownTableBodyNone">synchronized + async calls with locking    </td></tr>
+<td class="markdownTableBodyNone">interactive queries   </td><td class="markdownTableBodyCenter"><b>yes</b>   </td><td class="markdownTableBodyNone">dedicated (low-latency) client    </td></tr>
+<tr class="markdownTableRowEven">
+<td class="markdownTableBodyNone">pipelined (batch) processing   </td><td class="markdownTableBodyCenter"><b>yes</b>   </td><td class="markdownTableBodyNone">dedicated (high-bandwidth) client / user-defined callback    </td></tr>
+<tr class="markdownTableRowOdd">
+<td class="markdownTableBodyNone">PUB/SUB support   </td><td class="markdownTableBodyCenter"><b>yes</b>   </td><td class="markdownTableBodyNone">dedicated client / user callbacks / subscription management    </td></tr>
 <tr class="markdownTableRowEven">
 <td class="markdownTableBodyNone">push messages   </td><td class="markdownTableBodyCenter"><b>yes</b>   </td><td class="markdownTableBodyNone">(optional) user-defined callback    </td></tr>
 <tr class="markdownTableRowOdd">
 <td class="markdownTableBodyNone">attributes   </td><td class="markdownTableBodyCenter"><b>yes</b>   </td><td class="markdownTableBodyNone">(optional) on demand    </td></tr>
 <tr class="markdownTableRowEven">
-<td class="markdownTableBodyNone">interactive queries   </td><td class="markdownTableBodyCenter"><b>yes</b>   </td><td class="markdownTableBodyNone">dedicated (low-latency) client    </td></tr>
-<tr class="markdownTableRowOdd">
-<td class="markdownTableBodyNone">pipelined (batch) processing   </td><td class="markdownTableBodyCenter"><b>yes</b>   </td><td class="markdownTableBodyNone">dedicated (high-bandwidth) client / user-defined callback    </td></tr>
-<tr class="markdownTableRowEven">
-<td class="markdownTableBodyNone">PUB/SUB support   </td><td class="markdownTableBodyCenter"><b>yes</b>   </td><td class="markdownTableBodyNone">dedicated client / user callbacks / subscription management    </td></tr>
-<tr class="markdownTableRowOdd">
 <td class="markdownTableBodyNone">Sentinel support   </td><td class="markdownTableBodyCenter"><b>yes</b>   </td><td class="markdownTableBodyNone"><em>help me test it</em>    </td></tr>
-<tr class="markdownTableRowEven">
-<td class="markdownTableBodyNone">cluster support   </td><td class="markdownTableBodyCenter">no   </td><td class="markdownTableBodyNone"><em>coming soon...</em>    </td></tr>
 <tr class="markdownTableRowOdd">
+<td class="markdownTableBodyNone">cluster support   </td><td class="markdownTableBodyCenter">no   </td><td class="markdownTableBodyNone"><em>coming soon...</em>    </td></tr>
+<tr class="markdownTableRowEven">
 <td class="markdownTableBodyNone">TLS support   </td><td class="markdownTableBodyCenter">no   </td><td class="markdownTableBodyNone"><em>coming soon...</em>   </td></tr>
 </table>
 <p><a class="anchor" id="related-links"></a> </p>
@@ -345,25 +345,25 @@ Initializing</h3>
 <div class="line"> </div>
 <div class="line"><span class="comment">// (optional) configure a non-standard port number to use</span></div>
 <div class="line"><a class="code hl_function" href="redisx-net_8c.html#a37f39ede48014a2463e4c72bf6eb5a3e">redisxSetPort</a>(redis, 7089);</div>
-<div class="ttc" id="aredisx-net_8c_html_a37f39ede48014a2463e4c72bf6eb5a3e"><div class="ttname"><a href="redisx-net_8c.html#a37f39ede48014a2463e4c72bf6eb5a3e">redisxSetPort</a></div><div class="ttdeci">int redisxSetPort(Redis *redis, int port)</div><div class="ttdef"><b>Definition</b> redisx-net.c:1052</div></div>
+<div class="ttc" id="aredisx-net_8c_html_a37f39ede48014a2463e4c72bf6eb5a3e"><div class="ttname"><a href="redisx-net_8c.html#a37f39ede48014a2463e4c72bf6eb5a3e">redisxSetPort</a></div><div class="ttdeci">int redisxSetPort(Redis *redis, int port)</div><div class="ttdef"><b>Definition</b> redisx-net.c:855</div></div>
 </div><!-- fragment --><h4><a class="anchor" id="autotoc_md21"></a>
 Sentinel</h4>
-<p>Alternatively, instead of <code><a class="el" href="redisx-net_8c.html#a5c78c2189a76a077231016564a0cecd5">redisxInit()</a></code> above you may initialize the client for a high-availability configuration using with a set of <a href="https://redis.io/docs/latest/develop/reference/sentinel-clients/">Redis Sentinel</a> servers, using <code><a class="el" href="redisx-net_8c.html#a993ae780daeae021fba1866d752ba9c5">redisxInitSentinel()</a></code>, e.g.:</p>
+<p>Alternatively, instead of <code><a class="el" href="redisx-net_8c.html#a5c78c2189a76a077231016564a0cecd5">redisxInit()</a></code> above you may initialize the client for a high-availability configuration using with a set of <a href="https://redis.io/docs/latest/develop/reference/sentinel-clients/">Redis Sentinel</a> servers, using <code><a class="el" href="redisx-sentinel_8c.html#a993ae780daeae021fba1866d752ba9c5">redisxInitSentinel()</a></code>, e.g.:</p>
 <div class="fragment"><div class="line"><span class="comment">// An array defining N sentinel servers and ports to use.</span></div>
 <div class="line"><span class="comment">// A port number 0 or negative will use the default Redis port of 6379.</span></div>
 <div class="line"><a class="code hl_struct" href="structRedisServer.html">RedisServer</a> sentinels[N] = { { <span class="stringliteral">&quot;server1&quot;</span>, 0 }, { <span class="stringliteral">&quot;server2&quot;</span>, 7024 } ... };</div>
 <div class="line"> </div>
 <div class="line"><span class="comment">// Configure a Redis client instance for the Sentinel servers and &quot;my-service&quot; service name</span></div>
-<div class="line"><a class="code hl_struct" href="structRedis.html">Redis</a> *redis = <a class="code hl_function" href="redisx-net_8c.html#a993ae780daeae021fba1866d752ba9c5">redisxInitSentinel</a>(sentinels, N, <span class="stringliteral">&quot;my-service&quot;</span>);</div>
+<div class="line"><a class="code hl_struct" href="structRedis.html">Redis</a> *redis = <a class="code hl_function" href="redisx-sentinel_8c.html#a993ae780daeae021fba1866d752ba9c5">redisxInitSentinel</a>(sentinels, N, <span class="stringliteral">&quot;my-service&quot;</span>);</div>
 <div class="line"><span class="keywordflow">if</span> (redis == NULL) {</div>
 <div class="line">  <span class="comment">// Abort: something did not got to plan...</span></div>
 <div class="line">  <span class="keywordflow">return</span>;</div>
 <div class="line">}</div>
 <div class="line"> </div>
 <div class="line"><span class="comment">// (optional) set a sentinel discovery timeout in ms...</span></div>
-<div class="line"><a class="code hl_function" href="redisx-net_8c.html#a192ba03de94c1e8a1876d7c533b4df9a">redisxSetSentinelTimeout</a>(redis, 30);</div>
-<div class="ttc" id="aredisx-net_8c_html_a192ba03de94c1e8a1876d7c533b4df9a"><div class="ttname"><a href="redisx-net_8c.html#a192ba03de94c1e8a1876d7c533b4df9a">redisxSetSentinelTimeout</a></div><div class="ttdeci">int redisxSetSentinelTimeout(Redis *redis, int millis)</div><div class="ttdef"><b>Definition</b> redisx-net.c:945</div></div>
-<div class="ttc" id="aredisx-net_8c_html_a993ae780daeae021fba1866d752ba9c5"><div class="ttname"><a href="redisx-net_8c.html#a993ae780daeae021fba1866d752ba9c5">redisxInitSentinel</a></div><div class="ttdeci">Redis * redisxInitSentinel(const char *serviceName, const RedisServer *serverList, int nServers)</div><div class="ttdef"><b>Definition</b> redisx-net.c:899</div></div>
+<div class="line"><a class="code hl_function" href="redisx-sentinel_8c.html#a192ba03de94c1e8a1876d7c533b4df9a">redisxSetSentinelTimeout</a>(redis, 30);</div>
+<div class="ttc" id="aredisx-sentinel_8c_html_a192ba03de94c1e8a1876d7c533b4df9a"><div class="ttname"><a href="redisx-sentinel_8c.html#a192ba03de94c1e8a1876d7c533b4df9a">redisxSetSentinelTimeout</a></div><div class="ttdeci">int redisxSetSentinelTimeout(Redis *redis, int millis)</div><div class="ttdef"><b>Definition</b> redisx-sentinel.c:236</div></div>
+<div class="ttc" id="aredisx-sentinel_8c_html_a993ae780daeae021fba1866d752ba9c5"><div class="ttname"><a href="redisx-sentinel_8c.html#a993ae780daeae021fba1866d752ba9c5">redisxInitSentinel</a></div><div class="ttdeci">Redis * redisxInitSentinel(const char *serviceName, const RedisServer *serverList, int nServers)</div><div class="ttdef"><b>Definition</b> redisx-sentinel.c:190</div></div>
 <div class="ttc" id="astructRedisServer_html"><div class="ttname"><a href="structRedisServer.html">RedisServer</a></div><div class="ttdef"><b>Definition</b> redisx.h:208</div></div>
 </div><!-- fragment --><p>After successful initialization, you may proceed with the configuration the same way as for the regular standalone server connection.</p>
 <p>One thing to keep in mind about Sentinel is that once the connection to the master is established, it works just like a regular server connection, including the possibility of that connection being broken. It is up to the application to initiate reconnection and recovery as appropriate in case of errors. (See more in on <a class="el" href="index.html#reconnecting">Reconnecting</a> further below).</p>
@@ -399,8 +399,8 @@ Socket-level configuration</h4>
 <div class="line"> </div>
 <div class="line"><span class="comment">// (optional) Set the TCP send/rcv buffer sizes to use if not default values.</span></div>
 <div class="line"><a class="code hl_function" href="redisx-net_8c.html#a648557774b354ff99e279d3dcf94d240">redisxSetTcpBuf</a>(redis, 65536);</div>
-<div class="ttc" id="aredisx-net_8c_html_a648557774b354ff99e279d3dcf94d240"><div class="ttname"><a href="redisx-net_8c.html#a648557774b354ff99e279d3dcf94d240">redisxSetTcpBuf</a></div><div class="ttdeci">int redisxSetTcpBuf(Redis *redis, int size)</div><div class="ttdef"><b>Definition</b> redisx-net.c:1028</div></div>
-<div class="ttc" id="aredisx-net_8c_html_aaa87635d37e5d348b7dbb12952b39183"><div class="ttname"><a href="redisx-net_8c.html#aaa87635d37e5d348b7dbb12952b39183">redisxSetSocketTimeout</a></div><div class="ttdeci">int redisxSetSocketTimeout(Redis *redis, int millis)</div><div class="ttdef"><b>Definition</b> redisx-net.c:1078</div></div>
+<div class="ttc" id="aredisx-net_8c_html_a648557774b354ff99e279d3dcf94d240"><div class="ttname"><a href="redisx-net_8c.html#a648557774b354ff99e279d3dcf94d240">redisxSetTcpBuf</a></div><div class="ttdeci">int redisxSetTcpBuf(Redis *redis, int size)</div><div class="ttdef"><b>Definition</b> redisx-net.c:831</div></div>
+<div class="ttc" id="aredisx-net_8c_html_aaa87635d37e5d348b7dbb12952b39183"><div class="ttname"><a href="redisx-net_8c.html#aaa87635d37e5d348b7dbb12952b39183">redisxSetSocketTimeout</a></div><div class="ttdeci">int redisxSetSocketTimeout(Redis *redis, int millis)</div><div class="ttdef"><b>Definition</b> redisx-net.c:881</div></div>
 </div><!-- fragment --><p>If you want, you can perform further customization of the client sockets via a user-defined callback function, e.g.:</p>
 <div class="fragment"><div class="line"><span class="keywordtype">int</span> my_socket_config(<span class="keywordtype">int</span> sock, <span class="keyword">enum</span> <a class="code hl_enumeration" href="redisx_8h.html#a5349b7340813fbd1e32d04ed650bc3d9">redisx_channel</a> channel) {</div>
 <div class="line">   <span class="comment">// Set up the socket any way you like...</span></div>

@@ -309,19 +309,22 @@
           <topic label="redisxDestroy" href="redisx-net_8c.html#ac54dd4c46d8615db4da02702c18f062b"/>
           <topic label="redisxDisconnect" href="redisx-net_8c.html#acae5ab8af4db1c4ab13c4069aa744a44"/>
           <topic label="redisxInit" href="redisx-net_8c.html#a5c78c2189a76a077231016564a0cecd5"/>
-          <topic label="redisxInitSentinel" href="redisx-net_8c.html#a993ae780daeae021fba1866d752ba9c5"/>
           <topic label="redisxIsConnected" href="redisx-net_8c.html#a94326ebfa5868579c8448cdbb941b3da"/>
           <topic label="redisxReconnect" href="redisx-net_8c.html#a55a2efad7c8d8f840f4144a217f58965"/>
           <topic label="redisxSetPort" href="redisx-net_8c.html#a37f39ede48014a2463e4c72bf6eb5a3e"/>
-          <topic label="redisxSetSentinelTimeout" href="redisx-net_8c.html#a192ba03de94c1e8a1876d7c533b4df9a"/>
           <topic label="redisxSetSocketTimeout" href="redisx-net_8c.html#aaa87635d37e5d348b7dbb12952b39183"/>
           <topic label="redisxSetTcpBuf" href="redisx-net_8c.html#a648557774b354ff99e279d3dcf94d240"/>
-          <topic label="redisxValidateSentinel" href="redisx-net_8c.html#ace7dcf75a6f60817e1b3be00fb15658b"/>
+          <topic label="rSetServerAsync" href="redisx-net_8c.html#a4f838601cb99d4eb39b44449764af02c"/>
         </topic>
         <topic label="redisx-script.c" href="redisx-script_8c.html">
           <topic label="redisxLoadScript" href="redisx-script_8c.html#ae8930592b8f927a154508669132bebab"/>
           <topic label="redisxRunScript" href="redisx-script_8c.html#aebd84c84082d2367d8cbe233cfe14535"/>
           <topic label="redisxRunScriptAsync" href="redisx-script_8c.html#a711d6ba68a67ab814ddda0adc998a2ce"/>
+        </topic>
+        <topic label="redisx-sentinel.c" href="redisx-sentinel_8c.html">
+          <topic label="redisxInitSentinel" href="redisx-sentinel_8c.html#a993ae780daeae021fba1866d752ba9c5"/>
+          <topic label="redisxSetSentinelTimeout" href="redisx-sentinel_8c.html#a192ba03de94c1e8a1876d7c533b4df9a"/>
+          <topic label="redisxValidateSentinel" href="redisx-sentinel_8c.html#ace7dcf75a6f60817e1b3be00fb15658b"/>
         </topic>
         <topic label="redisx-sub.c" href="redisx-sub_8c.html">
           <topic label="redisxAddSubscriber" href="redisx-sub_8c.html#a4c268c33f23438af67117b09c26ec615"/>

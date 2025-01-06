@@ -1252,13 +1252,6 @@
       <arglist>(const char *server)</arglist>
     </member>
     <member kind="function">
-      <type>Redis *</type>
-      <name>redisxInitSentinel</name>
-      <anchorfile>redisx-net_8c.html</anchorfile>
-      <anchor>a993ae780daeae021fba1866d752ba9c5</anchor>
-      <arglist>(const char *serviceName, const RedisServer *serverList, int nServers)</arglist>
-    </member>
-    <member kind="function">
       <type>boolean</type>
       <name>redisxIsConnected</name>
       <anchorfile>redisx-net_8c.html</anchorfile>
@@ -1281,13 +1274,6 @@
     </member>
     <member kind="function">
       <type>int</type>
-      <name>redisxSetSentinelTimeout</name>
-      <anchorfile>redisx-net_8c.html</anchorfile>
-      <anchor>a192ba03de94c1e8a1876d7c533b4df9a</anchor>
-      <arglist>(Redis *redis, int millis)</arglist>
-    </member>
-    <member kind="function">
-      <type>int</type>
       <name>redisxSetSocketTimeout</name>
       <anchorfile>redisx-net_8c.html</anchorfile>
       <anchor>aaa87635d37e5d348b7dbb12952b39183</anchor>
@@ -1302,10 +1288,10 @@
     </member>
     <member kind="function">
       <type>int</type>
-      <name>redisxValidateSentinel</name>
+      <name>rSetServerAsync</name>
       <anchorfile>redisx-net_8c.html</anchorfile>
-      <anchor>ace7dcf75a6f60817e1b3be00fb15658b</anchor>
-      <arglist>(const char *serviceName, const RedisServer *serverList, int nServers)</arglist>
+      <anchor>a4f838601cb99d4eb39b44449764af02c</anchor>
+      <arglist>(Redis *redis, const char *desc, const char *hostname, int port)</arglist>
     </member>
   </compound>
   <compound kind="file">
@@ -1332,6 +1318,32 @@
       <anchorfile>redisx-script_8c.html</anchorfile>
       <anchor>a711d6ba68a67ab814ddda0adc998a2ce</anchor>
       <arglist>(RedisClient *cl, const char *sha1, const char **keys, const char **params)</arglist>
+    </member>
+  </compound>
+  <compound kind="file">
+    <name>redisx-sentinel.c</name>
+    <path>src/</path>
+    <filename>redisx-sentinel_8c.html</filename>
+    <member kind="function">
+      <type>Redis *</type>
+      <name>redisxInitSentinel</name>
+      <anchorfile>redisx-sentinel_8c.html</anchorfile>
+      <anchor>a993ae780daeae021fba1866d752ba9c5</anchor>
+      <arglist>(const char *serviceName, const RedisServer *serverList, int nServers)</arglist>
+    </member>
+    <member kind="function">
+      <type>int</type>
+      <name>redisxSetSentinelTimeout</name>
+      <anchorfile>redisx-sentinel_8c.html</anchorfile>
+      <anchor>a192ba03de94c1e8a1876d7c533b4df9a</anchor>
+      <arglist>(Redis *redis, int millis)</arglist>
+    </member>
+    <member kind="function">
+      <type>int</type>
+      <name>redisxValidateSentinel</name>
+      <anchorfile>redisx-sentinel_8c.html</anchorfile>
+      <anchor>ace7dcf75a6f60817e1b3be00fb15658b</anchor>
+      <arglist>(const char *serviceName, const RedisServer *serverList, int nServers)</arglist>
     </member>
   </compound>
   <compound kind="file">

@@ -1,0 +1,115 @@
+.TH "src/redisx-sentinel.c" 3 "Version v0.9" "RedisX" \" -*- nroff -*-
+.ad l
+.nh
+.SH NAME
+src/redisx-sentinel.c
+.SH SYNOPSIS
+.br
+.PP
+.SS "Functions"
+
+.in +1c
+.ti -1c
+.RI "\fBRedis\fP * \fBredisxInitSentinel\fP (const char *serviceName, const \fBRedisServer\fP *serverList, int nServers)"
+.br
+.ti -1c
+.RI "int \fBredisxSetSentinelTimeout\fP (\fBRedis\fP *redis, int millis)"
+.br
+.ti -1c
+.RI "int \fBredisxValidateSentinel\fP (const char *serviceName, const \fBRedisServer\fP *serverList, int nServers)"
+.br
+.in -1c
+.SH "Detailed Description"
+.PP 
+
+.PP
+\fBDate\fP
+.RS 4
+Created on Jan 6, 2025 
+.RE
+.PP
+\fBAuthor\fP
+.RS 4
+Attila Kovacs
+.RE
+.PP
+Functions to manage clients to high-availability \fBRedis\fP Sentinel server configurations\&. 
+.SH "Function Documentation"
+.PP 
+.SS "\fBRedis\fP * redisxInitSentinel (const char * serviceName, const \fBRedisServer\fP * serverList, int nServers)"
+Initializes a \fBRedis\fP client with a Sentinel configuration of alternate servers, and the default sentinel node connection timeout\&.
+.PP
+\fBParameters\fP
+.RS 4
+\fIserviceName\fP The service name as registered in the Sentinel server configuration\&. The supplied name will be copied, not referenced, so that the value passed may be freely destroyed after the call\&. 
+.br
+\fIserverList\fP An set of Sentinel servers to use to dynamically find the current master\&. The list itself and its contents are not referenced\&. Instead a deep copy will be made of it, so the list that was pased can be freely destroyed after the call\&. 
+.br
+\fInServers\fP The number of servers in the list 
+.RE
+.PP
+\fBReturns\fP
+.RS 4
+X_SUCCESS (0) if successful, or else an error code <0\&.
+.RE
+.PP
+\fBSee also\fP
+.RS 4
+\fBredisxSetSentinelTimeout()\fP 
+.PP
+\fBredisxInit()\fP 
+.PP
+\fBredisxConnect()\fP 
+.RE
+.PP
+
+.PP
+References \fBREDISX_DEFAULT_SENTINEL_TIMEOUT_MILLIS\fP, \fBredisxInit()\fP, \fBredisxValidateSentinel()\fP, \fBx_error()\fP, \fBX_SUCCESS\fP, \fBx_trace_null()\fP, and \fBxStringCopyOf()\fP\&.
+.SS "int redisxSetSentinelTimeout (\fBRedis\fP * redis, int millis)"
+Changes the connection timeout for Sentinel server instances in the discovery phase\&. This is different from the timeout that is used for the master server, once it is discovered\&.
+.PP
+\fBParameters\fP
+.RS 4
+\fIredis\fP The \fBRedis\fP instance, which was initialized for Sentinel via \fBredisxInitSentinel()\fP\&. 
+.br
+\fImillis\fP [ms] The new connection timeout or <=0 to use the default value\&. 
+.RE
+.PP
+\fBReturns\fP
+.RS 4
+X_SUCCESS (0) if successfully set sentinel connection timeout, or else X_NULL if the redis instance is NULL, or X_NO_INIT if the redis instance is not initialized for Sentinel\&.
+.RE
+.PP
+\fBSee also\fP
+.RS 4
+\fBredisxSetSocketTimeout()\fP 
+.PP
+\fBredisxInitSentinel()\fP 
+.RE
+.PP
+
+.PP
+References \fBREDISX_DEFAULT_SENTINEL_TIMEOUT_MILLIS\fP, \fBx_error()\fP, \fBX_NO_INIT\fP, and \fBX_SUCCESS\fP\&.
+.SS "int redisxValidateSentinel (const char * serviceName, const \fBRedisServer\fP * serverList, int nServers)"
+Validates a Sentinel configuration\&.
+.PP
+\fBParameters\fP
+.RS 4
+\fIserviceName\fP The service name as registered in the Sentinel server configuration\&. 
+.br
+\fIserverList\fP An set of Sentinel servers to use to dynamically find the current master\&. 
+.br
+\fInServers\fP The number of servers in the list 
+.RE
+.PP
+\fBReturns\fP
+.RS 4
+X_SUCCESS (0) if successful, or X_NAME_INVALID if the serviceName is NULL or empty, or X_NULL if the serverList is NULL, or X_SIZE_INVALID if nServers is 0 or negative, or else X_GROUP_INVALID if the first server has a NULL or empty host name\&. 
+.RE
+.PP
+
+.PP
+References \fBx_error()\fP, \fBX_GROUP_INVALID\fP, \fBX_NAME_INVALID\fP, \fBX_NULL\fP, \fBX_SIZE_INVALID\fP, and \fBX_SUCCESS\fP\&.
+.SH "Author"
+.PP 
+Generated automatically by Doxygen for RedisX from the source code\&.
