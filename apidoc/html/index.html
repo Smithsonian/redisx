@@ -592,38 +592,38 @@ RESP data type</h3>
 <p>To help with deciding what cast to use for a given <code>value</code> field of the <a class="el" href="structRESP.html" title="Structure that represents a Redis response (RESP format).">RESP</a> data structure, we provide the convenience methods <code><a class="el" href="resp_8c.html#a944a623a34b5a6a7af064fc0d0cc35bf">redisxIsScalarType()</a></code>, <code><a class="el" href="resp_8c.html#a7fb3a83bc8345413eb1a722444386abd">redisxIsStringType()</a></code>, <code><a class="el" href="resp_8c.html#af7d1a91b1d89fb11e6b16db04653a871">redisxIsArrayType()</a></code>, and <code><a class="el" href="resp_8c.html#a460822029ff730cd7a55d64797c329a3">redisxIsMapType()</a></code> functions.</p>
 <p>You can check that two <code><a class="el" href="structRESP.html" title="Structure that represents a Redis response (RESP format).">RESP</a></code> data structures are equivalent with <code>redisxIsEqualRESP(RESP *a, RESP *b)</code>.</p>
 <p>You may also check the integrity of a <code><a class="el" href="structRESP.html" title="Structure that represents a Redis response (RESP format).">RESP</a></code> using <code><a class="el" href="resp_8c.html#a4b5674d08da07250c0ca6116a4c48ccf">redisxCheckRESP()</a></code>. Since <code><a class="el" href="structRESP.html" title="Structure that represents a Redis response (RESP format).">RESP</a></code> data is dynamically allocated, the user is responsible for discarding them once they are no longer needed, e.g. by calling <code><a class="el" href="resp_8c.html#aa4e23a7454f7055711915ec430599011">redisxDestroyRESP()</a></code>. The two steps may be combined to automatically discard invalid or unexpected <code><a class="el" href="structRESP.html" title="Structure that represents a Redis response (RESP format).">RESP</a></code> data in a single step by calling <code><a class="el" href="resp_8c.html#a80d5a305523c51da7bc7cf4c9deca962">redisxCheckDestroyRESP()</a></code>.</p>
-<div class="fragment"><div class="line"><a class="code hl_struct" href="structRESP.html">RESP</a> *r = ...</div>
+<div class="fragment"><div class="line"><a class="code hl_struct" href="structRESP.html">RESP</a> *reply = ...</div>
 <div class="line"> </div>
-<div class="line"><span class="comment">// Let&#39;s say we expect &#39;r&#39; to contain of an embedded RESP array of 3 elements... </span></div>
-<div class="line">int status = <a class="code hl_function" href="resp_8c.html#a80d5a305523c51da7bc7cf4c9deca962">redisxCheckDestroyRESP</a>(r, <a class="code hl_enumvalue" href="redisx_8h.html#afa5c90630d37c2f77e5d7985932941a0ad16eee767b19b1c4bb650deea0dd0b30">RESP_ARRAY</a>, 3);</div>
+<div class="line"><span class="comment">// Let&#39;s say we expect &#39;reply&#39; to contain of an embedded RESP array of 3 elements... </span></div>
+<div class="line">int status = <a class="code hl_function" href="resp_8c.html#a80d5a305523c51da7bc7cf4c9deca962">redisxCheckDestroyRESP</a>(reply, <a class="code hl_enumvalue" href="redisx_8h.html#afa5c90630d37c2f77e5d7985932941a0ad16eee767b19b1c4bb650deea0dd0b30">RESP_ARRAY</a>, 3);</div>
 <div class="line"><span class="keywordflow">if</span> (status != X_SUCCESS) {</div>
-<div class="line">   <span class="comment">// Oops, &#39;r&#39; was either NULL, or does not contain a RESP array with 3 elements...</span></div>
+<div class="line">   <span class="comment">// Oops, &#39;reply&#39; was either NULL, or does not contain a RESP array with 3 elements...</span></div>
 <div class="line">   ...</div>
 <div class="line">}</div>
 <div class="line"><span class="keywordflow">else</span> {</div>
 <div class="line">   <span class="comment">// Process the expected response...</span></div>
 <div class="line">   ...</div>
-<div class="line">   <a class="code hl_function" href="resp_8c.html#aa4e23a7454f7055711915ec430599011">redisxDestroyRESP</a>(r);</div>
+<div class="line">   <a class="code hl_function" href="resp_8c.html#aa4e23a7454f7055711915ec430599011">redisxDestroyRESP</a>(reply);</div>
 <div class="line">}</div>
 <div class="ttc" id="aredisx_8h_html_afa5c90630d37c2f77e5d7985932941a0ad16eee767b19b1c4bb650deea0dd0b30"><div class="ttname"><a href="redisx_8h.html#afa5c90630d37c2f77e5d7985932941a0ad16eee767b19b1c4bb650deea0dd0b30">RESP_ARRAY</a></div><div class="ttdeci">@ RESP_ARRAY</div><div class="ttdoc">RESP array type.</div><div class="ttdef"><b>Definition</b> redisx.h:103</div></div>
 <div class="ttc" id="aresp_8c_html_a80d5a305523c51da7bc7cf4c9deca962"><div class="ttname"><a href="resp_8c.html#a80d5a305523c51da7bc7cf4c9deca962">redisxCheckDestroyRESP</a></div><div class="ttdeci">int redisxCheckDestroyRESP(RESP *resp, enum resp_type expectedType, int expectedSize)</div><div class="ttdef"><b>Definition</b> resp.c:190</div></div>
 </div><!-- fragment --><p>Before destroying a <a class="el" href="structRESP.html" title="Structure that represents a Redis response (RESP format).">RESP</a> structure, the caller may want to dereference values within it if they are to be used as is (without making copies), e.g.:</p>
-<div class="fragment"><div class="line"><a class="code hl_struct" href="structRESP.html">RESP</a> *r = ...</div>
-<div class="line">char *stringValue = NULL;   <span class="comment">// to be extracted from &#39;r&#39;</span></div>
+<div class="fragment"><div class="line"><a class="code hl_struct" href="structRESP.html">RESP</a> *reply = ...</div>
+<div class="line">char *stringValue = NULL;   <span class="comment">// to be extracted from &#39;reply&#39;</span></div>
 <div class="line"> </div>
-<div class="line"><span class="comment">// Let&#39;s say we expect &#39;r&#39; to contain of a simple string response (of whatever length)</span></div>
-<div class="line"><span class="keywordtype">int</span> status = <a class="code hl_function" href="resp_8c.html#a80d5a305523c51da7bc7cf4c9deca962">redisxCheckDestroyRESP</a>(r, <a class="code hl_enumvalue" href="redisx_8h.html#afa5c90630d37c2f77e5d7985932941a0a7868e33fc03b809c864bf271abd009b9">RESP_SIMPLE_STRING</a>, 0);</div>
+<div class="line"><span class="comment">// Let&#39;s say we expect &#39;rwply&#39; to contain of a simple string response (of whatever length)</span></div>
+<div class="line"><span class="keywordtype">int</span> status = <a class="code hl_function" href="resp_8c.html#a80d5a305523c51da7bc7cf4c9deca962">redisxCheckDestroyRESP</a>(reply, <a class="code hl_enumvalue" href="redisx_8h.html#afa5c90630d37c2f77e5d7985932941a0a7868e33fc03b809c864bf271abd009b9">RESP_SIMPLE_STRING</a>, 0);</div>
 <div class="line"><span class="keywordflow">if</span> (status != X_SUCCESS) {</div>
-<div class="line">  <span class="comment">// Oops, &#39;r&#39; was either NULL, or it was not a simple string type</span></div>
+<div class="line">  <span class="comment">// Oops, &#39;reply&#39; was either NULL, or it was not a simple string type</span></div>
 <div class="line">  ...</div>
 <div class="line">}</div>
 <div class="line"><span class="keywordflow">else</span> {</div>
 <div class="line">  <span class="comment">// Set &#39;stringValue&#39; and dereference the value field in the RESP so it&#39;s not </span></div>
 <div class="line">  <span class="comment">// destroyed with the RESP itself.</span></div>
-<div class="line">  stringValue = (<span class="keywordtype">char</span> *) r-&gt;<a class="code hl_variable" href="structRESP.html#a0f61d63b009d0880a89c843bd50d8d76">value</a>;</div>
-<div class="line">  r-&gt;<a class="code hl_variable" href="structRESP.html#a0f61d63b009d0880a89c843bd50d8d76">value</a> = NULL;</div>
+<div class="line">  stringValue = (<span class="keywordtype">char</span> *) reply-&gt;<a class="code hl_variable" href="structRESP.html#a0f61d63b009d0880a89c843bd50d8d76">value</a>;</div>
+<div class="line">  reply-&gt;<a class="code hl_variable" href="structRESP.html#a0f61d63b009d0880a89c843bd50d8d76">value</a> = NULL;</div>
 <div class="line">   </div>
-<div class="line">  <a class="code hl_function" href="resp_8c.html#aa4e23a7454f7055711915ec430599011">redisxDestroyRESP</a>(r);     <span class="comment">// &#39;stringValue&#39; is still a valid pointer after! </span></div>
+<div class="line">  <a class="code hl_function" href="resp_8c.html#aa4e23a7454f7055711915ec430599011">redisxDestroyRESP</a>(reply);     <span class="comment">// &#39;stringValue&#39; is still a valid pointer after! </span></div>
 <div class="line">}</div>
 <div class="ttc" id="aredisx_8h_html_afa5c90630d37c2f77e5d7985932941a0a7868e33fc03b809c864bf271abd009b9"><div class="ttname"><a href="redisx_8h.html#afa5c90630d37c2f77e5d7985932941a0a7868e33fc03b809c864bf271abd009b9">RESP_SIMPLE_STRING</a></div><div class="ttdeci">@ RESP_SIMPLE_STRING</div><div class="ttdoc">RESP simple string type.</div><div class="ttdef"><b>Definition</b> redisx.h:105</div></div>
 </div><!-- fragment --><p>Note, that you can convert a <a class="el" href="structRESP.html" title="Structure that represents a Redis response (RESP format).">RESP</a> to an <code><a class="elRef" href="../../xchange/apidoc/html/structXField.html">XField</a></code>, and/or to JSON representation using the <code><a class="el" href="resp_8c.html#adc7235cd1b6be038b9f3c7beb11a13ef">redisxRESP2XField()</a></code> and <code><a class="el" href="resp_8c.html#a7f4e74ee03cebf38eb9c1fb873784a35">redisxRESP2JSON()</a></code> functions, e.g.:</p>
