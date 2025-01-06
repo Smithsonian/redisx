@@ -33,6 +33,7 @@ static int rTryConnectSentinel(Redis *redis, int serverIndex) {
   char desc[80];
   int status;
 
+  // Since we'll set a new address / port, we should ensure we aren't connected to something else...
   redisxDisconnect(redis);
 
   sprintf(desc, "sentinel server %d", serverIndex);
@@ -46,16 +47,25 @@ static int rTryConnectSentinel(Redis *redis, int serverIndex) {
 
 /// \cond PRIVATE
 
-
-static int rSetTopSentinel(RedisSentinel *s, int idx) {
+/**
+ * Moves a server from its current position in the Sentinel server list to the top.
+ *
+ * @param s     The Redis Sentinel configuration
+ * @param idx   The current zero-based index of the server in the list
+ * @return
+ */
+static int rSetTopSentinelAsync(RedisSentinel *s, int idx) {
   RedisServer server;
 
   if(idx == 0) return X_SUCCESS;
 
+  // Make a local copy of the server's data.
   server = s->servers[idx];
 
-  // Move to the top of the list, so next time we try this one first...
+  // Bump the preceding elements down by one (this overwrites the slot at idx).
   memmove(&s->servers[1], s->servers, idx * sizeof(RedisServer));
+
+  // Set the top to the saved local copu.
   s->servers[0] = server;
 
   return X_SUCCESS;
@@ -70,7 +80,7 @@ static int rIncludeMasterAsync(RedisSentinel *s, char *hostname, int port) {
     int sport = server->port > 0 ? server->port : REDISX_TCP_PORT;
     if(sport == port && strcmp(server->host, hostname) == 0) {
       // Found master on server list, move it to the top...
-      rSetTopSentinel(s, i);
+      rSetTopSentinelAsync(s, i);
       return X_SUCCESS;
     }
   }
@@ -94,10 +104,11 @@ static int rIncludeMasterAsync(RedisSentinel *s, char *hostname, int port) {
 }
 
 /**
- * Verifies that a given Redis instance is in the master role. User's should always communicate
- * to the master, not to replicas.
+ * Verifies that a given Redis instance is in the master role. Users should always communicate
+ * to the master, not to replicas. It assumes that we have a live interactive connection to the
+ * server already.
  *
- * @param redis     A redis server instance
+ * @param redis     A Redis server instance, with the interactive client connected.
  * @return          X_SUCCESS (0) if the server is confirmed to be the master, or else an error
  *                  code &lt;0.
  */
@@ -136,7 +147,7 @@ int rConfirmMasterRole(Redis *redis) {
 
   redisxDestroyRESP(reply);
 
-  if(status) return x_error(X_FAILURE, EAGAIN, fn, "Replica is not master");
+  if(status) return x_error(X_FAILURE, EAGAIN, fn, "server is a replica, not the master");
 
   // Make sure the current master is included at the top of the sentinels server list
   if(rConfigLock(redis) == X_SUCCESS) {
@@ -153,7 +164,7 @@ int rConfirmMasterRole(Redis *redis) {
  * @param redis     A Redis server instance
  * @return          X_SUCCESS (0) if successful, or else an error code &lt;0.
  */
-int rDiscoverSentinel(Redis *redis) {
+int rDiscoverSentinelAsync(Redis *redis) {
   static const char *fn = "rConnectSentinel";
 
   RedisPrivate *p = (RedisPrivate *) redis->priv;
@@ -183,7 +194,7 @@ int rDiscoverSentinel(Redis *redis) {
       redisxDestroyRESP(reply);
       prop_error(fn, status);
 
-      if(i > 0) rSetTopSentinel(s, i);
+      if(i > 0) rSetTopSentinelAsync(s, i);
 
       // TODO update sentinel server list?...
 

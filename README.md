@@ -322,7 +322,7 @@ The first step is to create a `Redis` object, with the server name or IP address
 #### Sentinel
 
 Alternatively, instead of `redisxInit()` above you may initialize the client for a high-availability configuration 
-using with a set of [Redis Sentinel](https://redis.io/docs/latest/develop/reference/sentinel-clients/) servers, using 
+with a set of [Redis Sentinel](https://redis.io/docs/latest/develop/reference/sentinel-clients/) servers, using 
 `redisxInitSentinel()`, e.g.:
 
 ```c

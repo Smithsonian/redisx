@@ -29,7 +29,7 @@
 #include "redisx-priv.h"
 
 /// \cond PRIVATE
-extern int rDiscoverSentinel(Redis *redis);
+extern int rDiscoverSentinelAsync(Redis *redis);
 extern int rConfirmMasterRole(Redis *redis);
 extern void rDestroySentinel(RedisSentinel *sentinel);
 /// \endcond
@@ -264,7 +264,7 @@ static int rConnectAsync(Redis *redis, boolean usePipeline) {
     return X_ALREADY_OPEN;
   }
 
-  if(p->sentinel) prop_error(fn, rDiscoverSentinel(redis));
+  if(p->sentinel) prop_error(fn, rDiscoverSentinelAsync(redis));
 
   if(!ip->isEnabled) {
     static int warnedInteractive;
