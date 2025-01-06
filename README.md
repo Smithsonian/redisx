@@ -129,6 +129,7 @@ And at every step, you should check for and [handle errors](#error-handling) as 
  | Feature                           | supported  | comments                                                     |
  | --------------------------------- |:----------:| -------------------------------------------------------------|
  | concurrent Redis instances        |  __yes__   | You can manage and use multiple Redis servers simultaneously |
+ | thread safe (MT-safe)             |  __yes__   | synchronized + async calls with locking                      |
  | connect / disconnect hooks        |  __yes__   | user-defined callbacks                                       |
  | socket customization              |  __yes__   | (optional) user-defined timeout, buffer size and/or callback |
  | custom socket error handling      |  __yes__   | (optional) user-defined callback                             |
@@ -143,12 +144,11 @@ And at every step, you should check for and [handle errors](#error-handling) as 
  | --------------------------------- |:----------:| -------------------------------------------------------------|
  | user authentication               |  __yes__   | via `HELLO` if protocol is set, otherwise via `AUTH`         |
  | RESP3 / `HELLO` support           |  __yes__   | (optional) if specific protocol is set                       |
- | thread safe (MT-safe)             |  __yes__   | synchronized + async calls with locking                      |
- | push messages                     |  __yes__   | (optional) user-defined callback                             |
- | attributes                        |  __yes__   | (optional) on demand                                         |
  | interactive queries               |  __yes__   | dedicated (low-latency) client                               |
  | pipelined (batch) processing      |  __yes__   | dedicated (high-bandwidth) client / user-defined callback    |
  | PUB/SUB support                   |  __yes__   | dedicated client / user callbacks / subscription management  |
+ | push messages                     |  __yes__   | (optional) user-defined callback                             |
+ | attributes                        |  __yes__   | (optional) on demand                                         |
  | Sentinel support                  |  __yes__   | _help me test it_                                            |
  | cluster support                   |    no      | _coming soon..._                                             |
  | TLS support                       |    no      | _coming soon..._                                             |
@@ -682,18 +682,18 @@ The two steps may be combined to automatically discard invalid or unexpected `RE
 `redisxCheckDestroyRESP()`.
 
 ```c
-  RESP *r = ...
+  RESP *reply = ...
   
-  // Let's say we expect 'r' to contain of an embedded RESP array of 3 elements... 
-  int status = redisxCheckDestroyRESP(r, RESP_ARRAY, 3);
+  // Let's say we expect 'reply' to contain of an embedded RESP array of 3 elements... 
+  int status = redisxCheckDestroyRESP(reply, RESP_ARRAY, 3);
   if (status != X_SUCCESS) {
-     // Oops, 'r' was either NULL, or does not contain a RESP array with 3 elements...
+     // Oops, 'reply' was either NULL, or does not contain a RESP array with 3 elements...
      ...
   }
   else {
      // Process the expected response...
      ...
-     redisxDestroyRESP(r);
+     redisxDestroyRESP(reply);
   }
 ```
 
@@ -702,22 +702,22 @@ Before destroying a RESP structure, the caller may want to dereference values wi
 
 
 ```c
-  RESP *r = ...
-  char *stringValue = NULL;   // to be extracted from 'r'
+  RESP *reply = ...
+  char *stringValue = NULL;   // to be extracted from 'reply'
   
-  // Let's say we expect 'r' to contain of a simple string response (of whatever length)
-  int status = redisxCheckDestroyRESP(r, RESP_SIMPLE_STRING, 0);
+  // Let's say we expect 'rwply' to contain of a simple string response (of whatever length)
+  int status = redisxCheckDestroyRESP(reply, RESP_SIMPLE_STRING, 0);
   if (status != X_SUCCESS) {
-    // Oops, 'r' was either NULL, or it was not a simple string type
+    // Oops, 'reply' was either NULL, or it was not a simple string type
     ...
   }
   else {
     // Set 'stringValue' and dereference the value field in the RESP so it's not 
     // destroyed with the RESP itself.
-    stringValue = (char *) r->value;
-    r->value = NULL;
+    stringValue = (char *) reply->value;
+    reply->value = NULL;
      
-    redisxDestroyRESP(r);     // 'stringValue' is still a valid pointer after! 
+    redisxDestroyRESP(reply);     // 'stringValue' is still a valid pointer after! 
   }
 ```
 
