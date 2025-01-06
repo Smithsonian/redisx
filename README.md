@@ -1353,14 +1353,16 @@ clients are optimized for low-latency, at the socket level.
 ## Redis clusters
 
  - [Cluster basics](#cluster-basics)
+ - [Detecting cluster reconfiguration](#cluster-reconfiguration)
  - [Explicit connection management](#cluster-explicit-connect)
- - [Automatic reconfiguration](#cluster-reconfiguration)
 
-__RedisX__ provides support for clusters also. In cluster configuration the database is distributed over a collection
-of servers, each node of which serves only a subset of the Redis keys. 
+__RedisX__ provides support for [Redis clusters](https://redis.io/docs/latest/operate/oss_and_stack/management/scaling/) 
+also. In cluster configuration the database is distributed over a collection of servers, each node of which serves
+only a subset of the Redis keys. 
 
  1. Configure a known cluster node as usual.
- 2. Initialize a cluster using the known, configured node. (All shards in the cluster will inherit the configuration.)
+ 2. Initialize a cluster using the known, configured node. (All shards in the cluster will inherit the configuration 
+    from the initializing node.)
  3. For every request, you must obtain the appropriate cluster node for the given key to process. (PUB/SUB may be 
     processed on any cluster node.)
  4. Destroy the cluster resources when done using it.
@@ -1394,7 +1396,9 @@ Next, you can use the known node to obtain the cluster configuration:
 
 The above will query the cluster configuration from the node (the node need not be explicitly connected prior to the
 initialization, and will be returned in the same connection state as before). The cluster will inherit the configuration
-of the node, such as pipelining, socket configuration authentication, protocol, and callbacks, from the configuring node.
+of the node, such as pipelining, socket configuration authentication, protocol, and callbacks, from the configuring node 
+-- all but the database index, which is always 0 for clusters.
+
 If the initialization fails on a particular node, you might try other known nodes until one of then succeeds. (You
 might use `redisxSetHostName()` and `redisxSetPort()` on the configured `Redis` instance to update the address of the 
 configuring node, while leaving other configuration settings intact.)
@@ -1406,8 +1410,8 @@ You can start using the cluster right away. You can obtain a connected `Redis` i
 `redisxClusterGetShard()`, e.g.:
 
 ```c
-  RedisCluster *cluster = ...   // The initialized cluster configuration
   const char *key = "my-key";   // The Redis keyword of interest, can use Redis hashtags also
+  int status;                   // We'll track error status here.
 
   // Get the connected Redis server instance that serves the given key
   Redis *shard = redisxClusterGetShard(cluster, key);
@@ -1415,14 +1419,17 @@ You can start using the cluster right away. You can obtain a connected `Redis` i
     // Oops, there seems to be no server for the given key currently. Perhaps try again later...
     ...
   }
-  
-  // Run your query on using the given Redis key / keys.
-  int status = X_SUCCESS;
-  RESP *reply = redisxRequest(shard, "GET", key, NULL, NULL, &status);
-```
 
-As a matter a best practice you should never assume that a given keyword is persistently served by the same shard. 
-I.e., you should obtain the current shard for the key each time you want to use it with the cluster.
+  // Run your query on using the given Redis key / keys.
+  RESP *reply = redisxRequest(shard, "GET", key, NULL, NULL, &status);
+  if(redisxClusterMoved(reply)) {
+    // The key is now served by another shard.
+    // You might want to obtain the new shard and try again...
+    ...
+  }
+  
+  ...
+```
 
 Finally, when you are done using the cluster, simply discard it:
 
@@ -1431,35 +1438,49 @@ Finally, when you are done using the cluster, simply discard it:
   redisxClusterDestroy(cluster);
 ```
 
+<a name="cluster-reconfiguration"></a>
+### Detecting cluster reconfiguration
+
+In the above example we have shown one way you might check for errors that result from cluster being reconfigured
+on-the-fly, using `redisxClusterMoved()` on the `RESP` reply obtained from the shard.
+
+Equivalently, you might use `redisxCheckRESP()` or `redisxCheckDestroyRESP()` also for detecting a cluster 
+reconfiguration. Both of these will return a designated `REDIS_MOVED` error code if the keyword is now served on 
+another shard:
+
+```c
+  ...
+  int s = redisxCheckRESP(reply, ...);
+  if(s == REDIS_MOVED) {
+    // The key is now served by another shard.
+    ...
+  }
+  if(s != X_SUCCESS) {
+    // The reply is no good for some other reason...
+    ...
+  }
+  ...
+```
+
+A `REDIS_MOVED` error code will be returned by higher-level functions also, which ingest the `RESP` replies from the 
+shard and return a digested error code. For example, `redisxGetStringValue()` will set the output `len` value to 
+`REDIS_MOVED` if the value could not be obtained because of a cluster reconfiguration.
+
+As a matter a best practice you should never assume that a given keyword is persistently served by the same shard. 
+Rather, you should obtain the current shard for the key each time you want to use it with the cluster, and always 
+check for errors on shard requests, and repeat failed requests on a newly obtained shard if necessary.
+
+
 <a name="cluster-explicit-connect"></a>
-### Explicit connection management
+### Manual connection management
 
 The `redisxClusterGetShard()` will automatically connect the associated shard, if not already connected. Thus, you do
-not need to explicitly connect to the cluster. However, in some cases you might want to connect all shards before 
-running queries to eliminate the connection overhead during use. If so, you can call `redisxClusterConnect()` to 
-explicitly connect to all shards, before using the cluster. Similarly, you can also explicitly disconnect from all 
-connected shards using `redisxClusterDisconnect()`, e.g. to close unnecessary sockets. You may continue to use the 
-cluster after calling `redisxClusterDisconnect()`, as successive calls to `redisxClusterGetShard()` will automatically 
-reconnect the shards as needed.
-
-<a name="cluster-reconfiguration"></a>
-### Automatic reconfiguration
-
-Redis cluster can be reconfigured on the fly, and the __RedisX__ library provides support for automatically detecting 
-cluster reconfigurations. The process is automatic, but it is not entirely transparent to users, who may need to 
-re-submit failed queries after reconfiguration, since the library does not know how many pending queries may have been 
-sent, that are/were affected by the reconfiguration. In general, the reconfiguration is handled as follows:
-
- 1. __RedisX__ will automatically capture the cluster reconfiguration when a request returns an error message with 
-   the error `MOVED`. Upon receiving the telltale error, the library will immediately launch a thread to reconfigure
-   the cluster in the background. (The cluster will be blocked by a mutex while the reconfiguration takes place, such
-   that successive `redisxClusterGetShard()` call will block until the new configuration is in place.)
-   
- 2. Requests sent to the now invalid shards of the old configuration will return an error (message type `RESP_ERROR`)
-   to the caller. For interactive queries this would be the just for the last request sent, but for pipelined queries
-   it may be some subset of the submitted and pending queries, which are affected. The caller is responsible handling
-   these errors, and re-submitting the failed queries as necessary, by once again calling `redisxClusterGetShard()` on
-   the affected keywords.
+not need to explicitly connect to the cluster or its shards. However, in some cases you might want to connect all 
+shards before running queries to eliminate the connection overhead during use. If so, you can call 
+`redisxClusterConnect()` to explicitly connect to all shards before using the cluster. Similarly, you can also 
+explicitly disconnect from all connected shards using `redisxClusterDisconnect()`, e.g. to close unnecessary sockets. 
+You may continue to use the cluster after calling `redisxClusterDisconnect()`, as successive calls to 
+`redisxClusterGetShard()` will continue to reconnect the shards as needed automatically.
 
 
 -----------------------------------------------------------------------------

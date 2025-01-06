@@ -662,7 +662,7 @@ RESP *redisxRequest(Redis *redis, const char *command, const char *arg1, const c
  * \param status    Pointer to the return error status. If not NULL, it will be populated with one of:
  *
  *                      X_SUCCESS       on success.
- *                      X_NO_INIT       if the Redis client librarywas not initialized via initRedis.
+ *                      X_NO_INIT       if the Redis client librarywas not initialized via redisxInit().
  *                      X_NULL          if the argument is NULL or n<1.
  *                      X_TIMEDOUT      if the reading of the response timed out.
  *                      X_NO_SERVICE    if not connected to Redis.

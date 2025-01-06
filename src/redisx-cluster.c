@@ -252,7 +252,7 @@ static void rClusterSetShardsAsync(RedisCluster *cluster, RedisShard *shard, int
  *
  * @param pCluster
  */
-void *ClusterRefreshThread(void *pCluster) {
+static void *ClusterRefreshThread(void *pCluster) {
   RedisCluster *cluster = (RedisCluster *) pCluster;
   ClusterPrivate *p = (ClusterPrivate *) cluster->priv;
 
@@ -571,3 +571,21 @@ int redisxClusterDisconnect(RedisCluster *cluster) {
   return X_SUCCESS;
 }
 
+/**
+ * Checks if the reply is an error indicating that the cluster has been reconfigured and
+ * the request can no longer be fulfilled on the given shard. You might want to obtain
+ * the new shard using redisxClusterGetShard() again, and re-submit the request to the
+ * new shard.
+ *
+ * @param reply   The response obtained from the Redis shard / server.
+ * @return        TRUE (1) if the reply is an error indicating that the cluster has been
+ *                reconfigured and the key has moved to another shard.
+ *
+ * @sa redisxClusterGetShard()
+ */
+boolean redisxClusterMoved(const RESP *reply) {
+  if(!reply) return FALSE;
+  if(reply->type != RESP_ERROR) return FALSE;
+  if(reply->n < 5) return FALSE;
+  return (strncmp("MOVED", (char *) reply->value, 5) == 0);
+}

@@ -1052,7 +1052,7 @@ RESP *redisxReadReplyAsync(RedisClient *cl, int *pStatus) {
       resp->n = size-1;
       ((char *)resp->value)[resp->n] = '\0';
 
-      if(resp->type == RESP_ERROR) if(strncmp("MOVED", (char *) resp->value, 5) == 0) {
+      if(redisxClusterMoved(resp)) {
         // If cluster was reconfigured, refresh the cluster configuration automatically.
         const RedisPrivate *p = (RedisPrivate *) cp->redis->priv;
         rClusterRefresh(p->cluster);

@@ -127,6 +127,7 @@ enum resp_type {
 #define REDIS_INCOMPLETE_TRANSFER   (-104)  ///< \hideinitializer The transfer to/from Redis is incomplete
 #define REDIS_UNEXPECTED_RESP       (-105)  ///< \hideinitializer Got a Redis response of a different type than expected
 #define REDIS_UNEXPECTED_ARRAY_SIZE (-106)  ///< \hideinitializer Got a Redis response with different number of elements than expected.
+#define REDIS_MOVED                 (-107)  ///< \hideinitializer The requested key has moved to another cluster shard.
 
 /**
  * RedisX channel IDs. RedisX uses up to three separate connections to the server: (1) an interactive client, in which
@@ -409,6 +410,7 @@ int redisxReconnect(Redis *redis, boolean usePipeline);
 
 RedisCluster *redisxClusterInit(Redis *node);
 Redis *redisxClusterGetShard(RedisCluster *cluster, const char *key);
+boolean redisxClusterMoved(const RESP *reply);
 int redisxClusterConnect(RedisCluster *cluster);
 int redisxClusterDisconnect(RedisCluster *cluster);
 void redisxClusterDestroy(RedisCluster *cluster);
