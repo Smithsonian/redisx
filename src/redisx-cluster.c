@@ -155,6 +155,8 @@ static RedisShard *rClusterDiscoverAsync(Redis *redis, int *n_shards) {
     if(*n_shards) return x_trace_null(fn, NULL);
   }
 
+  xvprintf("Redis-X> Discovering cluster configuration...\n");
+
   reply = redisxRequest(redis, "CLUSTER", "SLOTS", NULL, NULL, n_shards);
   if(*n_shards) {
     redisxDestroyRESP(reply);
@@ -166,6 +168,8 @@ static RedisShard *rClusterDiscoverAsync(Redis *redis, int *n_shards) {
     int k;
 
     if(reply->n > 0) {
+      xvprintf("Redis-X> Got cluster with %d shards.\n", reply->n);
+
       shards = (RedisShard *) calloc(reply->n, sizeof(RedisShard));
       if(!shards) *n_shards = x_error(X_FAILURE, errno, fn, "alloc error (%d shards)", reply->n);
       else *n_shards = reply->n;
@@ -311,6 +315,8 @@ int rClusterRefresh(RedisCluster *cluster) {
     pthread_mutex_unlock(&lock);
     return X_SUCCESS;
   }
+
+  xvprintf("Redis-X> Reconfiguring cluster...\n");
 
   // We are now officially in charge of reconfiguring the cluster...
   p->reconfiguring = TRUE;
@@ -516,6 +522,8 @@ int redisxClusterConnect(RedisCluster *cluster) {
   p = (ClusterPrivate *) cluster->priv;
   if(!p) return x_error(X_NO_INIT, ENXIO, fn, "cluster is not initialized");
 
+  xvprintf("Redis-X> Connecting to all cluster shards.\n");
+
   pthread_mutex_lock(&p->mutex);
 
 #if WITH_OPENMP
@@ -559,6 +567,8 @@ int redisxClusterDisconnect(RedisCluster *cluster) {
 
   p = (ClusterPrivate *) cluster->priv;
   if(!p) return x_error(X_NO_INIT, ENXIO, fn, "cluster is not initialized");
+
+  xvprintf("Redis-X> Disconnecting from all cluster shards.\n");
 
   pthread_mutex_lock(&p->mutex);
 
