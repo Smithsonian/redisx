@@ -112,6 +112,8 @@ void rCloseClient(RedisClient *cl);
 void rCloseClientAsync(RedisClient *cl);
 boolean rIsLowLatency(const ClientPrivate *cp);
 int rCheckClient(const RedisClient *cl);
+int rSetServerAsync(Redis *redis, const char *desc, const char *hostname, int port);
+
 
 // in resp.c ------------------------------>
 int redisxAppendRESP(RESP *resp, RESP *part);
