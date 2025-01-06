@@ -233,8 +233,12 @@ static void rClusterSetShardsAsync(RedisCluster *cluster, RedisShard *shard, int
     RedisShard *s = &shard[k];
     int m;
     for(m = 0; m < s->n_servers; m++) {
-      RedisPrivate *np = (RedisPrivate *) s->redis[m]->priv;
+      Redis *r = s->redis[m];
+      RedisPrivate *np;
+      if(rConfigLock(r) != X_SUCCESS) continue;
+      np = (RedisPrivate *) r->priv;
       np->cluster = cluster;
+      rConfigUnlock(r);
     }
   }
 
@@ -242,7 +246,6 @@ static void rClusterSetShardsAsync(RedisCluster *cluster, RedisShard *shard, int
   p->shard = shard;
   p->n_shards = n_shards;
 }
-
 
 /// \cond PRIVATE
 
@@ -348,6 +351,7 @@ int rClusterRefresh(RedisCluster *cluster) {
  *                    (errno = EAGAIN).
  *
  * @sa redisxClusterInit()
+ * @sa redisxClusterMoved()
  */
 Redis *redisxClusterGetShard(RedisCluster *cluster, const char *key) {
   static const char *fn = "redisxClusterGetShard";
