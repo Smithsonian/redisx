@@ -7,13 +7,13 @@
  *  Functions to manage clients to high-availability Redis Sentinel server configurations.
  */
 
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <errno.h>
 
 #include "redisx-priv.h"
-
 
 /**
  * Attemps to connect to a given Redis sentinel server. If successful, the server is moved to the
@@ -43,7 +43,6 @@ static int rTryConnectSentinel(Redis *redis, int serverIndex) {
 
   return X_SUCCESS;
 }
-
 
 /// \cond PRIVATE
 
@@ -259,6 +258,7 @@ int redisxSetSentinelTimeout(Redis *redis, int millis) {
   return status;
 }
 
+
 /// \cond PRIVATE
 void rDestroySentinel(RedisSentinel *sentinel) {
   if(!sentinel) return;
@@ -270,3 +270,4 @@ void rDestroySentinel(RedisSentinel *sentinel) {
   if(sentinel->serviceName) free(sentinel->serviceName);
 }
 /// \endcond
+
