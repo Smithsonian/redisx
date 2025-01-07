@@ -26,6 +26,9 @@ CC ?= gcc
 # Whether to use OpenMP
 WITH_OPENMP ?= 1
 
+# Whether to build with TLS support (via OpenSSL)
+WITH_TLS ?= 1
+
 # Add include/ directory
 CPPFLAGS += -I$(INC)
 
@@ -70,6 +73,11 @@ LDFLAGS += -lm -lxchange
 ifeq ($(WITH_OPENMP),1)
   CFLAGS += -fopenmp
   LDFLAGS += -fopenmp
+endif
+
+ifeq ($(WITH_TLS),1)
+  CPPFLAGS += -DWITH_TLS=1
+  LDFLAGS += -lssl
 endif
 
 # Search for libraries under LIB

@@ -340,6 +340,10 @@ static void rDisconnectClientAsync(RedisClient *cl) {
  *
  */
 static void rResetClientAsync(RedisClient *cl) {
+#if(WITH_TLS)
+  extern void rDestroyClientTLS(ClientPrivate *cp);
+#endif
+
   ClientPrivate *cp = (ClientPrivate *) cl->priv;
 
   pthread_mutex_lock(&cp->pendingLock);
@@ -349,6 +353,12 @@ static void rResetClientAsync(RedisClient *cl) {
   cp->isEnabled = FALSE;
   cp->available = 0;
   cp->next = 0;
+
+#if(WITH_TLS)
+  rDestroyClientTLS(cp);
+#endif
+
+
   cp->socket = -1;                  // Reset the channel's socket descriptor to 'unassigned'
 }
 
@@ -611,6 +621,10 @@ static int rHelloAsync(RedisClient *cl, char *clientID) {
 int rConnectClient(Redis *redis, enum redisx_channel channel) {
   static const char *fn = "rConnectClient";
 
+#if WITH_TLS
+  extern int rConnectTLSClient(ClientPrivate *cp, const TLSConfig *tls);
+#endif
+
   struct sockaddr_in serverAddress;
   struct utsname u;
   RedisPrivate *p;
@@ -646,6 +660,13 @@ int rConnectClient(Redis *redis, enum redisx_channel channel) {
     prop_error(fn, config->socketConf(sock, channel));
   }
 
+#if WITH_TLS
+  if(config->tls.enabled && rConnectTLSClient(cp, &config->tls) != X_SUCCESS) {
+    close(sock);
+    return x_error(X_NO_INIT, errno, fn, "failed to connect (with TLS) to %s:%hu: %s", redis->id, port, strerror(errno));
+  }
+  else
+#endif
   if(connect(sock, (struct sockaddr *) &serverAddress, sizeof(serverAddress)) < 0) {
     close(sock);
     return x_error(X_NO_INIT, errno, fn, "failed to connect to %s:%hu: %s", redis->id, port, strerror(errno));

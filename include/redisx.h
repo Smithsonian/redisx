@@ -10,9 +10,10 @@
 #ifndef REDISX_H_
 #define REDISX_H_
 
+#include <xchange.h>
 #include <pthread.h>
 #include <stdint.h>
-#include <xchange.h>
+
 
 // Configuration constants ------------------------------------------------------->
 #ifndef REDISX_TCP_PORT
@@ -404,6 +405,9 @@ Redis *redisxInitSentinel(const char *serviceName, const RedisServer *serverList
 int redisxValidateSentinel(const char *serviceName, const RedisServer *serverList, int nServers);
 int redisxCheckValid(const Redis *redis);
 void redisxDestroy(Redis *redis);
+int redisxSetTLS(Redis *redis, const char *ca_file);
+int redisxSetMutualTLS(Redis *redis, const char *cert_file, const char *key_file);
+int redisxSetDHParams(Redis *redis, const char *dh_params_file);
 int redisxConnect(Redis *redis, boolean usePipeline);
 void redisxDisconnect(Redis *redis);
 int redisxReconnect(Redis *redis, boolean usePipeline);

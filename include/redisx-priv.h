@@ -15,9 +15,12 @@
 
 #include <pthread.h>
 #include <stdint.h>
+#if WITH_TLS
+#  include <openssl/ssl.h>
+#endif
 
 #define __XCHANGE_INTERNAL_API__
-#include <redisx.h>
+#include "redisx.h"
 
 #define IP_ADDRESS_LENGTH             40  ///< IPv6: 39 chars + termination.
 
@@ -49,6 +52,10 @@ typedef struct {
   int available;                ///< Number of bytes available in the buffer.
   int next;                     ///< Index of next unconsumed byte in buffer.
   int socket;                   ///< Changing the socket should require both locks!
+#if WITH_TLS
+  SSL_CTX *ctx;
+  SSL *ssl;
+#endif
   int pendingRequests;          ///< Number of request sent and not yet answered...
   RESP *attributes;             ///< Attributes from the last packet received.
 } ClientPrivate;
@@ -59,6 +66,16 @@ typedef struct {
   char *serviceName;            ///< Name of service (for Sentinel).
   int timeoutMillis;            ///< [ms] Connection timeout for sentinel nodes.
 } RedisSentinel;
+
+#if WITH_TLS
+typedef struct {
+  boolean enabled;        ///< Whether TLS is enabled.
+  char *certificate;      ///< Certificate (mutual TLS only)
+  char *key;              ///< Private key (mutual TLS only)
+  char *ca_certificate;   ///< CA sertificate
+  char *dh_params;        ///< (optional) parameter file for DH based cyphers
+} TLSConfig;
+#endif
 
 /**
  * A set of configuration settings for a Redis server connection.
@@ -73,6 +90,10 @@ typedef struct {
   int protocol;                 ///< RESP version to use
   boolean hello;                ///< whether to use HELLO (introduced in Redis 6.0.0 only)
   RedisSocketConfigurator socketConf;   ///< Additional user configuration of client sockets
+
+#if WITH_TLS
+  TLSConfig tls;                ///< TLS configuration settings
+#endif
 
   Hook *firstCleanupCall;       ///< Linked list of cleanup calls
   Hook *firstConnectCall;       ///< Linked list of connection calls

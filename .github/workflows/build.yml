@@ -40,7 +40,7 @@ jobs:
         path: xchange
 
     - name: Install build dependencies
-      run: sudo apt-get install libpopt-dev libreadline-dev libbsd-dev
+      run: sudo apt-get install libpopt-dev libreadline-dev libbsd-dev libssl-dev
 
     - name: Build static library	
       run: make static

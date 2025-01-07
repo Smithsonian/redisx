@@ -1,4 +1,5 @@
 # sudo apt install $(grep -v ^# requirements.apt)
+libssl-dev
 libpopt-dev
 libreadline-dev
 libbsd-dev

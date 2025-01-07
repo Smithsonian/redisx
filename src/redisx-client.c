@@ -104,6 +104,10 @@ static int rReadChunkAsync(ClientPrivate *cp) {
   errno = 0;
 
   cp->next = 0;
+#if WITH_TLS
+  if(cp->ssl) cp->available = SSL_read(cp->ssl, cp->in, REDISX_RCVBUF_SIZE);
+  else
+#endif
   cp->available = recv(sock, cp->in, REDISX_RCVBUF_SIZE, 0);
   trprintf(" ... read %d bytes from client %d socket.\n", cp->available, cp->idx);
   if(cp->available <= 0) {
@@ -272,6 +276,10 @@ static int rSendBytesAsync(ClientPrivate *cp, const char *buf, int length, boole
   while(length > 0) {
     int n;
 
+#if WITH_TLS
+    if(cp->ssl) n = SSL_write(cp->ssl, from, length);
+    else
+#endif
 #if __linux__
     // Linux supports flagging outgoing messages to inform it whether or not more
     // imminent data is on its way
@@ -283,7 +291,7 @@ static int rSendBytesAsync(ClientPrivate *cp, const char *buf, int length, boole
     n = send(sock, from, length, 0);
 #endif
 
-    if(n < 0) {
+    if(n <= 0) {
       int status = rTransmitErrorAsync(cp, "send");
       if(cp->isEnabled) x_trace(fn, NULL, status);
       cp->isEnabled = FALSE;
