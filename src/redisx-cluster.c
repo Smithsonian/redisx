@@ -411,6 +411,65 @@ Redis *redisxClusterGetShard(RedisCluster *cluster, const char *key) {
   return NULL;
 }
 
+/// \cond PRIVATE
+static Redis *rClusterGetShardByAddress(RedisCluster *cluster, const char *host, int port, boolean refresh) {
+  static const char *fn = "redisxClusterGetShard";
+
+  ClusterPrivate *p;
+  int i;
+
+  if(!cluster) {
+    x_error(X_NULL, EINVAL, fn, "cluster is NULL");
+    return NULL;
+  }
+
+  if(!host) {
+    x_error(X_NAME_INVALID, EINVAL, fn, "address is NULL");
+    return NULL;
+  }
+
+  if(!host[0]) {
+    x_error(X_NAME_INVALID, EINVAL, fn, "address is empty");
+    return NULL;
+  }
+
+  p = (ClusterPrivate *) cluster->priv;
+  if(!p) {
+    x_error(X_NO_INIT, ENXIO, fn, "cluster is not initialized");
+    return NULL;
+  }
+
+  pthread_mutex_lock(&p->mutex);
+
+  for(i = 0; i < p->n_shards; i++) {
+    const RedisShard *s = &p->shard[i];
+    int m;
+
+    for(m = 0; m < s->n_servers; m++) {
+      Redis *r = s->redis[m];
+      const RedisPrivate *np = (RedisPrivate *) r->priv;
+
+      if(np->port == port && strcmp(np->hostname, host) == 0) {
+        if(!redisxIsConnected(r)) if(redisxConnect(r, p->usePipeline) != X_SUCCESS) continue;
+        pthread_mutex_unlock(&p->mutex);
+        return r;
+      }
+    }
+  }
+
+  pthread_mutex_unlock(&p->mutex);
+
+  if(refresh) {
+    rClusterRefresh(cluster);
+    return rClusterGetShardByAddress(cluster, host, port, FALSE);
+  }
+
+  x_error(0, EAGAIN, fn, "not a known member of the cluster: %s:%d", host, port);
+  return NULL;
+}
+
+/// \endcond
+
 /**
  * Initializes a Redis cluster configuration using a known cluster node. The call will connect to
  * the specified node (if not already connected), and will query the cluster configuration from it.
@@ -587,14 +646,16 @@ int redisxClusterDisconnect(RedisCluster *cluster) {
 
 /**
  * Checks if the reply is an error indicating that the cluster has been reconfigured and
- * the request can no longer be fulfilled on the given shard. You might want to obtain
- * the new shard using redisxClusterGetShard() again, and re-submit the request to the
- * new shard.
+ * the request can no longer be fulfilled on the given shard (i.e., `MOVED` redirection).
+ * You might want to obtain the new shard using redisxClusterGetShard() again, and re-submit
+ * the request to the new shard.
  *
  * @param reply   The response obtained from the Redis shard / server.
  * @return        TRUE (1) if the reply is an error indicating that the cluster has been
  *                reconfigured and the key has moved to another shard.
  *
+ * @sa redisxClusterIsMigrating()
+ * @sa redisxClusterIsRedirected()
  * @sa redisxClusterGetShard()
  */
 boolean redisxClusterMoved(const RESP *reply) {
@@ -602,4 +663,201 @@ boolean redisxClusterMoved(const RESP *reply) {
   if(reply->type != RESP_ERROR) return FALSE;
   if(reply->n < 5) return FALSE;
   return (strncmp("MOVED", (char *) reply->value, 5) == 0);
+}
+
+/**
+ * Checks if the reply is an error indicating that the query is for a slot that is currently
+ * migrating to another shard (i.e., `ASK` redirection). You may need to use an `ASKING`
+ * directive, e.g. via redisxClusterAskMigrating() on the node specified in the message to
+ * access the key.
+ *
+ * @param reply   The response obtained from the Redis shard / server.
+ * @return        TRUE (1) if the reply is an error indicating that the cluster has been
+ *                reconfigured and the key has moved to another shard.
+ *
+ * @sa redisxClusterMoved()
+ * @sa redisxClusterIsRedirected()
+ * @sa redisxClusterAskMigrating()
+ */
+boolean redisxClusterIsMigrating(const RESP *reply) {
+  if(!reply) return FALSE;
+  if(reply->type != RESP_ERROR) return FALSE;
+  if(reply->n < 3) return FALSE;
+  return (strncmp("ASK", (char *) reply->value, 3) == 0);
+}
+
+
+/**
+ * Checks if the reply is an error indicating that the query should be redirected to another
+ * node (i.e., `MOVED` or `ASK` redirection).
+ *
+ * @param reply   The response obtained from the Redis shard / server.
+ * @return        TRUE (1) if the reply is an error indicating that the query should be
+ *                directed to another node.
+ *
+ * @sa redisxClusterMoved()
+ * @sa redisxClusterIsMigrating()
+ */
+boolean redisxClusterIsRedirected(const RESP *reply) {
+  return redisxClusterMoved(reply) || redisxClusterIsMigrating(reply);
+}
+
+/**
+ * Parses a `-MOVED` or `-ASK` redirection response from a Redis cluster node, to obtain
+ * the shard from which the same keyword that caused the error can now be accessed.
+ *
+ * @param cluster     Redis cluster configuration
+ * @param redirect    the redirection response sent to a keyword query
+ * @param refresh     whether it should refresh the cluster configuration and try again if the
+ *                    redirection target is not found in the current cluster configuration.
+ * @return            the migrated server, from which the keyword should be queried now.
+ *
+ * @sa redisxClusterMoved()
+ * @sa redisxClusterIsMigrating()
+ * @sa redisxClusterAskMigrating()
+ */
+Redis *redisxClusterGetRedirection(RedisCluster *cluster, const RESP *redirect, boolean refresh) {
+  static const char *fn = "redisxClusterGetRedirection";
+
+  char *str, *tok;
+
+  if(!cluster) {
+    x_error(0, EINVAL, fn, "input cluster is NULL");
+    return NULL;
+  }
+
+  if(!redisxClusterMoved(redirect) && !redisxClusterIsMigrating(redirect)) {
+    return NULL;
+  }
+
+  str = xStringCopyOf((char *) redirect->value);
+  x_check_alloc(str);
+
+  strtok(str, " \t\r\n");   // MOVED or ASK
+  strtok(NULL, " \t\r\n");  // SLOT #
+  tok = strtok(NULL, ":");  // host:port
+  if(tok) {
+    const char *host = tok;
+    int port = strtol(strtok(NULL, " \t\r\n"), NULL, 10);
+    free(str);
+    return rClusterGetShardByAddress(cluster, host, port, refresh);
+  }
+
+  x_error(X_PARSE_ERROR, EBADMSG, fn, "Unparseable migration reply: %s", str);
+
+  free(str);
+  return NULL;
+}
+
+/**
+ * Makes a redirected transaction using the ASKING directive to the specific client. This should be
+ * in response to an -ASK redirection error to obtain a key that is in a slot that is currently
+ * migrating. The requested Redis command arguments are sent prefixed with the 'ASKING' directive,
+ * as per the Redis Cluster specification.
+ *
+ * @param redis       Redirected Redis instance, e.g. from redisxClusterGetRedirect()
+ * @param args        Original command arguments that were redirected
+ * @param lengths     Original argument byte lengths redirected (or NULL to use strlen() automatically).
+ * @param n           Original number of arguments.
+ * @param status      Pointer to integer in which to return status: X_SUCCESS (0) if successful or
+ *                    else and error code &lt;0.
+ * @return            The response to the `ASKING` query from the redirected server.
+ *
+ * @sa redisxClusterAskMigratingAsync()
+ * @sa redisxClusterIsMigrating()
+ * @sa redisxClusterGetRedirect()
+ * @sa redisxArrayRequest()
+ */
+RESP *redisxClusterAskMigrating(Redis *redis, const char **args, const int *lengths, int n, int *status) {
+  static const char *fn = "redisxClusterAskMigrating";
+
+  RedisClient *cl;
+  RESP *reply = NULL;
+  int s;
+
+  s = redisxCheckValid(redis);
+  if(s != X_SUCCESS) {
+    if(status) *status = s;
+    return x_trace_null(fn, NULL);
+  }
+
+  cl = redis->interactive;
+  s = redisxLockConnected(cl);
+  if(s) {
+    if(status) *status = s;
+    return x_trace_null(fn, NULL);
+  }
+
+  redisxClearAttributesAsync(cl);
+
+  s = redisxClusterAskMigratingAsync(cl, args, lengths, n);
+  if(s == X_SUCCESS) reply = redisxReadReplyAsync(cl, &s);
+  redisxUnlockClient(cl);
+
+  if(s != X_SUCCESS) {
+    if(status) *status = s;
+    x_trace_null(fn, NULL);
+  }
+
+  return reply;
+}
+
+
+/**
+ * Makes a redirected request using the ASKING directive to the specific client. This should be
+ * in response to an -ASK redirection error to obtain a key that is in a slot that is currently
+ * migrating. The requested Redis command arguments are sent prefixed with the 'ASKING' directive,
+ * as per the Redis Cluster specification.
+ *
+ * This function should be called with exclusive access to the client.
+ *
+ * @param cl          Locked client on a redirected Redis instance, e.g. from redisxClusterGetRedirect()
+ * @param args        Original command arguments that were redirected
+ * @param lengths     Original argument byte lengths redirected (or NULL to use strlen() automatically).
+ * @param n           Original number of arguments.
+ * @return            X_SUCCESS (0) if successful or else and error code &lt;0.
+ *
+ * @sa redisxClusterAskMigrating()
+ * @sa redisxClusterIsMigrating()
+ * @sa redisxClusterGetRedirect()
+ * @sa redisxArrayRequest()
+ */
+int redisxClusterAskMigratingAsync(RedisClient *cl, const char **args, const int *lengths, int n) {
+  static const char *fn = "redisxClusterAskMigratingAsync";
+
+  const ClientPrivate *cp;
+  const char **askargs = NULL;
+  int *asklen = NULL;
+  int status = X_SUCCESS;
+
+  prop_error(fn, rCheckClient(cl));
+
+  cp = (ClientPrivate *) cl->priv;
+  if(!cp->isEnabled) return x_error(X_NO_SERVICE, ENOTCONN, fn, "client is not connected");
+
+  if(!args) return x_error(X_NULL, EINVAL, fn, "input args is NULL");
+
+  askargs = (const char **) malloc((n + 1) * sizeof(char *));
+  if(!askargs) return x_error(X_FAILURE, errno, fn, "alloc error (%d char *)", (n + 1));
+
+  if(lengths) {
+    asklen = (int *) malloc((n + 1) * sizeof(char *));
+    if(!asklen) {
+      free(askargs);
+      return x_error(X_FAILURE, errno, fn, "alloc error (%d int)", (n + 1));
+    }
+
+    asklen[0] = 0;
+    memcpy(&asklen[1], lengths, n * sizeof(int));
+  }
+
+  askargs[0] = xStringCopyOf("ASKING");
+  memcpy(&askargs[1], args, n * sizeof(char *));
+
+  status = redisxSendArrayRequestAsync(cl, askargs, asklen, n + 1);
+
+  if(asklen) free(asklen);
+  free(askargs);
+
+  return status;
 }

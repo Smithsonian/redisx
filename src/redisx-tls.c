@@ -5,8 +5,6 @@
  * @author Attila Kovacs
  */
 
-#define _XOPEN_SOURCE 500     ///< for strdup()
-
 #include <stdio.h>
 #include <unistd.h>
 #include <string.h>
@@ -210,8 +208,8 @@ int redisxSetTLS(Redis *redis, const char *ca_path, const char *ca_file) {
   tls = &p->config.tls;
 
   tls->enabled = TRUE;
-  tls->ca_path = ca_path ? strdup(ca_path) : NULL;
-  tls->ca_certificate = ca_file ? strdup(ca_file) : NULL;
+  tls->ca_path = xStringCopyOf(ca_path);
+  tls->ca_certificate = xStringCopyOf(ca_file);
 
   rConfigUnlock(redis);
 
@@ -255,8 +253,8 @@ int redisxSetMutualTLS(Redis *redis, const char *cert_file, const char *key_file
   p = (RedisPrivate *) redis->priv;
   tls = &p->config.tls;
 
-  tls->certificate = strdup(cert_file);
-  tls->key = strdup(key_file);
+  tls->certificate = xStringCopyOf(cert_file);
+  tls->key = xStringCopyOf(key_file);
 
   rConfigUnlock(redis);
 
@@ -293,7 +291,7 @@ int redisxSetTLSCiphers(Redis *redis, const char *cipher_list) {
     p = (RedisPrivate *) redis->priv;
     tls = &p->config.tls;
 
-    tls->ciphers = cipher_list ? strdup(cipher_list) : NULL;
+    tls->ciphers = xStringCopyOf(cipher_list);
 
     rConfigUnlock(redis);
 
@@ -329,7 +327,7 @@ int redisxSetTLSCipherSuites(Redis *redis, const char *list) {
     p = (RedisPrivate *) redis->priv;
     tls = &p->config.tls;
 
-    tls->cipher_suites = list ? strdup(list) : NULL;
+    tls->cipher_suites = xStringCopyOf(list);
 
     rConfigUnlock(redis);
 
@@ -366,7 +364,7 @@ int redisxSetDHCipherParams(Redis *redis, const char *dh_params_file) {
   p = (RedisPrivate *) redis->priv;
   tls = &p->config.tls;
 
-  tls->dh_params = dh_params_file ? strdup(dh_params_file) : NULL;
+  tls->dh_params = xStringCopyOf(dh_params_file);
 
   rConfigUnlock(redis);
 
@@ -400,7 +398,7 @@ int redisxSetTLSServerName(Redis *redis, const char *host) {
     p = (RedisPrivate *) redis->priv;
     tls = &p->config.tls;
 
-    tls->hostname = host ? strdup(host) : NULL;
+    tls->hostname = xStringCopyOf(host);
 
     rConfigUnlock(redis);
 

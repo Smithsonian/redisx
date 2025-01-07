@@ -650,6 +650,10 @@ RESP *redisxRequest(Redis *redis, const char *command, const char *arg1, const c
  * roundtrips for each and every request. But, it is simple and perfectly good method when one needs to retrieve
  * only a few (<1000) variables per second...
  *
+ * This is the base interactive query, which is used by all sorts of other interactive transactions. It handles
+ * `MOVED` and `ASK` redirections for Redis clusters automatically and transparently, so long as the target node
+ * is a known member of the cluster from before or immediately after the migration message was received.
+ *
  * \param redis     Pointer to a Redis instance.
  * \param args      An array of strings to send to Redis, corresponding to a single query.
  *                  If you have an `char **` array, you may need to cast to `(const char **)` to avoid
@@ -662,7 +666,7 @@ RESP *redisxRequest(Redis *redis, const char *command, const char *arg1, const c
  * \param status    Pointer to the return error status. If not NULL, it will be populated with one of:
  *
  *                      X_SUCCESS       on success.
- *                      X_NO_INIT       if the Redis client librarywas not initialized via redisxInit().
+ *                      X_NO_INIT       if the Redis client library was not initialized via redisxInit().
  *                      X_NULL          if the argument is NULL or n<1.
  *                      X_TIMEDOUT      if the reading of the response timed out.
  *                      X_NO_SERVICE    if not connected to Redis.
@@ -712,6 +716,23 @@ RESP *redisxArrayRequest(Redis *redis, const char **args, const int *lengths, in
   if(s != X_SUCCESS) {
     if(status) *status = s;
     x_trace_null(fn, NULL);
+  }
+
+  // Handle -ASK and -MOVED redirections.
+  if(redisxClusterIsRedirected(reply)) {
+    boolean ask = redisxClusterIsMigrating(reply);
+    RedisPrivate *p;
+    Redis *redirect;
+
+    rConfigLock(redis);
+    p = (RedisPrivate *) redis->priv;
+    redirect = redisxClusterGetRedirection(p->cluster, reply, ask);
+    rConfigUnlock(redis);
+
+    if(redirect) {
+      if(ask) return redisxClusterAskMigrating(redirect, args, lengths, n, status);
+      return redisxArrayRequest(redirect, args, lengths, n, status);
+    }
   }
 
   return reply;

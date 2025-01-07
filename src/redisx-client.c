@@ -660,7 +660,6 @@ int redisxSendArrayRequestAsync(RedisClient *cl, const char **args, const int *l
   // Send the number of string elements in the command...
   L = sprintf(buf, "*%d\r\n", n);
 
-
   xvprintf("Redis-X> request[%d]", n);
   for(i = 0; i < n; i++) {
     if(args[i]) xvprintf(" %s", args[i]);
