@@ -5,6 +5,8 @@
  * @author Attila Kovacs
  */
 
+#define _XOPEN_SOURCE 500     ///< for strdup()
+
 #include <stdio.h>
 #include <unistd.h>
 #include <string.h>
@@ -25,7 +27,7 @@ static int initialized = FALSE;
 /**
  * Shuts down SSL and frees up the SSL-related resources on a client.
  *
- * @param cp    Private client data
+ * @param cp    Private client data.
  *
  * @sa rConnectTLSClient()
  */
@@ -44,8 +46,8 @@ void rDestroyClientTLS(ClientPrivate *cp) {
 /**
  * Connects a client using the specified TLS configuration.
  *
- * @param cp    Private client data
- * @param tls   TLS configuration
+ * @param cp    Private client data.
+ * @param tls   TLS configuration.
  * @return      X_SUCCESS (0) if successful, or else an error code &lt;0.
  */
 int rConnectTLSClient(ClientPrivate *cp, const TLSConfig *tls) {
@@ -76,6 +78,16 @@ int rConnectTLSClient(ClientPrivate *cp, const TLSConfig *tls) {
     goto abort; // @suppress("Goto statement used")
   }
 
+  if(!tls->skip_verify) {
+    SSL_CTX_set_verify(cp->ctx, SSL_VERIFY_PEER, NULL);
+    SSL_CTX_set_verify_depth(cp->ctx, 4);
+  }
+
+  if(tls->ca_certificate || tls->ca_path) if(!SSL_CTX_load_verify_locations(cp->ctx, tls->ca_certificate, tls->ca_path)) {
+    x_error(0, errno, fn, "Failed to set CA certificate: %s / %s", tls->ca_path, tls->ca_certificate);
+    goto abort; // @suppress("Goto statement used")
+  }
+
   if(tls->certificate && tls->key) {
     /* Set the key and cert */
     if (SSL_CTX_use_certificate_file(cp->ctx, tls->certificate, SSL_FILETYPE_PEM) <= 0) {
@@ -89,6 +101,21 @@ int rConnectTLSClient(ClientPrivate *cp, const TLSConfig *tls) {
       if(redisxIsVerbose()) ERR_print_errors_fp(stderr);
       goto abort; // @suppress("Goto statement used")
     }
+
+    if(!SSL_CTX_check_private_key(cp->ctx)) {
+      x_error(0, errno, fn, "Private key does not match the certificate public key.");
+      goto abort; // @suppress("Goto statement used")
+    }
+  }
+
+  if(tls->ciphers) if(!SSL_CTX_set_cipher_list(cp->ctx, tls->ciphers)) {
+    x_error(0, errno, fn, "Failed to set ciphers %s", tls->ciphers);
+    goto abort; // @suppress("Goto statement used")
+  }
+
+  if(tls->cipher_suites) if(!SSL_CTX_set_ciphersuites(cp->ctx, tls->cipher_suites)) {
+    x_error(0, errno, fn, "Failed to set ciphers= suites %s", tls->ciphers);
+    goto abort; // @suppress("Goto statement used")
   }
 
   if(tls->dh_params) if(!SSL_CTX_set_tmp_dh(cp->ctx, tls->dh_params)) {
@@ -96,7 +123,16 @@ int rConnectTLSClient(ClientPrivate *cp, const TLSConfig *tls) {
     goto abort; // @suppress("Goto statement used")
   }
 
+  cp->ssl = SSL_new(cp->ctx);
+  if(!cp->ssl) {
+    x_error(0, errno, fn, "Failed to create SSL");
+    goto abort; // @suppress("Goto statement used")
+  }
+
   SSL_set_fd(cp->ssl, cp->socket);
+
+  if(tls->hostname) SSL_set_tlsext_host_name(cp->ssl, tls->hostname);
+
   if(!SSL_connect(cp->ssl)) {
     x_error(0, errno, fn, "TLS connect failed");
     goto abort; // @suppress("Goto statement used")
@@ -146,23 +182,27 @@ int rConnectTLSClient(ClientPrivate *cp, const TLSConfig *tls) {
  * mutual authentication. Additionally, you might also want to set parameters for DH-based cyphers if
  * needed using redisxSetDHCypherParams().
  *
- * @param redis     A Redis instance
- * @param ca_file   Path to the CA certificate file
+ * @param redis     A Redis instance.
+ * @param ca_path   Directory containing CA certificates. It may be NULL to use the default locations.
+ * @param ca_file   CA certificate file rel. to specified directory. It may be NULL to use default certificate.
  * @return          X_SUCCESS (0) if successful, or else an error code &lt;0.
  *
  * @sa redisxSetMutualTLS()
- * @sa redisxSetDHCypherParams()
+ * @sa redisxSetDHCipherParams()
+ * @sa redisxSetTLSCiphers()
+ * @sa redisxSetTLSCipherSuites()
+ * @sa redisxSetTLSServerName()
+ * @sa redisxTLSSkipVerify()
  */
-int redisxSetTLS(Redis *redis, const char *ca_file) {
-  static const char *fn = "redisxSetCA";
+int redisxSetTLS(Redis *redis, const char *ca_path, const char *ca_file) {
+  static const char *fn = "redisxSetTLS";
 
 #if WITH_TLS
   RedisPrivate *p;
   TLSConfig *tls;
 
-  if(!ca_file) return x_error(X_NULL, EINVAL, fn, "CA file is NULL");
-
-  if(access(ca_file, R_OK) != 0) return x_error(X_FAILURE, errno, fn, "CA file not readable: %s", ca_file);
+  if(ca_path) if(access(ca_path, R_OK | X_OK) != 0) return x_error(X_FAILURE, errno, fn, "CA path not accessible: %s", ca_file);
+  if(ca_file) if(access(ca_file, R_OK) != 0) return x_error(X_FAILURE, errno, fn, "CA file not readable: %s", ca_file);
 
   prop_error(fn, rConfigLock(redis));
 
@@ -170,7 +210,8 @@ int redisxSetTLS(Redis *redis, const char *ca_file) {
   tls = &p->config.tls;
 
   tls->enabled = TRUE;
-  tls->ca_certificate = (char *) ca_file;
+  tls->ca_path = ca_path ? strdup(ca_path) : NULL;
+  tls->ca_certificate = ca_file ? strdup(ca_file) : NULL;
 
   rConfigUnlock(redis);
 
@@ -190,9 +231,9 @@ int redisxSetTLS(Redis *redis, const char *ca_file) {
  * configure Redis servers to verify one way only with a CA certificate, in which case you don't need to call this to
  * configure the client.
  *
- * @param redis       A Redis instance
- * @param cert_file   Path to the server's certificate file
- * @param key_file    Path to the server'sprivate key file
+ * @param redis       A Redis instance.
+ * @param cert_file   Path to the server's certificate file.
+ * @param key_file    Path to the server'sprivate key file.
  * @return            X_SUCCESS (0) if successful, or else an error code &lt;0.
  *
  * @sa redisxSetTLS()
@@ -214,8 +255,8 @@ int redisxSetMutualTLS(Redis *redis, const char *cert_file, const char *key_file
   p = (RedisPrivate *) redis->priv;
   tls = &p->config.tls;
 
-  tls->certificate = (char *) cert_file;
-  tls->key = (char *) key_file;
+  tls->certificate = strdup(cert_file);
+  tls->key = strdup(key_file);
 
   rConfigUnlock(redis);
 
@@ -229,33 +270,103 @@ int redisxSetMutualTLS(Redis *redis, const char *cert_file, const char *key_file
 #endif
 }
 
+/**
+ * Sets the TLS ciphers to try (TLSv1.2 and earlier).
+ *
+ * @param redis            A Redis instance.
+ * @param cipher_list      a colon (:) separated list of ciphers, or NULL for default ciphers.
+ * @return                 X_SUCCESS (0) if successful, or else an error code &lt;0.
+ *
+ * @sa redisxSetTLSCipherSuites()
+ * @sa redisxSetTLS()
+ * @sa redisxSetDHCipherParams()
+ */
+int redisxSetTLSCiphers(Redis *redis, const char *cipher_list) {
+  static const char *fn = "redisxSetTLSCiphers";
+
+  #if WITH_TLS
+    RedisPrivate *p;
+    TLSConfig *tls;
+
+    prop_error(fn, rConfigLock(redis));
+
+    p = (RedisPrivate *) redis->priv;
+    tls = &p->config.tls;
+
+    tls->ciphers = cipher_list ? strdup(cipher_list) : NULL;
+
+    rConfigUnlock(redis);
+
+    return X_SUCCESS;
+  #else
+    (void) redis;
+    (void) ca_file;
+
+    return x_error(X_FAILURE, ENOSYS, fn, "RedisX was built without TLS support");
+  #endif
+}
+
+/**
+ * Sets the TLS ciphers suites to try (TLSv1.3 and later).
+ *
+ * @param redis            A Redis instance.
+ * @param list             a colon (:) separated list of cipher suites, or NULL for default cipher suites.
+ * @return                 X_SUCCESS (0) if successful, or else an error code &lt;0.
+ *
+ * @sa redisxSetTLSCiphers()
+ * @sa redisxSetTLS()
+ * @sa redisxSetDHCipherParams()
+ */
+int redisxSetTLSCipherSuites(Redis *redis, const char *list) {
+  static const char *fn = "redisxSetTLSCiphers";
+
+  #if WITH_TLS
+    RedisPrivate *p;
+    TLSConfig *tls;
+
+    prop_error(fn, rConfigLock(redis));
+
+    p = (RedisPrivate *) redis->priv;
+    tls = &p->config.tls;
+
+    tls->cipher_suites = list ? strdup(list) : NULL;
+
+    rConfigUnlock(redis);
+
+    return X_SUCCESS;
+  #else
+    (void) redis;
+    (void) ca_file;
+
+    return x_error(X_FAILURE, ENOSYS, fn, "RedisX was built without TLS support");
+  #endif
+}
 
 /**
  * Sets parameters for DH-based cyphers when using a TLS encrypted connection to Redis.
  *
- * @param redis            A Redis instance
- * @param dh_params_file   Path to the DH-based cypher parameters file
+ * @param redis            A Redis instance.
+ * @param dh_params_file   Path to the DH-based cypher parameters file,or NULL for no params.
  * @return                 X_SUCCESS (0) if successful, or else an error code &lt;0.
  *
  * @sa redisxSetTLS()
+ * @sa redisxSetTLSCiphers()
  */
-int redisxSetDHCypherParams(Redis *redis, const char *dh_params_file) {
-  static const char *fn = "redisxSetDHCypherParams";
+int redisxSetDHCipherParams(Redis *redis, const char *dh_params_file) {
+  static const char *fn = "redisxSetDHCipherParams";
 
 #if WITH_TLS
   RedisPrivate *p;
   TLSConfig *tls;
 
-  if(!dh_params_file) return x_error(X_NULL, EINVAL, fn, "DH parameters file is NULL");
-
-  if(access(dh_params_file, R_OK) != 0) return x_error(X_FAILURE, errno, fn, "CA file not readable: %s", dh_params_file);
+  if(dh_params_file) if(access(dh_params_file, R_OK) != 0) return x_error(X_FAILURE, errno, fn, "CA file not readable: %s", dh_params_file);
 
   prop_error(fn, rConfigLock(redis));
 
   p = (RedisPrivate *) redis->priv;
   tls = &p->config.tls;
 
-  tls->dh_params = (char *) dh_params_file;
+  tls->dh_params = dh_params_file ? strdup(dh_params_file) : NULL;
 
   rConfigUnlock(redis);
 
@@ -266,4 +377,72 @@ int redisxSetDHCypherParams(Redis *redis, const char *dh_params_file) {
 
   return x_error(X_FAILURE, ENOSYS, fn, "RedisX was built without TLS support");
 #endif
+}
+
+/**
+ * Sets the Server name for TLS Server Name Indication (SNI), an optional extra later of security.
+ *
+ * @param redis   A Redis instance.
+ * @param host    server name to use for SNI.
+ * @return        X_SUCCESS (0)
+ *
+ * @sa redisxSetTLS()
+ */
+int redisxSetTLSServerName(Redis *redis, const char *host) {
+  static const char *fn = "redisxSetDHCipherParams";
+
+  #if WITH_TLS
+    RedisPrivate *p;
+    TLSConfig *tls;
+
+    prop_error(fn, rConfigLock(redis));
+
+    p = (RedisPrivate *) redis->priv;
+    tls = &p->config.tls;
+
+    tls->hostname = host ? strdup(host) : NULL;
+
+    rConfigUnlock(redis);
+
+    return X_SUCCESS;
+  #else
+    (void) redis;
+    (void) host;
+
+    return x_error(X_FAILURE, ENOSYS, fn, "RedisX was built without TLS support");
+  #endif
+}
+
+/**
+ * Sets whether to verify the the certificate.
+ *
+ * @param redis   A Redis instance.
+ * @param value   TRUE (non-zero) or FALSE (0)
+ * @return        X_SUCCESS (0)
+ *
+ * @sa redisxSetTLS()
+ */
+int redisxSetTLSSkipVerify(Redis *redis, boolean value) {
+  static const char *fn = "redisxTLSSkipVerify";
+
+  #if WITH_TLS
+    RedisPrivate *p;
+    TLSConfig *tls;
+
+    prop_error(fn, rConfigLock(redis));
+
+    p = (RedisPrivate *) redis->priv;
+    tls = &p->config.tls;
+
+    tls->skip_verify = (value != 0);
+
+    rConfigUnlock(redis);
+
+    return X_SUCCESS;
+  #else
+    (void) redis;
+    (void) host;
+
+    return x_error(X_FAILURE, ENOSYS, fn, "RedisX was built without TLS support");
+  #endif
 }

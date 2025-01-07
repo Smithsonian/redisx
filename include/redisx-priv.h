@@ -70,10 +70,15 @@ typedef struct {
 #if WITH_TLS
 typedef struct {
   boolean enabled;        ///< Whether TLS is enabled.
-  char *certificate;      ///< Certificate (mutual TLS only)
-  char *key;              ///< Private key (mutual TLS only)
+  char *ca_path;          ///< Directory in which CA certificates reside
   char *ca_certificate;   ///< CA sertificate
-  char *dh_params;        ///< (optional) parameter file for DH based cyphers
+  boolean skip_verify;    ///< Whether to skip verification of the certificate (insecure)
+  char *certificate;      ///< Client certificate (mutual TLS only)
+  char *key;              ///< Client private key (mutual TLS only)
+  char *dh_params;        ///< (optional) parameter file for DH based ciphers
+  char *ciphers;          ///< colon separated list of ciphers to try (TKS v1.2 and earlier)
+  char *cipher_suites;    ///< colon separated list of ciphers suites to try (TKS v1.3 and later)
+  char *hostname;         ///< Server name for SNI
 } TLSConfig;
 #endif
 

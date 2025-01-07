@@ -203,6 +203,15 @@ int main(int argc, const char *argv[]) {
   const char *eval = NULL;
   int verbose = 0;
   int debug = 0;
+  int tls = 0;
+  char *ca_file = NULL;
+  char *ca_path = NULL;
+  char *cert_file = NULL;
+  char *key_file = NULL;
+  char *ciphers = NULL;
+  char *cipher_suites = NULL;
+  char *sni = NULL;
+  int skip_verify = 0;
 
   struct poptOption options[] = { //
           {"host",       'h', POPT_ARG_STRING | POPT_ARGFLAG_SHOW_DEFAULT,    &host,     0, "Server hostname.", "<hostname>"}, //
@@ -226,9 +235,22 @@ int main(int argc, const char *argv[]) {
           {"delim",     'd', POPT_ARG_STRING  | POPT_ARGFLAG_SHOW_DEFAULT, &delim,       0, "Delimiter between elements for raw format.  " //
                   "You can use JSON convention for escaping special characters.", "<string>" //
           },
-          {"group",     'D', POPT_ARG_STRING  | POPT_ARGFLAG_SHOW_DEFAULT, &groupDelim,  0, "Group prefix for raw format.  " //
+          {"prefix",    'D', POPT_ARG_STRING  | POPT_ARGFLAG_SHOW_DEFAULT, &groupDelim,  0, "Group prefix for raw format.  " //
                   "You can use JSON convention for escaping special characters.", "<string>" //
           },
+          {"tls",         0, POPT_ARG_NONE,   &tls,        0, "Establish a secure TLS connection.", NULL}, //
+          {"sni",         0, POPT_ARG_NONE,   &sni,        0, "Server name indication for TLS.", "<host>"}, //
+          {"cacert",      0, POPT_ARG_STRING, &ca_file,    0, "CA Certificate file to verify with.", "<file>"}, //
+          {"cacertdir",   0, POPT_ARG_STRING, &ca_path,     0, "Directory where trusted CA certificates are stored.  If neither cacert nor cacertdir are "
+                 "specified, the default system-wide trusted root certs configuration will apply.", "<path>" //
+          },
+          {"insecure",    0, POPT_ARG_NONE,   &skip_verify,0, "Allow insecure TLS connection by skipping cert validation.", NULL}, //
+          {"cert",        0, POPT_ARG_STRING, &cert_file,  0, "Client certificate to authenticate with.", "<path>"}, //
+          {"key",         0, POPT_ARG_STRING, &key_file,   0, "Private key file to authenticate with.", "<path>"}, //
+          {"tls-ciphers", 0, POPT_ARG_STRING, &ciphers,    0, "Sets the list of preferred ciphers (TLSv1.2 and below) in order of preference from "
+                  "highest to lowest separated by colon (':').", "<list>"}, //
+          {"tls-ciphersuites", 0, POPT_ARG_STRING, &cipher_suites,    0, "Sets the list of preferred ciphersuites (TLSv1.3) in order of preference from "
+                  "highest to lowest separated by colon (':').", "<list>"}, //
           {"show-pushes", 0, POPT_ARG_STRING  | POPT_ARGFLAG_SHOW_DEFAULT, &push,        0, "Whether to print RESP3 PUSH messages.", "yes|no" }, //
           {"attributes",  0, POPT_ARG_NONE,   &attrib,     0, "Show RESP3 attributes also, if available.", NULL}, //
           {"eval",        0, POPT_ARG_STRING, &push,       0, "Send an EVAL command using the Lua script at <file>.  " //
@@ -304,6 +326,19 @@ int main(int argc, const char *argv[]) {
   if(protocol > 0) redisxSetProtocol(redis, protocol);
 
   if(push) if(strcmp("y", push) == 0 || strcmp("yes", push) == 0) redisxSetPushProcessor(redis, PushProcessor, NULL);
+
+  if(tls) {
+    if(skip_verify) redisxSetTLSSkipVerify(redis, TRUE);
+    if(sni) redisxSetTLSServerName(redis, sni);
+    if(ca_path || ca_file) redisxSetTLS(redis, ca_path, ca_file);
+    if(cert_file && key_file) redisxSetMutualTLS(redis, cert_file, key_file);
+    else if(cert_file || key_file) {
+      fprintf(stderr, "ERROR! Need both --cert and --key options.\n");
+      exit(1);
+    }
+    if(ciphers) redisxSetTLSCiphers(redis, ciphers);
+    if(cipher_suites) redisxSetTLSCipherSuites(redis, cipher_suites);
+  }
 
   xSetDebug(1);
   prop_error(fn, redisxConnect(redis, 0));

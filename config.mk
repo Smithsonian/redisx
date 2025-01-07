@@ -70,6 +70,10 @@ CHECKOPTS += --inline-suppr $(CHECKEXTRA)
 # Link against math libs (for e.g. isnan()), and xchange dependency
 LDFLAGS += -lm -lxchange
 
+ifeq ($(WEXTRA),1)
+  CFLAGS += -Wextra
+endif
+
 ifeq ($(WITH_OPENMP),1)
   CFLAGS += -fopenmp
   LDFLAGS += -fopenmp

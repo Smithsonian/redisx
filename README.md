@@ -398,7 +398,7 @@ subscription client when there are active subscriptions.
 
 We provide (experimental) support for TLS (see the Redis docs on 
 [TLS support](https://redis.io/docs/latest/operate/oss_and_stack/management/security/encryption/)). Simply configure 
-the necessary certificates, keys, and cypher parameters as needed using `redisxSetTLS()`, `redisxSetMutualTLS()`, and `redisxSetDHCypherParams()`, e.g.:
+the necessary certificates, keys, and cypher parameters as needed, e.g.:
 
 ```c
   Redis *redis = ...
@@ -418,8 +418,20 @@ the necessary certificates, keys, and cypher parameters as needed using `redisxS
     // Oops, the certificate or key file is not accessible...
     ...
   }
+
+  // (optional) Skip verification of the certificate (insecure!)
+  redisxSkipVerify(redis, TRUE);
+
+  // (optional) Set server name for SNI
+  redisxSetTLSServerName(redis, "my.redis-server.com");
+
+  // (optional) Set ciphers to use (TLSv1.2 and earlier)
+  redisxSetTLSCiphers(redisx, "HIGH:!aNULL:!kRSA:!PSK:!SRP:!MD5:!RC4");
   
-  // (optional) To set parameters for DH-based cyphers
+  // (optional) Set cipher suites to use (TLSv1.3 and later)
+  redisxSetTLSCiphers(redisx, "ECDHE-RSA-AES256-GCM-SHA384:TLS_AES_256_GCM_SHA384");
+  
+  // (optional) Set parameters for DH-based cyphers
   status = redisxSetDHCypherParams(redisx, "path/to/redis.dh");
   if(status) {
     // Oops, the parameter file is not accessible...
