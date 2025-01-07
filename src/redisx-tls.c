@@ -68,47 +68,58 @@ int rConnectTLSClient(ClientPrivate *cp, const TLSConfig *tls) {
   pthread_mutex_unlock(&mutex);
 
   method = TLS_client_method();
+
   cp->ctx = SSL_CTX_new(method);
   if (!cp->ctx) {
-    perror("Unable to create SSL context");
-    ERR_print_errors_fp(stderr);
+    x_error(0, errno, fn, "Failed to create SSL context");
+    if(redisxIsVerbose()) ERR_print_errors_fp(stderr);
     goto abort; // @suppress("Goto statement used")
   }
 
   if(tls->certificate && tls->key) {
     /* Set the key and cert */
     if (SSL_CTX_use_certificate_file(cp->ctx, tls->certificate, SSL_FILETYPE_PEM) <= 0) {
-      ERR_print_errors_fp(stderr);
+      x_error(0, errno, fn, "Failed to set certificate: %s", tls->certificate);
+      if(redisxIsVerbose()) ERR_print_errors_fp(stderr);
       goto abort; // @suppress("Goto statement used")
     }
 
     if (SSL_CTX_use_PrivateKey_file(cp->ctx, tls->key, SSL_FILETYPE_PEM) <= 0 ) {
-      ERR_print_errors_fp(stderr);
+      x_error(0, errno, fn, "Failed to set certificate: %s", tls->key);
+      if(redisxIsVerbose()) ERR_print_errors_fp(stderr);
       goto abort; // @suppress("Goto statement used")
     }
   }
 
-  if(tls->dh_params) if(!SSL_CTX_set_tmp_dh(cp->ctx, tls->dh_params))
+  if(tls->dh_params) if(!SSL_CTX_set_tmp_dh(cp->ctx, tls->dh_params)) {
+    x_error(0, errno, fn, "Failed to set DH-based cypher parameters from: %s", tls->dh_params);
     goto abort; // @suppress("Goto statement used")
+  }
 
   SSL_set_fd(cp->ssl, cp->socket);
-  if(!SSL_connect(cp->ssl)) goto abort; // @suppress("Goto statement used")
+  if(!SSL_connect(cp->ssl)) {
+    x_error(0, errno, fn, "TLS connect failed");
+    goto abort; // @suppress("Goto statement used")
+  }
 
   server_cert = SSL_get_peer_certificate(cp->ssl);
-  if(!server_cert) goto abort; // @suppress("Goto statement used")
+  if(!server_cert) {
+    x_error(0, errno, fn, "Failed to obtain X.509 certificate");
+    goto abort; // @suppress("Goto statement used")
+  }
 
   if(redisxIsVerbose()) {
-    printf("Server certificate: \n");
+    printf("Redis-X> Server certificate: \n");
     char *str = X509_NAME_oneline(X509_get_subject_name(server_cert), 0, 0);
     if(str) {
-      printf("\tsubject: %s\n", str);
+      printf("    subject: %s\n", str);
       OPENSSL_free(str);
     }
     else printf("<null>\n");
 
     str = X509_NAME_oneline(X509_get_issuer_name(server_cert), 0, 0);
     if(str) {
-      printf("\tissuer: %s\n", str);
+      printf("    issuer: %s\n", str);
       OPENSSL_free(str);
     }
     else printf("<null>\n");
@@ -126,12 +137,14 @@ int rConnectTLSClient(ClientPrivate *cp, const TLSConfig *tls) {
   return x_error(X_FAILURE, errno, fn, "TLS connection failed.");
 }
 
-#endif
-
 /// \endcond
 
+#endif
+
+
+
 /**
- * Configures a TLS-enrypted connection to Redis with the specified CA certificate file. Normally you
+ * Configures a TLS-encrypted connection to Redis with the specified CA certificate file. Normally you
  * will want to set up mutual TLS with redisxSetMutualTLS() also, unless the server is not requiring
  * mutual authentication. Additionally, you might also want to set parameters for DH-based cyphers if
  * needed using redisxSetDHParams().
