@@ -13,6 +13,8 @@
 #include <errno.h>
 #include <limits.h>
 #include <ctype.h>
+#include <poll.h>
+#include <sys/types.h>
 #if __Lynx__
 #  include <socket.h>
 #else
@@ -97,21 +99,40 @@ static int rTransmitErrorAsync(ClientPrivate *cp, const char *op) {
  */
 static int rReadChunkAsync(ClientPrivate *cp) {
   const int sock = cp->socket;      // Local copy of socket fd that won't possibly change mid-call.
+  struct pollfd pfd = {};
+  int status;
 
   if(sock < 0) return x_error(X_NO_SERVICE, ENOTCONN, "rReadChunkAsync", "client %d: not connected", cp->idx);
 
   // Reset errno prior to the call.
   errno = 0;
 
-  cp->next = 0;
+  // Wait for data to be available on the input.
+  pfd.fd = sock;
+  pfd.events = POLLIN;
+
+  status = poll(&pfd, 1, -1);
+
+  if(status < 1) cp->available = status;
+  else if(pfd.revents & POLLIN) {
+    cp->next = 0;
+
 #if WITH_TLS
-  if(cp->ssl) cp->available = SSL_read(cp->ssl, cp->in, REDISX_RCVBUF_SIZE);
-  else
+    if(cp->ssl) {
+      // For SSL we cannot have concurrent reads/writes...
+      pthread_mutex_lock(&cp->writeLock);
+      cp->available = SSL_read(cp->ssl, cp->in, REDISX_RCVBUF_SIZE);
+      pthread_mutex_unlock(&cp->writeLock);
+    }
+    else
 #endif
-  cp->available = recv(sock, cp->in, REDISX_RCVBUF_SIZE, 0);
-  trprintf(" ... read %d bytes from client %d socket.\n", cp->available, cp->idx);
+    cp->available = recv(sock, cp->in, REDISX_RCVBUF_SIZE, 0);
+    trprintf(" ... read %d bytes from client %d socket.\n", cp->available, cp->idx);
+  }
+  else cp->available = -1;
+
   if(cp->available <= 0) {
-    int status = rTransmitErrorAsync(cp, "read");
+    status = rTransmitErrorAsync(cp, "read");
     if(cp->available == 0) errno = ECONNRESET;        // 0 return is remote cleared connection. So set ECONNRESET...
     if(cp->isEnabled) x_trace("rReadChunkAsync", NULL, status);
     return status;
