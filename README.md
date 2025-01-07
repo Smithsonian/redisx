@@ -152,7 +152,7 @@ And at every step, you should check for and [handle errors](#error-handling) as 
  | attributes                        |  __yes__   | (optional) on demand                                         |
  | Sentinel support                  |  __yes__   | _help me test it_                                            |
  | cluster support                   |  __yes__   | _help me test it_                                            |
- | TLS support                       |    no      | _coming soon..._                                             |
+ | TLS support                       |  __yes__   | _help me test it_                                            |
 
 
 <a name="related-links"></a>
@@ -209,6 +209,10 @@ prior to invoking `make`. The following build variables can be configured:
  - `WITH_OPENMP`: If set to 1 (default), we will compile and link with OpenMP (i.e., `-fopenmp` is added to both 
    `CFLAGS` and `LDFLAGS` automatically). Since OpenMP is not available on all platforms / compilers, you may want
    to explicitly set `WITH_OPENMP=0` prior to calling `make` to disable.
+
+ - `WITH_TLS`: If set to 1 (default), we will build with TLS support via OpenSSL (And `-lssl` is added to `LDFLAGS`
+   automatically). Not all platforms may have a suitably recent version of OpenSSL, in which case you may want to
+   disable TLS support by setting `WITH_TLS=0` prior to calling make.
 
  - `CHECKEXTRA`: Extra options to pass to `cppcheck` for the `make check` target
  
@@ -349,6 +353,8 @@ a regular server connection, including the possibility of that connection being 
 to initiate reconnection and recovery as appropriate in case of errors. (See more in on [Reconnecting](#reconnecting)
 further below).
 
+The Sentinel support is still experimental and requires testing. You can help by submitting bug reports in the GitHub
+repository.
 
 <a name="configuring"></a>
 ### Configuring
@@ -387,6 +393,54 @@ Optionally, you can select the database index to use now (or later, after connec
 
 Note, that you can switch the database index any time, with the caveat that it's not possible to change it for the 
 subscription client when there are active subscriptions.
+
+#### TLS configuration
+
+We provide (experimental) support for TLS (see the Redis docs on 
+[TLS support](https://redis.io/docs/latest/operate/oss_and_stack/management/security/encryption/)). Simply configure 
+the necessary certificates, keys, and cypher parameters as needed, e.g.:
+
+```c
+  Redis *redis = ...
+  int status;
+  
+  // Use TLS with the specified CA certificate file
+  status = redisxSetTLS(redis, "path/to/ca.crt");
+  if(status) {
+    // Oops, the CA certificate is not accessible...
+    ...
+  }
+  
+  // (optional) If servers requires mutual TLS, you will need to provide 
+  // a certificate and private key also
+  status = redisxSetMutualTLS(redis, "path/to/redis.crt", "path/to/redis.key");
+  if(status) {
+    // Oops, the certificate or key file is not accessible...
+    ...
+  }
+
+  // (optional) Skip verification of the certificate (insecure!)
+  redisxSkipVerify(redis, TRUE);
+
+  // (optional) Set server name for SNI
+  redisxSetTLSServerName(redis, "my.redis-server.com");
+
+  // (optional) Set ciphers to use (TLSv1.2 and earlier)
+  redisxSetTLSCiphers(redisx, "HIGH:!aNULL:!kRSA:!PSK:!SRP:!MD5:!RC4");
+  
+  // (optional) Set cipher suites to use (TLSv1.3 and later)
+  redisxSetTLSCiphers(redisx, "ECDHE-RSA-AES256-GCM-SHA384:TLS_AES_256_GCM_SHA384");
+  
+  // (optional) Set parameters for DH-based cyphers
+  status = redisxSetDHCypherParams(redisx, "path/to/redis.dh");
+  if(status) {
+    // Oops, the parameter file is not accessible...
+    ...
+  }
+```
+
+The TLS support is still experimental and requires testing. You can help by submitting bug reports in the GitHub
+repository.
 
 <a name="socket-configuration"></a>
 #### Socket-level configuration
@@ -1367,6 +1421,8 @@ only a subset of the Redis keys.
     processed on any cluster node.)
  4. Destroy the cluster resources when done using it.
   
+The support for Redis clusters is still experimental and requires testing. You can help by submitting bug reports in 
+the GitHub repository.
 
 <a name="cluster-basics"></a>
 ### Cluster basics 

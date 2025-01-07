@@ -29,7 +29,7 @@ jobs:
       CC: gcc
     steps:
     - name: install build deps
-      run: sudo apt-get install doxygen libpopt-dev libreadline-dev libbsd-dev
+      run: sudo apt-get install doxygen libpopt-dev libreadline-dev libbsd-dev libssl-dev
 
     - name: Check out RedisX
       uses: actions/checkout@v4
