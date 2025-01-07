@@ -138,23 +138,20 @@ int rConnectTLSClient(ClientPrivate *cp, const TLSConfig *tls) {
 }
 
 /// \endcond
-
 #endif
-
-
 
 /**
  * Configures a TLS-encrypted connection to Redis with the specified CA certificate file. Normally you
  * will want to set up mutual TLS with redisxSetMutualTLS() also, unless the server is not requiring
  * mutual authentication. Additionally, you might also want to set parameters for DH-based cyphers if
- * needed using redisxSetDHParams().
+ * needed using redisxSetDHCypherParams().
  *
  * @param redis     A Redis instance
  * @param ca_file   Path to the CA certificate file
  * @return          X_SUCCESS (0) if successful, or else an error code &lt;0.
  *
  * @sa redisxSetMutualTLS()
- * @sa redisxSetDHParams()
+ * @sa redisxSetDHCypherParams()
  */
 int redisxSetTLS(Redis *redis, const char *ca_file) {
   static const char *fn = "redisxSetCA";
@@ -242,8 +239,8 @@ int redisxSetMutualTLS(Redis *redis, const char *cert_file, const char *key_file
  *
  * @sa redisxSetTLS()
  */
-int redisxSetDHParams(Redis *redis, const char *dh_params_file) {
-  static const char *fn = "redisxSetDHParams";
+int redisxSetDHCypherParams(Redis *redis, const char *dh_params_file) {
+  static const char *fn = "redisxSetDHCypherParams";
 
 #if WITH_TLS
   RedisPrivate *p;
@@ -270,5 +267,3 @@ int redisxSetDHParams(Redis *redis, const char *dh_params_file) {
   return x_error(X_FAILURE, ENOSYS, fn, "RedisX was built without TLS support");
 #endif
 }
-
-
