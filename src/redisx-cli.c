@@ -81,6 +81,7 @@ static void printResult(const RESP *reply, const RESP *attr, const RESP *push) {
      XStructure *s = xCreateStruct();
      char *json;
 
+     // We add them in reverse order...
      if(push) xSetField(s, redisxRESP2XField("PUSH", push));
      if(attr) xSetField(s, redisxRESP2XField("ATTRIBUTES", attr));
      if(reply) xSetField(s, redisxRESP2XField("REPLY", reply));
@@ -97,8 +98,8 @@ static void printResult(const RESP *reply, const RESP *attr, const RESP *push) {
    else {
      if(reply) printRESP(reply);
      if(attr) printRESP(attr);
+     if(push) printRESP(push);
    }
-
 }
 
 static void *ListenerThread() {
