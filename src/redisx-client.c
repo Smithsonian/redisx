@@ -15,6 +15,7 @@
 #include <ctype.h>
 #include <poll.h>
 #include <sys/types.h>
+#include <sys/ioctl.h>
 #if __Lynx__
 #  include <socket.h>
 #else
@@ -855,6 +856,52 @@ int redisxClearAttributesAsync(RedisClient *cl) {
   return X_SUCCESS;
 }
 
+/**
+ * Returns the number of bytes of response available on the given Redis client connection. This version
+ * assumes the caller has exclusive access to the client.
+ *
+ * @param cl    a locked and connected Redis client
+ * @return      the number of bytes of response available on the client, or else an error code &lt;0.
+ *
+ * @sa redisxGetAvailable()
+ * @sa redisxLockConnected()
+ * @sa redisxReadReplyAsync()
+ */
+int redisxGetAvailableAsync(RedisClient *cl) {
+  static const char *fn = "redisxGetAvailable";
+
+  ClientPrivate *cp;
+  int n = 0;
+
+  prop_error(fn, rCheckClient(cl));
+
+  cp = cl->priv;
+  if(ioctl(cp->socket, FIONREAD, &n) < 0) return x_error(X_FAILURE, errno, fn, "ioctl() error: %s", strerror(errno));
+
+  return n;
+}
+
+/**
+ * Returns the number of bytes of response available on the given Redis client connection. This is the
+ * synchronized version, which will obtain a exclusive lock on the client before determining the result.
+ *
+ * @param cl    a locked and connected Redis client
+ * @return      the number of bytes of response available on the client, or else an error code &lt;0.
+ *
+ * @sa redisxGetAvailableAsync()
+ */
+int redisxGetAvailable(RedisClient *cl) {
+  static const char *fn = "redisxGetAvailable";
+
+  int n;
+
+  prop_error(fn, redisxLockConnected(cl));
+  n = redisxGetAvailable(cl);
+  redisxUnlockClient(cl);
+
+  prop_error(fn, n);
+  return n;
+}
 
 /**
  * Reads a response from Redis and returns it.
@@ -868,6 +915,7 @@ int redisxClearAttributesAsync(RedisClient *cl) {
  *              i.e., other than a timeout, the client will be disabled.)
  *
  * @sa redisxSetReplyTimeout()
+ * @sa redisxGetAvailavleAsync()
  */
 RESP *redisxReadReplyAsync(RedisClient *cl, int *pStatus) {
   static const char *fn = "redisxReadReplyAsync";

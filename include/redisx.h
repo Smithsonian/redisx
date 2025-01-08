@@ -451,6 +451,7 @@ void redisxClearDisconnectHooks(Redis *redis);
 RESP *redisxRequest(Redis *redis, const char *command, const char *arg1, const char *arg2, const char *arg3, int *status);
 RESP *redisxArrayRequest(Redis *redis, const char **args, const int *length, int n, int *status);
 RESP *redisxGetAttributes(Redis *redis);
+int redisxGetAvailable(RedisClient *cl);
 int redisxSetValue(Redis *redis, const char *table, const char *key, const char *value, boolean confirm);
 RESP *redisxGetValue(Redis*redis, const char *table, const char *key, int *status);
 char *redisxGetStringValue(Redis *redis, const char *table, const char *key, int *len);
@@ -516,6 +517,7 @@ int redisxSendArrayRequestAsync(RedisClient *cl, const char **args, const int *l
 int redisxClusterAskMigratingAsync(RedisClient *cl, const char **args, const int *lengths, int n);
 int redisxSetValueAsync(RedisClient *cl, const char *table, const char *key, const char *value, boolean confirm);
 int redisxMultiSetAsync(RedisClient *cl, const char *table, const RedisEntry *entries, int n, boolean confirm);
+int redisxGetAvailableAsync(RedisClient *cl);
 RESP *redisxReadReplyAsync(RedisClient *cl, int *pStatus);
 int redisxClearAttributesAsync(RedisClient *cl);
 const RESP *redisxGetAttributesAsync(const RedisClient *cl);

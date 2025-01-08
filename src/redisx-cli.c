@@ -22,6 +22,7 @@
 #include <popt.h>
 #include <time.h>
 #include <math.h>
+#include <pthread.h>
 #include <readline/readline.h>
 #include <readline/history.h>
 #include <bsd/readpassphrase.h>
@@ -32,6 +33,8 @@
 #define FORMAT_JSON 1
 #define FORMAT_RAW  2
 
+#define POLL_MILLIS 10
+
 static char *host = "127.0.0.1";
 static int port = 6379;
 static int format = 0;
@@ -41,6 +44,9 @@ static int attrib = 0;
 
 static Redis *redis;
 static RedisCluster *cluster;
+
+static pthread_mutex_t mutex = PTHREAD_MUTEX_INITIALIZER;
+
 
 static void printVersion(const char *name) {
   printf("%s %s\n", name, REDISX_VERSION_STRING);
@@ -69,9 +75,64 @@ static void printRESP(const RESP *resp) {
   }
 }
 
+static void printResult(const RESP *reply, const RESP *attr, const RESP *push) {
+  if(format == FORMAT_JSON) {
+     // Bundle reply and attributes into one JSON document.
+     XStructure *s = xCreateStruct();
+     char *json;
+
+     if(push) xSetField(s, redisxRESP2XField("PUSH", push));
+     if(attr) xSetField(s, redisxRESP2XField("ATTRIBUTES", attr));
+     if(reply) xSetField(s, redisxRESP2XField("REPLY", reply));
+
+     json = xjsonToString(s);
+     xDestroyStruct(s);
+
+     if(json) {
+       printf("%s", json);
+       free(json);
+     }
+     else printf("{}\n");
+   }
+   else {
+     if(reply) printRESP(reply);
+     if(attr) printRESP(attr);
+   }
+
+}
+
+static void *ListenerThread() {
+  while(TRUE) {
+    struct timespec nap;
+
+    nap.tv_sec = POLL_MILLIS / 1000;
+    nap.tv_nsec = 1000000 * (POLL_MILLIS % 1000);
+
+    pthread_mutex_lock(&mutex);
+
+    if(redis && redisxLockConnected(redis->interactive) == X_SUCCESS) {
+      while(redisxGetAvailableAsync(redis->interactive) > 0) {
+        int status = X_SUCCESS;
+        const RESP *resp = redisxReadReplyAsync(redis->interactive, &status);
+        if(status) break;
+        printResult(NULL, NULL, resp);
+      }
+      redisxUnlockClient(redis->interactive);
+    }
+
+    pthread_mutex_unlock(&mutex);
+
+    nanosleep(&nap, NULL);
+  }
+
+  return NULL; /* NOT REACHED */
+}
+
 static void process(const char **cmdargs, int nargs) {
   int status = X_SUCCESS;
   RESP *reply, *attr = NULL;
+
+  pthread_mutex_lock(&mutex);
 
   if(cluster) {
     const char *key = NULL;
@@ -85,33 +146,16 @@ static void process(const char **cmdargs, int nargs) {
     redis = redisxClusterGetShard(cluster, key);
     if(!redis) {
       fprintf(stderr, "ERROR! No suitable cluster node found for transaction.");
+      pthread_mutex_unlock(&mutex);
       return;
     }
   }
 
   reply = redisxArrayRequest(redis, cmdargs, NULL, nargs, &status);
   if(!status && attrib) attr = redisxGetAttributes(redis);
+  pthread_mutex_unlock(&mutex);
 
-  if(format == FORMAT_JSON) {
-    // Bundle reply and attributes into one JSON document.
-    XStructure *s = xCreateStruct();
-    char *json;
-
-    if(attr) xSetField(s, redisxRESP2XField("ATTRIBUTES", attr));
-    xSetField(s, redisxRESP2XField("REPLY", reply));
-    json = xjsonToString(s);
-    xDestroyStruct(s);
-
-    if(json) {
-      printf("%s", json);
-      free(json);
-    }
-    else printf("{}\n");
-  }
-  else {
-    if(!status) printRESP(reply);
-    if(attr) printRESP(attr);
-  }
+  printResult(reply, attr, NULL);
 
   redisxDestroyRESP(attr);
   redisxDestroyRESP(reply);
@@ -125,10 +169,16 @@ static void PushProcessor(RedisClient *cl, RESP *resp, void *ptr) {
 }
 
 static int interactive(Redis *redis) {
+  pthread_t listenerTID;
   char *prompt = malloc(strlen(host) + 20);
   sprintf(prompt, "%s:%d> ", host, port);
 
   using_history();
+
+  if(pthread_create(&listenerTID, NULL, ListenerThread, NULL) < 0) {
+    perror("ERROR! launching listener thread");
+    exit(1);
+  }
 
   for(;;) {
     char *line = readline(prompt);
@@ -393,6 +443,7 @@ int main(int argc, const char *argv[]) {
   }
 
   if(!cluster) {
+    if(!redis) return x_error(X_NULL, EAGAIN, fn, "redis is NULL");
     prop_error(fn, redisxConnect(redis, FALSE));
 
     if(scan) {
