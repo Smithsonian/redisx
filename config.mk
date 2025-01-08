@@ -23,11 +23,13 @@ BIN ?= bin
 # Compiler: use gcc by default
 CC ?= gcc
 
-# Whether to use OpenMP
-WITH_OPENMP ?= 1
+# Whether to use OpenMP. If not defined, we'll enable it automatically if 
+# libgomp is available
+#WITH_OPENMP = 1
 
-# Whether to build with TLS support (via OpenSSL)
-WITH_TLS ?= 1
+# Whether to build with TLS support (via OpenSSL). If not defined, we'll
+# enable it automatically if libssl is available
+#WITH_TLS = 1
 
 # Add include/ directory
 CPPFLAGS += -I$(INC)
@@ -66,6 +68,30 @@ CHECKOPTS += --inline-suppr $(CHECKEXTRA)
 #
 # Below are some generated constants based on the one that were set above
 # ============================================================================
+
+ifneq ($(shell which ldconfig), )
+  # Detect OpenSSL automatically, and enable TLS support if present
+  ifndef WITH_TLS 
+    ifneq ($(shell ldconfig -p | grep libssl), )
+      $(info INFO: TLS support is enabled automatically.)
+      WITH_TLS = 1
+    else
+      $(info INFO: optional TLS support is not enabled.)
+      WITH_TLS = 0
+    endif
+  endif
+
+  # Detect OpenMP automatically, and enable WITH_OPENMP support if present
+  ifndef WITH_OPENMP 
+    ifneq ($(shell ldconfig -p | grep libgomp), )
+      $(info INFO: OpenMP optimizations are enabled automatically.)
+      WITH_OPENMP = 1
+    else
+      $(info INFO: optional OpenMP optimizations are not enabled.)
+      WITH_OPENMP = 0
+    endif
+  endif
+endif
 
 # Link against math libs (for e.g. isnan()), and xchange dependency
 LDFLAGS += -lm -lxchange
