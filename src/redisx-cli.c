@@ -5,6 +5,16 @@
 
 #define _POSIX_C_SOURCE  199309L      ///< for nanosleep()
 
+// We'll use gcc major version as a proxy for the glibc library to decide which feature macro to use.
+// gcc 5.1 was released 2015-04-22...
+#ifndef __GNUC__
+#  define _DEFAULT_SOURCE         ///< strcasecmp() feature macro starting glibc 2.20 (2014-09-08)
+#elif __GNUC__ >= 5
+#  define _DEFAULT_SOURCE         ///< strcasecmp() feature macro starting glibc 2.20 (2014-09-08)
+#else
+#  define _BSD_SOURCE             ///< strcasecmp() feature macro for glibc <= 2.19
+#endif
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -28,6 +38,9 @@ static int format = 0;
 static char *delim = "\\n";
 static char *groupDelim = "\\n";
 static int attrib = 0;
+
+static Redis *redis;
+static RedisCluster *cluster;
 
 static void printVersion(const char *name) {
   printf("%s %s\n", name, REDISX_VERSION_STRING);
@@ -56,9 +69,22 @@ static void printRESP(const RESP *resp) {
   }
 }
 
-static void process(Redis *redis, const char **cmdargs, int nargs) {
+static void process(const char **cmdargs, int nargs) {
   int status = X_SUCCESS;
   RESP *reply, *attr = NULL;
+
+  if(cluster) {
+    const char *key = cmdargs[1];
+
+    if(nargs > 3) if(strcasecmp("EVAL", cmdargs[0]) == 0 || strcasecmp("EVALSHA", cmdargs[0]) || strcasecmp("FCALL", cmdargs[0]))
+      key = cmdargs[3];
+
+    redis = redisxClusterGetShard(cluster, key);
+    if(!redis) {
+      fprintf(stderr, "ERROR! No suitable cluster node found for transaction.");
+      return;
+    }
+  }
 
   reply = redisxArrayRequest(redis, cmdargs, NULL, nargs, &status);
   if(!status && attrib) attr = redisxGetAttributes(redis);
@@ -103,18 +129,18 @@ static int interactive(Redis *redis) {
 
   for(;;) {
     char *line = readline(prompt);
-    char **args;
+    const char **args;
     int nargs;
 
     if(!line) continue;
 
     if(strcmp("quit", line) == 0 || strcmp("exit", line) == 0) break;
 
-    poptParseArgvString(line, &nargs, (const char ***) &args);
+    poptParseArgvString(line, &nargs, &args);
 
     if(args) {
       if(nargs > 0) {
-        process(redis, (const char **) args, nargs);
+        process(args, nargs);
         add_history(line);
       }
       free(args);
@@ -164,15 +190,16 @@ static char *readScript(const char *eval) {
  * @return          The argument list to pass to Redis , of the form:
  *                  `EVAL <script> <NKEYS> [key1 [key2] ...] [arg1 [arg2 ...]]`
  */
-static char **setScriptArgs(char *script, char **args, int *nargs) {
+static const char **setScriptArgs(char *script, const char **args, int *nargs) {
   int i, to = 0, n = *nargs, nkeys = 0;
-  char keys[20], **a;
+  char keys[20];
+  const char **a;
 
   // Count the number of keys on the command-line up to the comma separator
   for(nkeys = 0; nkeys < n; nkeys++) if(strcmp(",", args[nkeys])) break;
   sprintf(keys, "%d", nkeys);
 
-  a = (char **) calloc((n + 2), sizeof(char *));
+  a = (const char **) calloc((n + 2), sizeof(char *));
   x_check_alloc(a);
 
   a[to++] = "EVAL";
@@ -212,61 +239,62 @@ int main(int argc, const char *argv[]) {
   char *cipher_suites = NULL;
   char *sni = NULL;
   int skip_verify = 0;
+  int clusterMode = 0;
 
   struct poptOption options[] = { //
           {"host",       'h', POPT_ARG_STRING | POPT_ARGFLAG_SHOW_DEFAULT,    &host,     0, "Server hostname.", "<hostname>"}, //
           {"port",       'p', POPT_ARG_INT    | POPT_ARGFLAG_SHOW_DEFAULT,    &port,     0, "Server port.", "<port>"}, //
-          {"timeout",    't', POPT_ARG_DOUBLE, &timeout,   0, "Server connection timeout (decimals allowed).", "<seconds>"}, //
-          {"pass",       'a', POPT_ARG_STRING, &password,  0, "Password to use when connecting to the server.", "<password>"}, //
-          {"user",         0, POPT_ARG_STRING, &user,      0, "Used to send ACL style 'AUTH username pass'. Needs -a.", "<username>"}, //
-          {"askpass",      0, POPT_ARG_NONE,   &askpass,   0, "Force user to input password with mask from STDIN.  " //
+          {"timeout",    't', POPT_ARG_DOUBLE, &timeout,     0, "Server connection timeout (decimals allowed).", "<seconds>"}, //
+          {"pass",       'a', POPT_ARG_STRING, &password,    0, "Password to use when connecting to the server.", "<password>"}, //
+          {"user",         0, POPT_ARG_STRING, &user,        0, "Used to send ACL style 'AUTH username pass'. Needs -a.", "<username>"}, //
+          {"askpass",      0, POPT_ARG_NONE,   &askpass,     0, "Force user to input password with mask from STDIN.  " //
                   "If this argument is used, '-a' will be ignored.", NULL //
           }, //
-          {"repeat",    'r', POPT_ARG_INT,    &repeat,     0, "Execute specified command this many times.", "<times>"}, //
+          {"repeat",    'r', POPT_ARG_INT,    &repeat,       0, "Execute specified command this many times.", "<times>"}, //
           {"interval",  'i', POPT_ARG_DOUBLE | POPT_ARGFLAG_SHOW_DEFAULT, &interval,     0, "When -r is used, waits this many seconds before repeating.  " //
                   "It is possible to specify sub-second times like -i 0.1.", "<seconds>" //
           }, //
           {"db",        'n', POPT_ARG_INT     | POPT_ARGFLAG_SHOW_DEFAULT, &dbIndex,     0, "Database number.", "<index>"}, //
-          {"RESP2",     '2', POPT_ARG_VAL,    &protocol,   2, "Start session in RESP2 protocol mode.", NULL}, //
-          {"RESP3",     '3', POPT_ARG_VAL,    &protocol,   3, "Start session in RESP3 protocol mode.", NULL}, //
-          {"stdin",     'x', POPT_ARG_VAL,    &input,      0, "Read last argument from STDIN", NULL}, //
-          {"json",        0, POPT_ARG_NONE,   NULL,      'j', "Output in JSON format", NULL}, //
-          {"raw",         0, POPT_ARG_NONE,   NULL,      'r', "Use raw formatting for replies (with delimiters).", NULL}, //
+          {"RESP2",     '2', POPT_ARG_VAL,    &protocol,     2, "Start session in RESP2 protocol mode.", NULL}, //
+          {"RESP3",     '3', POPT_ARG_VAL,    &protocol,     3, "Start session in RESP3 protocol mode.", NULL}, //
+          {"stdin",     'x', POPT_ARG_VAL,    &input,        0, "Read last argument from STDIN", NULL}, //
+          {"json",        0, POPT_ARG_NONE,   NULL,        'j', "Output in JSON format", NULL}, //
+          {"raw",         0, POPT_ARG_NONE,   NULL,        'r', "Use raw formatting for replies (with delimiters).", NULL}, //
           {"delim",     'd', POPT_ARG_STRING  | POPT_ARGFLAG_SHOW_DEFAULT, &delim,       0, "Delimiter between elements for raw format.  " //
                   "You can use JSON convention for escaping special characters.", "<string>" //
           },
           {"prefix",    'D', POPT_ARG_STRING  | POPT_ARGFLAG_SHOW_DEFAULT, &groupDelim,  0, "Group prefix for raw format.  " //
                   "You can use JSON convention for escaping special characters.", "<string>" //
           },
-          {"tls",         0, POPT_ARG_NONE,   &tls,        0, "Establish a secure TLS connection.", NULL}, //
-          {"sni",         0, POPT_ARG_NONE,   &sni,        0, "Server name indication for TLS.", "<host>"}, //
-          {"cacert",      0, POPT_ARG_STRING, &ca_file,    0, "CA Certificate file to verify with.", "<file>"}, //
-          {"cacertdir",   0, POPT_ARG_STRING, &ca_path,     0, "Directory where trusted CA certificates are stored.  If neither cacert nor cacertdir are "
+          {"cluster",   'c', POPT_ARG_NONE,   &clusterMode,  0, "Enable cluster mode (follow -ASK and -MOVED redirections).", NULL}, //
+          {"tls",         0, POPT_ARG_NONE,   &tls,          0, "Establish a secure TLS connection.", NULL}, //
+          {"sni",         0, POPT_ARG_NONE,   &sni,          0, "Server name indication for TLS.", "<host>"}, //
+          {"cacert",      0, POPT_ARG_STRING, &ca_file,      0, "CA Certificate file to verify with.", "<file>"}, //
+          {"cacertdir",   0, POPT_ARG_STRING, &ca_path,      0, "Directory where trusted CA certificates are stored.  If neither cacert nor cacertdir are "
                  "specified, the default system-wide trusted root certs configuration will apply.", "<path>" //
           },
-          {"insecure",    0, POPT_ARG_NONE,   &skip_verify,0, "Allow insecure TLS connection by skipping cert validation.", NULL}, //
-          {"cert",        0, POPT_ARG_STRING, &cert_file,  0, "Client certificate to authenticate with.", "<path>"}, //
-          {"key",         0, POPT_ARG_STRING, &key_file,   0, "Private key file to authenticate with.", "<path>"}, //
-          {"tls-ciphers", 0, POPT_ARG_STRING, &ciphers,    0, "Sets the list of preferred ciphers (TLSv1.2 and below) in order of preference from "
+          {"insecure",    0, POPT_ARG_NONE,   &skip_verify,  0, "Allow insecure TLS connection by skipping cert validation.", NULL}, //
+          {"cert",        0, POPT_ARG_STRING, &cert_file,    0, "Client certificate to authenticate with.", "<path>"}, //
+          {"key",         0, POPT_ARG_STRING, &key_file,     0, "Private key file to authenticate with.", "<path>"}, //
+          {"tls-ciphers", 0, POPT_ARG_STRING, &ciphers,      0, "Sets the list of preferred ciphers (TLSv1.2 and below) in order of preference from "
                   "highest to lowest separated by colon (':').", "<list>"}, //
           {"tls-ciphersuites", 0, POPT_ARG_STRING, &cipher_suites,    0, "Sets the list of preferred ciphersuites (TLSv1.3) in order of preference from "
                   "highest to lowest separated by colon (':').", "<list>"}, //
           {"show-pushes", 0, POPT_ARG_STRING  | POPT_ARGFLAG_SHOW_DEFAULT, &push,        0, "Whether to print RESP3 PUSH messages.", "yes|no" }, //
-          {"attributes",  0, POPT_ARG_NONE,   &attrib,     0, "Show RESP3 attributes also, if available.", NULL}, //
-          {"eval",        0, POPT_ARG_STRING, &push,       0, "Send an EVAL command using the Lua script at <file>.  " //
+          {"attributes",  0, POPT_ARG_NONE,   &attrib,       0, "Show RESP3 attributes also, if available.", NULL}, //
+          {"eval",        0, POPT_ARG_STRING, &push,         0, "Send an EVAL command using the Lua script at <file>.  " //
                   "The keyword and other arguments should be separated with a standalone comma on the command-line, such as: 'key1 key2 , arg1 arg2 ...'", "<file>" //
           },
-          {"verbose",     0, POPT_ARG_NONE,   &verbose,    0, "Verbose mode.", NULL }, //
+          {"verbose",     0, POPT_ARG_NONE,   &verbose,      0, "Verbose mode.", NULL }, //
           {"debug",       0, POPT_ARG_NONE   | POPT_ARGFLAG_DOC_HIDDEN,   &debug,       0, "Debug mode. Prints all network traffic.", NULL }, //
-          {"version",     0, POPT_ARG_NONE,   NULL,      'v', "Output version and exit.", NULL }, //
+          {"version",     0, POPT_ARG_NONE,   NULL,        'v', "Output version and exit.", NULL }, //
 
           POPT_AUTOHELP POPT_TABLEEND //
   };
 
   int rc;
-  char **cmdargs;
+  const char **cmdargs;
   int i, nargs = 0;
-  Redis *redis;
 
   poptContext optcon = poptGetContext(fn, argc, argv, options, 0);
   poptSetOtherOptionHelp(optcon, "[OPTIONS] [cmd [arg [arg ...]]]");
@@ -289,7 +317,7 @@ int main(int argc, const char *argv[]) {
   delim = xjsonUnescape(delim);
   groupDelim = xjsonUnescape(groupDelim);
 
-  cmdargs = (char **) poptGetArgs(optcon);
+  cmdargs = (const char **) poptGetArgs(optcon);
 
   if(askpass) {
     password = (char *) malloc(1024);
@@ -341,7 +369,16 @@ int main(int argc, const char *argv[]) {
   }
 
   xSetDebug(1);
-  prop_error(fn, redisxConnect(redis, 0));
+
+  if(clusterMode) {
+    cluster = redisxClusterInit(redis);
+    if(cluster) {
+      redisxDestroy(redis);
+      redis = NULL;
+    }
+  }
+
+  if(!cluster) prop_error(fn, redisxConnect(redis, FALSE));
 
   if(!cmdargs) return interactive(redis);
 
@@ -355,10 +392,12 @@ int main(int argc, const char *argv[]) {
       nanosleep(&sleeptime, NULL);
     }
 
-    if(nargs) process(redis, (const char **) cmdargs, nargs);
+    if(nargs) process(cmdargs, nargs);
   }
 
-  redisxDisconnect(redis);
+  if(cluster) redisxClusterDisconnect(cluster);
+  else redisxDisconnect(redis);
+
   poptFreeContext(optcon);
 
   return 0;

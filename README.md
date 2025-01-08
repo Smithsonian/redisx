@@ -1478,14 +1478,35 @@ You can start using the cluster right away. You can obtain a connected `Redis` i
 
   // Run your query on using the given Redis key / keys.
   RESP *reply = redisxRequest(shard, "GET", key, NULL, NULL, &status);
-  if(redisxClusterMoved(reply)) {
-    // The key is now served by another shard.
-    // You might want to obtain the new shard and try again...
-    ...
-  }
-  
   ...
 ```
+
+The interactive queries handle both `MOVED` and `ASK` redirections automatically. However, asynchronous queries do not
+since they return before receiving a response. Thus, when using `redisxReadReplyAsync()` later to process replies, you
+should check for redirections:
+
+```c
+  RESP *reply = redisxReadReplyAsync(...);
+
+  if(redisxClusterMoved(reply)) {
+    // The key is now served by another shard.
+    // You might want to obtain the new shard and repeat the failed
+    // transaction again (interactively or pipelined)...
+    ...
+  }
+  if(redisxClusterIsMigrating(reply)) {
+    // The key's slot is currently migrating. You may try the redirected 
+    // address indicated in the reply, with the ASKING command, e.g. via a 
+    // redisxClusterAskMigrating() interactive transaction.
+    ...
+  }
+  ...
+  
+```
+
+As a matter a best practice you should never assume that a given keyword is persistently served by the same shard. 
+Rather, you should obtain the current shard for the key each time you want to use it with the cluster, and always 
+check for errors on shard requests, and repeat failed requests on a newly obtained shard if necessary.
 
 Finally, when you are done using the cluster, simply discard it:
 
@@ -1498,17 +1519,22 @@ Finally, when you are done using the cluster, simply discard it:
 ### Detecting cluster reconfiguration
 
 In the above example we have shown one way you might check for errors that result from cluster being reconfigured
-on-the-fly, using `redisxClusterMoved()` on the `RESP` reply obtained from the shard.
+on-the-fly, using `redisxClusterMoved()` and/or `redisxClusterIsMigrating()` on the `RESP` reply obtained from the 
+shard.
 
 Equivalently, you might use `redisxCheckRESP()` or `redisxCheckDestroyRESP()` also for detecting a cluster 
-reconfiguration. Both of these will return a designated `REDIS_MOVED` error code if the keyword is now served on 
-another shard:
+reconfiguration. Both of these will return a designated `REDIS_MOVED` or `REDIS_MIGRATING` error code if the keyword 
+has moved or is migrating, respectively, to another node, e.g.:
 
 ```c
   ...
   int s = redisxCheckRESP(reply, ...);
   if(s == REDIS_MOVED) {
     // The key is now served by another shard.
+    ...
+  }
+  if(s == REDIS_MIGRATING) {
+    // The key is migrating and may be accessed from new location via an ASKING directive
     ...
   }
   if(s != X_SUCCESS) {
@@ -1518,13 +1544,13 @@ another shard:
   ...
 ```
 
-A `REDIS_MOVED` error code will be returned by higher-level functions also, which ingest the `RESP` replies from the 
-shard and return a digested error code. For example, `redisxGetStringValue()` will set the output `len` value to 
-`REDIS_MOVED` if the value could not be obtained because of a cluster reconfiguration.
+To help manage redirection responses for asynchronous requests, we provide `redisxClusterGetRedirection()` to obtain 
+the redirected Redis instance based on the redirection `RESP`. Once the redirected cluster shard is identified you may 
+either resubmit the same query as before (e.h. with `redisxSendArrayRequestAsync()`) if `MOVED`, or else repeat the 
+query via an interactive `ASKING` directive using `redisxClusterAskMigrating()`.
 
-As a matter a best practice you should never assume that a given keyword is persistently served by the same shard. 
-Rather, you should obtain the current shard for the key each time you want to use it with the cluster, and always 
-check for errors on shard requests, and repeat failed requests on a newly obtained shard if necessary.
+A `REDIS_MOVED` error code may be returned by higher-level functions also, which ingest the `RESP` replies from the 
+shard and return a digested error code.
 
 
 <a name="cluster-explicit-connect"></a>

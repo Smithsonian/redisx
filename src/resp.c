@@ -162,6 +162,7 @@ int redisxCheckRESP(const RESP *resp, enum resp_type expectedType, int expectedS
 
   if(resp == NULL) return x_error(X_NULL, EINVAL, fn, "RESP is NULL");
   if(redisxClusterMoved(resp)) return x_error(REDIS_MOVED, EAGAIN, fn, "keyword has moved to another cluster shard");
+  if(redisxClusterIsMigrating(resp)) return x_error(REDIS_MIGRATING, EAGAIN, fn, "keyword is migrating. Use ASKING on new shard");
   if(resp->type == RESP3_BOOLEAN) {
     if(resp->n != (expectedSize ? 1 : 0)) return x_error(X_FAILURE, EBADMSG, fn, "unexpected boolean value: expected %d, got %d", (expectedSize ? 1 : 0), resp->n);
   }

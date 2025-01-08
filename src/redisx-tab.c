@@ -127,18 +127,19 @@ int redisxSetValue(Redis *redis, const char *table, const char *key, const char 
 
   int status = X_SUCCESS;
 
-  prop_error(fn, redisxCheckValid(redis));
-  prop_error(fn, redisxLockConnected(redis->interactive));
-
-  status = redisxSetValueAsync(redis->interactive, table, key, value, confirm);
-
-  if(!status && confirm) {
-    RESP *reply = redisxReadReplyAsync(redis->interactive, &status);
-    if(!status) status = redisxCheckRESP(reply, RESP_INT, 0);
+  if(confirm) {
+    RESP *reply = (table == NULL) ?
+            redisxRequest(redis, "SET", key, value, NULL, &status) :
+            redisxRequest(redis, "HSET", table, key, value, &status);
+    if(!status) status = redisxCheckRESP(reply, RESP_INT, -1);
     redisxDestroyRESP(reply);
   }
-
-  redisxUnlockClient(redis->interactive);
+  else {
+    if(redis == NULL) return x_error(X_NULL, EINVAL, fn, "redis is NULL");
+    prop_error(fn, redisxLockConnected(redis->interactive));
+    status = redisxSetValueAsync(redis->interactive, table, key, value, FALSE);
+    redisxUnlockClient(redis->interactive);
+  }
 
   prop_error(fn, status);
   return X_SUCCESS;
@@ -279,6 +280,90 @@ char *redisxGetStringValue(Redis *redis, const char *table, const char *key, int
 }
 
 /**
+ * Checks the input parameters for setting multiple entries at once in a Redis hash table.
+ *
+ * @param table     Redis hash table name
+ * @param entries   array of key/value pairs
+ * @param n         number of key/value pairs in the array
+ * @return          X_SUCCESS (0) if successful, or else an error code &lt;0 (errno is set
+ *                  to EINVAL in case of an error).
+ *
+ * @sa redisxMultiSet()
+ * @sa redisxMultiSetAsync()
+ */
+static int rCheckMultiSetArgs(const char *table, const RedisEntry *entries, int n) {
+  static const char *fn = "rCheckMultiSetArgs";
+
+  if(table == NULL) return x_error(X_GROUP_INVALID, EINVAL, fn, "table parameter is NULL");
+  if(!table[0]) return x_error(X_GROUP_INVALID, EINVAL, fn, "table parameter is empty");
+  if(entries == NULL) return x_error(X_NULL, EINVAL, fn, "'entries' parameter is NULL");
+  if(n < 1) return x_error(X_SIZE_INVALID, EINVAL, fn, "invalid array size: %d", n);
+
+  return X_SUCCESS;
+}
+
+
+/**
+ * Returns a HMSET argument array.
+ *
+ * @param table       Redis hash table name
+ * @param entries     array of key/value pairs
+ * @param[in, out] n  number of key/value pairs in the array [in], and returning the number
+ *                    of arguments in the returned array [out].
+ * @return            an allocated array containing the HMSET command and its arguments.'
+ *
+ * @sa rGetMultiSetLengths()
+ */
+static const char **rGetMultiSetArgs(const char *table, const RedisEntry *entries, int *n) {
+  int i, m, N = 2 + ((*n) << 1);
+
+  const char **req = (const char **) malloc(N * sizeof(char *));
+  if(!req) {
+    *n = x_error(X_FAILURE, errno, "rGetMultiSetArgs", "alloc error (%d char *)", N);
+    return NULL;
+  }
+
+  req[0] = "HMSET"; // TODO, as of Redis 4.0.0, just use HSET...
+  req[1] = (char *) table;
+
+  for(i = 0, m = 2; i < *n; i++) {
+    req[m++] = (char *) entries[i].key;
+    req[m++] = (char *) entries[i].value;
+  }
+
+  *n = N;
+
+  return req;
+}
+
+/**
+ * Returns an array of argument lengths for an HMSET argument array, with the lengths of
+ * the values set to the nominal lengths of the entry values, such that they may not
+ * be null-terminated strings.
+ *
+ * @param entries   array of key/value pairs
+ * @param n         number of key/value pairs in the array
+ * @return          an allocated array containing the actual value lengths. All other
+ *                  elements are set to 0, indicating that strlen() may be used on
+ *                  those arguments to determine their lengths automatically.
+ *
+ * @sa rGetMultiSetArgs()
+ */
+static int *rGetMultiSetLengths(const RedisEntry *entries, int n) {
+  int i, m, N = 2 + (n << 1), *L;
+
+  L = (int *) calloc(N, sizeof(int));
+  if(!L) {
+    x_error(0, errno, "rGetMultiSetLengths", "alloc error (%d int)", N);
+    return NULL;
+  }
+
+  for(i = 0, m = 3; i < n; i++, m += 2) L[m] = entries[i].length;
+
+  return L;
+}
+
+/**
  * Sets multiple key/value pairs in a given hash table. This function should be called with exclusive
  * access to the client.
  *
@@ -295,38 +380,20 @@ char *redisxGetStringValue(Redis *redis, const char *table, const char *key, int
  */
 int redisxMultiSetAsync(RedisClient *cl, const char *table, const RedisEntry *entries, int n, boolean confirm) {
   static const char *fn = "redisxMultiSetAsync";
-  int i, *L, N, status = X_SUCCESS;
+  int *L, N, status = X_SUCCESS;
   const char **req;
 
-  if(cl == NULL) return  x_error(X_NULL, EINVAL, fn, "redis is NULL");
-  if(table == NULL) return  x_error(X_GROUP_INVALID, EINVAL, fn, "table parameter is NULL");
-  if(!table[0]) return  x_error(X_GROUP_INVALID, EINVAL, fn, "table parameter is empty");
-  if(entries == NULL) return  x_error(X_NULL, EINVAL, fn, "'entries' parameter is NULL");
-  if(n < 1) return  x_error(X_SIZE_INVALID, EINVAL, fn, "invalid size: %d", n);
+  prop_error(fn, rCheckClient(cl));
+  prop_error(fn, rCheckMultiSetArgs(table, entries, n));
 
-  N = (n<<1)+2;
+  N = n;
+  req = rGetMultiSetArgs(table, entries, &N);
+  if(!req) return x_trace(fn, NULL, X_FAILURE);
 
-  req = (const char **) malloc(N * sizeof(char *));
-  if(!req) {
-    fprintf(stderr, "WARNING! Redis-X : alloc %d request components: %s\n", N, strerror(errno));
-    return x_trace(fn, NULL, X_FAILURE);
-  }
-
-  L = (int *) calloc(N, sizeof(int));
+  L = rGetMultiSetLengths(entries, n);
   if(!L) {
-    fprintf(stderr, "WARNING! Redis-X : alloc %d request sizes: %s\n", N, strerror(errno));
     free(req);
     return x_trace(fn, NULL, X_FAILURE);
-  }
-
-  req[0] = "HMSET"; // TODO, as of Redis 4.0.0, just use HSET...
-  req[1] = (char *) table;
-
-  for(i=0; i<n; i++) {
-    int m = 2 + (i<<1);
-    req[m] = (char *) entries[i].key;
-    req[m+1] = (char *) entries[i].value;
-    L[m+1] = entries[i].length;
   }
 
   if(!confirm) status = redisxSkipReplyAsync(cl);
@@ -354,29 +421,43 @@ int redisxMultiSetAsync(RedisClient *cl, const char *table, const RedisEntry *en
  */
 int redisxMultiSet(Redis *redis, const char *table, const RedisEntry *entries, int n, boolean confirm) {
   static const char *fn = "redisxMultiSet";
-  int status;
+
+  int status = X_SUCCESS;
 
   prop_error(fn, redisxCheckValid(redis));
 
-  if(table == NULL) return x_error(X_GROUP_INVALID, EINVAL, fn, "table parameter is NULL");
-  if(!table[0]) return x_error(X_GROUP_INVALID, EINVAL, fn, "table parameter is empty");
-  if(entries == NULL) return x_error(X_NULL, EINVAL, fn, "'entries' parameter is NULL");
-  if(n < 1) return x_error(X_SIZE_INVALID, EINVAL, fn, "invalid size: %d", n);
+  if(confirm) {
+    const char **req;
+    int *L, N;
+    RESP *reply;
 
-  prop_error(fn, redisxLockConnected(redis->interactive));
-  status = redisxMultiSetAsync(redis->interactive, table, entries, n, confirm);
-  if(status == X_SUCCESS && confirm) {
-    RESP *reply = redisxReadReplyAsync(redis->interactive, &status);
-    if(!status) {
-      status = redisxCheckRESP(reply, RESP_SIMPLE_STRING, 0);
-      if(!status) if(strcmp(reply->value, "OK")) status = REDIS_ERROR;
+    prop_error(fn, rCheckMultiSetArgs(table, entries, n));
+
+    N = n;
+    req = rGetMultiSetArgs(table, entries, &N);
+    if(!req) return x_trace(fn, NULL, X_FAILURE);
+
+    L = rGetMultiSetLengths(entries, n);
+    if(!L) {
+      free(req);
+      return x_trace(fn, NULL, X_FAILURE);
     }
+
+    reply = redisxArrayRequest(redis, req, L, N, &status);
+
+    free(req);
+    free(L);
+
+    if(!status) if(strcmp("OK", (char *) reply->value))
+      status = x_error(REDIS_UNEXPECTED_RESP, EBADMSG, fn, "unexpected HMSET response: %s", (char *) reply->value);
+
     redisxDestroyRESP(reply);
   }
-  redisxUnlockClient(redis->interactive);
+  else {
+    status = redisxMultiSetAsync(redis->interactive, table, entries, n, confirm);
+  }
 
   prop_error(fn, status);
-
   return X_SUCCESS;
 }
 

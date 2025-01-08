@@ -129,6 +129,7 @@ enum resp_type {
 #define REDIS_UNEXPECTED_RESP       (-105)  ///< \hideinitializer Got a Redis response of a different type than expected
 #define REDIS_UNEXPECTED_ARRAY_SIZE (-106)  ///< \hideinitializer Got a Redis response with different number of elements than expected.
 #define REDIS_MOVED                 (-107)  ///< \hideinitializer The requested key has moved to another cluster shard.
+#define REDIS_MIGRATING             (-108)  ///< \hideinitializer The requested key is importing, and you may query with ASKED on the specified node.
 
 /**
  * RedisX channel IDs. RedisX uses up to three separate connections to the server: (1) an interactive client, in which
@@ -418,10 +419,14 @@ int redisxSetTLSSkipVerify(Redis *redis, boolean value);
 
 RedisCluster *redisxClusterInit(Redis *node);
 Redis *redisxClusterGetShard(RedisCluster *cluster, const char *key);
+boolean redisxClusterIsRedirected(const RESP *reply);
 boolean redisxClusterMoved(const RESP *reply);
+boolean redisxClusterIsMigrating(const RESP *reply);
 int redisxClusterConnect(RedisCluster *cluster);
 int redisxClusterDisconnect(RedisCluster *cluster);
 void redisxClusterDestroy(RedisCluster *cluster);
+Redis *redisxClusterGetRedirection(RedisCluster *cluster, const RESP *redirect, boolean refresh);
+RESP *redisxClusterAskMigrating(Redis *redis, const char **args, const int *lengths, int n, int *status);
 
 int redisxPing(Redis *redis, const char *message);
 enum redisx_protocol redisxGetProtocol(Redis *redis);
@@ -507,6 +512,7 @@ int redisxUnlockClient(RedisClient *cl);
 // Asynchronous access routines (use within redisxLockClient()/ redisxUnlockClient() blocks)...
 int redisxSendRequestAsync(RedisClient *cl, const char *command, const char *arg1, const char *arg2, const char *arg3);
 int redisxSendArrayRequestAsync(RedisClient *cl, const char **args, const int *length, int n);
+int redisxClusterAskMigratingAsync(RedisClient *cl, const char **args, const int *lengths, int n);
 int redisxSetValueAsync(RedisClient *cl, const char *table, const char *key, const char *value, boolean confirm);
 int redisxMultiSetAsync(RedisClient *cl, const char *table, const RedisEntry *entries, int n, boolean confirm);
 RESP *redisxReadReplyAsync(RedisClient *cl, int *pStatus);
@@ -515,6 +521,7 @@ const RESP *redisxGetAttributesAsync(const RedisClient *cl);
 int redisxIgnoreReplyAsync(RedisClient *cl);
 int redisxSkipReplyAsync(RedisClient *cl);
 int redisxPublishAsync(Redis *redis, const char *channel, const char *data, int length);
+
 
 // Error generation with stderr message...
 int redisxError(const char *func, int errorCode);

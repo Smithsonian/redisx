@@ -51,6 +51,47 @@ int redisxLoadScript(Redis *redis, const char *script, char **sha1) {
 }
 
 /**
+ * Returns an EVAL argument array for the given Redis script and its keys and parameters.
+ *
+ * @param sha1        script SHA1 sum
+ * @param keys        NULL-terminated array of Redis keys to pass to script, or NULL if the
+ *                    script requires no keys.
+ * @param params      NULL-terminated array of other parameters to pass to script, or NULL
+ *                    if the script requires no parameters
+ * @param[out] nargs  number of entries in returned argument array
+ * @return            array containing EVAL command and arguments.
+ *
+ * @sa redisxRunScript()
+ * @sa redisxRunScriptAsync()
+ */
+static const char **rGetScriptArgs(const char *sha1, const char **keys, const char **params, int *nargs) {
+  const char **args;
+  char sn[20];
+  int i = 0,k, nkeys = 0, nparams = 0, n;
+
+  if(keys) while(keys[nkeys]) nkeys++;
+  if(params) while(params[nparams]) nparams++;
+
+  n = 3 + nkeys + nparams;
+  sprintf(sn, "%d", nkeys);
+  args = (const char **) malloc(n * sizeof(char *));
+  if(!args) {
+    *nargs = x_error(0, errno, "rGetScriptArgs", "alloc() error (%d char *)", n);
+    return NULL;
+  }
+
+  args[i++] = "EVALSHA";
+  args[i++] = (char *) sha1;
+  args[i++] = sn;
+
+  for(k = 0; k < nkeys; k++) args[i++] = (char *) keys[k];
+  for(k = 0; k < nparams; k++) args[i++] = (char *) params[k];
+
+  *nargs = n;
+  return args;
+}
+
+/**
  * Send a request to runs a LUA script that has been loaded into the Redis database. This function should
  * be called with the connected client's mutex locked. The call returns as soon as the request has been
  * sent, without waiting for a response to come back.
@@ -72,33 +113,20 @@ int redisxLoadScript(Redis *redis, const char *script, char **sha1) {
 int redisxRunScriptAsync(RedisClient *cl, const char *sha1, const char **keys, const char **params) {
   static const char *fn = "redisxRunScriptAsync";
 
-  int i = 0, k, nkeys = 0, nparams = 0, nargs;
-  char sn[20], **args;
+  const char **args;
+  int nargs, status;
 
   prop_error(fn, rCheckClient(cl));
 
   if(sha1 == NULL) return x_error(X_NULL, EINVAL, fn, "input script SHA1 sum is NULL");
 
-  if(keys) while(keys[nkeys]) nkeys++;
-  if(params) while(params[nparams]) nparams++;
+  args = rGetScriptArgs(sha1, keys, params, &nargs);
+  prop_error(fn, nargs);
 
-  nargs = 3 + nkeys + nparams;
-  sprintf(sn, "%d", nkeys);
-  args = (char **) malloc(nargs * sizeof(char *));
-  if(!args) return x_error(X_NULL, errno, fn, "malloc() error");
-
-  args[i++] = "EVALSHA";
-  args[i++] = (char *) sha1;
-  args[i++] = sn;
-
-  for(k = 0; k < nkeys; k++) args[i++] = (char *) keys[k];
-  for(k = 0; k < nparams; k++) args[i++] = (char *) params[k];
-
-  i = redisxSendArrayRequestAsync(cl, (const char **) args, NULL, nargs);
+  status = redisxSendArrayRequestAsync(cl, (const char **) args, NULL, nargs);
   free(args);
 
-  prop_error(fn, i);
-
+  prop_error(fn, status);
   return X_SUCCESS;
 }
 
@@ -122,23 +150,26 @@ int redisxRunScriptAsync(RedisClient *cl, const char *sha1, const char **keys, c
 RESP *redisxRunScript(Redis *redis, const char *sha1, const char **keys, const char **params, int *status) {
   static const char *fn = "redisxRunScript";
 
+  const char **args;
+  int nargs;
   RESP *reply = NULL;
 
   if(redisxCheckValid(redis) != X_SUCCESS) return x_trace_null(fn, NULL);
 
   if(sha1 == NULL) {
+    if(status) *status = X_NULL;
     x_error(0, EINVAL, fn, "sha1 parameter is NULL");
     return NULL;
   }
 
-  if(redisxLockConnected(redis->interactive) != X_SUCCESS) return x_trace_null(fn, NULL);
+  args = rGetScriptArgs(sha1, keys, params, &nargs);
+  if(!args) {
+    if(status) *status = nargs;
+    return x_trace_null(fn, NULL);
+  }
 
-  if(redisxRunScriptAsync(redis->interactive, sha1, keys, params) == X_SUCCESS)
-    reply = redisxReadReplyAsync(redis->interactive, status);
-
-  redisxUnlockClient(redis->interactive);
-
-  if(reply == NULL) return x_trace_null(fn, NULL);
+  reply = redisxArrayRequest(redis, args, NULL, nargs, status);
+  free(args);
 
   return reply;
 }
