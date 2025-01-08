@@ -5,6 +5,8 @@ var redisx_client_8c =
     [ "redisxClearAttributesAsync", "redisx-client_8c.html#a576bb47774aaf4d5d735a5ef18253048", null ],
     [ "redisxExecBlockAsync", "redisx-client_8c.html#a766ad80d9b84f4ca16be3da08e1968c9", null ],
     [ "redisxGetAttributesAsync", "redisx-client_8c.html#a6c9d4ce9babbcaac35e45f536d47858d", null ],
+    [ "redisxGetAvailable", "redisx-client_8c.html#a66c0fd419669b68344cf1f35168c8919", null ],
+    [ "redisxGetAvailableAsync", "redisx-client_8c.html#a0060b460e43c3b0d15d5dee9f8937c35", null ],
     [ "redisxGetClient", "redisx-client_8c.html#a14907be8fba6a13505a352673cea5895", null ],
     [ "redisxGetLockedConnectedClient", "redisx-client_8c.html#a19d2fb18f2f939edfdc412d064741f9f", null ],
     [ "redisxIgnoreReplyAsync", "redisx-client_8c.html#ac0f30d62044638a2ead07583ad723fdf", null ],

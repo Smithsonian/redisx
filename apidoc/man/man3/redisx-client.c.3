@@ -30,6 +30,12 @@ src/redisx-client.c
 .RI "const \fBRESP\fP * \fBredisxGetAttributesAsync\fP (const \fBRedisClient\fP *cl)"
 .br
 .ti -1c
+.RI "int \fBredisxGetAvailable\fP (\fBRedisClient\fP *cl)"
+.br
+.ti -1c
+.RI "int \fBredisxGetAvailableAsync\fP (\fBRedisClient\fP *cl)"
+.br
+.ti -1c
 .RI "\fBRedisClient\fP * \fBredisxGetClient\fP (\fBRedis\fP *redis, enum \fBredisx_channel\fP channel)"
 .br
 .ti -1c
@@ -192,6 +198,52 @@ The attributes last received (possibly NULL)\&.
 
 .PP
 References \fBx_error()\fP\&.
+.SS "int redisxGetAvailable (\fBRedisClient\fP * cl)"
+Returns the number of bytes of response available on the given \fBRedis\fP client connection\&. This is the synchronized version, which will obtain a exclusive lock on the client before determining the result\&.
+.PP
+\fBParameters\fP
+.RS 4
+\fIcl\fP a locked and connected \fBRedis\fP client 
+.RE
+.PP
+\fBReturns\fP
+.RS 4
+the number of bytes of response available on the client, or else an error code <0\&.
+.RE
+.PP
+\fBSee also\fP
+.RS 4
+\fBredisxGetAvailableAsync()\fP 
+.RE
+.PP
+
+.PP
+References \fBredisxGetAvailable()\fP, \fBredisxLockConnected()\fP, and \fBredisxUnlockClient()\fP\&.
+.SS "int redisxGetAvailableAsync (\fBRedisClient\fP * cl)"
+Returns the number of bytes of response available on the given \fBRedis\fP client connection\&. This version assumes the caller has exclusive access to the client\&.
+.PP
+\fBParameters\fP
+.RS 4
+\fIcl\fP a locked and connected \fBRedis\fP client 
+.RE
+.PP
+\fBReturns\fP
+.RS 4
+the number of bytes of response available on the client, or else an error code <0\&.
+.RE
+.PP
+\fBSee also\fP
+.RS 4
+\fBredisxGetAvailable()\fP 
+.PP
+\fBredisxLockConnected()\fP 
+.PP
+\fBredisxReadReplyAsync()\fP 
+.RE
+.PP
+
+.PP
+References \fBx_error()\fP, and \fBX_FAILURE\fP\&.
 .SS "\fBRedisClient\fP * redisxGetClient (\fBRedis\fP * redis, enum \fBredisx_channel\fP channel)"
 Returns the redis client for a given connection type in a \fBRedis\fP instance\&.
 .PP
@@ -318,7 +370,14 @@ Reads a response from \fBRedis\fP and returns it\&.
 .PP
 \fBReturns\fP
 .RS 4
-The \fBRESP\fP structure for the reponse received from \fBRedis\fP, or NULL if an error was encountered (errno will be set to describe the error, which may either be an errno produced by recv() or EBADMSG if the message was corrupted and/or unparseable\&. If the error is irrecoverable i\&.e\&., other than a timeout, the client will be disabled\&.) 
+The \fBRESP\fP structure for the reponse received from \fBRedis\fP, or NULL if an error was encountered (errno will be set to describe the error, which may either be an errno produced by recv() or EBADMSG if the message was corrupted and/or unparseable\&. If the error is irrecoverable i\&.e\&., other than a timeout, the client will be disabled\&.)
+.RE
+.PP
+\fBSee also\fP
+.RS 4
+\fBredisxSetReplyTimeout()\fP 
+.PP
+redisxGetAvailavleAsync() 
 .RE
 .PP
 

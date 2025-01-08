@@ -71,6 +71,9 @@ src/redisx.c \- A \fBRedis\fP client library that compiles on older and newer pl
 .RI "int \fBredisxSetPushProcessor\fP (\fBRedis\fP *redis, \fBRedisPushProcessor\fP func, void *arg)"
 .br
 .ti -1c
+.RI "int \fBredisxSetReplyTimeout\fP (\fBRedis\fP *redis, int timeoutMillis)"
+.br
+.ti -1c
 .RI "int \fBredisxSetSocketConfigurator\fP (\fBRedis\fP *redis, \fBRedisSocketConfigurator\fP func)"
 .br
 .ti -1c
@@ -559,6 +562,29 @@ X_SUCCESS (0) if successful, or else X_NULL (errno set to EINVAL) if the client 
 
 .PP
 References \fBX_SUCCESS\fP\&.
+.SS "int redisxSetReplyTimeout (\fBRedis\fP * redis, int timeoutMillis)"
+Set a timeout for getting replies on the interactive client\&. This does not affect the pipeline and subscription clients, which do not have a timeout (appropriately for asynchronous processing)
+.PP
+\fBParameters\fP
+.RS 4
+\fIredis\fP Pointer to a \fBRedis\fP instance\&. 
+.br
+\fItimeoutMillis\fP [ms] timeout for interactive responses, or <0 for indefinite\&. 
+.RE
+.PP
+\fBReturns\fP
+.RS 4
+X_SUCCESS (0)\&.
+.RE
+.PP
+\fBSee also\fP
+.RS 4
+\fBredisxSetSocketTimeout()\fP 
+.RE
+.PP
+
+.PP
+References \fBRedis::interactive\fP, and \fBX_SUCCESS\fP\&.
 .SS "int redisxSetSocketConfigurator (\fBRedis\fP * redis, \fBRedisSocketConfigurator\fP func)"
 Sets a user-defined callback for additioan custom configuring of client sockets
 .PP

@@ -20,6 +20,7 @@ var redisx_8c =
     [ "redisxSetPipelineConsumer", "redisx_8c.html#a0799a0a79705d1a7579bdf57879d1fec", null ],
     [ "redisxSetProtocol", "redisx_8c.html#a842cfeb16ae3cb690cb40c5b006dd918", null ],
     [ "redisxSetPushProcessor", "redisx_8c.html#a2caca9bc8a09225edb88699fdda10602", null ],
+    [ "redisxSetReplyTimeout", "redisx_8c.html#abaa3e3716d42d465a4b7536727328e90", null ],
     [ "redisxSetSocketConfigurator", "redisx_8c.html#a085da763bc6a656c649a33dfd296d33f", null ],
     [ "redisxSetSocketErrorHandler", "redisx_8c.html#ad3aaa3b6fb5353a52a7013421baa9b89", null ],
     [ "redisxSetUser", "redisx_8c.html#a3beff3a9e373a0f1de626a8e64da98cf", null ],

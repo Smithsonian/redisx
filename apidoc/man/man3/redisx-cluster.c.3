@@ -232,7 +232,7 @@ Returns the \fBRedis\fP server in a cluster which is to be used for queries rela
 .RS 4
 \fIcluster\fP Pointer to a \fBRedis\fP cluster configuration 
 .br
-\fIkey\fP The \fBRedis\fP keyword of interest\&. It may use hashtags (i\&.e\&., if the keyword contains a segment enclosed in {} brackets, then the hash will be calculated on the bracketed segment only\&. E\&.g\&. \fC{user:1000}\&.name\fP and \fC{user:1000}\&.address\fP will both return the same hash for \fCuser:1000\fP only\&. 
+\fIkey\fP The \fBRedis\fP keyword of interest\&. It may use hashtags (i\&.e\&., if the keyword contains a segment enclosed in {} brackets, then the hash will be calculated on the bracketed segment only\&. E\&.g\&. \fC{user:1000}\&.name\fP and \fC{user:1000}\&.address\fP will both return the same hash for \fCuser:1000\fP only\&. NULL and empty keys are allowed and will return the shard for slot 0\&. 
 .RE
 .PP
 \fBReturns\fP
@@ -249,7 +249,7 @@ A connected \fBRedis\fP server (cluster shard), which can be used for queries on
 .PP
 
 .PP
-References \fBRedisCluster::priv\fP, \fBredisxConnect()\fP, \fBredisxIsConnected()\fP, \fBx_error()\fP, \fBX_NAME_INVALID\fP, \fBX_NO_INIT\fP, \fBX_NULL\fP, and \fBX_SUCCESS\fP\&.
+References \fBRedisCluster::priv\fP, \fBredisxConnect()\fP, \fBredisxIsConnected()\fP, \fBx_error()\fP, \fBX_NO_INIT\fP, \fBX_NULL\fP, and \fBX_SUCCESS\fP\&.
 .SS "\fBRedisCluster\fP * redisxClusterInit (\fBRedis\fP * node)"
 Initializes a \fBRedis\fP cluster configuration using a known cluster node\&. The call will connect to the specified node (if not already connected), and will query the cluster configuration from it\&. On return the input node's connection state remains what it was prior to the call\&.
 .PP

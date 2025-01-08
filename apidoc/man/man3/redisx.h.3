@@ -276,6 +276,12 @@ include/redisx.h
 .RI "const \fBRESP\fP * \fBredisxGetAttributesAsync\fP (const \fBRedisClient\fP *cl)"
 .br
 .ti -1c
+.RI "int \fBredisxGetAvailable\fP (\fBRedisClient\fP *cl)"
+.br
+.ti -1c
+.RI "int \fBredisxGetAvailableAsync\fP (\fBRedisClient\fP *cl)"
+.br
+.ti -1c
 .RI "\fBRedisClient\fP * \fBredisxGetClient\fP (\fBRedis\fP *redis, enum \fBredisx_channel\fP channel)"
 .br
 .ti -1c
@@ -451,6 +457,9 @@ include/redisx.h
 .br
 .ti -1c
 .RI "int \fBredisxSetPushProcessor\fP (\fBRedis\fP *redis, \fBRedisPushProcessor\fP func, void *arg)"
+.br
+.ti -1c
+.RI "int \fBredisxSetReplyTimeout\fP (\fBRedis\fP *redis, int timeoutMillis)"
 .br
 .ti -1c
 .RI "int \fBredisxSetScanCount\fP (\fBRedis\fP *redis, int count)"
@@ -1174,7 +1183,7 @@ Returns the \fBRedis\fP server in a cluster which is to be used for queries rela
 .RS 4
 \fIcluster\fP Pointer to a \fBRedis\fP cluster configuration 
 .br
-\fIkey\fP The \fBRedis\fP keyword of interest\&. It may use hashtags (i\&.e\&., if the keyword contains a segment enclosed in {} brackets, then the hash will be calculated on the bracketed segment only\&. E\&.g\&. \fC{user:1000}\&.name\fP and \fC{user:1000}\&.address\fP will both return the same hash for \fCuser:1000\fP only\&. 
+\fIkey\fP The \fBRedis\fP keyword of interest\&. It may use hashtags (i\&.e\&., if the keyword contains a segment enclosed in {} brackets, then the hash will be calculated on the bracketed segment only\&. E\&.g\&. \fC{user:1000}\&.name\fP and \fC{user:1000}\&.address\fP will both return the same hash for \fCuser:1000\fP only\&. NULL and empty keys are allowed and will return the shard for slot 0\&. 
 .RE
 .PP
 \fBReturns\fP
@@ -1191,7 +1200,7 @@ A connected \fBRedis\fP server (cluster shard), which can be used for queries on
 .PP
 
 .PP
-References \fBRedisCluster::priv\fP, \fBredisxConnect()\fP, \fBredisxIsConnected()\fP, \fBx_error()\fP, \fBX_NAME_INVALID\fP, \fBX_NO_INIT\fP, \fBX_NULL\fP, and \fBX_SUCCESS\fP\&.
+References \fBRedisCluster::priv\fP, \fBredisxConnect()\fP, \fBredisxIsConnected()\fP, \fBx_error()\fP, \fBX_NO_INIT\fP, \fBX_NULL\fP, and \fBX_SUCCESS\fP\&.
 .SS "\fBRedisCluster\fP * redisxClusterInit (\fBRedis\fP * node)"
 Initializes a \fBRedis\fP cluster configuration using a known cluster node\&. The call will connect to the specified node (if not already connected), and will query the cluster configuration from it\&. On return the input node's connection state remains what it was prior to the call\&.
 .PP
@@ -1579,6 +1588,52 @@ The attributes last received (possibly NULL)\&.
 
 .PP
 References \fBx_error()\fP\&.
+.SS "int redisxGetAvailable (\fBRedisClient\fP * cl)"
+Returns the number of bytes of response available on the given \fBRedis\fP client connection\&. This is the synchronized version, which will obtain a exclusive lock on the client before determining the result\&.
+.PP
+\fBParameters\fP
+.RS 4
+\fIcl\fP a locked and connected \fBRedis\fP client 
+.RE
+.PP
+\fBReturns\fP
+.RS 4
+the number of bytes of response available on the client, or else an error code <0\&.
+.RE
+.PP
+\fBSee also\fP
+.RS 4
+\fBredisxGetAvailableAsync()\fP 
+.RE
+.PP
+
+.PP
+References \fBredisxGetAvailable()\fP, \fBredisxLockConnected()\fP, and \fBredisxUnlockClient()\fP\&.
+.SS "int redisxGetAvailableAsync (\fBRedisClient\fP * cl)"
+Returns the number of bytes of response available on the given \fBRedis\fP client connection\&. This version assumes the caller has exclusive access to the client\&.
+.PP
+\fBParameters\fP
+.RS 4
+\fIcl\fP a locked and connected \fBRedis\fP client 
+.RE
+.PP
+\fBReturns\fP
+.RS 4
+the number of bytes of response available on the client, or else an error code <0\&.
+.RE
+.PP
+\fBSee also\fP
+.RS 4
+\fBredisxGetAvailable()\fP 
+.PP
+\fBredisxLockConnected()\fP 
+.PP
+\fBredisxReadReplyAsync()\fP 
+.RE
+.PP
+
+.PP
+References \fBx_error()\fP, and \fBX_FAILURE\fP\&.
 .SS "\fBRedisClient\fP * redisxGetClient (\fBRedis\fP * redis, enum \fBredisx_channel\fP channel)"
 Returns the redis client for a given connection type in a \fBRedis\fP instance\&.
 .PP
@@ -2517,7 +2572,14 @@ Reads a response from \fBRedis\fP and returns it\&.
 .PP
 \fBReturns\fP
 .RS 4
-The \fBRESP\fP structure for the reponse received from \fBRedis\fP, or NULL if an error was encountered (errno will be set to describe the error, which may either be an errno produced by recv() or EBADMSG if the message was corrupted and/or unparseable\&. If the error is irrecoverable i\&.e\&., other than a timeout, the client will be disabled\&.) 
+The \fBRESP\fP structure for the reponse received from \fBRedis\fP, or NULL if an error was encountered (errno will be set to describe the error, which may either be an errno produced by recv() or EBADMSG if the message was corrupted and/or unparseable\&. If the error is irrecoverable i\&.e\&., other than a timeout, the client will be disabled\&.)
+.RE
+.PP
+\fBSee also\fP
+.RS 4
+\fBredisxSetReplyTimeout()\fP 
+.PP
+redisxGetAvailavleAsync() 
 .RE
 .PP
 
@@ -3071,6 +3133,29 @@ X_SUCCESS (0) if successful, or else X_NULL (errno set to EINVAL) if the client 
 
 .PP
 References \fBX_SUCCESS\fP\&.
+.SS "int redisxSetReplyTimeout (\fBRedis\fP * redis, int timeoutMillis)"
+Set a timeout for getting replies on the interactive client\&. This does not affect the pipeline and subscription clients, which do not have a timeout (appropriately for asynchronous processing)
+.PP
+\fBParameters\fP
+.RS 4
+\fIredis\fP Pointer to a \fBRedis\fP instance\&. 
+.br
+\fItimeoutMillis\fP [ms] timeout for interactive responses, or <0 for indefinite\&. 
+.RE
+.PP
+\fBReturns\fP
+.RS 4
+X_SUCCESS (0)\&.
+.RE
+.PP
+\fBSee also\fP
+.RS 4
+\fBredisxSetSocketTimeout()\fP 
+.RE
+.PP
+
+.PP
+References \fBRedis::interactive\fP, and \fBX_SUCCESS\fP\&.
 .SS "int redisxSetScanCount (\fBRedis\fP * redis, int count)"
 Sets the COUNT parameter to use with \fBRedis\fP SCAN type commands\&. COUNT specifies how much work \fBRedis\fP should do in a single scan iteration\&. 0 (or negative) values can be used to scan with defaults (without the COUNT option), which is usually equivalent to COUNT=10\&. When scanning large datasets, it may take many scan calls to go through all the data\&. When networking has limited bandwidth, or large latencies it may be desirable to do more work per call on the server side to reduce traffic\&. However, the cost of larger COUNT values is that it may increase server latencies for other queries\&.
 .PP
@@ -3165,7 +3250,9 @@ X_SUCCESS if the handler was successfully configured, or X_NULL if the \fBRedis\
 .PP
 References \fBX_SUCCESS\fP\&.
 .SS "int redisxSetSocketTimeout (\fBRedis\fP * redis, int millis)"
-Sets a socket timeout for future client connections on a \fBRedis\fP instance\&. If not set (or set to zero or a negative value), then the timeout will not be configured for sockets, and the system default timeout values will apply\&.
+Sets a socket timeout for future client connections on a \fBRedis\fP instance\&. Effectively this is a timeout for send() only\&. The timeout for interatvice replies is controlled separately via redisxSetReplyTimoeut()\&.
+.PP
+If not set (or set to zero or a negative value), then the timeout will not be configured for sockets, and the system default timeout values will apply\&.
 .PP
 \fBParameters\fP
 .RS 4
@@ -3176,7 +3263,12 @@ Sets a socket timeout for future client connections on a \fBRedis\fP instance\&.
 .PP
 \fBReturns\fP
 .RS 4
-X_SUCCESS (0) if successful, or else X_NULL if the redis instance is NULL, or X_NO_INIT if the redis instance is not initialized\&. 
+X_SUCCESS (0) if successful, or else X_NULL if the redis instance is NULL, or X_NO_INIT if the redis instance is not initialized\&.
+.RE
+.PP
+\fBSee also\fP
+.RS 4
+\fBredisxSetReplyTimeout()\fP 
 .RE
 .PP
 

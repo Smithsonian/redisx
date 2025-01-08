@@ -254,7 +254,9 @@ X_SUCCESS (0) if successful, or else X_NULL if the redis instance is NULL, or X_
 .PP
 References \fBredisxIsConnected()\fP, \fBX_ALREADY_OPEN\fP, \fBx_error()\fP, \fBX_FAILURE\fP, and \fBX_SUCCESS\fP\&.
 .SS "int redisxSetSocketTimeout (\fBRedis\fP * redis, int millis)"
-Sets a socket timeout for future client connections on a \fBRedis\fP instance\&. If not set (or set to zero or a negative value), then the timeout will not be configured for sockets, and the system default timeout values will apply\&.
+Sets a socket timeout for future client connections on a \fBRedis\fP instance\&. Effectively this is a timeout for send() only\&. The timeout for interatvice replies is controlled separately via redisxSetReplyTimoeut()\&.
+.PP
+If not set (or set to zero or a negative value), then the timeout will not be configured for sockets, and the system default timeout values will apply\&.
 .PP
 \fBParameters\fP
 .RS 4
@@ -265,7 +267,12 @@ Sets a socket timeout for future client connections on a \fBRedis\fP instance\&.
 .PP
 \fBReturns\fP
 .RS 4
-X_SUCCESS (0) if successful, or else X_NULL if the redis instance is NULL, or X_NO_INIT if the redis instance is not initialized\&. 
+X_SUCCESS (0) if successful, or else X_NULL if the redis instance is NULL, or X_NO_INIT if the redis instance is not initialized\&.
+.RE
+.PP
+\fBSee also\fP
+.RS 4
+\fBredisxSetReplyTimeout()\fP 
 .RE
 .PP
 

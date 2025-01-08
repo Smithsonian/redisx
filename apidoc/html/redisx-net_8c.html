@@ -517,7 +517,8 @@ Functions</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
-<p>Sets a socket timeout for future client connections on a <a class="el" href="structRedis.html" title="Structure that represents a Redis database instance, with one or more RedisClient connections.">Redis</a> instance. If not set (or set to zero or a negative value), then the timeout will not be configured for sockets, and the system default timeout values will apply.</p>
+<p>Sets a socket timeout for future client connections on a <a class="el" href="structRedis.html" title="Structure that represents a Redis database instance, with one or more RedisClient connections.">Redis</a> instance. Effectively this is a timeout for send() only. The timeout for interatvice replies is controlled separately via redisxSetReplyTimoeut().</p>
+<p>If not set (or set to zero or a negative value), then the timeout will not be configured for sockets, and the system default timeout values will apply.</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">redis</td><td>The <a class="el" href="structRedis.html" title="Structure that represents a Redis database instance, with one or more RedisClient connections.">Redis</a> instance </td></tr>
@@ -525,7 +526,8 @@ Functions</h2></td></tr>
   </table>
   </dd>
 </dl>
-<dl class="section return"><dt>Returns</dt><dd>X_SUCCESS (0) if successful, or else X_NULL if the redis instance is NULL, or X_NO_INIT if the redis instance is not initialized. </dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>X_SUCCESS (0) if successful, or else X_NULL if the redis instance is NULL, or X_NO_INIT if the redis instance is not initialized.</dd></dl>
+<dl class="section see"><dt>See also</dt><dd><a class="el" href="redisx_8c.html#abaa3e3716d42d465a4b7536727328e90">redisxSetReplyTimeout()</a> </dd></dl>
 
 <p class="reference">References <a class="el" href="redisx_8h.html#aff9bac60d5293a00d481b5a6701b3882">REDISX_DEFAULT_TIMEOUT_MILLIS</a>, and <a class="elRef" href="../../xchange/apidoc/html/xchange_8h.html#a7b2679c964ea5f2160380ed55654b873">X_SUCCESS</a>.</p>
 

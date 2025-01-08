@@ -163,6 +163,8 @@ Functions</h2></td></tr>
 <tr class="separator:a842cfeb16ae3cb690cb40c5b006dd918"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a2caca9bc8a09225edb88699fdda10602" id="r_a2caca9bc8a09225edb88699fdda10602"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="redisx_8c.html#a2caca9bc8a09225edb88699fdda10602">redisxSetPushProcessor</a> (<a class="el" href="structRedis.html">Redis</a> *redis, <a class="el" href="redisx_8h.html#ac819fe43d592df70e8bbc6b25f4d090b">RedisPushProcessor</a> func, void *arg)</td></tr>
 <tr class="separator:a2caca9bc8a09225edb88699fdda10602"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:abaa3e3716d42d465a4b7536727328e90" id="r_abaa3e3716d42d465a4b7536727328e90"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="redisx_8c.html#abaa3e3716d42d465a4b7536727328e90">redisxSetReplyTimeout</a> (<a class="el" href="structRedis.html">Redis</a> *redis, int timeoutMillis)</td></tr>
+<tr class="separator:abaa3e3716d42d465a4b7536727328e90"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a085da763bc6a656c649a33dfd296d33f" id="r_a085da763bc6a656c649a33dfd296d33f"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="redisx_8c.html#a085da763bc6a656c649a33dfd296d33f">redisxSetSocketConfigurator</a> (<a class="el" href="structRedis.html">Redis</a> *redis, <a class="el" href="redisx_8h.html#a356281f9b55b794cb988b44761bbd0ba">RedisSocketConfigurator</a> func)</td></tr>
 <tr class="separator:a085da763bc6a656c649a33dfd296d33f"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ad3aaa3b6fb5353a52a7013421baa9b89" id="r_ad3aaa3b6fb5353a52a7013421baa9b89"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="redisx_8c.html#ad3aaa3b6fb5353a52a7013421baa9b89">redisxSetSocketErrorHandler</a> (<a class="el" href="structRedis.html">Redis</a> *redis, <a class="el" href="redisx_8h.html#a1c01a3b6357a4dd0ad9499d85d4c0368">RedisErrorHandler</a> f)</td></tr>
@@ -963,6 +965,46 @@ The client on which the push is originated will be locked, thus the implementati
 <dl class="section return"><dt>Returns</dt><dd>X_SUCCESS (0) if successful, or else X_NULL (errno set to EINVAL) if the client argument is NULL, or X_NO_INIT (errno set to EAGAIN) if redis is uninitialized. </dd></dl>
 
 <p class="reference">References <a class="elRef" href="../../xchange/apidoc/html/xchange_8h.html#a7b2679c964ea5f2160380ed55654b873">X_SUCCESS</a>.</p>
+
+</div>
+</div>
+<a id="abaa3e3716d42d465a4b7536727328e90" name="abaa3e3716d42d465a4b7536727328e90"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#abaa3e3716d42d465a4b7536727328e90">&#9670;&#160;</a></span>redisxSetReplyTimeout()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">int redisxSetReplyTimeout </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="structRedis.html">Redis</a> *&#160;</td>
+          <td class="paramname"><em>redis</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">int&#160;</td>
+          <td class="paramname"><em>timeoutMillis</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>Set a timeout for getting replies on the interactive client. This does not affect the pipeline and subscription clients, which do not have a timeout (appropriately for asynchronous processing)</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">redis</td><td>Pointer to a <a class="el" href="structRedis.html" title="Structure that represents a Redis database instance, with one or more RedisClient connections.">Redis</a> instance. </td></tr>
+    <tr><td class="paramname">timeoutMillis</td><td>[ms] timeout for interactive responses, or &lt;0 for indefinite. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>X_SUCCESS (0).</dd></dl>
+<dl class="section see"><dt>See also</dt><dd><a class="el" href="redisx-net_8c.html#aaa87635d37e5d348b7dbb12952b39183">redisxSetSocketTimeout()</a> </dd></dl>
+
+<p class="reference">References <a class="el" href="structRedis.html#af51011d99955d6f036a9f2c291577749">Redis::interactive</a>, and <a class="elRef" href="../../xchange/apidoc/html/xchange_8h.html#a7b2679c964ea5f2160380ed55654b873">X_SUCCESS</a>.</p>
 
 </div>
 </div>

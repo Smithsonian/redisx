@@ -608,6 +608,20 @@
       <arglist>(const RedisClient *cl)</arglist>
     </member>
     <member kind="function">
+      <type>int</type>
+      <name>redisxGetAvailable</name>
+      <anchorfile>redisx_8h.html</anchorfile>
+      <anchor>a66c0fd419669b68344cf1f35168c8919</anchor>
+      <arglist>(RedisClient *cl)</arglist>
+    </member>
+    <member kind="function">
+      <type>int</type>
+      <name>redisxGetAvailableAsync</name>
+      <anchorfile>redisx_8h.html</anchorfile>
+      <anchor>a0060b460e43c3b0d15d5dee9f8937c35</anchor>
+      <arglist>(RedisClient *cl)</arglist>
+    </member>
+    <member kind="function">
       <type>RedisClient *</type>
       <name>redisxGetClient</name>
       <anchorfile>redisx_8h.html</anchorfile>
@@ -1022,6 +1036,13 @@
     </member>
     <member kind="function">
       <type>int</type>
+      <name>redisxSetReplyTimeout</name>
+      <anchorfile>redisx_8h.html</anchorfile>
+      <anchor>abaa3e3716d42d465a4b7536727328e90</anchor>
+      <arglist>(Redis *redis, int timeoutMillis)</arglist>
+    </member>
+    <member kind="function">
+      <type>int</type>
       <name>redisxSetScanCount</name>
       <anchorfile>redisx_8h.html</anchorfile>
       <anchor>a3bd0d2964966ed6655358ff2fe0802c0</anchor>
@@ -1213,6 +1234,20 @@
       <anchorfile>redisx-client_8c.html</anchorfile>
       <anchor>a6c9d4ce9babbcaac35e45f536d47858d</anchor>
       <arglist>(const RedisClient *cl)</arglist>
+    </member>
+    <member kind="function">
+      <type>int</type>
+      <name>redisxGetAvailable</name>
+      <anchorfile>redisx-client_8c.html</anchorfile>
+      <anchor>a66c0fd419669b68344cf1f35168c8919</anchor>
+      <arglist>(RedisClient *cl)</arglist>
+    </member>
+    <member kind="function">
+      <type>int</type>
+      <name>redisxGetAvailableAsync</name>
+      <anchorfile>redisx-client_8c.html</anchorfile>
+      <anchor>a0060b460e43c3b0d15d5dee9f8937c35</anchor>
+      <arglist>(RedisClient *cl)</arglist>
     </member>
     <member kind="function">
       <type>RedisClient *</type>
@@ -1951,6 +1986,13 @@
       <anchorfile>redisx_8c.html</anchorfile>
       <anchor>a2caca9bc8a09225edb88699fdda10602</anchor>
       <arglist>(Redis *redis, RedisPushProcessor func, void *arg)</arglist>
+    </member>
+    <member kind="function">
+      <type>int</type>
+      <name>redisxSetReplyTimeout</name>
+      <anchorfile>redisx_8c.html</anchorfile>
+      <anchor>abaa3e3716d42d465a4b7536727328e90</anchor>
+      <arglist>(Redis *redis, int timeoutMillis)</arglist>
     </member>
     <member kind="function">
       <type>int</type>
