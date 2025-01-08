@@ -1540,9 +1540,6 @@ the redirected Redis instance based on the redirection `RESP`. Once the redirect
 either resubmit the same query as before (e.h. with `redisxSendArrayRequestAsync()`) if `MOVED`, or else repeat the 
 query via an interactive `ASKING` directive using `redisxClusterAskMigrating()`.
 
-A `REDIS_MOVED` error code may be returned by higher-level functions also, which ingest the `RESP` replies from the 
-shard and return a digested error code.
-
 
 <a name="cluster-explicit-connect"></a>
 ### Manual connection management
