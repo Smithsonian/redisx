@@ -42,11 +42,6 @@ ifdef CSTANDARD
   CFLAGS += -std=$(CSTANDARD)
 endif
 
-# Extra warnings (not supported on all compilers)
-ifeq ($(WEXTRA), 1) 
-  CFLAGS += -Wextra
-endif
-
 # Extra linker flags (if any)
 #LDFLAGS=
 
