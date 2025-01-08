@@ -240,6 +240,9 @@ int main(int argc, const char *argv[]) {
   char *sni = NULL;
   int skip_verify = 0;
   int clusterMode = 0;
+  int scan = 0;
+  char *pattern = NULL;
+  int scanCount = 10;
 
   struct poptOption options[] = { //
           {"host",       'h', POPT_ARG_STRING | POPT_ARGFLAG_SHOW_DEFAULT,    &host,     0, "Server hostname.", "<hostname>"}, //
@@ -282,11 +285,14 @@ int main(int argc, const char *argv[]) {
                   "highest to lowest separated by colon (':').", "<list>"}, //
           {"show-pushes", 0, POPT_ARG_STRING  | POPT_ARGFLAG_SHOW_DEFAULT, &push,        0, "Whether to print RESP3 PUSH messages.", "yes|no" }, //
           {"attributes",  0, POPT_ARG_NONE,   &attrib,       0, "Show RESP3 attributes also, if available.", NULL}, //
+          {"scan",        0, POPT_ARG_NONE,   &scan,         0, "List all keys using the SCAN command.", NULL}, //
+          {"pattern",     0, POPT_ARG_STRING, &pattern,      0, "Keys pattern when using the --scan (default: *).", "<glob>"}, //
+          {"count",       0, POPT_ARG_INT     | POPT_ARGFLAG_SHOW_DEFAULT, &scanCount,   0, "Count option when using the --scan.", "<n>"}, //
           {"eval",        0, POPT_ARG_STRING, &push,         0, "Send an EVAL command using the Lua script at <file>.  " //
                   "The keyword and other arguments should be separated with a standalone comma on the command-line, such as: 'key1 key2 , arg1 arg2 ...'", "<file>" //
           },
           {"verbose",     0, POPT_ARG_NONE,   &verbose,      0, "Verbose mode.", NULL }, //
-          {"debug",       0, POPT_ARG_NONE   | POPT_ARGFLAG_DOC_HIDDEN,   &debug,       0, "Debug mode. Prints all network traffic.", NULL }, //
+          {"debug",       0, POPT_ARG_NONE   | POPT_ARGFLAG_DOC_HIDDEN,    &debug,       0, "Debug mode. Prints all network traffic.", NULL }, //
           {"version",     0, POPT_ARG_NONE,   NULL,        'v', "Output version and exit.", NULL }, //
 
           POPT_AUTOHELP POPT_TABLEEND //
@@ -343,6 +349,7 @@ int main(int argc, const char *argv[]) {
   if(debug) redisxDebugTraffic(1);
 
   redis = redisxInit(host);
+  if(!redis) return x_trace(fn, NULL, X_FAILURE);
 
   if(port <= 0) port = 6369;
   else redisxSetPort(redis, port);
@@ -378,7 +385,24 @@ int main(int argc, const char *argv[]) {
     }
   }
 
-  if(!cluster) prop_error(fn, redisxConnect(redis, FALSE));
+  if(!cluster) {
+    prop_error(fn, redisxConnect(redis, FALSE));
+
+    if(scan) {
+      int n = 0, status = X_SUCCESS;
+      char **keys;
+
+      prop_error(fn, redisxSetScanCount(redis, scanCount));
+
+      keys = redisxScanKeys(redis, pattern, &n, &status);
+      prop_error(fn, status);
+
+      for(i = 0; i < n; i++) printf("\"%s\"\n", keys[i]);
+      redisxDestroyKeys(keys, n);
+
+      if(!cmdargs) return status;
+    }
+  }
 
   if(!cmdargs) return interactive(redis);
 
