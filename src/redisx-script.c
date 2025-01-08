@@ -121,10 +121,7 @@ int redisxRunScriptAsync(RedisClient *cl, const char *sha1, const char **keys, c
   if(sha1 == NULL) return x_error(X_NULL, EINVAL, fn, "input script SHA1 sum is NULL");
 
   args = rGetScriptArgs(sha1, keys, params, &nargs);
-  if(!args) {
-    if(args) free(args);
-    return x_trace(fn, NULL, nargs);
-  }
+  if(!args) return x_trace(fn, NULL, nargs);
 
   status = redisxSendArrayRequestAsync(cl, (const char **) args, NULL, nargs);
   free(args);
