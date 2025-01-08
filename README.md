@@ -70,8 +70,8 @@ The __RedisX__ library was created, and is maintained, by Attila Kovács at the 
 &amp; Smithsonian, and it is available through the [Smithsonian/redisx](https://github.com/Smithsonian/redisx) 
 repository on GitHub. 
 
-There are no official releases of __RedisX__ yet. An initial 1.0.0 release is expected in late 2024 or early 2025. 
-Before then the API may undergo slight changes and tweaks. Use the repository as is at your own risk for now.
+There are no official releases of __RedisX__ yet. An initial 1.0.0 release is expected in early 2025. Before then the 
+API may undergo slight changes and tweaks. Use the repository as is at your own risk for now.
 
 <a name="example"></a>
 ### A simple example
@@ -1557,9 +1557,6 @@ the redirected Redis instance based on the redirection `RESP`. Once the redirect
 either resubmit the same query as before (e.h. with `redisxSendArrayRequestAsync()`) if `MOVED`, or else repeat the 
 query via an interactive `ASKING` directive using `redisxClusterAskMigrating()`.
 
-A `REDIS_MOVED` error code may be returned by higher-level functions also, which ingest the `RESP` replies from the 
-shard and return a digested error code.
-
 
 <a name="cluster-explicit-connect"></a>
 ### Manual connection management
@@ -1677,9 +1674,7 @@ settings.
 
 Some obvious ways the library could evolve and grow in the not too distant future:
 
- - TLS support.
  - Automated regression testing and coverage tracking.
- - Keep track of subscription patterns, and automatically resubscribe to them on reconnecting.
  - Add high-level support for managing and calling custom Redis functions.
  - Add more high-level [Redis commands](https://redis.io/docs/latest/commands/), e.g. for lists, streams, etc.
 

@@ -469,10 +469,10 @@ int main(int argc, const char *argv[]) {
 
   for(i = 0; i < repeat; i++) {
     if(i > 0 && interval > 0.0) {
-      struct timespec sleeptime;
-      sleeptime.tv_sec = (int) interval;
-      sleeptime.tv_nsec = 1000000000 * (interval - sleeptime.tv_sec);
-      nanosleep(&sleeptime, NULL);
+      struct timespec nap;
+      nap.tv_sec = (int) interval;
+      nap.tv_nsec = 1000000000 * (interval - nap.tv_sec);
+      nanosleep(&nap, NULL);
     }
 
     if(nargs) process(cmdargs, nargs);
