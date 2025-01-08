@@ -135,8 +135,8 @@ And at every step, you should check for and [handle errors](#error-handling) as 
  | attributes                        |  __yes__   | (optional) on demand                                         |
  | Sentinel support                  |  __yes__   | _help me test it_                                            |
  | cluster support                   |  __yes__   | _help me test it_                                            |
- | ... MOVED redirection               |  __yes__   | automatic for interative transactions                        |
- | ... ASK redirection                 |  __yes__   | automatic for interative transactions                        |
+ | ... MOVED redirection             |  __yes__   | automatic for interactive transactions                       |
+ | ... ASK redirection               |  __yes__   | automatic for interactive transactions                       |
  | TLS support                       |  __yes__   | _help me test it_                                            |
 
 
