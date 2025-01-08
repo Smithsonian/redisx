@@ -572,7 +572,7 @@ int redisxGetScanCount(Redis *redis) {
 }
 
 static int compare_strings(const void *a, const void *b) {
-  return strcmp((char *) a, (char *)b);
+  return strcmp(*(char **) a, *(char **) b);
 }
 
 /**
