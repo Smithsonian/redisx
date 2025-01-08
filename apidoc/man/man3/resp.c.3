@@ -154,7 +154,7 @@ X_SUCCESS (0) if the \fBRESP\fP passes the tests, or X_NULL if the \fBRESP\fP is
 .PP
 or the error returned in resp->n\&. 
 .PP
-References \fBRESP::n\fP, \fBREDIS_NULL\fP, \fBREDIS_UNEXPECTED_RESP\fP, \fBRESP3_BOOLEAN\fP, \fBRESP3_NULL\fP, \fBRESP_INT\fP, \fBRESP::type\fP, \fBRESP::value\fP, \fBx_error()\fP, \fBX_FAILURE\fP, \fBX_NULL\fP, and \fBX_SUCCESS\fP\&.
+References \fBRESP::n\fP, \fBREDIS_MIGRATING\fP, \fBREDIS_MOVED\fP, \fBREDIS_NULL\fP, \fBREDIS_UNEXPECTED_RESP\fP, \fBredisxClusterIsMigrating()\fP, \fBredisxClusterMoved()\fP, \fBRESP3_BOOLEAN\fP, \fBRESP3_NULL\fP, \fBRESP_INT\fP, \fBRESP::type\fP, \fBRESP::value\fP, \fBx_error()\fP, \fBX_FAILURE\fP, \fBX_NULL\fP, and \fBX_SUCCESS\fP\&.
 .SS "\fBRESP\fP * redisxCopyOfRESP (const \fBRESP\fP * resp)"
 Creates an independent deep copy of the \fBRESP\fP, which shares no references with the original\&.
 .PP

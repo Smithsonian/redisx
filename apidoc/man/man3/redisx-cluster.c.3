@@ -1,0 +1,357 @@
+.TH "src/redisx-cluster.c" 3 "Version v0.9" "RedisX" \" -*- nroff -*-
+.ad l
+.nh
+.SH NAME
+src/redisx-cluster.c
+.SH SYNOPSIS
+.br
+.PP
+.SS "Functions"
+
+.in +1c
+.ti -1c
+.RI "\fBRESP\fP * \fBredisxClusterAskMigrating\fP (\fBRedis\fP *redis, const char **args, const int *lengths, int n, int *status)"
+.br
+.ti -1c
+.RI "int \fBredisxClusterAskMigratingAsync\fP (\fBRedisClient\fP *cl, const char **args, const int *lengths, int n)"
+.br
+.ti -1c
+.RI "int \fBredisxClusterConnect\fP (\fBRedisCluster\fP *cluster)"
+.br
+.ti -1c
+.RI "void \fBredisxClusterDestroy\fP (\fBRedisCluster\fP *cluster)"
+.br
+.ti -1c
+.RI "int \fBredisxClusterDisconnect\fP (\fBRedisCluster\fP *cluster)"
+.br
+.ti -1c
+.RI "\fBRedis\fP * \fBredisxClusterGetRedirection\fP (\fBRedisCluster\fP *cluster, const \fBRESP\fP *redirect, \fBboolean\fP refresh)"
+.br
+.ti -1c
+.RI "\fBRedis\fP * \fBredisxClusterGetShard\fP (\fBRedisCluster\fP *cluster, const char *key)"
+.br
+.ti -1c
+.RI "\fBRedisCluster\fP * \fBredisxClusterInit\fP (\fBRedis\fP *node)"
+.br
+.ti -1c
+.RI "\fBboolean\fP \fBredisxClusterIsMigrating\fP (const \fBRESP\fP *reply)"
+.br
+.ti -1c
+.RI "\fBboolean\fP \fBredisxClusterIsRedirected\fP (const \fBRESP\fP *reply)"
+.br
+.ti -1c
+.RI "\fBboolean\fP \fBredisxClusterMoved\fP (const \fBRESP\fP *reply)"
+.br
+.in -1c
+.SH "Detailed Description"
+.PP 
+
+.PP
+\fBDate\fP
+.RS 4
+Created on Jan 2, 2025 
+.RE
+.PP
+\fBAuthor\fP
+.RS 4
+Attila Kovacs 
+.RE
+.PP
+
+.SH "Function Documentation"
+.PP 
+.SS "\fBRESP\fP * redisxClusterAskMigrating (\fBRedis\fP * redis, const char ** args, const int * lengths, int n, int * status)"
+Makes a redirected transaction using the ASKING directive to the specific client\&. This should be in response to an -ASK redirection error to obtain a key that is in a slot that is currently migrating\&. The requested \fBRedis\fP command arguments are sent prefixed with the 'ASKING' directive, as per the \fBRedis\fP Cluster specification\&.
+.PP
+\fBParameters\fP
+.RS 4
+\fIredis\fP Redirected \fBRedis\fP instance, e\&.g\&. from redisxClusterGetRedirect() 
+.br
+\fIargs\fP Original command arguments that were redirected 
+.br
+\fIlengths\fP Original argument byte lengths redirected (or NULL to use strlen() automatically)\&. 
+.br
+\fIn\fP Original number of arguments\&. 
+.br
+\fIstatus\fP Pointer to integer in which to return status: X_SUCCESS (0) if successful or else and error code <0\&. 
+.RE
+.PP
+\fBReturns\fP
+.RS 4
+The response to the \fCASKING\fP query from the redirected server\&.
+.RE
+.PP
+\fBSee also\fP
+.RS 4
+\fBredisxClusterAskMigratingAsync()\fP 
+.PP
+\fBredisxClusterIsMigrating()\fP 
+.PP
+redisxClusterGetRedirect() 
+.PP
+\fBredisxArrayRequest()\fP 
+.RE
+.PP
+
+.PP
+References \fBRedis::interactive\fP, \fBredisxCheckValid()\fP, \fBredisxClearAttributesAsync()\fP, \fBredisxClusterAskMigratingAsync()\fP, \fBredisxLockConnected()\fP, \fBredisxReadReplyAsync()\fP, \fBredisxUnlockClient()\fP, \fBX_SUCCESS\fP, and \fBx_trace_null()\fP\&.
+.SS "int redisxClusterAskMigratingAsync (\fBRedisClient\fP * cl, const char ** args, const int * lengths, int n)"
+Makes a redirected request using the ASKING directive to the specific client\&. This should be in response to an -ASK redirection error to obtain a key that is in a slot that is currently migrating\&. The requested \fBRedis\fP command arguments are sent prefixed with the 'ASKING' directive, as per the \fBRedis\fP Cluster specification\&.
+.PP
+This function should be called with exclusive access to the client\&.
+.PP
+\fBParameters\fP
+.RS 4
+\fIcl\fP Locked client on a redirected \fBRedis\fP instance, e\&.g\&. from redisxClusterGetRedirect() 
+.br
+\fIargs\fP Original command arguments that were redirected 
+.br
+\fIlengths\fP Original argument byte lengths redirected (or NULL to use strlen() automatically)\&. 
+.br
+\fIn\fP Original number of arguments\&. 
+.RE
+.PP
+\fBReturns\fP
+.RS 4
+X_SUCCESS (0) if successful or else and error code <0\&.
+.RE
+.PP
+\fBSee also\fP
+.RS 4
+\fBredisxClusterAskMigrating()\fP 
+.PP
+\fBredisxClusterIsMigrating()\fP 
+.PP
+redisxClusterGetRedirect() 
+.PP
+\fBredisxArrayRequest()\fP 
+.RE
+.PP
+
+.PP
+References \fBredisxSendArrayRequestAsync()\fP, \fBx_error()\fP, \fBX_FAILURE\fP, \fBX_NO_SERVICE\fP, \fBX_NULL\fP, \fBX_SUCCESS\fP, and \fBxStringCopyOf()\fP\&.
+.SS "int redisxClusterConnect (\fBRedisCluster\fP * cluster)"
+Connects all shards of a \fBRedis\fP cluster\&. Shards normally get connected on demand\&. Thus, this function is only necessary if the user wants to ensure that all shards are connected before using the cluster\&.
+.PP
+Note, that if the cluster configuration changes while connected, the automatically reconfigured cluster will not automatically reconnect to the new shards during the reconfiguration\&. However, the new shards will still connect on demand when accessed via redisClusterGetShard()\&.
+.PP
+\fBParameters\fP
+.RS 4
+\fIcluster\fP Pointer to a \fBRedis\fP cluster configuration 
+.RE
+.PP
+\fBReturns\fP
+.RS 4
+X_SUCCESS (0) if successful, or else a RedisX error code <0 (errno will also indicate the type of error)\&.
+.RE
+.PP
+\fBSee also\fP
+.RS 4
+\fBredisxClusterInit()\fP 
+.PP
+\fBredisxClusterConnect()\fP 
+.PP
+\fBredisxClusterGetShard()\fP 
+.RE
+.PP
+
+.PP
+References \fBRedisCluster::priv\fP, \fBredisxConnect()\fP, \fBx_error()\fP, \fBX_NO_INIT\fP, \fBX_NULL\fP, \fBX_SUCCESS\fP, \fBx_trace()\fP, and \fBxvprintf\fP\&.
+.SS "void redisxClusterDestroy (\fBRedisCluster\fP * cluster)"
+Destroys a \fBRedis\fP cluster configuration, freeing up all resources used, but not before disconnecting from all shards that may be in a connected state\&.
+.PP
+\fBParameters\fP
+.RS 4
+\fIcluster\fP Pointer to a \fBRedis\fP cluster configuration\&.
+.RE
+.PP
+\fBSee also\fP
+.RS 4
+\fBredisxClusterInit()\fP 
+.RE
+.PP
+
+.PP
+References \fBRedisCluster::priv\fP, and \fBredisxClusterDisconnect()\fP\&.
+.SS "int redisxClusterDisconnect (\fBRedisCluster\fP * cluster)"
+Disconnects from all shards of a \fBRedis\fP cluster\&. Note, that a cluster can still be used even after it is disconnected, since each call to \fBredisxClusterGetShard()\fP will automatically reconnect the requested shard as needed\&.
+.PP
+\fBParameters\fP
+.RS 4
+\fIcluster\fP Pointer to a \fBRedis\fP cluster configuration 
+.RE
+.PP
+\fBReturns\fP
+.RS 4
+X_SUCCESS (0) if successful, or else a RedisX error code <0 (errno will also indicate the type of error)\&.
+.RE
+.PP
+\fBSee also\fP
+.RS 4
+\fBredisxClusterInit()\fP 
+.PP
+\fBredisxClusterConnect()\fP 
+.RE
+.PP
+
+.PP
+References \fBRedisCluster::priv\fP, \fBredisxDisconnect()\fP, \fBx_error()\fP, \fBX_NO_INIT\fP, \fBX_NULL\fP, \fBX_SUCCESS\fP, and \fBxvprintf\fP\&.
+.SS "\fBRedis\fP * redisxClusterGetRedirection (\fBRedisCluster\fP * cluster, const \fBRESP\fP * redirect, \fBboolean\fP refresh)"
+Parses a \fC-MOVED\fP or \fC-ASK\fP redirection response from a \fBRedis\fP cluster node, to obtain the shard from which the same keyword that caused the error can now be accessed\&.
+.PP
+\fBParameters\fP
+.RS 4
+\fIcluster\fP \fBRedis\fP cluster configuration 
+.br
+\fIredirect\fP the redirection response sent to a keyword query 
+.br
+\fIrefresh\fP whether it should refresh the cluster configuration and try again if the redirection target is not found in the current cluster configuration\&. 
+.RE
+.PP
+\fBReturns\fP
+.RS 4
+the migrated server, from which the keyword should be queried now\&.
+.RE
+.PP
+\fBSee also\fP
+.RS 4
+\fBredisxClusterMoved()\fP 
+.PP
+\fBredisxClusterIsMigrating()\fP 
+.PP
+\fBredisxClusterAskMigrating()\fP 
+.RE
+.PP
+
+.PP
+References \fBredisxClusterIsMigrating()\fP, \fBredisxClusterMoved()\fP, \fBRESP::value\fP, \fBx_error()\fP, \fBX_PARSE_ERROR\fP, and \fBxStringCopyOf()\fP\&.
+.SS "\fBRedis\fP * redisxClusterGetShard (\fBRedisCluster\fP * cluster, const char * key)"
+Returns the \fBRedis\fP server in a cluster which is to be used for queries relating to the specified \fBRedis\fP keyword\&. In \fBRedis\fP cluster configurations, the database is distributed in a way that each cluster node serves only a subset of the \fBRedis\fP keys\&. Thus, this function allows to identify the node that serves a given key\&. The function supports Redish hashtags according to the specification\&.
+.PP
+\fBParameters\fP
+.RS 4
+\fIcluster\fP Pointer to a \fBRedis\fP cluster configuration 
+.br
+\fIkey\fP The \fBRedis\fP keyword of interest\&. It may use hashtags (i\&.e\&., if the keyword contains a segment enclosed in {} brackets, then the hash will be calculated on the bracketed segment only\&. E\&.g\&. \fC{user:1000}\&.name\fP and \fC{user:1000}\&.address\fP will both return the same hash for \fCuser:1000\fP only\&. 
+.RE
+.PP
+\fBReturns\fP
+.RS 4
+A connected \fBRedis\fP server (cluster shard), which can be used for queries on the given keyword, or NULL if either input pointer is NULL (errno = EINVAL), or the cluster has not been initialized (errno = ENXIO), or if no node could be connected to serve queries for the given key (errno = EAGAIN)\&.
+.RE
+.PP
+\fBSee also\fP
+.RS 4
+\fBredisxClusterInit()\fP 
+.PP
+\fBredisxClusterMoved()\fP 
+.RE
+.PP
+
+.PP
+References \fBRedisCluster::priv\fP, \fBredisxConnect()\fP, \fBredisxIsConnected()\fP, \fBx_error()\fP, \fBX_NAME_INVALID\fP, \fBX_NO_INIT\fP, \fBX_NULL\fP, and \fBX_SUCCESS\fP\&.
+.SS "\fBRedisCluster\fP * redisxClusterInit (\fBRedis\fP * node)"
+Initializes a \fBRedis\fP cluster configuration using a known cluster node\&. The call will connect to the specified node (if not already connected), and will query the cluster configuration from it\&. On return the input node's connection state remains what it was prior to the call\&.
+.PP
+The caller may try multiple nodes from a list of known cluster nodes, until a valid (non-NULL) configuration is returned\&.
+.PP
+The returned cluster will inherit configuration from the node, including user authentication, socket configuration, connection / disconnection hooks, and asynchronous processing functions\&. Thus, you may configure the node as usual prior to this call, knowing that the nodes in the cluster will be configured the same way also\&.
+.PP
+\fBParameters\fP
+.RS 4
+\fInode\fP A known cluster node (connected or not)\&. It's configuration will be used for all cluster nodes discovered also\&. 
+.RE
+.PP
+\fBReturns\fP
+.RS 4
+The \fBRedis\fP cluster configuration obtained from the node, or else NULL if there was an error (errno may indicate the type of error)\&.
+.RE
+.PP
+\fBSee also\fP
+.RS 4
+\fBredisxClusterGetShard()\fP 
+.PP
+\fBredisxClusterDestroy()\fP 
+.PP
+\fBredisxClusterConnect()\fP 
+.RE
+.PP
+
+.PP
+References \fBRedisCluster::priv\fP, \fBredisxClusterDestroy()\fP, \fBredisxHasPipeline()\fP, and \fBx_trace_null()\fP\&.
+.SS "\fBboolean\fP redisxClusterIsMigrating (const \fBRESP\fP * reply)"
+Checks if the reply is an error indicating that the query is for a slot that is currently migrating to another shard (i\&.e\&., \fCASK\fP redirection)\&. You may need to use an \fCASKING\fP directive, e\&.g\&. via \fBredisxClusterAskMigrating()\fP on the node specified in the message to access the key\&.
+.PP
+\fBParameters\fP
+.RS 4
+\fIreply\fP The response obtained from the \fBRedis\fP shard / server\&. 
+.RE
+.PP
+\fBReturns\fP
+.RS 4
+TRUE (1) if the reply is an error indicating that the cluster has been reconfigured and the key has moved to another shard\&.
+.RE
+.PP
+\fBSee also\fP
+.RS 4
+\fBredisxClusterMoved()\fP 
+.PP
+\fBredisxClusterIsRedirected()\fP 
+.PP
+\fBredisxClusterAskMigrating()\fP 
+.RE
+.PP
+
+.PP
+References \fBFALSE\fP, \fBRESP::n\fP, \fBRESP_ERROR\fP, \fBRESP::type\fP, and \fBRESP::value\fP\&.
+.SS "\fBboolean\fP redisxClusterIsRedirected (const \fBRESP\fP * reply)"
+Checks if the reply is an error indicating that the query should be redirected to another node (i\&.e\&., \fCMOVED\fP or \fCASK\fP redirection)\&.
+.PP
+\fBParameters\fP
+.RS 4
+\fIreply\fP The response obtained from the \fBRedis\fP shard / server\&. 
+.RE
+.PP
+\fBReturns\fP
+.RS 4
+TRUE (1) if the reply is an error indicating that the query should be directed to another node\&.
+.RE
+.PP
+\fBSee also\fP
+.RS 4
+\fBredisxClusterMoved()\fP 
+.PP
+\fBredisxClusterIsMigrating()\fP 
+.RE
+.PP
+
+.PP
+References \fBredisxClusterIsMigrating()\fP, and \fBredisxClusterMoved()\fP\&.
+.SS "\fBboolean\fP redisxClusterMoved (const \fBRESP\fP * reply)"
+Checks if the reply is an error indicating that the cluster has been reconfigured and the request can no longer be fulfilled on the given shard (i\&.e\&., \fCMOVED\fP redirection)\&. You might want to obtain the new shard using \fBredisxClusterGetShard()\fP again, and re-submit the request to the new shard\&.
+.PP
+\fBParameters\fP
+.RS 4
+\fIreply\fP The response obtained from the \fBRedis\fP shard / server\&. 
+.RE
+.PP
+\fBReturns\fP
+.RS 4
+TRUE (1) if the reply is an error indicating that the cluster has been reconfigured and the key has moved to another shard\&.
+.RE
+.PP
+\fBSee also\fP
+.RS 4
+\fBredisxClusterIsMigrating()\fP 
+.PP
+\fBredisxClusterIsRedirected()\fP 
+.PP
+\fBredisxClusterGetShard()\fP 
+.RE
+.PP
+
+.PP
+References \fBFALSE\fP, \fBRESP::n\fP, \fBRESP_ERROR\fP, \fBRESP::type\fP, and \fBRESP::value\fP\&.
+.SH "Author"
+.PP 
+Generated automatically by Doxygen for RedisX from the source code\&.

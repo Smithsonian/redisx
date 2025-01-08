@@ -103,7 +103,7 @@ X_SUCCESS (0) if successful, or X_NULL if the client is NULL, or X_NO_SERVICE if
 .PP
 
 .PP
-References \fBredisxIgnoreReplyAsync()\fP, \fBTRUE\fP, \fBx_error()\fP, \fBX_NO_INIT\fP, and \fBX_SUCCESS\fP\&.
+References \fBredisxIgnoreReplyAsync()\fP, \fBTRUE\fP, and \fBX_SUCCESS\fP\&.
 .SS "int redisxClearAttributesAsync (\fBRedisClient\fP * cl)"
 Clears the attributes for the specified client\&. The caller should have an exclusive lock on the client's mutex prior to making this call\&.
 .PP
@@ -280,7 +280,7 @@ X_SUCCESS if the exclusive lock for the channel was successfully obtained, or X_
 .PP
 
 .PP
-References \fBx_error()\fP, \fBX_FAILURE\fP, \fBX_NO_INIT\fP, and \fBX_SUCCESS\fP\&.
+References \fBx_error()\fP, \fBX_FAILURE\fP, and \fBX_SUCCESS\fP\&.
 .SS "int redisxLockConnected (\fBRedisClient\fP * cl)"
 Lock a channel, but only if it has been enabled for communication\&.
 .PP
@@ -305,7 +305,7 @@ X_SUCCESS (0) if an excusive lock to the channel has been granted, or X_FAILURE 
 .PP
 
 .PP
-References \fBredisxLockClient()\fP, \fBredisxUnlockClient()\fP, \fBx_error()\fP, \fBX_NO_INIT\fP, \fBX_NO_SERVICE\fP, and \fBX_SUCCESS\fP\&.
+References \fBredisxLockClient()\fP, \fBredisxUnlockClient()\fP, \fBx_error()\fP, \fBX_NO_SERVICE\fP, and \fBX_SUCCESS\fP\&.
 .SS "\fBRESP\fP * redisxReadReplyAsync (\fBRedisClient\fP * cl, int * pStatus)"
 Reads a response from \fBRedis\fP and returns it\&.
 .PP
@@ -323,7 +323,7 @@ The \fBRESP\fP structure for the reponse received from \fBRedis\fP, or NULL if a
 .PP
 
 .PP
-References \fBFALSE\fP, \fBRedisMap::key\fP, \fBRESP::n\fP, \fBrCloseClientAsync()\fP, \fBREDIS_INCOMPLETE_TRANSFER\fP, \fBREDIS_SIMPLE_STRING_SIZE\fP, \fBREDIS_UNEXPECTED_RESP\fP, \fBredisxAppendRESP()\fP, \fBredisxDestroyRESP()\fP, \fBredisxHasComponents()\fP, \fBredisxReadReplyAsync()\fP, \fBRESP3_ATTRIBUTE\fP, \fBRESP3_BIG_NUMBER\fP, \fBRESP3_BLOB_ERROR\fP, \fBRESP3_BOOLEAN\fP, \fBRESP3_CONTINUED\fP, \fBRESP3_DOUBLE\fP, \fBRESP3_MAP\fP, \fBRESP3_NULL\fP, \fBRESP3_PUSH\fP, \fBRESP3_SET\fP, \fBRESP3_VERBATIM_STRING\fP, \fBRESP_ARRAY\fP, \fBRESP_BULK_STRING\fP, \fBRESP_ERROR\fP, \fBRESP_INT\fP, \fBRESP_SIMPLE_STRING\fP, \fBTRUE\fP, \fBRESP::type\fP, \fBRESP::value\fP, \fBRedisMap::value\fP, \fBx_error()\fP, \fBX_FAILURE\fP, \fBX_NO_INIT\fP, \fBX_NO_SERVICE\fP, \fBX_PARSE_ERROR\fP, \fBX_SUCCESS\fP, \fBx_trace_null()\fP, \fBxParseDouble()\fP, and \fBxStringCopyOf()\fP\&.
+References \fBFALSE\fP, \fBRedisMap::key\fP, \fBRESP::n\fP, \fBrCloseClientAsync()\fP, \fBREDIS_INCOMPLETE_TRANSFER\fP, \fBREDIS_SIMPLE_STRING_SIZE\fP, \fBREDIS_UNEXPECTED_RESP\fP, \fBredisxAppendRESP()\fP, \fBredisxClusterMoved()\fP, \fBredisxDestroyRESP()\fP, \fBredisxHasComponents()\fP, \fBredisxReadReplyAsync()\fP, \fBRESP3_ATTRIBUTE\fP, \fBRESP3_BIG_NUMBER\fP, \fBRESP3_BLOB_ERROR\fP, \fBRESP3_BOOLEAN\fP, \fBRESP3_CONTINUED\fP, \fBRESP3_DOUBLE\fP, \fBRESP3_MAP\fP, \fBRESP3_NULL\fP, \fBRESP3_PUSH\fP, \fBRESP3_SET\fP, \fBRESP3_VERBATIM_STRING\fP, \fBRESP_ARRAY\fP, \fBRESP_BULK_STRING\fP, \fBRESP_ERROR\fP, \fBRESP_INT\fP, \fBRESP_SIMPLE_STRING\fP, \fBTRUE\fP, \fBRESP::type\fP, \fBRESP::value\fP, \fBRedisMap::value\fP, \fBx_error()\fP, \fBX_FAILURE\fP, \fBX_NO_INIT\fP, \fBX_NO_SERVICE\fP, \fBX_PARSE_ERROR\fP, \fBX_SUCCESS\fP, \fBx_trace_null()\fP, \fBxParseDouble()\fP, and \fBxStringCopyOf()\fP\&.
 .SS "int redisxResetClient (\fBRedisClient\fP * cl)"
 Sends a \fCRESET\fP request to the specified \fBRedis\fP client\&. The server will perform a reset as if the client disconnected and reconnected again\&.
 .PP
@@ -361,7 +361,7 @@ X_SUCCESS (0) on success or X_NULL if the client is NULL, or X_NO_SERVICE if not
 .PP
 
 .PP
-References \fBFALSE\fP, \fBREDISX_CMDBUF_SIZE\fP, \fBTRUE\fP, \fBx_error()\fP, \fBX_NO_INIT\fP, \fBX_NO_SERVICE\fP, \fBX_SUCCESS\fP, and \fBxvprintf\fP\&.
+References \fBFALSE\fP, \fBREDISX_CMDBUF_SIZE\fP, \fBTRUE\fP, \fBx_error()\fP, \fBX_NO_SERVICE\fP, \fBX_SUCCESS\fP, and \fBxvprintf\fP\&.
 .SS "int redisxSendRequestAsync (\fBRedisClient\fP * cl, const char * command, const char * arg1, const char * arg2, const char * arg3)"
 Send a command (with up to 3 arguments) to the \fBRedis\fP server\&. The caller must have an exclusive lock on the client for this version\&. The arguments supplied will be used up to the first non-NULL value\&.
 .PP
@@ -403,7 +403,7 @@ X_SUCCESS (0) on success or X_NULL if the client is NULL, or else X_NO_SERVICE i
 .PP
 
 .PP
-References \fBTRUE\fP, \fBx_error()\fP, \fBX_NO_INIT\fP, and \fBX_SUCCESS\fP\&.
+References \fBTRUE\fP, and \fBX_SUCCESS\fP\&.
 .SS "int redisxStartBlockAsync (\fBRedisClient\fP * cl)"
 Starts an atomic \fBRedis\fP transaction block, by sending \fCMULTI\fP on the specified client connection\&. \fBRedis\fP transaction blocks behave just like scripts (in fact they are effectively improptu scripts themselves)\&. As such the rules of \fBRedis\fP scripting apply, such as you cannot call LUA from within a transaction block (which is a real pity\&.\&.\&.)
 .PP
@@ -428,7 +428,7 @@ X_SUCCESS (0) if successful, or X_NULL if the \fBRedis\fP client is NULL, or X_N
 .PP
 
 .PP
-References \fBTRUE\fP, \fBx_error()\fP, \fBX_NO_INIT\fP, and \fBX_SUCCESS\fP\&.
+References \fBTRUE\fP, and \fBX_SUCCESS\fP\&.
 .SS "int redisxUnlockClient (\fBRedisClient\fP * cl)"
 Relinquish exclusive write access to the specified \fBRedis\fP channel
 .PP
@@ -451,7 +451,7 @@ X_SUCCESS if the exclusive lock for the channel was successfully obtained, or X_
 .PP
 
 .PP
-References \fBx_error()\fP, \fBX_FAILURE\fP, \fBX_NO_INIT\fP, and \fBX_SUCCESS\fP\&.
+References \fBx_error()\fP, \fBX_FAILURE\fP, and \fBX_SUCCESS\fP\&.
 .SH "Author"
 .PP 
 Generated automatically by Doxygen for RedisX from the source code\&.

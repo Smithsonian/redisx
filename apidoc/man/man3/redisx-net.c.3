@@ -34,6 +34,9 @@ src/redisx-net.c
 .RI "int \fBredisxReconnect\fP (\fBRedis\fP *redis, \fBboolean\fP usePipeline)"
 .br
 .ti -1c
+.RI "int \fBredisxSetHostname\fP (\fBRedis\fP *redis, const char *host)"
+.br
+.ti -1c
 .RI "int \fBredisxSetPort\fP (\fBRedis\fP *redis, int port)"
 .br
 .ti -1c
@@ -133,7 +136,7 @@ Destroys a \fBRedis\fP intance, disconnecting any clients that may be connected,
 .PP
 
 .PP
-References \fBRedis::id\fP, \fBREDISX_CHANNELS\fP, \fBredisxClearConnectHooks()\fP, \fBredisxClearSubscribers()\fP, \fBredisxDestroyRESP()\fP, \fBredisxDisconnect()\fP, and \fBredisxIsConnected()\fP\&.
+References \fBRedis::id\fP, \fBREDISX_CHANNELS\fP, \fBredisxClearSubscribers()\fP, \fBredisxDestroyRESP()\fP, \fBredisxDisconnect()\fP, and \fBredisxIsConnected()\fP\&.
 .SS "void redisxDisconnect (\fBRedis\fP * redis)"
 Disconnect all clients from the \fBRedis\fP server\&.
 .PP
@@ -200,6 +203,31 @@ X_SUCCESS (0) if successful X_NULL if the \fBRedis\fP instance is NULL
 or else an error (<0) as would be returned by \fBredisxConnect()\fP\&. 
 .PP
 References \fBX_SUCCESS\fP\&.
+.SS "int redisxSetHostname (\fBRedis\fP * redis, const char * host)"
+Changes the host name for the \fBRedis\fP server, prior to calling \fC\fBredisxConnect()\fP\fP\&.
+.PP
+\fBParameters\fP
+.RS 4
+\fIredis\fP Pointer to a \fBRedis\fP instance\&. 
+.br
+\fIhost\fP New host name or IP address to use\&.
+.RE
+.PP
+\fBReturns\fP
+.RS 4
+X_SUCCESS (0) if successful, or else X_NULL if the redis instance or the host name is NULL, or X_NO_INIT if the redis instance is not initialized, X_ALREADY_OPEN if the redis instance is currently in a connected state, or X_FAILURE if \fBRedis\fP was initialized in Sentinel configuration\&.
+.RE
+.PP
+\fBSee also\fP
+.RS 4
+\fBredisxSetPort()\fP 
+.PP
+\fBredisxConnect()\fP 
+.RE
+.PP
+
+.PP
+References \fBredisxIsConnected()\fP, \fBrSetServerAsync()\fP, \fBX_ALREADY_OPEN\fP, \fBx_error()\fP, \fBX_FAILURE\fP, \fBX_NULL\fP, and \fBX_SUCCESS\fP\&.
 .SS "int redisxSetPort (\fBRedis\fP * redis, int port)"
 Sets a non-standard TCP port number to use for the \fBRedis\fP server, prior to calling \fC\fBredisxConnect()\fP\fP\&.
 .PP
@@ -212,17 +240,19 @@ Sets a non-standard TCP port number to use for the \fBRedis\fP server, prior to 
 .PP
 \fBReturns\fP
 .RS 4
-X_SUCCESS (0) if successful, or else X_NULL if the redis instance is NULL, or X_NO_INIT if the redis instance is not initialized, or X_FAILURE if \fBRedis\fP was initialized in Sentinel configuration\&.
+X_SUCCESS (0) if successful, or else X_NULL if the redis instance is NULL, or X_NO_INIT if the redis instance is not initialized, X_ALREADY_OPEN if the \fBRedis\fP instance is lready connected to a server, or X_FAILURE if \fBRedis\fP was initialized in Sentinel configuration\&.
 .RE
 .PP
 \fBSee also\fP
 .RS 4
-\fBredisxConnect()\fP; 
+\fBredisxSetHostname()\fP 
+.PP
+\fBredisxConnect()\fP 
 .RE
 .PP
 
 .PP
-References \fBx_error()\fP, \fBX_FAILURE\fP, and \fBX_SUCCESS\fP\&.
+References \fBredisxIsConnected()\fP, \fBX_ALREADY_OPEN\fP, \fBx_error()\fP, \fBX_FAILURE\fP, and \fBX_SUCCESS\fP\&.
 .SS "int redisxSetSocketTimeout (\fBRedis\fP * redis, int millis)"
 Sets a socket timeout for future client connections on a \fBRedis\fP instance\&. If not set (or set to zero or a negative value), then the timeout will not be configured for sockets, and the system default timeout values will apply\&.
 .PP

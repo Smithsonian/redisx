@@ -44,42 +44,48 @@ var NAVTREE =
           [ "Sentinel", "index.html#autotoc_md21", null ]
         ] ],
         [ "Configuring", "index.html#autotoc_md22", [
-          [ "Socket-level configuration", "index.html#autotoc_md23", null ],
-          [ "Connection & disconnection hooks", "index.html#autotoc_md24", null ]
+          [ "TLS configuration", "index.html#autotoc_md23", null ],
+          [ "Socket-level configuration", "index.html#autotoc_md24", null ],
+          [ "Connection & disconnection hooks", "index.html#autotoc_md25", null ]
         ] ],
-        [ "Connecting", "index.html#autotoc_md25", null ],
-        [ "Disconnecting", "index.html#autotoc_md26", null ],
-        [ "Reconnecting", "index.html#autotoc_md27", null ]
+        [ "Connecting", "index.html#autotoc_md26", null ],
+        [ "Disconnecting", "index.html#autotoc_md27", null ],
+        [ "Reconnecting", "index.html#autotoc_md28", null ]
       ] ],
-      [ "Simple Redis queries", "index.html#autotoc_md29", [
-        [ "Interactive transactions", "index.html#autotoc_md30", null ],
-        [ "Bundled Attributes", "index.html#autotoc_md31", null ],
-        [ "Push notifications", "index.html#autotoc_md32", null ],
-        [ "RESP data type", "index.html#autotoc_md33", null ]
+      [ "Simple Redis queries", "index.html#autotoc_md30", [
+        [ "Interactive transactions", "index.html#autotoc_md31", null ],
+        [ "Bundled Attributes", "index.html#autotoc_md32", null ],
+        [ "Push notifications", "index.html#autotoc_md33", null ],
+        [ "RESP data type", "index.html#autotoc_md34", null ]
       ] ],
-      [ "Accessing key / value data", "index.html#autotoc_md35", [
-        [ "Getting and setting keyed values", "index.html#autotoc_md36", null ],
-        [ "Listing and Scanning", "index.html#autotoc_md37", null ]
+      [ "Accessing key / value data", "index.html#autotoc_md36", [
+        [ "Getting and setting keyed values", "index.html#autotoc_md37", null ],
+        [ "Listing and Scanning", "index.html#autotoc_md38", null ]
       ] ],
-      [ "Publish / subscribe (PUB/SUB) support", "index.html#autotoc_md39", [
-        [ "Broadcasting messages", "index.html#autotoc_md40", null ],
-        [ "Subscriptions", "index.html#autotoc_md41", null ]
+      [ "Publish / subscribe (PUB/SUB) support", "index.html#autotoc_md40", [
+        [ "Broadcasting messages", "index.html#autotoc_md41", null ],
+        [ "Subscriptions", "index.html#autotoc_md42", null ]
       ] ],
-      [ "Atomic execution blocks and LUA scripts", "index.html#autotoc_md43", [
-        [ "Execution blocks", "index.html#autotoc_md44", null ],
-        [ "LUA script loading and execution", "index.html#autotoc_md45", null ],
-        [ "Custom Redis functions", "index.html#autotoc_md46", null ]
+      [ "Atomic execution blocks and LUA scripts", "index.html#autotoc_md44", [
+        [ "Execution blocks", "index.html#autotoc_md45", null ],
+        [ "LUA script loading and execution", "index.html#autotoc_md46", null ],
+        [ "Custom Redis functions", "index.html#autotoc_md47", null ]
       ] ],
-      [ "Advanced queries and pipelining", "index.html#autotoc_md48", [
-        [ "Asynchronous client processing", "index.html#autotoc_md49", null ],
-        [ "Bundled Attributes", "index.html#autotoc_md50", null ],
-        [ "Pipelined transactions", "index.html#autotoc_md51", null ]
+      [ "Advanced queries and pipelining", "index.html#autotoc_md49", [
+        [ "Asynchronous client processing", "index.html#autotoc_md50", null ],
+        [ "Bundled Attributes", "index.html#autotoc_md51", null ],
+        [ "Pipelined transactions", "index.html#autotoc_md52", null ]
       ] ],
-      [ "Error handling", "index.html#autotoc_md53", [
-        [ "Socket-level errors", "index.html#autotoc_md54", null ]
+      [ "Redis clusters", "index.html#autotoc_md54", [
+        [ "Cluster basics", "index.html#autotoc_md55", null ],
+        [ "Detecting cluster reconfiguration", "index.html#autotoc_md56", null ],
+        [ "Manual connection management", "index.html#autotoc_md57", null ]
       ] ],
-      [ "Debug support", "index.html#autotoc_md56", null ],
-      [ "Future plans", "index.html#autotoc_md58", null ],
+      [ "Error handling", "index.html#autotoc_md59", [
+        [ "Socket-level errors", "index.html#autotoc_md60", null ]
+      ] ],
+      [ "Debug support", "index.html#autotoc_md62", null ],
+      [ "Future plans", "index.html#autotoc_md64", null ],
       [ "[Unreleased]", "../../xchange/apidoc/html/md_CHANGELOG.html#autotoc_md1", null ]
     ] ],
     [ "Contributing to RedisX", "../../xchange/apidoc/html/md_CONTRIBUTING.html", null ],
@@ -108,7 +114,7 @@ var NAVTREE =
 var NAVTREEINDEX =
 [
 "annotated.html",
-"redisx_8h.html#ab56c292120a99c1e841869b5c8d6dd5d"
+"redisx_8h.html#a648557774b354ff99e279d3dcf94d240"
 ];
 
 var SYNCONMSG = 'click to disable panel synchronisation';

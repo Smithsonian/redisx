@@ -6,6 +6,7 @@
     <filename>redisx_8h.html</filename>
     <class kind="struct">Redis</class>
     <class kind="struct">RedisClient</class>
+    <class kind="struct">RedisCluster</class>
     <class kind="struct">RedisEntry</class>
     <class kind="struct">RedisMap</class>
     <class kind="struct">RedisServer</class>
@@ -29,6 +30,20 @@
       <name>REDIS_INVALID_CHANNEL</name>
       <anchorfile>redisx_8h.html</anchorfile>
       <anchor>a8827c9e06650c47f2cfd96496af5487e</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="define">
+      <type>#define</type>
+      <name>REDIS_MIGRATING</name>
+      <anchorfile>redisx_8h.html</anchorfile>
+      <anchor>ae491047bf974c1210d50d97220e6abd0</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="define">
+      <type>#define</type>
+      <name>REDIS_MOVED</name>
+      <anchorfile>redisx_8h.html</anchorfile>
+      <anchor>a3997b7dc4f4a6984507da4a1f1448aa5</anchor>
       <arglist></arglist>
     </member>
     <member kind="define">
@@ -416,6 +431,83 @@
       <anchorfile>redisx_8h.html</anchorfile>
       <anchor>af70948d6e1b0e3b8f4fde82d0ce27094</anchor>
       <arglist>(Redis *redis)</arglist>
+    </member>
+    <member kind="function">
+      <type>RESP *</type>
+      <name>redisxClusterAskMigrating</name>
+      <anchorfile>redisx_8h.html</anchorfile>
+      <anchor>aa6c97d758f2eb78216702432a40fac6f</anchor>
+      <arglist>(Redis *redis, const char **args, const int *lengths, int n, int *status)</arglist>
+    </member>
+    <member kind="function">
+      <type>int</type>
+      <name>redisxClusterAskMigratingAsync</name>
+      <anchorfile>redisx_8h.html</anchorfile>
+      <anchor>a1f27971d485e30863df37af6ef388e61</anchor>
+      <arglist>(RedisClient *cl, const char **args, const int *lengths, int n)</arglist>
+    </member>
+    <member kind="function">
+      <type>int</type>
+      <name>redisxClusterConnect</name>
+      <anchorfile>redisx_8h.html</anchorfile>
+      <anchor>a83dadbc667e48fab6272bed1025a3db8</anchor>
+      <arglist>(RedisCluster *cluster)</arglist>
+    </member>
+    <member kind="function">
+      <type>void</type>
+      <name>redisxClusterDestroy</name>
+      <anchorfile>redisx_8h.html</anchorfile>
+      <anchor>a3b2fb45ad35cbc4e501db00f5c416ef9</anchor>
+      <arglist>(RedisCluster *cluster)</arglist>
+    </member>
+    <member kind="function">
+      <type>int</type>
+      <name>redisxClusterDisconnect</name>
+      <anchorfile>redisx_8h.html</anchorfile>
+      <anchor>aaf2048bd9d3c86f57234c856ec7e1350</anchor>
+      <arglist>(RedisCluster *cluster)</arglist>
+    </member>
+    <member kind="function">
+      <type>Redis *</type>
+      <name>redisxClusterGetRedirection</name>
+      <anchorfile>redisx_8h.html</anchorfile>
+      <anchor>ac40bd92e2c9cc4f14521c2efcea57018</anchor>
+      <arglist>(RedisCluster *cluster, const RESP *redirect, boolean refresh)</arglist>
+    </member>
+    <member kind="function">
+      <type>Redis *</type>
+      <name>redisxClusterGetShard</name>
+      <anchorfile>redisx_8h.html</anchorfile>
+      <anchor>a383492763c7162b48bb86e9523bfff69</anchor>
+      <arglist>(RedisCluster *cluster, const char *key)</arglist>
+    </member>
+    <member kind="function">
+      <type>RedisCluster *</type>
+      <name>redisxClusterInit</name>
+      <anchorfile>redisx_8h.html</anchorfile>
+      <anchor>a325731b1f8f467cf2c84700b345049ba</anchor>
+      <arglist>(Redis *node)</arglist>
+    </member>
+    <member kind="function">
+      <type>boolean</type>
+      <name>redisxClusterIsMigrating</name>
+      <anchorfile>redisx_8h.html</anchorfile>
+      <anchor>a57a19ba90951b891677b1be3af8a8f36</anchor>
+      <arglist>(const RESP *reply)</arglist>
+    </member>
+    <member kind="function">
+      <type>boolean</type>
+      <name>redisxClusterIsRedirected</name>
+      <anchorfile>redisx_8h.html</anchorfile>
+      <anchor>a537ed3806a44fb40f6e8dccd813ad0da</anchor>
+      <arglist>(const RESP *reply)</arglist>
+    </member>
+    <member kind="function">
+      <type>boolean</type>
+      <name>redisxClusterMoved</name>
+      <anchorfile>redisx_8h.html</anchorfile>
+      <anchor>a19fc54725ba4725e0281cff59b642e15</anchor>
+      <arglist>(const RESP *reply)</arglist>
     </member>
     <member kind="function">
       <type>int</type>
@@ -881,6 +973,20 @@
     </member>
     <member kind="function">
       <type>int</type>
+      <name>redisxSetDHCipherParams</name>
+      <anchorfile>redisx_8h.html</anchorfile>
+      <anchor>ab1f40a05c3c74c55f0f92066cbc7db09</anchor>
+      <arglist>(Redis *redis, const char *dh_params_file)</arglist>
+    </member>
+    <member kind="function">
+      <type>int</type>
+      <name>redisxSetMutualTLS</name>
+      <anchorfile>redisx_8h.html</anchorfile>
+      <anchor>ad62a82cdab6e2fd11da87b1bdcc1604b</anchor>
+      <arglist>(Redis *redis, const char *cert_file, const char *key_file)</arglist>
+    </member>
+    <member kind="function">
+      <type>int</type>
       <name>redisxSetPassword</name>
       <anchorfile>redisx_8h.html</anchorfile>
       <anchor>a0e9eda38aa6f084ac151cbebe2886c2f</anchor>
@@ -955,6 +1061,41 @@
       <anchorfile>redisx_8h.html</anchorfile>
       <anchor>a648557774b354ff99e279d3dcf94d240</anchor>
       <arglist>(Redis *redis, int size)</arglist>
+    </member>
+    <member kind="function">
+      <type>int</type>
+      <name>redisxSetTLS</name>
+      <anchorfile>redisx_8h.html</anchorfile>
+      <anchor>a1820331a34d40c9dcc894480e22d90e7</anchor>
+      <arglist>(Redis *redis, const char *ca_path, const char *ca_file)</arglist>
+    </member>
+    <member kind="function">
+      <type>int</type>
+      <name>redisxSetTLSCiphers</name>
+      <anchorfile>redisx_8h.html</anchorfile>
+      <anchor>a11828fc2962a62c27bf8b5627f69a8a0</anchor>
+      <arglist>(Redis *redis, const char *cipher_list)</arglist>
+    </member>
+    <member kind="function">
+      <type>int</type>
+      <name>redisxSetTLSCipherSuites</name>
+      <anchorfile>redisx_8h.html</anchorfile>
+      <anchor>aece815a388c13dfa9381d194fc65526a</anchor>
+      <arglist>(Redis *redis, const char *list)</arglist>
+    </member>
+    <member kind="function">
+      <type>int</type>
+      <name>redisxSetTLSServerName</name>
+      <anchorfile>redisx_8h.html</anchorfile>
+      <anchor>a9cafd12ab9ff4df77c7fc9d6bac33c1a</anchor>
+      <arglist>(Redis *redis, const char *host)</arglist>
+    </member>
+    <member kind="function">
+      <type>int</type>
+      <name>redisxSetTLSSkipVerify</name>
+      <anchorfile>redisx_8h.html</anchorfile>
+      <anchor>afa24f8a0e389625005685f3ec2dd0bca</anchor>
+      <arglist>(Redis *redis, boolean value)</arglist>
     </member>
     <member kind="function">
       <type>int</type>
@@ -1159,6 +1300,88 @@
     </member>
   </compound>
   <compound kind="file">
+    <name>redisx-cluster.c</name>
+    <path>src/</path>
+    <filename>redisx-cluster_8c.html</filename>
+    <member kind="function">
+      <type>RESP *</type>
+      <name>redisxClusterAskMigrating</name>
+      <anchorfile>redisx-cluster_8c.html</anchorfile>
+      <anchor>aa6c97d758f2eb78216702432a40fac6f</anchor>
+      <arglist>(Redis *redis, const char **args, const int *lengths, int n, int *status)</arglist>
+    </member>
+    <member kind="function">
+      <type>int</type>
+      <name>redisxClusterAskMigratingAsync</name>
+      <anchorfile>redisx-cluster_8c.html</anchorfile>
+      <anchor>a1f27971d485e30863df37af6ef388e61</anchor>
+      <arglist>(RedisClient *cl, const char **args, const int *lengths, int n)</arglist>
+    </member>
+    <member kind="function">
+      <type>int</type>
+      <name>redisxClusterConnect</name>
+      <anchorfile>redisx-cluster_8c.html</anchorfile>
+      <anchor>a83dadbc667e48fab6272bed1025a3db8</anchor>
+      <arglist>(RedisCluster *cluster)</arglist>
+    </member>
+    <member kind="function">
+      <type>void</type>
+      <name>redisxClusterDestroy</name>
+      <anchorfile>redisx-cluster_8c.html</anchorfile>
+      <anchor>a3b2fb45ad35cbc4e501db00f5c416ef9</anchor>
+      <arglist>(RedisCluster *cluster)</arglist>
+    </member>
+    <member kind="function">
+      <type>int</type>
+      <name>redisxClusterDisconnect</name>
+      <anchorfile>redisx-cluster_8c.html</anchorfile>
+      <anchor>aaf2048bd9d3c86f57234c856ec7e1350</anchor>
+      <arglist>(RedisCluster *cluster)</arglist>
+    </member>
+    <member kind="function">
+      <type>Redis *</type>
+      <name>redisxClusterGetRedirection</name>
+      <anchorfile>redisx-cluster_8c.html</anchorfile>
+      <anchor>ac40bd92e2c9cc4f14521c2efcea57018</anchor>
+      <arglist>(RedisCluster *cluster, const RESP *redirect, boolean refresh)</arglist>
+    </member>
+    <member kind="function">
+      <type>Redis *</type>
+      <name>redisxClusterGetShard</name>
+      <anchorfile>redisx-cluster_8c.html</anchorfile>
+      <anchor>a383492763c7162b48bb86e9523bfff69</anchor>
+      <arglist>(RedisCluster *cluster, const char *key)</arglist>
+    </member>
+    <member kind="function">
+      <type>RedisCluster *</type>
+      <name>redisxClusterInit</name>
+      <anchorfile>redisx-cluster_8c.html</anchorfile>
+      <anchor>a325731b1f8f467cf2c84700b345049ba</anchor>
+      <arglist>(Redis *node)</arglist>
+    </member>
+    <member kind="function">
+      <type>boolean</type>
+      <name>redisxClusterIsMigrating</name>
+      <anchorfile>redisx-cluster_8c.html</anchorfile>
+      <anchor>a57a19ba90951b891677b1be3af8a8f36</anchor>
+      <arglist>(const RESP *reply)</arglist>
+    </member>
+    <member kind="function">
+      <type>boolean</type>
+      <name>redisxClusterIsRedirected</name>
+      <anchorfile>redisx-cluster_8c.html</anchorfile>
+      <anchor>a537ed3806a44fb40f6e8dccd813ad0da</anchor>
+      <arglist>(const RESP *reply)</arglist>
+    </member>
+    <member kind="function">
+      <type>boolean</type>
+      <name>redisxClusterMoved</name>
+      <anchorfile>redisx-cluster_8c.html</anchorfile>
+      <anchor>a19fc54725ba4725e0281cff59b642e15</anchor>
+      <arglist>(const RESP *reply)</arglist>
+    </member>
+  </compound>
+  <compound kind="file">
     <name>redisx-hooks.c</name>
     <path>src/</path>
     <filename>redisx-hooks_8c.html</filename>
@@ -1264,6 +1487,13 @@
       <anchorfile>redisx-net_8c.html</anchorfile>
       <anchor>a55a2efad7c8d8f840f4144a217f58965</anchor>
       <arglist>(Redis *redis, boolean usePipeline)</arglist>
+    </member>
+    <member kind="function">
+      <type>int</type>
+      <name>redisxSetHostname</name>
+      <anchorfile>redisx-net_8c.html</anchorfile>
+      <anchor>a16a0aa9545e7dd5fd290dd2b4ee968f1</anchor>
+      <arglist>(Redis *redis, const char *host)</arglist>
     </member>
     <member kind="function">
       <type>int</type>
@@ -1522,6 +1752,60 @@
       <anchorfile>redisx-tab_8c.html</anchorfile>
       <anchor>a9e784632598b0c418a3ae3a87aa09fe4</anchor>
       <arglist>(RedisClient *cl, const char *table, const char *key, const char *value, boolean confirm)</arglist>
+    </member>
+  </compound>
+  <compound kind="file">
+    <name>redisx-tls.c</name>
+    <path>src/</path>
+    <filename>redisx-tls_8c.html</filename>
+    <member kind="function">
+      <type>int</type>
+      <name>redisxSetDHCipherParams</name>
+      <anchorfile>redisx-tls_8c.html</anchorfile>
+      <anchor>ab1f40a05c3c74c55f0f92066cbc7db09</anchor>
+      <arglist>(Redis *redis, const char *dh_params_file)</arglist>
+    </member>
+    <member kind="function">
+      <type>int</type>
+      <name>redisxSetMutualTLS</name>
+      <anchorfile>redisx-tls_8c.html</anchorfile>
+      <anchor>ad62a82cdab6e2fd11da87b1bdcc1604b</anchor>
+      <arglist>(Redis *redis, const char *cert_file, const char *key_file)</arglist>
+    </member>
+    <member kind="function">
+      <type>int</type>
+      <name>redisxSetTLS</name>
+      <anchorfile>redisx-tls_8c.html</anchorfile>
+      <anchor>a1820331a34d40c9dcc894480e22d90e7</anchor>
+      <arglist>(Redis *redis, const char *ca_path, const char *ca_file)</arglist>
+    </member>
+    <member kind="function">
+      <type>int</type>
+      <name>redisxSetTLSCiphers</name>
+      <anchorfile>redisx-tls_8c.html</anchorfile>
+      <anchor>a11828fc2962a62c27bf8b5627f69a8a0</anchor>
+      <arglist>(Redis *redis, const char *cipher_list)</arglist>
+    </member>
+    <member kind="function">
+      <type>int</type>
+      <name>redisxSetTLSCipherSuites</name>
+      <anchorfile>redisx-tls_8c.html</anchorfile>
+      <anchor>aece815a388c13dfa9381d194fc65526a</anchor>
+      <arglist>(Redis *redis, const char *list)</arglist>
+    </member>
+    <member kind="function">
+      <type>int</type>
+      <name>redisxSetTLSServerName</name>
+      <anchorfile>redisx-tls_8c.html</anchorfile>
+      <anchor>a9cafd12ab9ff4df77c7fc9d6bac33c1a</anchor>
+      <arglist>(Redis *redis, const char *host)</arglist>
+    </member>
+    <member kind="function">
+      <type>int</type>
+      <name>redisxSetTLSSkipVerify</name>
+      <anchorfile>redisx-tls_8c.html</anchorfile>
+      <anchor>afa24f8a0e389625005685f3ec2dd0bca</anchor>
+      <arglist>(Redis *redis, boolean value)</arglist>
     </member>
   </compound>
   <compound kind="file">
@@ -1879,6 +2163,17 @@
     <filename>structRedisClient.html</filename>
   </compound>
   <compound kind="struct">
+    <name>RedisCluster</name>
+    <filename>structRedisCluster.html</filename>
+    <member kind="variable">
+      <type>void *</type>
+      <name>priv</name>
+      <anchorfile>structRedisCluster.html</anchorfile>
+      <anchor>a8b6505c37d4ff95854b8b00527e4d9fa</anchor>
+      <arglist></arglist>
+    </member>
+  </compound>
+  <compound kind="struct">
     <name>RedisEntry</name>
     <filename>structRedisEntry.html</filename>
     <member kind="variable">
@@ -2004,6 +2299,10 @@
     <docanchor file="index.html">asynchronous-client-processing</docanchor>
     <docanchor file="index.html">async-attributes</docanchor>
     <docanchor file="index.html">pipelined-transactions</docanchor>
+    <docanchor file="index.html">cluster-support</docanchor>
+    <docanchor file="index.html">cluster-basics</docanchor>
+    <docanchor file="index.html">cluster-reconfiguration</docanchor>
+    <docanchor file="index.html">cluster-explicit-connect</docanchor>
     <docanchor file="index.html">error-handling</docanchor>
     <docanchor file="index.html">debug-support</docanchor>
     <docanchor file="index.html">future-plans</docanchor>

@@ -105,6 +105,8 @@ Attila Kovacs
 .SS "\fBRESP\fP * redisxArrayRequest (\fBRedis\fP * redis, const char ** args, const int * lengths, int n, int * status)"
 Returns the result of the most generic type of \fBRedis\fP request with any number of arguments\&. This is not the highest throughput mode (that would be sending asynchronous pipeline request, and then asynchronously collecting the results such as with \fBredisxSendArrayRequestAsync()\fP / \fBredisxReadReplyAsync()\fP, because it requires separate network roundtrips for each and every request\&. But, it is simple and perfectly good method when one needs to retrieve only a few (<1000) variables per second\&.\&.\&.
 .PP
+This is the base interactive query, which is used by all sorts of other interactive transactions\&. It handles \fCMOVED\fP and \fCASK\fP redirections for \fBRedis\fP clusters automatically and transparently, so long as the target node is a known member of the cluster from before or immediately after the migration message was received\&.
+.PP
 \fBParameters\fP
 .RS 4
 \fIredis\fP Pointer to a \fBRedis\fP instance\&. 
@@ -119,7 +121,7 @@ Returns the result of the most generic type of \fBRedis\fP request with any numb
 .PP
 .nf
                  X_SUCCESS       on success\&.
-                 X_NO_INIT       if the Redis client librarywas not initialized via initRedis\&.
+                 X_NO_INIT       if the Redis client library was not initialized via redisxInit()\&.
                  X_NULL          if the argument is NULL or n<1\&.
                  X_TIMEDOUT      if the reading of the response timed out\&.
                  X_NO_SERVICE    if not connected to Redis\&.
@@ -145,7 +147,7 @@ A freshly allocated \fBRESP\fP array containing the \fBRedis\fP response, or NUL
 .PP
 
 .PP
-References \fBRedis::interactive\fP, \fBredisxCheckValid()\fP, \fBredisxClearAttributesAsync()\fP, \fBredisxLockConnected()\fP, \fBredisxReadReplyAsync()\fP, \fBredisxSendArrayRequestAsync()\fP, \fBredisxUnlockClient()\fP, \fBx_error()\fP, \fBX_NULL\fP, \fBX_SUCCESS\fP, and \fBx_trace_null()\fP\&.
+References \fBRedis::interactive\fP, \fBredisxArrayRequest()\fP, \fBredisxCheckValid()\fP, \fBredisxClearAttributesAsync()\fP, \fBredisxClusterAskMigrating()\fP, \fBredisxClusterGetRedirection()\fP, \fBredisxClusterIsMigrating()\fP, \fBredisxClusterIsRedirected()\fP, \fBredisxLockConnected()\fP, \fBredisxReadReplyAsync()\fP, \fBredisxSendArrayRequestAsync()\fP, \fBredisxUnlockClient()\fP, \fBx_error()\fP, \fBX_NULL\fP, \fBX_SUCCESS\fP, and \fBx_trace_null()\fP\&.
 .SS "int redisxCheckValid (const \fBRedis\fP * redis)"
 Checks that a redis instance is valid\&.
 .PP
@@ -156,7 +158,7 @@ Checks that a redis instance is valid\&.
 .PP
 \fBReturns\fP
 .RS 4
-X_SUCCESS (0) if the instance is valid, or X_NULL if the argument is NULL, or else X_NO_INIT if the redis instance is not initialized\&. 
+X_SUCCESS (0) if the instance is valid, or X_NULL if the argument is NULL (errno = EINVAL), or else X_NO_INIT (errno = ENXIO) if the redis instance is not initialized\&. 
 .RE
 .PP
 
@@ -295,7 +297,7 @@ Returns the actual protocol used with the \fBRedis\fP server\&. If HELLO was use
 .PP
 \fBReturns\fP
 .RS 4
-REDISX_RESP2 or REDISX_RESP3, or else an error code, such as X_NULL if the argument is NULL, or X_NO_INIT if the \fBRedis\fP server instance was not initialized\&.
+REDISX_RESP2 or REDISX_RESP3, or else an error code, such as X_NULL (errno = EINVAL) if the argument is NULL, or X_NO_INIT (errno = ENXIO) if the \fBRedis\fP server instance was not initialized\&.
 .RE
 .PP
 \fBSee also\fP
@@ -569,7 +571,7 @@ Sets a user-defined callback for additioan custom configuring of client sockets
 .PP
 \fBReturns\fP
 .RS 4
-X_SUCCESS (0) if successful, or or X_NULL if the redis argument in NULL, X_NO_INIT if the redis instance was not initialized\&.
+X_SUCCESS (0) if successful, or or X_NULL (errno = EINVAL) if the redis argument in NULL, X_NO_INIT (errno = ENXIO) if the redis instance was not initialized\&.
 .RE
 .PP
 \fBSee also\fP

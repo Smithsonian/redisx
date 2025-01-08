@@ -16,42 +16,48 @@
         <topic label="Sentinel" href="index.html#autotoc_md21"/>
       </topic>
       <topic label="Configuring" href="index.html#autotoc_md22">
-        <topic label="Socket-level configuration" href="index.html#autotoc_md23"/>
-        <topic label="Connection &amp;amp; disconnection hooks" href="index.html#autotoc_md24"/>
+        <topic label="TLS configuration" href="index.html#autotoc_md23"/>
+        <topic label="Socket-level configuration" href="index.html#autotoc_md24"/>
+        <topic label="Connection &amp;amp; disconnection hooks" href="index.html#autotoc_md25"/>
       </topic>
-      <topic label="Connecting" href="index.html#autotoc_md25"/>
-      <topic label="Disconnecting" href="index.html#autotoc_md26"/>
-      <topic label="Reconnecting" href="index.html#autotoc_md27"/>
+      <topic label="Connecting" href="index.html#autotoc_md26"/>
+      <topic label="Disconnecting" href="index.html#autotoc_md27"/>
+      <topic label="Reconnecting" href="index.html#autotoc_md28"/>
     </topic>
-    <topic label="Simple Redis queries" href="index.html#autotoc_md29">
-      <topic label="Interactive transactions" href="index.html#autotoc_md30"/>
-      <topic label="Bundled Attributes" href="index.html#autotoc_md31"/>
-      <topic label="Push notifications" href="index.html#autotoc_md32"/>
-      <topic label="RESP data type" href="index.html#autotoc_md33"/>
+    <topic label="Simple Redis queries" href="index.html#autotoc_md30">
+      <topic label="Interactive transactions" href="index.html#autotoc_md31"/>
+      <topic label="Bundled Attributes" href="index.html#autotoc_md32"/>
+      <topic label="Push notifications" href="index.html#autotoc_md33"/>
+      <topic label="RESP data type" href="index.html#autotoc_md34"/>
     </topic>
-    <topic label="Accessing key / value data" href="index.html#autotoc_md35">
-      <topic label="Getting and setting keyed values" href="index.html#autotoc_md36"/>
-      <topic label="Listing and Scanning" href="index.html#autotoc_md37"/>
+    <topic label="Accessing key / value data" href="index.html#autotoc_md36">
+      <topic label="Getting and setting keyed values" href="index.html#autotoc_md37"/>
+      <topic label="Listing and Scanning" href="index.html#autotoc_md38"/>
     </topic>
-    <topic label="Publish / subscribe (PUB/SUB) support" href="index.html#autotoc_md39">
-      <topic label="Broadcasting messages" href="index.html#autotoc_md40"/>
-      <topic label="Subscriptions" href="index.html#autotoc_md41"/>
+    <topic label="Publish / subscribe (PUB/SUB) support" href="index.html#autotoc_md40">
+      <topic label="Broadcasting messages" href="index.html#autotoc_md41"/>
+      <topic label="Subscriptions" href="index.html#autotoc_md42"/>
     </topic>
-    <topic label="Atomic execution blocks and LUA scripts" href="index.html#autotoc_md43">
-      <topic label="Execution blocks" href="index.html#autotoc_md44"/>
-      <topic label="LUA script loading and execution" href="index.html#autotoc_md45"/>
-      <topic label="Custom Redis functions" href="index.html#autotoc_md46"/>
+    <topic label="Atomic execution blocks and LUA scripts" href="index.html#autotoc_md44">
+      <topic label="Execution blocks" href="index.html#autotoc_md45"/>
+      <topic label="LUA script loading and execution" href="index.html#autotoc_md46"/>
+      <topic label="Custom Redis functions" href="index.html#autotoc_md47"/>
     </topic>
-    <topic label="Advanced queries and pipelining" href="index.html#autotoc_md48">
-      <topic label="Asynchronous client processing" href="index.html#autotoc_md49"/>
-      <topic label="Bundled Attributes" href="index.html#autotoc_md50"/>
-      <topic label="Pipelined transactions" href="index.html#autotoc_md51"/>
+    <topic label="Advanced queries and pipelining" href="index.html#autotoc_md49">
+      <topic label="Asynchronous client processing" href="index.html#autotoc_md50"/>
+      <topic label="Bundled Attributes" href="index.html#autotoc_md51"/>
+      <topic label="Pipelined transactions" href="index.html#autotoc_md52"/>
     </topic>
-    <topic label="Error handling" href="index.html#autotoc_md53">
-      <topic label="Socket-level errors" href="index.html#autotoc_md54"/>
+    <topic label="Redis clusters" href="index.html#autotoc_md54">
+      <topic label="Cluster basics" href="index.html#autotoc_md55"/>
+      <topic label="Detecting cluster reconfiguration" href="index.html#autotoc_md56"/>
+      <topic label="Manual connection management" href="index.html#autotoc_md57"/>
     </topic>
-    <topic label="Debug support" href="index.html#autotoc_md56"/>
-    <topic label="Future plans" href="index.html#autotoc_md58"/>
+    <topic label="Error handling" href="index.html#autotoc_md59">
+      <topic label="Socket-level errors" href="index.html#autotoc_md60"/>
+    </topic>
+    <topic label="Debug support" href="index.html#autotoc_md62"/>
+    <topic label="Future plans" href="index.html#autotoc_md64"/>
   </topic>
   <topic label="Changelog" href="md_CHANGELOG.html">
     <topic label="[Unreleased]" href="md_CHANGELOG.html#autotoc_md1"/>
@@ -66,6 +72,9 @@
         <topic label="subscription" href="structRedis.html#aa4878fb8cef61468ee8e7426a973a75c"/>
       </topic>
       <topic label="RedisClient" href="structRedisClient.html"/>
+      <topic label="RedisCluster" href="structRedisCluster.html">
+        <topic label="priv" href="structRedisCluster.html#a8b6505c37d4ff95854b8b00527e4d9fa"/>
+      </topic>
       <topic label="RedisEntry" href="structRedisEntry.html">
         <topic label="key" href="structRedisEntry.html#a5892a9181e6a332f84d27aecd41dcd12"/>
         <topic label="length" href="structRedisEntry.html#a9f59b34b1f25fe00023291b678246bcc"/>
@@ -102,6 +111,9 @@
             <topic label="subscription" href="structRedis.html#aa4878fb8cef61468ee8e7426a973a75c"/>
           </topic>
           <topic label="RedisClient" href="structRedisClient.html"/>
+          <topic label="RedisCluster" href="structRedisCluster.html">
+            <topic label="priv" href="structRedisCluster.html#a8b6505c37d4ff95854b8b00527e4d9fa"/>
+          </topic>
           <topic label="RedisEntry" href="structRedisEntry.html">
             <topic label="key" href="structRedisEntry.html#a5892a9181e6a332f84d27aecd41dcd12"/>
             <topic label="length" href="structRedisEntry.html#a9f59b34b1f25fe00023291b678246bcc"/>
@@ -123,6 +135,8 @@
           <topic label="REDIS_ERROR" href="redisx_8h.html#aad063b5d1f8eaeadc0c70f8568113034"/>
           <topic label="REDIS_INCOMPLETE_TRANSFER" href="redisx_8h.html#a158f2b6af2421e42128d014e50896bb4"/>
           <topic label="REDIS_INVALID_CHANNEL" href="redisx_8h.html#a8827c9e06650c47f2cfd96496af5487e"/>
+          <topic label="REDIS_MIGRATING" href="redisx_8h.html#ae491047bf974c1210d50d97220e6abd0"/>
+          <topic label="REDIS_MOVED" href="redisx_8h.html#a3997b7dc4f4a6984507da4a1f1448aa5"/>
           <topic label="REDIS_NULL" href="redisx_8h.html#a7e2f81e12d6982c6aa97b50a77fd98f5"/>
           <topic label="REDIS_UNEXPECTED_ARRAY_SIZE" href="redisx_8h.html#a447a38ce70634136b737274965aa5ecc"/>
           <topic label="REDIS_UNEXPECTED_RESP" href="redisx_8h.html#a9d530bcfae7689b4275749b47a6d9b51"/>
@@ -184,6 +198,17 @@
           <topic label="redisxClearConnectHooks" href="redisx_8h.html#acd72a7be15e670c865e46d6755618f2d"/>
           <topic label="redisxClearDisconnectHooks" href="redisx_8h.html#aed087a61d22caaaada5d95bdc15bba6a"/>
           <topic label="redisxClearSubscribers" href="redisx_8h.html#af70948d6e1b0e3b8f4fde82d0ce27094"/>
+          <topic label="redisxClusterAskMigrating" href="redisx_8h.html#aa6c97d758f2eb78216702432a40fac6f"/>
+          <topic label="redisxClusterAskMigratingAsync" href="redisx_8h.html#a1f27971d485e30863df37af6ef388e61"/>
+          <topic label="redisxClusterConnect" href="redisx_8h.html#a83dadbc667e48fab6272bed1025a3db8"/>
+          <topic label="redisxClusterDestroy" href="redisx_8h.html#a3b2fb45ad35cbc4e501db00f5c416ef9"/>
+          <topic label="redisxClusterDisconnect" href="redisx_8h.html#aaf2048bd9d3c86f57234c856ec7e1350"/>
+          <topic label="redisxClusterGetRedirection" href="redisx_8h.html#ac40bd92e2c9cc4f14521c2efcea57018"/>
+          <topic label="redisxClusterGetShard" href="redisx_8h.html#a383492763c7162b48bb86e9523bfff69"/>
+          <topic label="redisxClusterInit" href="redisx_8h.html#a325731b1f8f467cf2c84700b345049ba"/>
+          <topic label="redisxClusterIsMigrating" href="redisx_8h.html#a57a19ba90951b891677b1be3af8a8f36"/>
+          <topic label="redisxClusterIsRedirected" href="redisx_8h.html#a537ed3806a44fb40f6e8dccd813ad0da"/>
+          <topic label="redisxClusterMoved" href="redisx_8h.html#a19fc54725ba4725e0281cff59b642e15"/>
           <topic label="redisxConnect" href="redisx_8h.html#ad71822356ffd40ed4b1c71d065f48809"/>
           <topic label="redisxCopyOfRESP" href="redisx_8h.html#af093c487ee72ade826ce894f59691475"/>
           <topic label="redisxDebugTraffic" href="redisx_8h.html#a7cde25fca6ae274d8d0a66d5c8b63ff5"/>
@@ -250,6 +275,8 @@
           <topic label="redisxSelectDB" href="redisx_8h.html#aec99fb8b19d6751038bf9c4c6d04f8d0"/>
           <topic label="redisxSendArrayRequestAsync" href="redisx_8h.html#a9b869bd8912f647f4abe5c98abf3a88d"/>
           <topic label="redisxSendRequestAsync" href="redisx_8h.html#afc7b28288c07baf0b3c8fdc9d8ddf263"/>
+          <topic label="redisxSetDHCipherParams" href="redisx_8h.html#ab1f40a05c3c74c55f0f92066cbc7db09"/>
+          <topic label="redisxSetMutualTLS" href="redisx_8h.html#ad62a82cdab6e2fd11da87b1bdcc1604b"/>
           <topic label="redisxSetPassword" href="redisx_8h.html#a0e9eda38aa6f084ac151cbebe2886c2f"/>
           <topic label="redisxSetPipelineConsumer" href="redisx_8h.html#a0799a0a79705d1a7579bdf57879d1fec"/>
           <topic label="redisxSetPort" href="redisx_8h.html#a37f39ede48014a2463e4c72bf6eb5a3e"/>
@@ -261,6 +288,11 @@
           <topic label="redisxSetSocketErrorHandler" href="redisx_8h.html#ad3aaa3b6fb5353a52a7013421baa9b89"/>
           <topic label="redisxSetSocketTimeout" href="redisx_8h.html#aaa87635d37e5d348b7dbb12952b39183"/>
           <topic label="redisxSetTcpBuf" href="redisx_8h.html#a648557774b354ff99e279d3dcf94d240"/>
+          <topic label="redisxSetTLS" href="redisx_8h.html#a1820331a34d40c9dcc894480e22d90e7"/>
+          <topic label="redisxSetTLSCiphers" href="redisx_8h.html#a11828fc2962a62c27bf8b5627f69a8a0"/>
+          <topic label="redisxSetTLSCipherSuites" href="redisx_8h.html#aece815a388c13dfa9381d194fc65526a"/>
+          <topic label="redisxSetTLSServerName" href="redisx_8h.html#a9cafd12ab9ff4df77c7fc9d6bac33c1a"/>
+          <topic label="redisxSetTLSSkipVerify" href="redisx_8h.html#afa24f8a0e389625005685f3ec2dd0bca"/>
           <topic label="redisxSetUser" href="redisx_8h.html#a3beff3a9e373a0f1de626a8e64da98cf"/>
           <topic label="redisxSetValue" href="redisx_8h.html#a1465b1a965ddd685e16bccbf0b34f08b"/>
           <topic label="redisxSetValueAsync" href="redisx_8h.html#a9e784632598b0c418a3ae3a87aa09fe4"/>
@@ -294,6 +326,19 @@
           <topic label="redisxStartBlockAsync" href="redisx-client_8c.html#a3e49508e4e4fcc283832226fd1bffd85"/>
           <topic label="redisxUnlockClient" href="redisx-client_8c.html#a87efe53c80fcff3fcf189362cbc602f7"/>
         </topic>
+        <topic label="redisx-cluster.c" href="redisx-cluster_8c.html">
+          <topic label="redisxClusterAskMigrating" href="redisx-cluster_8c.html#aa6c97d758f2eb78216702432a40fac6f"/>
+          <topic label="redisxClusterAskMigratingAsync" href="redisx-cluster_8c.html#a1f27971d485e30863df37af6ef388e61"/>
+          <topic label="redisxClusterConnect" href="redisx-cluster_8c.html#a83dadbc667e48fab6272bed1025a3db8"/>
+          <topic label="redisxClusterDestroy" href="redisx-cluster_8c.html#a3b2fb45ad35cbc4e501db00f5c416ef9"/>
+          <topic label="redisxClusterDisconnect" href="redisx-cluster_8c.html#aaf2048bd9d3c86f57234c856ec7e1350"/>
+          <topic label="redisxClusterGetRedirection" href="redisx-cluster_8c.html#ac40bd92e2c9cc4f14521c2efcea57018"/>
+          <topic label="redisxClusterGetShard" href="redisx-cluster_8c.html#a383492763c7162b48bb86e9523bfff69"/>
+          <topic label="redisxClusterInit" href="redisx-cluster_8c.html#a325731b1f8f467cf2c84700b345049ba"/>
+          <topic label="redisxClusterIsMigrating" href="redisx-cluster_8c.html#a57a19ba90951b891677b1be3af8a8f36"/>
+          <topic label="redisxClusterIsRedirected" href="redisx-cluster_8c.html#a537ed3806a44fb40f6e8dccd813ad0da"/>
+          <topic label="redisxClusterMoved" href="redisx-cluster_8c.html#a19fc54725ba4725e0281cff59b642e15"/>
+        </topic>
         <topic label="redisx-hooks.c" href="redisx-hooks_8c.html">
           <topic label="redisxAddConnectHook" href="redisx-hooks_8c.html#aab103bdeb66dd1daded10e1f6e993568"/>
           <topic label="redisxAddDisconnectHook" href="redisx-hooks_8c.html#a37d95c69831058865b078f0f0f20d540"/>
@@ -311,6 +356,7 @@
           <topic label="redisxInit" href="redisx-net_8c.html#a5c78c2189a76a077231016564a0cecd5"/>
           <topic label="redisxIsConnected" href="redisx-net_8c.html#a94326ebfa5868579c8448cdbb941b3da"/>
           <topic label="redisxReconnect" href="redisx-net_8c.html#a55a2efad7c8d8f840f4144a217f58965"/>
+          <topic label="redisxSetHostname" href="redisx-net_8c.html#a16a0aa9545e7dd5fd290dd2b4ee968f1"/>
           <topic label="redisxSetPort" href="redisx-net_8c.html#a37f39ede48014a2463e4c72bf6eb5a3e"/>
           <topic label="redisxSetSocketTimeout" href="redisx-net_8c.html#aaa87635d37e5d348b7dbb12952b39183"/>
           <topic label="redisxSetTcpBuf" href="redisx-net_8c.html#a648557774b354ff99e279d3dcf94d240"/>
@@ -353,6 +399,15 @@
           <topic label="redisxSetScanCount" href="redisx-tab_8c.html#a3bd0d2964966ed6655358ff2fe0802c0"/>
           <topic label="redisxSetValue" href="redisx-tab_8c.html#a1465b1a965ddd685e16bccbf0b34f08b"/>
           <topic label="redisxSetValueAsync" href="redisx-tab_8c.html#a9e784632598b0c418a3ae3a87aa09fe4"/>
+        </topic>
+        <topic label="redisx-tls.c" href="redisx-tls_8c.html">
+          <topic label="redisxSetDHCipherParams" href="redisx-tls_8c.html#ab1f40a05c3c74c55f0f92066cbc7db09"/>
+          <topic label="redisxSetMutualTLS" href="redisx-tls_8c.html#ad62a82cdab6e2fd11da87b1bdcc1604b"/>
+          <topic label="redisxSetTLS" href="redisx-tls_8c.html#a1820331a34d40c9dcc894480e22d90e7"/>
+          <topic label="redisxSetTLSCiphers" href="redisx-tls_8c.html#a11828fc2962a62c27bf8b5627f69a8a0"/>
+          <topic label="redisxSetTLSCipherSuites" href="redisx-tls_8c.html#aece815a388c13dfa9381d194fc65526a"/>
+          <topic label="redisxSetTLSServerName" href="redisx-tls_8c.html#a9cafd12ab9ff4df77c7fc9d6bac33c1a"/>
+          <topic label="redisxSetTLSSkipVerify" href="redisx-tls_8c.html#afa24f8a0e389625005685f3ec2dd0bca"/>
         </topic>
         <topic label="redisx.c" href="redisx_8c.html">
           <topic label="redisxArrayRequest" href="redisx_8c.html#ac6767cea95b4cc90348796c61ebdac75"/>

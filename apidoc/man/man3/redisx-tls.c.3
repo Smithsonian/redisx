@@ -1,0 +1,238 @@
+.TH "src/redisx-tls.c" 3 "Version v0.9" "RedisX" \" -*- nroff -*-
+.ad l
+.nh
+.SH NAME
+src/redisx-tls.c
+.SH SYNOPSIS
+.br
+.PP
+.SS "Functions"
+
+.in +1c
+.ti -1c
+.RI "int \fBredisxSetDHCipherParams\fP (\fBRedis\fP *redis, const char *dh_params_file)"
+.br
+.ti -1c
+.RI "int \fBredisxSetMutualTLS\fP (\fBRedis\fP *redis, const char *cert_file, const char *key_file)"
+.br
+.ti -1c
+.RI "int \fBredisxSetTLS\fP (\fBRedis\fP *redis, const char *ca_path, const char *ca_file)"
+.br
+.ti -1c
+.RI "int \fBredisxSetTLSCiphers\fP (\fBRedis\fP *redis, const char *cipher_list)"
+.br
+.ti -1c
+.RI "int \fBredisxSetTLSCipherSuites\fP (\fBRedis\fP *redis, const char *list)"
+.br
+.ti -1c
+.RI "int \fBredisxSetTLSServerName\fP (\fBRedis\fP *redis, const char *host)"
+.br
+.ti -1c
+.RI "int \fBredisxSetTLSSkipVerify\fP (\fBRedis\fP *redis, \fBboolean\fP value)"
+.br
+.in -1c
+.SH "Detailed Description"
+.PP 
+
+.PP
+\fBDate\fP
+.RS 4
+Created on Jan 6, 2025 
+.RE
+.PP
+\fBAuthor\fP
+.RS 4
+Attila Kovacs 
+.RE
+.PP
+
+.SH "Function Documentation"
+.PP 
+.SS "int redisxSetDHCipherParams (\fBRedis\fP * redis, const char * dh_params_file)"
+Sets parameters for DH-based cyphers when using a TLS encrypted connection to \fBRedis\fP\&.
+.PP
+\fBParameters\fP
+.RS 4
+\fIredis\fP A \fBRedis\fP instance\&. 
+.br
+\fIdh_params_file\fP Path to the DH-based cypher parameters file,or NULL for no params\&. 
+.RE
+.PP
+\fBReturns\fP
+.RS 4
+X_SUCCESS (0) if successful, or else an error code <0\&.
+.RE
+.PP
+\fBSee also\fP
+.RS 4
+\fBredisxSetTLS()\fP 
+.PP
+\fBredisxSetTLSCiphers()\fP 
+.RE
+.PP
+
+.PP
+References \fBx_error()\fP, \fBX_FAILURE\fP, \fBX_SUCCESS\fP, and \fBxStringCopyOf()\fP\&.
+.SS "int redisxSetMutualTLS (\fBRedis\fP * redis, const char * cert_file, const char * key_file)"
+Set a TLS certificate and private key for mutual TLS\&. You will still need to call \fBredisxSetTLS()\fP also to create a complete TLS configuration\&. \fBRedis\fP normally uses mutual TLS, which requires both the client and the server to authenticate themselves\&. For this you need the server's TLS certificate and private key also\&. It is possible to configure \fBRedis\fP servers to verify one way only with a CA certificate, in which case you don't need to call this to configure the client\&.
+.PP
+\fBParameters\fP
+.RS 4
+\fIredis\fP A \fBRedis\fP instance\&. 
+.br
+\fIcert_file\fP Path to the server's certificate file\&. 
+.br
+\fIkey_file\fP Path to the server'sprivate key file\&. 
+.RE
+.PP
+\fBReturns\fP
+.RS 4
+X_SUCCESS (0) if successful, or else an error code <0\&.
+.RE
+.PP
+\fBSee also\fP
+.RS 4
+\fBredisxSetTLS()\fP 
+.RE
+.PP
+
+.PP
+References \fBx_error()\fP, \fBX_FAILURE\fP, \fBX_NULL\fP, \fBX_SUCCESS\fP, and \fBxStringCopyOf()\fP\&.
+.SS "int redisxSetTLS (\fBRedis\fP * redis, const char * ca_path, const char * ca_file)"
+Configures a TLS-encrypted connection to \fBRedis\fP with the specified CA certificate file\&. Normally you will want to set up mutual TLS with \fBredisxSetMutualTLS()\fP also, unless the server is not requiring mutual authentication\&. Additionally, you might also want to set parameters for DH-based cyphers if needed using redisxSetDHCypherParams()\&.
+.PP
+\fBParameters\fP
+.RS 4
+\fIredis\fP A \fBRedis\fP instance\&. 
+.br
+\fIca_path\fP Directory containing CA certificates\&. It may be NULL to use the default locations\&. 
+.br
+\fIca_file\fP CA certificate file rel\&. to specified directory\&. It may be NULL to use default certificate\&. 
+.RE
+.PP
+\fBReturns\fP
+.RS 4
+X_SUCCESS (0) if successful, or else an error code <0\&.
+.RE
+.PP
+\fBSee also\fP
+.RS 4
+\fBredisxSetMutualTLS()\fP 
+.PP
+\fBredisxSetDHCipherParams()\fP 
+.PP
+\fBredisxSetTLSCiphers()\fP 
+.PP
+\fBredisxSetTLSCipherSuites()\fP 
+.PP
+\fBredisxSetTLSServerName()\fP 
+.PP
+redisxTLSSkipVerify() 
+.RE
+.PP
+
+.PP
+References \fBTRUE\fP, \fBx_error()\fP, \fBX_FAILURE\fP, \fBX_SUCCESS\fP, and \fBxStringCopyOf()\fP\&.
+.SS "int redisxSetTLSCiphers (\fBRedis\fP * redis, const char * cipher_list)"
+Sets the TLS ciphers to try (TLSv1\&.2 and earlier)\&.
+.PP
+\fBParameters\fP
+.RS 4
+\fIredis\fP A \fBRedis\fP instance\&. 
+.br
+\fIcipher_list\fP a colon (:) separated list of ciphers, or NULL for default ciphers\&. 
+.RE
+.PP
+\fBReturns\fP
+.RS 4
+X_SUCCESS (0) if successful, or else an error code <0\&.
+.RE
+.PP
+\fBSee also\fP
+.RS 4
+\fBredisxSetTLSCipherSuites()\fP 
+.PP
+\fBredisxSetTLS()\fP 
+.PP
+\fBredisxSetDHCipherParams()\fP 
+.RE
+.PP
+
+.PP
+References \fBx_error()\fP, \fBX_FAILURE\fP, \fBX_SUCCESS\fP, and \fBxStringCopyOf()\fP\&.
+.SS "int redisxSetTLSCipherSuites (\fBRedis\fP * redis, const char * list)"
+Sets the TLS ciphers suites to try (TLSv1\&.3 and later)\&.
+.PP
+\fBParameters\fP
+.RS 4
+\fIredis\fP A \fBRedis\fP instance\&. 
+.br
+\fIlist\fP a colon (:) separated list of cipher suites, or NULL for default cipher suites\&. 
+.RE
+.PP
+\fBReturns\fP
+.RS 4
+X_SUCCESS (0) if successful, or else an error code <0\&.
+.RE
+.PP
+\fBSee also\fP
+.RS 4
+\fBredisxSetTLSCiphers()\fP 
+.PP
+\fBredisxSetTLS()\fP 
+.PP
+\fBredisxSetDHCipherParams()\fP 
+.RE
+.PP
+
+.PP
+References \fBx_error()\fP, \fBX_FAILURE\fP, \fBX_SUCCESS\fP, and \fBxStringCopyOf()\fP\&.
+.SS "int redisxSetTLSServerName (\fBRedis\fP * redis, const char * host)"
+Sets the Server name for TLS Server Name Indication (SNI), an optional extra later of security\&.
+.PP
+\fBParameters\fP
+.RS 4
+\fIredis\fP A \fBRedis\fP instance\&. 
+.br
+\fIhost\fP server name to use for SNI\&. 
+.RE
+.PP
+\fBReturns\fP
+.RS 4
+X_SUCCESS (0)
+.RE
+.PP
+\fBSee also\fP
+.RS 4
+\fBredisxSetTLS()\fP 
+.RE
+.PP
+
+.PP
+References \fBx_error()\fP, \fBX_FAILURE\fP, \fBX_SUCCESS\fP, and \fBxStringCopyOf()\fP\&.
+.SS "int redisxSetTLSSkipVerify (\fBRedis\fP * redis, \fBboolean\fP value)"
+Sets whether to verify the the certificate\&.
+.PP
+\fBParameters\fP
+.RS 4
+\fIredis\fP A \fBRedis\fP instance\&. 
+.br
+\fIvalue\fP TRUE (non-zero) or FALSE (0) 
+.RE
+.PP
+\fBReturns\fP
+.RS 4
+X_SUCCESS (0)
+.RE
+.PP
+\fBSee also\fP
+.RS 4
+\fBredisxSetTLS()\fP 
+.RE
+.PP
+
+.PP
+References \fBx_error()\fP, \fBX_FAILURE\fP, and \fBX_SUCCESS\fP\&.
+.SH "Author"
+.PP 
+Generated automatically by Doxygen for RedisX from the source code\&.

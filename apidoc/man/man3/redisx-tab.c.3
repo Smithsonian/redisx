@@ -281,7 +281,7 @@ X_SUCCESS (0) on success or an error code (<0) from \fBredisx\&.h\fP / \fBxchang
 .PP
 
 .PP
-References \fBRedis::interactive\fP, \fBREDIS_ERROR\fP, \fBredisxCheckRESP()\fP, \fBredisxCheckValid()\fP, \fBredisxDestroyRESP()\fP, \fBredisxLockConnected()\fP, \fBredisxMultiSetAsync()\fP, \fBredisxReadReplyAsync()\fP, \fBredisxUnlockClient()\fP, \fBRESP_SIMPLE_STRING\fP, \fBRESP::value\fP, \fBx_error()\fP, \fBX_GROUP_INVALID\fP, \fBX_NULL\fP, \fBX_SIZE_INVALID\fP, and \fBX_SUCCESS\fP\&.
+References \fBRedis::interactive\fP, \fBREDIS_UNEXPECTED_RESP\fP, \fBredisxArrayRequest()\fP, \fBredisxCheckValid()\fP, \fBredisxDestroyRESP()\fP, \fBredisxMultiSetAsync()\fP, \fBRESP::value\fP, \fBx_error()\fP, \fBX_FAILURE\fP, \fBX_SUCCESS\fP, and \fBx_trace()\fP\&.
 .SS "int redisxMultiSetAsync (\fBRedisClient\fP * cl, const char * table, const \fBRedisEntry\fP * entries, int n, \fBboolean\fP confirm)"
 Sets multiple key/value pairs in a given hash table\&. This function should be called with exclusive access to the client\&.
 .PP
@@ -312,7 +312,7 @@ X_SUCCESS (0) on success or an error code (<0) from \fBredisx\&.h\fP / \fBxchang
 .PP
 
 .PP
-References \fBRedisEntry::length\fP, \fBredisxSendArrayRequestAsync()\fP, \fBredisxSkipReplyAsync()\fP, \fBx_error()\fP, \fBX_FAILURE\fP, \fBX_GROUP_INVALID\fP, \fBX_NULL\fP, \fBX_SIZE_INVALID\fP, \fBX_SUCCESS\fP, and \fBx_trace()\fP\&.
+References \fBredisxSendArrayRequestAsync()\fP, \fBredisxSkipReplyAsync()\fP, \fBX_FAILURE\fP, \fBX_SUCCESS\fP, and \fBx_trace()\fP\&.
 .SS "char ** redisxScanKeys (\fBRedis\fP * redis, const char * pattern, int * n, int * status)"
 Returns an alphabetical list of the \fBRedis\fP keys using the \fBRedis\fP SCAN command\&. Because it uses the scan command, it is guaranteed to not hog the database for excessive periods, and hence it is preferable to redisxGetKeys(table=NULL)\&.
 .PP
@@ -429,12 +429,12 @@ Sets a global or hashtable value on \fBRedis\fP\&.
 .PP
 \fBReturns\fP
 .RS 4
-X_SUCCESS if the variable was succesfully set, or: X_NO_INIT X_NAME_INVALID X_NULL X_NO_SERVICE X_FAILURE 
+X_SUCCESS (0) if the variable was succesfully set, or: X_NO_INIT X_NAME_INVALID X_NULL X_NO_SERVICE X_FAILURE 
 .RE
 .PP
 
 .PP
-References \fBRedis::interactive\fP, \fBredisxCheckValid()\fP, \fBredisxLockConnected()\fP, \fBredisxSetValueAsync()\fP, \fBredisxUnlockClient()\fP, and \fBX_SUCCESS\fP\&.
+References \fBFALSE\fP, \fBRedis::interactive\fP, \fBredisxCheckRESP()\fP, \fBredisxDestroyRESP()\fP, \fBredisxLockConnected()\fP, \fBredisxRequest()\fP, \fBredisxSetValueAsync()\fP, \fBredisxUnlockClient()\fP, \fBRESP_INT\fP, \fBx_error()\fP, \fBX_NULL\fP, and \fBX_SUCCESS\fP\&.
 .SS "int redisxSetValueAsync (\fBRedisClient\fP * cl, const char * table, const char * key, const char * value, \fBboolean\fP confirm)"
 Sends a request for setting a table value, using the \fBRedis\fP 'SET' or 'HSET' command\&.
 .PP
@@ -448,7 +448,7 @@ Sends a request for setting a table value, using the \fBRedis\fP 'SET' or 'HSET'
 .br
 \fIvalue\fP The string value to set (assumes normal string termination)\&.' 
 .br
-\fIconfirm\fP Whether confirmation is required from \fBRedis\fP to acknowledge\&.
+\fIconfirm\fP Whether confirmation is requested from \fBRedis\fP to acknowledge\&.
 .RE
 .PP
 \fBReturns\fP
@@ -458,7 +458,7 @@ X_SUCCESS (0) if successful, or X_NULL if the client or value is NULL X_NAME_INV
 .PP
 
 .PP
-References \fBredisxCheckRESP()\fP, \fBredisxDestroyRESP()\fP, \fBredisxReadReplyAsync()\fP, \fBredisxSendRequestAsync()\fP, \fBredisxSkipReplyAsync()\fP, \fBRESP_INT\fP, \fBx_error()\fP, \fBX_NAME_INVALID\fP, \fBX_NULL\fP, \fBX_SUCCESS\fP, and \fBxvprintf\fP\&.
+References \fBredisxSendRequestAsync()\fP, \fBredisxSkipReplyAsync()\fP, \fBx_error()\fP, \fBX_NAME_INVALID\fP, \fBX_NULL\fP, \fBX_SUCCESS\fP, and \fBxvprintf\fP\&.
 .SH "Author"
 .PP 
 Generated automatically by Doxygen for RedisX from the source code\&.
