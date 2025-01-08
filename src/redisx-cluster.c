@@ -95,8 +95,10 @@ static uint16_t crc16(const uint8_t *buf, size_t len) {
  * Returns the hash value using the same ZMODEM / ACORN CRC-16 algorithm that Redis
  * uses internally.
  *
- * @param key
- * @return
+ * @param key   The Redis key. If it contains a hashtafg, then only the hash for the
+ *              tagged part is returned. NULL and empty keys are allowed and will
+ *              return the hash slot 0.
+ * @return      The Redis hash slot for the key.
  */
 uint16_t rCalcHash(const char *key) {
   const char *from;
@@ -114,6 +116,12 @@ uint16_t rCalcHash(const char *key) {
 }
 /// \endcond
 
+/**
+ * Discards the shards of a cluster configuration, freeing up the resources it used.
+ *
+ * @param shards      array of cluster shards
+ * @param n_shards    the number of shards in the array.
+ */
 static void rDiscardShardsAsync(RedisShard *shards, int n_shards) {
   int i;
 
@@ -407,6 +415,23 @@ Redis *redisxClusterGetShard(RedisCluster *cluster, const char *key) {
 }
 
 /// \cond PRIVATE
+
+
+/**
+ * Returns the Redis server in a cluster for the given host name and port. If the `refresh` option
+ * is set to TRUE (non-zero), and the given host/port is not found in the current cluster configuration,
+ * then the cluster configuration is refreshed before retrying once more.
+ *
+ * @param cluster     Pointer to a Redis cluster configuration
+ * @param host        host name or IP address of shard
+ * @param port        port number of shard.
+ * @return            A connected Redis server (cluster shard), or NULL if either input pointer
+ *                    is NULL (errno = EINVAL), or the cluster has not been initialized (errno = ENXIO),
+ *                    or if no node could be connected to serve queries for the given key (errno = EAGAIN).
+ *
+ * @sa redisxClusterInit()
+ * @sa redisxClusterMoved()
+ */
 static Redis *rClusterGetShardByAddress(RedisCluster *cluster, const char *host, int port, boolean refresh) {
   static const char *fn = "redisxClusterGetShard";
 
