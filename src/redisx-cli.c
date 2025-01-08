@@ -74,10 +74,13 @@ static void process(const char **cmdargs, int nargs) {
   RESP *reply, *attr = NULL;
 
   if(cluster) {
-    const char *key = cmdargs[1];
+    const char *key = NULL;
 
-    if(nargs > 3) if(strcasecmp("EVAL", cmdargs[0]) == 0 || strcasecmp("EVALSHA", cmdargs[0]) || strcasecmp("FCALL", cmdargs[0]))
-      key = cmdargs[3];
+    if(nargs > 1) {
+      key = cmdargs[1];
+      if(nargs > 3) if(strcasecmp("EVAL", cmdargs[0]) == 0 || strcasecmp("EVALSHA", cmdargs[0]) || strcasecmp("FCALL", cmdargs[0]))
+        key = cmdargs[3];
+    }
 
     redis = redisxClusterGetShard(cluster, key);
     if(!redis) {

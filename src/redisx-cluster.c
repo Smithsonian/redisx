@@ -99,7 +99,11 @@ static uint16_t crc16(const uint8_t *buf, size_t len) {
  * @return
  */
 uint16_t rCalcHash(const char *key) {
-  const char *from = strchr(key, '{');
+  const char *from;
+
+  if(!key) return 0;
+
+  from = strchr(key, '{');
 
   if(from) {
     const char *to = strchr(++from, '}');
@@ -350,6 +354,7 @@ int rClusterRefresh(RedisCluster *cluster) {
  *                    contains a segment enclosed in {} brackets, then the hash will be
  *                    calculated on the bracketed segment only. E.g. `{user:1000}.name` and
  *                    `{user:1000}.address` will both return the same hash for `user:1000` only.
+ *                    NULL and empty keys are allowed and will return the shard for slot 0.
  * @return            A connected Redis server (cluster shard), which can be used for
  *                    queries on the given keyword, or NULL if either input pointer is NULL
  *                    (errno = EINVAL), or the cluster has not been initialized (errno = ENXIO),
@@ -368,16 +373,6 @@ Redis *redisxClusterGetShard(RedisCluster *cluster, const char *key) {
 
   if(!cluster) {
     x_error(X_NULL, EINVAL, fn, "cluster is NULL");
-    return NULL;
-  }
-
-  if(!key) {
-    x_error(X_NAME_INVALID, EINVAL, fn, "key is NULL");
-    return NULL;
-  }
-
-  if(!key[0]) {
-    x_error(X_NAME_INVALID, EINVAL, fn, "key is empty");
     return NULL;
   }
 
