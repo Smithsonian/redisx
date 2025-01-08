@@ -114,12 +114,12 @@ RedisEntry *redisxGetTable(Redis *redis, const char *table, int *n) {
  * \param value         A proper 0-terminated string value to store.
  * \param confirm       Whether we should get a confirmation from the server (requires a round-trip).
  *
- * \return      X_SUCCESS if the variable was succesfully set, or:
- *                  X_NO_INIT
- *                  X_NAME_INVALID
- *                  X_NULL
- *                  X_NO_SERVICE
- *                  X_FAILURE
+ * \return      X_SUCCESS (0) if the variable was succesfully set, or:
+ *              X_NO_INIT
+ *              X_NAME_INVALID
+ *              X_NULL
+ *              X_NO_SERVICE
+ *              X_FAILURE
  *
  */
 int redisxSetValue(Redis *redis, const char *table, const char *key, const char *value, boolean confirm) {
@@ -131,6 +131,13 @@ int redisxSetValue(Redis *redis, const char *table, const char *key, const char 
   prop_error(fn, redisxLockConnected(redis->interactive));
 
   status = redisxSetValueAsync(redis->interactive, table, key, value, confirm);
+
+  if(!status && confirm) {
+    RESP *reply = redisxReadReplyAsync(redis->interactive, &status);
+    if(!status) status = redisxCheckRESP(reply, RESP_INT, 0);
+    redisxDestroyRESP(reply);
+  }
+
   redisxUnlockClient(redis->interactive);
 
   prop_error(fn, status);
@@ -144,7 +151,7 @@ int redisxSetValue(Redis *redis, const char *table, const char *key, const char 
  * \param table     Hashtable from which to retrieve a value or NULL if to use the global table.
  * \param key       Field name (i.e. variable name).
  * \param value     The string value to set (assumes normal string termination).'
- * \param confirm   Whether confirmation is required from Redis to acknowledge.
+ * \param confirm   Whether confirmation is requested from Redis to acknowledge.
  *
  * \return          X_SUCCESS (0)   if successful, or
  *                  X_NULL          if the client or value is NULL
@@ -171,15 +178,6 @@ int redisxSetValueAsync(RedisClient *cl, const char *table, const char *key, con
   prop_error(fn, status);
 
   xvprintf("Redis-X> set %s = %s on %s\n", key, value, table);
-
-  if(confirm) {
-    RESP *reply = redisxReadReplyAsync(cl, &status);
-    prop_error(fn, status);
-
-    status = redisxCheckRESP(reply, RESP_INT, 0);
-    redisxDestroyRESP(reply);
-    prop_error(fn, status);
-  }
 
   return X_SUCCESS;
 }
