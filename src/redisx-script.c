@@ -76,7 +76,7 @@ static const char **rGetScriptArgs(const char *sha1, const char **keys, const ch
   sprintf(sn, "%d", nkeys);
   args = (const char **) malloc(n * sizeof(char *));
   if(!args) {
-    *nargs = x_error(0, errno, "rGetScriptArgs", "alloc() error (%d char *)", n);
+    *nargs = x_error(X_FAILURE, errno, "rGetScriptArgs", "alloc() error (%d char *)", n);
     return NULL;
   }
 
@@ -121,7 +121,10 @@ int redisxRunScriptAsync(RedisClient *cl, const char *sha1, const char **keys, c
   if(sha1 == NULL) return x_error(X_NULL, EINVAL, fn, "input script SHA1 sum is NULL");
 
   args = rGetScriptArgs(sha1, keys, params, &nargs);
-  prop_error(fn, nargs);
+  if(!args) {
+    if(args) free(args);
+    return x_trace(fn, NULL, nargs);
+  }
 
   status = redisxSendArrayRequestAsync(cl, (const char **) args, NULL, nargs);
   free(args);
