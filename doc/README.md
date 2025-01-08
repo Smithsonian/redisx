@@ -1660,9 +1660,7 @@ settings.
 
 Some obvious ways the library could evolve and grow in the not too distant future:
 
- - TLS support.
  - Automated regression testing and coverage tracking.
- - Keep track of subscription patterns, and automatically resubscribe to them on reconnecting.
  - Add high-level support for managing and calling custom Redis functions.
  - Add more high-level [Redis commands](https://redis.io/docs/latest/commands/), e.g. for lists, streams, etc.
 
