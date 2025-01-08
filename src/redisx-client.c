@@ -111,7 +111,7 @@ static int rReadChunkAsync(ClientPrivate *cp) {
   pfd.fd = sock;
   pfd.events = POLLIN;
 
-  status = poll(&pfd, 1, -1);
+  status = poll(&pfd, 1, cp->timeoutMillis > 0 ? cp->timeoutMillis : -1);
 
   if(status < 1) cp->available = status;
   else if(pfd.revents & POLLIN) {
@@ -855,6 +855,7 @@ int redisxClearAttributesAsync(RedisClient *cl) {
   return X_SUCCESS;
 }
 
+
 /**
  * Reads a response from Redis and returns it.
  *
@@ -865,6 +866,8 @@ int redisxClearAttributesAsync(RedisClient *cl) {
  *              (errno will be set to describe the error, which may either be an errno produced by recv()
  *              or EBADMSG if the message was corrupted and/or unparseable. If the error is irrecoverable
  *              i.e., other than a timeout, the client will be disabled.)
+ *
+ * @sa redisxSetReplyTimeout()
  */
 RESP *redisxReadReplyAsync(RedisClient *cl, int *pStatus) {
   static const char *fn = "redisxReadReplyAsync";

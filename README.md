@@ -383,8 +383,14 @@ will not be used, and RESP2 will be assumed -- which is best for older servers (
 always check the actual protocol used after connecting, using `redisxGetProtocol()`). Note, that after connecting, 
 you may retrieve the set of server properties sent in response to `HELLO` using `redisxGetHelloData()`.
 
-Optionally, you can select the database index to use now (or later, after connecting), if not the default (index 
-0):
+You can also set a timeout for the interative transactions, such as:
+
+```c
+  // (optional) Set a 1.5 second timeout for interactive replies
+  redisxSetReplyTimeout(redis, 1500);
+```
+
+You may also select the database index to use now (or later, after connecting), if not the default (index 0):
 
 ```c
   // (optional) Select the database index 2

@@ -388,6 +388,7 @@ void redisxSetVerbose(boolean value);
 boolean redisxIsVerbose();
 void redisxDebugTraffic(boolean value);
 
+int redisxSetReplyTimeout(Redis *redis, int timeoutMillis);
 int redisxSetSocketTimeout(Redis *redis, int millis);
 int redisxSetTcpBuf(Redis *redis, int size);
 int redisxSetSentinelTimeout(Redis *redis, int millis);

@@ -233,6 +233,27 @@ enum redisx_protocol redisxGetProtocol(Redis *redis) {
 }
 
 /**
+ * Set a timeout for getting replies on the interactive client. This does not affect the pipeline
+ * and subscription clients, which do not have a timeout (appropriately for asynchronous processing)
+ *
+ * @param redis             Pointer to a Redis instance.
+ * @param timeoutMillis     [ms] timeout for interactive responses, or &lt;0 for indefinite.
+ * @return                  X_SUCCESS (0).
+ *
+ * @sa redisxSetSocketTimeout()
+ */
+int redisxSetReplyTimeout(Redis *redis, int timeoutMillis) {
+  ClientPrivate *cp;
+
+  prop_error("redisxSetTcpBuf", rConfigLock(redis));
+  cp = (ClientPrivate *) redis->interactive->priv;
+  cp->timeoutMillis = timeoutMillis > 0 ? timeoutMillis : -1;
+  rConfigUnlock(redis);
+
+  return X_SUCCESS;
+}
+
+/**
  * Sets a user-defined callback for additioan custom configuring of client sockets
  *
  *

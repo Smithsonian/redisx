@@ -357,7 +357,11 @@ int main(int argc, const char *argv[]) {
   if(user) redisxSetUser(redis, user);
   if(password) redisxSetPassword(redis, password);
   if(dbIndex > 0) redisxSelectDB(redis, dbIndex);
-  if(timeout > 0.0) redisxSetSocketTimeout(redis, (int) ceil(1000 * timeout));
+  if(timeout > 0.0) {
+    int ms = (int) ceil(1000 * timeout);
+    redisxSetSocketTimeout(redis, ms);
+    redisxSetReplyTimeout(redis, ms);
+  }
   if(protocol > 0) redisxSetProtocol(redis, protocol);
 
   if(push) if(strcmp("y", push) == 0 || strcmp("yes", push) == 0) redisxSetPushProcessor(redis, PushProcessor, NULL);

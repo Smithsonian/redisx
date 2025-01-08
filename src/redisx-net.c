@@ -358,7 +358,6 @@ static void rResetClientAsync(RedisClient *cl) {
   rDestroyClientTLS(cp);
 #endif
 
-
   cp->socket = -1;                  // Reset the channel's socket descriptor to 'unassigned'
 }
 
@@ -940,14 +939,18 @@ int redisxSetPort(Redis *redis, int port) {
 
 
 /**
- * Sets a socket timeout for future client connections on a Redis instance. If not set (or set to zero
- * or a negative value), then the timeout will not be configured for sockets, and the system default
- * timeout values will apply.
+ * Sets a socket timeout for future client connections on a Redis instance. Effectively this is a timeout for
+ * send() only. The timeout for interatvice replies is controlled separately via redisxSetReplyTimoeut().
+ *
+ * If not set (or set to zero or a negative value), then the timeout will not be configured for sockets, and
+ * the system default timeout values will apply.
  *
  * @param redis      The Redis instance
  * @param millis     [ms] The desired socket read/write timeout, or &lt;0 for socket default.
  * @return           X_SUCCESS (0) if successful, or else X_NULL if the redis instance is NULL,
  *                   or X_NO_INIT if the redis instance is not initialized.
+ *
+ * @sa redisxSetReplyTimeout()
  */
 int redisxSetSocketTimeout(Redis *redis, int millis) {
   RedisPrivate *p;
