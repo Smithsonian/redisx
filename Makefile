@@ -29,7 +29,7 @@ else
 endif
 
 # Link against thread lib
-LDFLAGS += -pthread
+LDFLAGS += -lpthread
 
 # Build for distribution
 .PHONY: distro
