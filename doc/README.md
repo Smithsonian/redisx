@@ -206,7 +206,7 @@ prior to invoking `make`. The following build variables can be configured:
    default `LD_LIBRARY_PATH`.
    
  - `STATICLINK`: Set to 1 to prefer linking tools statically against `libredisx.a`. (It may still link dynamically if 
-   `libredisx.so` is also available.
+   `libredisx.so` is also available.)
  
 After configuring, you can simply run `make`, which will build the `shared` (`lib/libredisx.so[.1]`) and `static` 
 (`lib/libredisx.a`) libraries, local HTML documentation (provided `doxygen` is available), and performs static
