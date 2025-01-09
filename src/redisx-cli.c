@@ -421,6 +421,7 @@ int main(int argc, const char *argv[]) {
   if(push) if(strcmp("y", push) == 0 || strcmp("yes", push) == 0) redisxSetPushProcessor(redis, PushProcessor, NULL);
 
   if(tls) {
+#if WITH_TLS
     if(skip_verify) redisxSetTLSSkipVerify(redis, TRUE);
     if(sni) redisxSetTLSServerName(redis, sni);
     if(ca_path || ca_file) redisxSetTLS(redis, ca_path, ca_file);
@@ -431,6 +432,9 @@ int main(int argc, const char *argv[]) {
     }
     if(ciphers) redisxSetTLSCiphers(redis, ciphers);
     if(cipher_suites) redisxSetTLSCipherSuites(redis, cipher_suites);
+#else
+    fprintf(stderr, "ERROR! Cannot use TLS: RedisX was built without TLS support.\n");
+#endif
   }
 
   xSetDebug(1);
