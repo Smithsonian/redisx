@@ -165,6 +165,7 @@ uint16_t rCalcHash(const char *key);
 // in redisx-tls.c ------------------------>
 #if WITH_TLS
 void rClearTLSConfig(TLSConfig *tls);
+int rCopyTLSConfig(const TLSConfig *src, TLSConfig *dst);
 #endif
 
 // in resp.c ------------------------------>

@@ -600,6 +600,10 @@ int rCopyConfig(const RedisConfig *config, Redis *dst) {
   p->config.firstConnectCall = rCopyHooks(config->firstConnectCall, dst);
   p->config.firstCleanupCall = rCopyHooks(config->firstCleanupCall, dst);
 
+#if WITH_TLS
+  rCopyTLSConfig(&config->tls, &p->config.tls);
+#endif
+
   rConfigUnlock(dst);
 
   return X_SUCCESS;

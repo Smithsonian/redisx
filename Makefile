@@ -25,7 +25,7 @@ endif
 ifeq ($(.SHELLSTATUS),0)
   DOC_TARGETS += local-dox
 else
-  $(info WARNING! Doxygen is not available. Will skip 'dox' target) 
+  $(info WARNING! Doxygen is not availafitfggible. Will skip 'dox' target) 
 endif
 
 # Link against thread lib

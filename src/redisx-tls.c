@@ -45,6 +45,29 @@ void rClearTLSConfig(TLSConfig *tls) {
 }
 
 /**
+ * Copies a TLS configuration by making independent references
+ *
+ * @param src   original TLS configuration.
+ * @param dst   the destination that copies the original. If the destination has
+ *              non-NULL references they will be freed first.
+ * @return      X_SUCCESS (0)
+ */
+int rCopyTLSConfig(const TLSConfig *src, TLSConfig *dst) {
+  rClearTLSConfig(dst);
+
+  dst->hostname = xStringCopyOf(src->hostname);
+  dst->ca_certificate = xStringCopyOf(src->ca_certificate);
+  dst->ca_path = xStringCopyOf(src->ca_path);
+  dst->certificate = xStringCopyOf(src->certificate);
+  dst->key = xStringCopyOf(src->key);
+  dst->ciphers = xStringCopyOf(src->ciphers);
+  dst->cipher_suites = xStringCopyOf(src->cipher_suites);
+  dst->dh_params = xStringCopyOf(src->dh_params);
+
+  return X_SUCCESS;
+}
+
+/**
  * Shuts down SSL and frees up the SSL-related resources on a client.
  *
  * @param cp    Private client data.
