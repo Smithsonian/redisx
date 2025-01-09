@@ -422,7 +422,8 @@ int redisxSetTLSCipherSuites(Redis *redis, const char *list) {
  * Sets parameters for DH-based cyphers when using a TLS encrypted connection to Redis.
  *
  * @param redis            A Redis instance.
- * @param dh_params_file   Path to the DH-based cypher parameters file,or NULL for no params.
+ * @param dh_params_file   Path to the DH-based cypher parameters file (in PEM format; we don't support
+ *                         the old DER format), or NULL for no params.
  * @return                 X_SUCCESS (0) if successful, or else an error code &lt;0.
  *
  * @sa redisxSetTLS()
