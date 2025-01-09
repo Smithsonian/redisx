@@ -421,7 +421,7 @@ the necessary certificates, keys, and cypher parameters as needed, e.g.:
   // (optional) Set cipher suites to use (TLSv1.3 and later)
   redisxSetTLSCipherSuites(redisx, "ECDHE-RSA-AES256-GCM-SHA384:TLS_AES_256_GCM_SHA384");
   
-  // (optional) Set parameters for DH-based cyphers
+  // (optional) Set parameters for DH-based ciphers
   status = redisxSetDHCypherParams(redisx, "path/to/redis.dh");
   if(status) {
     // Oops, the parameter file is not accessible...

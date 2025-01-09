@@ -435,7 +435,7 @@ TLS configuration</h4>
 <div class="line"><span class="comment">// (optional) Set cipher suites to use (TLSv1.3 and later)</span></div>
 <div class="line"><a class="code hl_function" href="redisx-tls_8c.html#aece815a388c13dfa9381d194fc65526a">redisxSetTLSCipherSuites</a>(redisx, <span class="stringliteral">&quot;ECDHE-RSA-AES256-GCM-SHA384:TLS_AES_256_GCM_SHA384&quot;</span>);</div>
 <div class="line"> </div>
-<div class="line"><span class="comment">// (optional) Set parameters for DH-based cyphers</span></div>
+<div class="line"><span class="comment">// (optional) Set parameters for DH-based ciphers</span></div>
 <div class="line">status = redisxSetDHCypherParams(redisx, <span class="stringliteral">&quot;path/to/redis.dh&quot;</span>);</div>
 <div class="line"><span class="keywordflow">if</span>(status) {</div>
 <div class="line">  <span class="comment">// Oops, the parameter file is not accessible...</span></div>
