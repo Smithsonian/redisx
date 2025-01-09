@@ -466,7 +466,9 @@ int redisxUnlockClient(RedisClient *cl) {
 }
 
 /**
- * Instructs Redis to skip sending a reply for the next command.
+ * Instructs Redis to skip sending a reply for the next command. This function should be called
+ * with an exclusive lock on a connected client, and just before redisxSendRequest() or
+ * redisxSendArrayRequestAsync().
  *
  * Sends <code>CLIENT REPLY SKIP</code>
  *
@@ -476,7 +478,9 @@ int redisxUnlockClient(RedisClient *cl) {
  *                      if not connected to the Redis server on the requested channel, or if send()
  *                      failed, or else X_NO_INIT if the client was not initialized.
  *
- *
+ * @sa redixSendRequestAsync()
+ * @sa redisxSendArrayRequestAsync()
+ * @sa redisxGetLockedConnected()
  */
 int redisxSkipReplyAsync(RedisClient *cl) {
   static const char *fn = "redisSkipReplyAsync";
@@ -490,6 +494,8 @@ int redisxSkipReplyAsync(RedisClient *cl) {
 
 /**
  * Starts an atomic Redis transaction block, by sending <code>MULTI</code> on the specified client connection.
+ * This function should be called with an exclusive lock on a connected client.
+ *
  * Redis transaction blocks behave just like scripts (in fact they are effectively improptu scripts
  * themselves). As such the rules of Redis scripting apply, such as you cannot call LUA from within
  * a transaction block (which is a real pity...)
@@ -507,7 +513,7 @@ int redisxSkipReplyAsync(RedisClient *cl) {
  *
  * @sa redisxExecBlockAsync()
  * @sa redisxAbortBlockAsync()
- *
+ * @sa redisxGetLockedConnected()
  */
 int redisxStartBlockAsync(RedisClient *cl) {
   static const char *fn = "redisxStartBlockAsync";
@@ -520,7 +526,9 @@ int redisxStartBlockAsync(RedisClient *cl) {
 }
 
 /**
- * Abort an atomic transaction block. It sends <code>DISCARD</code>.
+ * Abort an atomic transaction block. It sends <code>DISCARD</code>. This function should be called
+ * with an exclusive lock on a connected client, and after starting an execution block with
+ * redisxStartBlockAsync().
  *
  * \param cl    Pointer to a Redis client
  *
@@ -529,7 +537,6 @@ int redisxStartBlockAsync(RedisClient *cl) {
  *              X_NO_INIT       if the client was not initialized.
  *
  * @sa redisxStartBlockAsync()
- *
  */
 int redisxAbortBlockAsync(RedisClient *cl) {
   static const char *fn = "redisxAbortBlockAsync";
@@ -546,7 +553,7 @@ int redisxAbortBlockAsync(RedisClient *cl) {
 /**
  * Finish and execute an atomic transaction block. It sends <code>EXEC</code>, skips through all
  * <code>OK</code> and <code>QUEUED</code> acknowledgements, and returns the reply to the transaction
- * block itself.
+ * block itself. This function should be called with an exclusive lock on a connected client.
  *
  * \param cl        Pointer to a Redis client
  * \param pStatus   Pointer to int in which to return error status. or NULL if not required.
@@ -555,7 +562,7 @@ int redisxAbortBlockAsync(RedisClient *cl) {
  *
  * @sa redisxStartBlockAsync()
  * @sa redisxAbortBlockAsync()
- *
+ * @sa redisxGetLockedConnected()
  */
 RESP *redisxExecBlockAsync(RedisClient *cl, int *pStatus) {
   static const char *fn = "redisxExecBlockAsync";
@@ -602,6 +609,13 @@ RESP *redisxExecBlockAsync(RedisClient *cl, int *pStatus) {
  * exclusive lock on the client for this version. The arguments supplied will be used up
  * to the first non-NULL value.
  *
+ * Unlike its interactive counterpart, redisxRequest(), this method does not follow cluster
+ * MOVED or ASK redirections automatically. It cannot, since it returns without waiting
+ * for a response. To implement redirections, the caller must keep track of the asynchronous
+ * requests sent, and check for redirections when processing responses via
+ * redisxReadReplyAsync(). If the response is a redirection, then the caller can decide if
+ * and how to re-submit the request to follow the redirection.
+ *
  * \param cl            Pointer to the Redis client instance.
  * \param command       Redis command string.
  * \param arg1          Optional first string argument or NULL.
@@ -610,6 +624,12 @@ RESP *redisxExecBlockAsync(RedisClient *cl, int *pStatus) {
  *
  * \return              X_SUCCESS (0) on success or X_NULL if the client is NULL, or else
  *                      X_NO_SERVICE if not connected to the client or if send() failed
+ *
+ * @sa redisxSendArrayRequestAsync()
+ * @sa redisxRequest()
+ * @sa redisxReadReplyAsync()
+ * @sa redisxGetLockedConnected()
+ * @sa redisxSkipReplyAsync()
  */
 int redisxSendRequestAsync(RedisClient *cl, const char *command, const char *arg1, const char *arg2, const char *arg3) {
   static const char *fn = "redisxSendRequestAsync";
@@ -632,7 +652,15 @@ int redisxSendRequestAsync(RedisClient *cl, const char *command, const char *arg
 }
 
 /**
- * Send a Redis request with an arbitrary number of arguments.
+ * Send a Redis request with an arbitrary number of arguments. This function should be called
+ * with an exclusive lock on a connected client.
+ *
+ * Unlike its interactive counterpart, redisxArrayRequest(), this method does not follow cluster
+ * MOVED or ASK redirections automatically. It cannot, since it returns without waiting
+ * for a response. To implement redirections, the caller must keep track of the asynchronous
+ * requests sent, and check for redirections when processing responses via
+ * redisxReadReplyAsync(). If the response is a redirection, then the caller can decide if
+ * and how to re-submit the request to follow the redirection.
  *
  * \param cl            Pointer to the Redis client.
  * \param args          The array of string arguments to send. If you have an `char **` array, you
@@ -646,6 +674,12 @@ int redisxSendRequestAsync(RedisClient *cl, const char *command, const char *arg
  * \return              X_SUCCESS (0) on success or X_NULL if the client is NULL, or
  *                      X_NO_SERVICE if not connected to the client or if send() failed, or
  *                      X_NO_INIT if the client was not initialized.
+ *
+ * @sa redisxSendRequestAsync()
+ * @sa redisxArrayRequest()
+ * @sa redisxReadReplyAsync()
+ * @sa redisxGetLockedConnected()
+ * @sa redisxSkipReplyAsync()
  */
 int redisxSendArrayRequestAsync(RedisClient *cl, const char **args, const int *lengths, int n) {
   static const char *fn = "redisxSendArrayRequestAsync";
@@ -719,13 +753,16 @@ int redisxSendArrayRequestAsync(RedisClient *cl, const char **args, const int *l
 }
 
 /**
- * Silently consumes a reply from the specified Redis channel.
+ * Silently consumes a reply from the specified Redis channel. This function should be called
+ * with an exclusive lock on a connected client.
  *
  * \param cl    Pointer to a Redis channel.
  *
  * \return      X_SUCCESS if a response was successfully consumed, or
  *              REDIS_NULL if a valid response could not be obtained.
  *
+ * @sa redisxReadReplyAsync()
+ * @sa redisxGetLockedConnected()
  */
 int redisxIgnoreReplyAsync(RedisClient *cl) {
   static const char *fn = "redisxIgnoreReplyAsync";
@@ -814,7 +851,7 @@ static void rPushMessageAsync(RedisClient *cl, RESP *resp) {
  * @sa redisxGetAttributes()
  * @sa redisxClearAttributesAsync()
  * @sa redisxReadReplyAsync()
- * @sa redisxLockClient()
+ * @sa redisxGetLockedConnected()
  *
  */
 const RESP *redisxGetAttributesAsync(const RedisClient *cl) {
@@ -846,8 +883,7 @@ static void rSetAttributeAsync(ClientPrivate *cp, RESP *resp) {
  *
  * @sa redisxGetAttributesAsync()
  * @sa redisxReadReplyAsync()
- * @sa redisxLockClient()
- *
+ * @sa redisxGetLockedConnected()
  */
 int redisxClearAttributesAsync(RedisClient *cl) {
   prop_error("redisxClearAttributesAsync", rCheckClient(cl));
@@ -864,7 +900,7 @@ int redisxClearAttributesAsync(RedisClient *cl) {
  * @return      the number of bytes of response available on the client, or else an error code &lt;0.
  *
  * @sa redisxGetAvailable()
- * @sa redisxLockConnected()
+ * @sa redisxGetLockConnected()
  * @sa redisxReadReplyAsync()
  */
 int redisxGetAvailableAsync(RedisClient *cl) {
@@ -904,7 +940,14 @@ int redisxGetAvailable(RedisClient *cl) {
 }
 
 /**
- * Reads a response from Redis and returns it.
+ * Reads a response from Redis and returns it. It should be used with an exclusive lock on a connected
+ * client, to collect responses for requests sent previously. It is up to the caller to keep track of
+ * what request the response is for. The responses arrive in the same order (and same nummber) as
+ * the requests that were sent out.
+ *
+ * To follow cluster MOVED or ASK redirections, the caller should check the reponse for redirections
+ * (e.g. via redisxIsRedirected()) and then act accordingly to re-submit the corresponding request,
+ * as is or with an ASKING directive to follow the redirection.
  *
  * \param cl         Pointer to a Redis channel
  * \param pStatus    Pointer to int in which to return an error status, or NULL if not required.
@@ -914,8 +957,14 @@ int redisxGetAvailable(RedisClient *cl) {
  *              or EBADMSG if the message was corrupted and/or unparseable. If the error is irrecoverable
  *              i.e., other than a timeout, the client will be disabled.)
  *
+ * @sa redisxIgnoreReplyAsync()
  * @sa redisxSetReplyTimeout()
- * @sa redisxGetAvailavleAsync()
+ * @sa redisxGetAvailableAsync()
+ * @sa redisxSendRequestAsync()
+ * @sa redisxSendArrayRequestAsync()
+ * @sa redisxGetLockedConnected()
+ * @sa redisxCheckRESP()
+ * @sa redisxIsRedirected()
  */
 RESP *redisxReadReplyAsync(RedisClient *cl, int *pStatus) {
   static const char *fn = "redisxReadReplyAsync";
