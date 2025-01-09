@@ -278,7 +278,11 @@ Related links</h3>
 <p><a class="anchor" id="prerequisites"></a> </p>
 <h2><a class="anchor" id="autotoc_md11"></a>
 Prerequisites</h2>
-<p>The <a href="https://github.com/Smithsonian/xchange">Smithsonian/xchange</a> library is both a build and a runtime dependency of RedisX. OpenSSL (<code>openssl-devel</code> on RPM-based, or <code>libssl-dev</code> on Debian-based Linux) is also required if built with TLS support.</p>
+<p>The <a href="https://github.com/Smithsonian/xchange">Smithsonian/xchange</a> library is both a build and a runtime dependency of RedisX. There are some optional dependencies, depending on the build configuration:</p>
+<ul>
+<li>OpenSSL (<code>openssl-devel</code> on RPM-based, or <code>libssl-dev</code> on Debian-based Linux) to build with TLS support.</li>
+<li>OpenMP (<code>libgomp</code> on RPM-based, or <code>libgomp1</code> on Debian-based Linux) is needed to build with parallelization support (for parallelized cluster connection / disconnection).</li>
+</ul>
 <p>Additionally <code>redisx-cli</code> has the following dependencies on standard GNU/POSIX libraries:</p>
 <ul>
 <li>POPT (<code>popt-devel</code> on RPM-based, or <code>libpopt-dev</code> on Debian based Linux).</li>
