@@ -175,8 +175,12 @@ And at every step, you should check for and [handle errors](#error-handling) as 
 ## Prerequisites
 
 The [Smithsonian/xchange](https://github.com/Smithsonian/xchange) library is both a build and a runtime dependency of 
-RedisX. OpenSSL (`openssl-devel` on RPM-based, or `libssl-dev` on Debian-based Linux) is also required if built with TLS 
-support.
+RedisX. There are some optional dependencies, depending on the build configuration:
+
+ - OpenSSL (`openssl-devel` on RPM-based, or `libssl-dev` on Debian-based Linux) to build with TLS support. 
+  
+ - OpenMP (`libgomp` on RPM-based, or `libgomp1` on Debian-based Linux) is needed to build with parallelization
+   support (for parallelized cluster connection / disconnection). 
 
 Additionally `redisx-cli` has the following dependencies on standard GNU/POSIX libraries:
  

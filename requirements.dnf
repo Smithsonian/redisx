@@ -1,6 +1,8 @@
 # sudo dnf install $(grep -v ^# requirements.dnf)
+libgomp
 openssl-devel
 popt-devel
 readline-devel
 libbsd-devel
+
 
