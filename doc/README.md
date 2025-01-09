@@ -394,8 +394,8 @@ the necessary certificates, keys, and cypher parameters as needed, e.g.:
   Redis *redis = ...
   int status;
   
-  // Use TLS with the specified CA certificate file
-  status = redisxSetTLS(redis, "path/to/ca.crt");
+  // Use TLS with the specified CA certificate file and path
+  status = redisxSetTLS(redis, "path/to/certificates", "ca.crt");
   if(status) {
     // Oops, the CA certificate is not accessible...
     ...
@@ -419,7 +419,7 @@ the necessary certificates, keys, and cypher parameters as needed, e.g.:
   redisxSetTLSCiphers(redisx, "HIGH:!aNULL:!kRSA:!PSK:!SRP:!MD5:!RC4");
   
   // (optional) Set cipher suites to use (TLSv1.3 and later)
-  redisxSetTLSCiphers(redisx, "ECDHE-RSA-AES256-GCM-SHA384:TLS_AES_256_GCM_SHA384");
+  redisxSetTLSCipherSuites(redisx, "ECDHE-RSA-AES256-GCM-SHA384:TLS_AES_256_GCM_SHA384");
   
   // (optional) Set parameters for DH-based cyphers
   status = redisxSetDHCypherParams(redisx, "path/to/redis.dh");

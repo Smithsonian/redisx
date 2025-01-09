@@ -408,8 +408,8 @@ TLS configuration</h4>
 <div class="fragment"><div class="line"><a class="code hl_struct" href="structRedis.html">Redis</a> *redis = ...</div>
 <div class="line">int status;</div>
 <div class="line"> </div>
-<div class="line"><span class="comment">// Use TLS with the specified CA certificate file</span></div>
-<div class="line">status = <a class="code hl_function" href="redisx-tls_8c.html#a1820331a34d40c9dcc894480e22d90e7">redisxSetTLS</a>(redis, <span class="stringliteral">&quot;path/to/ca.crt&quot;</span>);</div>
+<div class="line"><span class="comment">// Use TLS with the specified CA certificate file and path</span></div>
+<div class="line">status = <a class="code hl_function" href="redisx-tls_8c.html#a1820331a34d40c9dcc894480e22d90e7">redisxSetTLS</a>(redis, <span class="stringliteral">&quot;path/to/certificates&quot;</span>, <span class="stringliteral">&quot;ca.crt&quot;</span>);</div>
 <div class="line"><span class="keywordflow">if</span>(status) {</div>
 <div class="line">  <span class="comment">// Oops, the CA certificate is not accessible...</span></div>
 <div class="line">  ...</div>
@@ -433,7 +433,7 @@ TLS configuration</h4>
 <div class="line"><a class="code hl_function" href="redisx-tls_8c.html#a11828fc2962a62c27bf8b5627f69a8a0">redisxSetTLSCiphers</a>(redisx, <span class="stringliteral">&quot;HIGH:!aNULL:!kRSA:!PSK:!SRP:!MD5:!RC4&quot;</span>);</div>
 <div class="line"> </div>
 <div class="line"><span class="comment">// (optional) Set cipher suites to use (TLSv1.3 and later)</span></div>
-<div class="line"><a class="code hl_function" href="redisx-tls_8c.html#a11828fc2962a62c27bf8b5627f69a8a0">redisxSetTLSCiphers</a>(redisx, <span class="stringliteral">&quot;ECDHE-RSA-AES256-GCM-SHA384:TLS_AES_256_GCM_SHA384&quot;</span>);</div>
+<div class="line"><a class="code hl_function" href="redisx-tls_8c.html#aece815a388c13dfa9381d194fc65526a">redisxSetTLSCipherSuites</a>(redisx, <span class="stringliteral">&quot;ECDHE-RSA-AES256-GCM-SHA384:TLS_AES_256_GCM_SHA384&quot;</span>);</div>
 <div class="line"> </div>
 <div class="line"><span class="comment">// (optional) Set parameters for DH-based cyphers</span></div>
 <div class="line">status = redisxSetDHCypherParams(redisx, <span class="stringliteral">&quot;path/to/redis.dh&quot;</span>);</div>
@@ -441,10 +441,11 @@ TLS configuration</h4>
 <div class="line">  <span class="comment">// Oops, the parameter file is not accessible...</span></div>
 <div class="line">  ...</div>
 <div class="line">}</div>
-<div class="ttc" id="aredisx-tls_8c_html_a11828fc2962a62c27bf8b5627f69a8a0"><div class="ttname"><a href="redisx-tls_8c.html#a11828fc2962a62c27bf8b5627f69a8a0">redisxSetTLSCiphers</a></div><div class="ttdeci">int redisxSetTLSCiphers(Redis *redis, const char *cipher_list)</div><div class="ttdef"><b>Definition</b> redisx-tls.c:349</div></div>
-<div class="ttc" id="aredisx-tls_8c_html_a1820331a34d40c9dcc894480e22d90e7"><div class="ttname"><a href="redisx-tls_8c.html#a1820331a34d40c9dcc894480e22d90e7">redisxSetTLS</a></div><div class="ttdeci">int redisxSetTLS(Redis *redis, const char *ca_path, const char *ca_file)</div><div class="ttdef"><b>Definition</b> redisx-tls.c:255</div></div>
-<div class="ttc" id="aredisx-tls_8c_html_a9cafd12ab9ff4df77c7fc9d6bac33c1a"><div class="ttname"><a href="redisx-tls_8c.html#a9cafd12ab9ff4df77c7fc9d6bac33c1a">redisxSetTLSServerName</a></div><div class="ttdeci">int redisxSetTLSServerName(Redis *redis, const char *host)</div><div class="ttdef"><b>Definition</b> redisx-tls.c:467</div></div>
-<div class="ttc" id="aredisx-tls_8c_html_ad62a82cdab6e2fd11da87b1bdcc1604b"><div class="ttname"><a href="redisx-tls_8c.html#ad62a82cdab6e2fd11da87b1bdcc1604b">redisxSetMutualTLS</a></div><div class="ttdeci">int redisxSetMutualTLS(Redis *redis, const char *cert_file, const char *key_file)</div><div class="ttdef"><b>Definition</b> redisx-tls.c:303</div></div>
+<div class="ttc" id="aredisx-tls_8c_html_a11828fc2962a62c27bf8b5627f69a8a0"><div class="ttname"><a href="redisx-tls_8c.html#a11828fc2962a62c27bf8b5627f69a8a0">redisxSetTLSCiphers</a></div><div class="ttdeci">int redisxSetTLSCiphers(Redis *redis, const char *cipher_list)</div><div class="ttdef"><b>Definition</b> redisx-tls.c:350</div></div>
+<div class="ttc" id="aredisx-tls_8c_html_a1820331a34d40c9dcc894480e22d90e7"><div class="ttname"><a href="redisx-tls_8c.html#a1820331a34d40c9dcc894480e22d90e7">redisxSetTLS</a></div><div class="ttdeci">int redisxSetTLS(Redis *redis, const char *ca_path, const char *ca_file)</div><div class="ttdef"><b>Definition</b> redisx-tls.c:256</div></div>
+<div class="ttc" id="aredisx-tls_8c_html_a9cafd12ab9ff4df77c7fc9d6bac33c1a"><div class="ttname"><a href="redisx-tls_8c.html#a9cafd12ab9ff4df77c7fc9d6bac33c1a">redisxSetTLSServerName</a></div><div class="ttdeci">int redisxSetTLSServerName(Redis *redis, const char *host)</div><div class="ttdef"><b>Definition</b> redisx-tls.c:468</div></div>
+<div class="ttc" id="aredisx-tls_8c_html_ad62a82cdab6e2fd11da87b1bdcc1604b"><div class="ttname"><a href="redisx-tls_8c.html#ad62a82cdab6e2fd11da87b1bdcc1604b">redisxSetMutualTLS</a></div><div class="ttdeci">int redisxSetMutualTLS(Redis *redis, const char *cert_file, const char *key_file)</div><div class="ttdef"><b>Definition</b> redisx-tls.c:304</div></div>
+<div class="ttc" id="aredisx-tls_8c_html_aece815a388c13dfa9381d194fc65526a"><div class="ttname"><a href="redisx-tls_8c.html#aece815a388c13dfa9381d194fc65526a">redisxSetTLSCipherSuites</a></div><div class="ttdeci">int redisxSetTLSCipherSuites(Redis *redis, const char *list)</div><div class="ttdef"><b>Definition</b> redisx-tls.c:387</div></div>
 </div><!-- fragment --><p>The TLS support is still experimental and requires testing. You can help by submitting bug reports in the GitHub repository.</p>
 <p><a class="anchor" id="socket-configuration"></a> </p>
 <h4><a class="anchor" id="autotoc_md24"></a>
