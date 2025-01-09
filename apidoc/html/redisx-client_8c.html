@@ -185,7 +185,7 @@ Functions</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
-<p>Abort an atomic transaction block. It sends <code>DISCARD</code>.</p>
+<p>Abort an atomic transaction block. It sends <code>DISCARD</code>. This function should be called with an exclusive lock on a connected client, and after starting an execution block with <a class="el" href="redisx-client_8c.html#a3e49508e4e4fcc283832226fd1bffd85">redisxStartBlockAsync()</a>.</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">cl</td><td>Pointer to a <a class="el" href="structRedis.html" title="Structure that represents a Redis database instance, with one or more RedisClient connections.">Redis</a> client</td></tr>
@@ -227,7 +227,7 @@ Functions</h2></td></tr>
 <dd>
 <a class="el" href="redisx-client_8c.html#a06c5b62c7b92c83af8f080dd1bb91b17">redisxReadReplyAsync()</a> </dd>
 <dd>
-<a class="el" href="redisx-client_8c.html#ac9c69fbcaa2a2fbe95af72d91a7b7e6c">redisxLockClient()</a> </dd></dl>
+redisxGetLockedConnected() </dd></dl>
 
 <p class="reference">References <a class="elRef" href="../../xchange/apidoc/html/xchange_8h.html#a7b2679c964ea5f2160380ed55654b873">X_SUCCESS</a>.</p>
 
@@ -258,7 +258,7 @@ Functions</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
-<p>Finish and execute an atomic transaction block. It sends <code>EXEC</code>, skips through all <code>OK</code> and <code>QUEUED</code> acknowledgements, and returns the reply to the transaction block itself.</p>
+<p>Finish and execute an atomic transaction block. It sends <code>EXEC</code>, skips through all <code>OK</code> and <code>QUEUED</code> acknowledgements, and returns the reply to the transaction block itself. This function should be called with an exclusive lock on a connected client.</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">cl</td><td>Pointer to a <a class="el" href="structRedis.html" title="Structure that represents a Redis database instance, with one or more RedisClient connections.">Redis</a> client </td></tr>
@@ -269,7 +269,9 @@ Functions</h2></td></tr>
 <dl class="section return"><dt>Returns</dt><dd>The array <a class="el" href="structRESP.html" title="Structure that represents a Redis response (RESP format).">RESP</a> returned by EXEC, or NULL if there was an error.</dd></dl>
 <dl class="section see"><dt>See also</dt><dd><a class="el" href="redisx-client_8c.html#a3e49508e4e4fcc283832226fd1bffd85">redisxStartBlockAsync()</a> </dd>
 <dd>
-<a class="el" href="redisx-client_8c.html#ab98b0e71d2d0941920e3097a66eae7b8">redisxAbortBlockAsync()</a> </dd></dl>
+<a class="el" href="redisx-client_8c.html#ab98b0e71d2d0941920e3097a66eae7b8">redisxAbortBlockAsync()</a> </dd>
+<dd>
+redisxGetLockedConnected() </dd></dl>
 
 <p class="reference">References <a class="el" href="resp_8c.html#aa4e23a7454f7055711915ec430599011">redisxDestroyRESP()</a>, <a class="el" href="redisx-client_8c.html#a06c5b62c7b92c83af8f080dd1bb91b17">redisxReadReplyAsync()</a>, <a class="el" href="redisx-client_8c.html#a44c5d0bd24f5a4f2f131218f14c9c599">redisxSkipReplyAsync()</a>, <a class="el" href="redisx_8h.html#afa5c90630d37c2f77e5d7985932941a0ad16eee767b19b1c4bb650deea0dd0b30">RESP_ARRAY</a>, <a class="el" href="redisx_8h.html#afa5c90630d37c2f77e5d7985932941a0ae792047eeaca57b6ad382c02d0306656">RESP_ERROR</a>, <a class="elRef" href="../../xchange/apidoc/html/xchange_8h.html#aa8cecfc5c5c054d2875c03e77b7be15d">TRUE</a>, <a class="el" href="structRESP.html#a93869a69154ac2297800b0afff64d600">RESP::type</a>, <a class="elRef" href="../../xchange/apidoc/html/xchange_8c.html#ae73aaf705dc4e7d58dfb0fd81f4805c7">x_error()</a>, <a class="elRef" href="../../xchange/apidoc/html/xchange_8h.html#a7b2679c964ea5f2160380ed55654b873">X_SUCCESS</a>, and <a class="elRef" href="../../xchange/apidoc/html/xchange_8c.html#ac39ae03ca89b115d49a12f633522dc31">x_trace_null()</a>.</p>
 
@@ -311,7 +313,7 @@ The caller must not attempt to call free() on the returned <a class="el" href="s
 <dd>
 <a class="el" href="redisx-client_8c.html#a06c5b62c7b92c83af8f080dd1bb91b17">redisxReadReplyAsync()</a> </dd>
 <dd>
-<a class="el" href="redisx-client_8c.html#ac9c69fbcaa2a2fbe95af72d91a7b7e6c">redisxLockClient()</a> </dd></dl>
+redisxGetLockedConnected() </dd></dl>
 
 <p class="reference">References <a class="elRef" href="../../xchange/apidoc/html/xchange_8c.html#ae73aaf705dc4e7d58dfb0fd81f4805c7">x_error()</a>.</p>
 
@@ -371,7 +373,7 @@ The caller must not attempt to call free() on the returned <a class="el" href="s
 <dl class="section return"><dt>Returns</dt><dd>the number of bytes of response available on the client, or else an error code &lt;0.</dd></dl>
 <dl class="section see"><dt>See also</dt><dd><a class="el" href="redisx-client_8c.html#a66c0fd419669b68344cf1f35168c8919">redisxGetAvailable()</a> </dd>
 <dd>
-<a class="el" href="redisx-client_8c.html#aad864c08ef9365c264c30bbacb0b77b2">redisxLockConnected()</a> </dd>
+redisxGetLockConnected() </dd>
 <dd>
 <a class="el" href="redisx-client_8c.html#a06c5b62c7b92c83af8f080dd1bb91b17">redisxReadReplyAsync()</a> </dd></dl>
 
@@ -478,14 +480,17 @@ The caller must not attempt to call free() on the returned <a class="el" href="s
         </tr>
       </table>
 </div><div class="memdoc">
-<p>Silently consumes a reply from the specified <a class="el" href="structRedis.html" title="Structure that represents a Redis database instance, with one or more RedisClient connections.">Redis</a> channel.</p>
+<p>Silently consumes a reply from the specified <a class="el" href="structRedis.html" title="Structure that represents a Redis database instance, with one or more RedisClient connections.">Redis</a> channel. This function should be called with an exclusive lock on a connected client.</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">cl</td><td>Pointer to a <a class="el" href="structRedis.html" title="Structure that represents a Redis database instance, with one or more RedisClient connections.">Redis</a> channel.</td></tr>
   </table>
   </dd>
 </dl>
-<dl class="section return"><dt>Returns</dt><dd>X_SUCCESS if a response was successfully consumed, or REDIS_NULL if a valid response could not be obtained. </dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>X_SUCCESS if a response was successfully consumed, or REDIS_NULL if a valid response could not be obtained.</dd></dl>
+<dl class="section see"><dt>See also</dt><dd><a class="el" href="redisx-client_8c.html#a06c5b62c7b92c83af8f080dd1bb91b17">redisxReadReplyAsync()</a> </dd>
+<dd>
+redisxGetLockedConnected() </dd></dl>
 
 <p class="reference">References <a class="el" href="redisx_8h.html#a7e2f81e12d6982c6aa97b50a77fd98f5">REDIS_NULL</a>, <a class="el" href="resp_8c.html#aa4e23a7454f7055711915ec430599011">redisxDestroyRESP()</a>, <a class="el" href="redisx-client_8c.html#a06c5b62c7b92c83af8f080dd1bb91b17">redisxReadReplyAsync()</a>, <a class="elRef" href="../../xchange/apidoc/html/xchange_8h.html#a7b2679c964ea5f2160380ed55654b873">X_SUCCESS</a>, and <a class="elRef" href="../../xchange/apidoc/html/xchange_8c.html#a9b61b8b8b3ef0f7cc0b96ab499265c74">x_trace()</a>.</p>
 
@@ -580,7 +585,8 @@ The caller must not attempt to call free() on the returned <a class="el" href="s
         </tr>
       </table>
 </div><div class="memdoc">
-<p>Reads a response from <a class="el" href="structRedis.html" title="Structure that represents a Redis database instance, with one or more RedisClient connections.">Redis</a> and returns it.</p>
+<p>Reads a response from <a class="el" href="structRedis.html" title="Structure that represents a Redis database instance, with one or more RedisClient connections.">Redis</a> and returns it. It should be used with an exclusive lock on a connected client, to collect responses for requests sent previously. It is up to the caller to keep track of what request the response is for. The responses arrive in the same order (and same nummber) as the requests that were sent out.</p>
+<p>To follow cluster MOVED or ASK redirections, the caller should check the reponse for redirections (e.g. via redisxIsRedirected()) and then act accordingly to re-submit the corresponding request, as is or with an ASKING directive to follow the redirection.</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">cl</td><td>Pointer to a <a class="el" href="structRedis.html" title="Structure that represents a Redis database instance, with one or more RedisClient connections.">Redis</a> channel </td></tr>
@@ -589,9 +595,21 @@ The caller must not attempt to call free() on the returned <a class="el" href="s
   </dd>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>The <a class="el" href="structRESP.html" title="Structure that represents a Redis response (RESP format).">RESP</a> structure for the reponse received from <a class="el" href="structRedis.html" title="Structure that represents a Redis database instance, with one or more RedisClient connections.">Redis</a>, or NULL if an error was encountered (errno will be set to describe the error, which may either be an errno produced by recv() or EBADMSG if the message was corrupted and/or unparseable. If the error is irrecoverable i.e., other than a timeout, the client will be disabled.)</dd></dl>
-<dl class="section see"><dt>See also</dt><dd><a class="el" href="redisx_8c.html#abaa3e3716d42d465a4b7536727328e90">redisxSetReplyTimeout()</a> </dd>
+<dl class="section see"><dt>See also</dt><dd><a class="el" href="redisx-client_8c.html#ac0f30d62044638a2ead07583ad723fdf">redisxIgnoreReplyAsync()</a> </dd>
 <dd>
-redisxGetAvailavleAsync() </dd></dl>
+<a class="el" href="redisx_8c.html#abaa3e3716d42d465a4b7536727328e90">redisxSetReplyTimeout()</a> </dd>
+<dd>
+<a class="el" href="redisx-client_8c.html#a0060b460e43c3b0d15d5dee9f8937c35">redisxGetAvailableAsync()</a> </dd>
+<dd>
+<a class="el" href="redisx-client_8c.html#afc7b28288c07baf0b3c8fdc9d8ddf263">redisxSendRequestAsync()</a> </dd>
+<dd>
+<a class="el" href="redisx-client_8c.html#a17de2c4323d3da4b3a3d386d85c12d8e">redisxSendArrayRequestAsync()</a> </dd>
+<dd>
+redisxGetLockedConnected() </dd>
+<dd>
+<a class="el" href="resp_8c.html#a4b5674d08da07250c0ca6116a4c48ccf">redisxCheckRESP()</a> </dd>
+<dd>
+redisxIsRedirected() </dd></dl>
 
 <p class="reference">References <a class="elRef" href="../../xchange/apidoc/html/xchange_8h.html#aa93f0eb578d23995850d61f7d61c55c1">FALSE</a>, <a class="el" href="structRedisMap.html#ab48749655da556e91b5286bb4d196eb1">RedisMap::key</a>, <a class="el" href="structRESP.html#a76f11d9a0a47b94f72c2d0e77fb32240">RESP::n</a>, <a class="el" href="redisx-net_8c.html#abc9dd988935375c5459bcaa09c17fa47">rCloseClientAsync()</a>, <a class="el" href="redisx_8h.html#a158f2b6af2421e42128d014e50896bb4">REDIS_INCOMPLETE_TRANSFER</a>, <a class="el" href="redisx-client_8c.html#ac5021fd53b8fb32c06455b174e849751">REDIS_SIMPLE_STRING_SIZE</a>, <a class="el" href="redisx_8h.html#a9d530bcfae7689b4275749b47a6d9b51">REDIS_UNEXPECTED_RESP</a>, <a class="el" href="resp_8c.html#aea5830b9c06c6603c0fc04bf10238b83">redisxAppendRESP()</a>, <a class="el" href="redisx-cluster_8c.html#a19fc54725ba4725e0281cff59b642e15">redisxClusterMoved()</a>, <a class="el" href="resp_8c.html#aa4e23a7454f7055711915ec430599011">redisxDestroyRESP()</a>, <a class="el" href="resp_8c.html#a39055bb1b469883dabfaf1b8efe3b6fe">redisxHasComponents()</a>, <a class="el" href="redisx-client_8c.html#a06c5b62c7b92c83af8f080dd1bb91b17">redisxReadReplyAsync()</a>, <a class="el" href="redisx_8h.html#afa5c90630d37c2f77e5d7985932941a0a2da22ebb851ace110ab55425d2fe19fd">RESP3_ATTRIBUTE</a>, <a class="el" href="redisx_8h.html#afa5c90630d37c2f77e5d7985932941a0a6584ded22b188e62c73ef63c4221333c">RESP3_BIG_NUMBER</a>, <a class="el" href="redisx_8h.html#afa5c90630d37c2f77e5d7985932941a0a955aeeb6f1b51f7a3286e1ac033a7a4b">RESP3_BLOB_ERROR</a>, <a class="el" href="redisx_8h.html#afa5c90630d37c2f77e5d7985932941a0a764e3114139243c0d896877739d6fc8f">RESP3_BOOLEAN</a>, <a class="el" href="redisx_8h.html#ac8f311a1aacb893bb4e8650e8de9325e">RESP3_CONTINUED</a>, <a class="el" href="redisx_8h.html#afa5c90630d37c2f77e5d7985932941a0adcd1d7124f08e1ed73594d2ac5709cca">RESP3_DOUBLE</a>, <a class="el" href="redisx_8h.html#afa5c90630d37c2f77e5d7985932941a0a84ed8b97007ad57425cec2cb9b12e89b">RESP3_MAP</a>, <a class="el" href="redisx_8h.html#afa5c90630d37c2f77e5d7985932941a0a587dbeb89a4ed22f829b0e0238d8aca1">RESP3_NULL</a>, <a class="el" href="redisx_8h.html#afa5c90630d37c2f77e5d7985932941a0a3cf51b299d0be37b2d72dee132e6f481">RESP3_PUSH</a>, <a class="el" href="redisx_8h.html#afa5c90630d37c2f77e5d7985932941a0a4ca6058290704cf1fa5aae3d3dcfdff7">RESP3_SET</a>, <a class="el" href="redisx_8h.html#afa5c90630d37c2f77e5d7985932941a0a01f039d5dc20f5c7964b5c27f8084cfe">RESP3_VERBATIM_STRING</a>, <a class="el" href="redisx_8h.html#afa5c90630d37c2f77e5d7985932941a0ad16eee767b19b1c4bb650deea0dd0b30">RESP_ARRAY</a>, <a class="el" href="redisx_8h.html#afa5c90630d37c2f77e5d7985932941a0a36dd81166f9ba91db70b1571b25fec9f">RESP_BULK_STRING</a>, <a class="el" href="redisx_8h.html#afa5c90630d37c2f77e5d7985932941a0ae792047eeaca57b6ad382c02d0306656">RESP_ERROR</a>, <a class="el" href="redisx_8h.html#afa5c90630d37c2f77e5d7985932941a0a503265f716490a963125ade1e6646e0a">RESP_INT</a>, <a class="el" href="redisx_8h.html#afa5c90630d37c2f77e5d7985932941a0a7868e33fc03b809c864bf271abd009b9">RESP_SIMPLE_STRING</a>, <a class="elRef" href="../../xchange/apidoc/html/xchange_8h.html#aa8cecfc5c5c054d2875c03e77b7be15d">TRUE</a>, <a class="el" href="structRESP.html#a93869a69154ac2297800b0afff64d600">RESP::type</a>, <a class="el" href="structRESP.html#a0f61d63b009d0880a89c843bd50d8d76">RESP::value</a>, <a class="el" href="structRedisMap.html#a449b0c7dacd31c5e7edf071da3bda96a">RedisMap::value</a>, <a class="elRef" href="../../xchange/apidoc/html/xchange_8c.html#ae73aaf705dc4e7d58dfb0fd81f4805c7">x_error()</a>, <a class="elRef" href="../../xchange/apidoc/html/xchange_8h.html#a1d4a0c99f979fd0ecf0e9dcb7191a8d7">X_FAILURE</a>, <a class="elRef" href="../../xchange/apidoc/html/xchange_8h.html#a1324cef45d5b26097bf488ad3b7f9e7b">X_NO_INIT</a>, <a class="elRef" href="../../xchange/apidoc/html/xchange_8h.html#a7aeb707470a6d1a45626c123e84abe86">X_NO_SERVICE</a>, <a class="elRef" href="../../xchange/apidoc/html/xchange_8h.html#a86d83cc351dfae22fe7346559f5a440e">X_PARSE_ERROR</a>, <a class="elRef" href="../../xchange/apidoc/html/xchange_8h.html#a7b2679c964ea5f2160380ed55654b873">X_SUCCESS</a>, <a class="elRef" href="../../xchange/apidoc/html/xchange_8c.html#ac39ae03ca89b115d49a12f633522dc31">x_trace_null()</a>, <a class="elRef" href="../../xchange/apidoc/html/xchange_8h.html#a7e2e177c11fe7f44ca5ce11f316c0ad9">xParseDouble()</a>, and <a class="elRef" href="../../xchange/apidoc/html/xchange_8h.html#a01d730a1a98963816de2dd73e72957a5">xStringCopyOf()</a>.</p>
 
@@ -662,7 +680,8 @@ redisxGetAvailavleAsync() </dd></dl>
         </tr>
       </table>
 </div><div class="memdoc">
-<p>Send a <a class="el" href="structRedis.html" title="Structure that represents a Redis database instance, with one or more RedisClient connections.">Redis</a> request with an arbitrary number of arguments.</p>
+<p>Send a <a class="el" href="structRedis.html" title="Structure that represents a Redis database instance, with one or more RedisClient connections.">Redis</a> request with an arbitrary number of arguments. This function should be called with an exclusive lock on a connected client.</p>
+<p>Unlike its interactive counterpart, <a class="el" href="redisx_8c.html#ac6767cea95b4cc90348796c61ebdac75">redisxArrayRequest()</a>, this method does not follow cluster MOVED or ASK redirections automatically. It cannot, since it returns without waiting for a response. To implement redirections, the caller must keep track of the asynchronous requests sent, and check for redirections when processing responses via <a class="el" href="redisx-client_8c.html#a06c5b62c7b92c83af8f080dd1bb91b17">redisxReadReplyAsync()</a>. If the response is a redirection, then the caller can decide if and how to re-submit the request to follow the redirection.</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">cl</td><td>Pointer to the <a class="el" href="structRedis.html" title="Structure that represents a Redis database instance, with one or more RedisClient connections.">Redis</a> client. </td></tr>
@@ -672,7 +691,16 @@ redisxGetAvailavleAsync() </dd></dl>
   </table>
   </dd>
 </dl>
-<dl class="section return"><dt>Returns</dt><dd>X_SUCCESS (0) on success or X_NULL if the client is NULL, or X_NO_SERVICE if not connected to the client or if send() failed, or X_NO_INIT if the client was not initialized. </dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>X_SUCCESS (0) on success or X_NULL if the client is NULL, or X_NO_SERVICE if not connected to the client or if send() failed, or X_NO_INIT if the client was not initialized.</dd></dl>
+<dl class="section see"><dt>See also</dt><dd><a class="el" href="redisx-client_8c.html#afc7b28288c07baf0b3c8fdc9d8ddf263">redisxSendRequestAsync()</a> </dd>
+<dd>
+<a class="el" href="redisx_8c.html#ac6767cea95b4cc90348796c61ebdac75">redisxArrayRequest()</a> </dd>
+<dd>
+<a class="el" href="redisx-client_8c.html#a06c5b62c7b92c83af8f080dd1bb91b17">redisxReadReplyAsync()</a> </dd>
+<dd>
+redisxGetLockedConnected() </dd>
+<dd>
+<a class="el" href="redisx-client_8c.html#a44c5d0bd24f5a4f2f131218f14c9c599">redisxSkipReplyAsync()</a> </dd></dl>
 
 <p class="reference">References <a class="elRef" href="../../xchange/apidoc/html/xchange_8h.html#aa93f0eb578d23995850d61f7d61c55c1">FALSE</a>, <a class="el" href="redisx_8h.html#a7e2b05b584b2b1b7af9430657679fe65">REDISX_CMDBUF_SIZE</a>, <a class="elRef" href="../../xchange/apidoc/html/xchange_8h.html#aa8cecfc5c5c054d2875c03e77b7be15d">TRUE</a>, <a class="elRef" href="../../xchange/apidoc/html/xchange_8c.html#ae73aaf705dc4e7d58dfb0fd81f4805c7">x_error()</a>, <a class="elRef" href="../../xchange/apidoc/html/xchange_8h.html#a7aeb707470a6d1a45626c123e84abe86">X_NO_SERVICE</a>, <a class="elRef" href="../../xchange/apidoc/html/xchange_8h.html#a7b2679c964ea5f2160380ed55654b873">X_SUCCESS</a>, and <a class="elRef" href="../../xchange/apidoc/html/xchange_8h.html#a1f038bf7ddb58819805cfc44162cb403">xvprintf</a>.</p>
 
@@ -722,6 +750,7 @@ redisxGetAvailavleAsync() </dd></dl>
       </table>
 </div><div class="memdoc">
 <p>Send a command (with up to 3 arguments) to the <a class="el" href="structRedis.html" title="Structure that represents a Redis database instance, with one or more RedisClient connections.">Redis</a> server. The caller must have an exclusive lock on the client for this version. The arguments supplied will be used up to the first non-NULL value.</p>
+<p>Unlike its interactive counterpart, <a class="el" href="redisx_8c.html#a09092bd97eead5c5fa73fa0d9241018c">redisxRequest()</a>, this method does not follow cluster MOVED or ASK redirections automatically. It cannot, since it returns without waiting for a response. To implement redirections, the caller must keep track of the asynchronous requests sent, and check for redirections when processing responses via <a class="el" href="redisx-client_8c.html#a06c5b62c7b92c83af8f080dd1bb91b17">redisxReadReplyAsync()</a>. If the response is a redirection, then the caller can decide if and how to re-submit the request to follow the redirection.</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">cl</td><td>Pointer to the <a class="el" href="structRedis.html" title="Structure that represents a Redis database instance, with one or more RedisClient connections.">Redis</a> client instance. </td></tr>
@@ -732,7 +761,16 @@ redisxGetAvailavleAsync() </dd></dl>
   </table>
   </dd>
 </dl>
-<dl class="section return"><dt>Returns</dt><dd>X_SUCCESS (0) on success or X_NULL if the client is NULL, or else X_NO_SERVICE if not connected to the client or if send() failed </dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>X_SUCCESS (0) on success or X_NULL if the client is NULL, or else X_NO_SERVICE if not connected to the client or if send() failed</dd></dl>
+<dl class="section see"><dt>See also</dt><dd><a class="el" href="redisx-client_8c.html#a17de2c4323d3da4b3a3d386d85c12d8e">redisxSendArrayRequestAsync()</a> </dd>
+<dd>
+<a class="el" href="redisx_8c.html#a09092bd97eead5c5fa73fa0d9241018c">redisxRequest()</a> </dd>
+<dd>
+<a class="el" href="redisx-client_8c.html#a06c5b62c7b92c83af8f080dd1bb91b17">redisxReadReplyAsync()</a> </dd>
+<dd>
+redisxGetLockedConnected() </dd>
+<dd>
+<a class="el" href="redisx-client_8c.html#a44c5d0bd24f5a4f2f131218f14c9c599">redisxSkipReplyAsync()</a> </dd></dl>
 
 <p class="reference">References <a class="el" href="redisx-client_8c.html#a17de2c4323d3da4b3a3d386d85c12d8e">redisxSendArrayRequestAsync()</a>, <a class="elRef" href="../../xchange/apidoc/html/xchange_8c.html#ae73aaf705dc4e7d58dfb0fd81f4805c7">x_error()</a>, <a class="elRef" href="../../xchange/apidoc/html/xchange_8h.html#a5426366367d169401f779c4764ba7736">X_NAME_INVALID</a>, and <a class="elRef" href="../../xchange/apidoc/html/xchange_8h.html#a7b2679c964ea5f2160380ed55654b873">X_SUCCESS</a>.</p>
 
@@ -753,7 +791,7 @@ redisxGetAvailavleAsync() </dd></dl>
         </tr>
       </table>
 </div><div class="memdoc">
-<p>Instructs <a class="el" href="structRedis.html" title="Structure that represents a Redis database instance, with one or more RedisClient connections.">Redis</a> to skip sending a reply for the next command.</p>
+<p>Instructs <a class="el" href="structRedis.html" title="Structure that represents a Redis database instance, with one or more RedisClient connections.">Redis</a> to skip sending a reply for the next command. This function should be called with an exclusive lock on a connected client, and just before redisxSendRequest() or <a class="el" href="redisx-client_8c.html#a17de2c4323d3da4b3a3d386d85c12d8e">redisxSendArrayRequestAsync()</a>.</p>
 <p>Sends <code>CLIENT REPLY SKIP</code></p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
@@ -761,7 +799,12 @@ redisxGetAvailavleAsync() </dd></dl>
   </table>
   </dd>
 </dl>
-<dl class="section return"><dt>Returns</dt><dd>X_SUCCESS (0) on success or X_NULL if the client is NULL, or else X_NO_SERVICE if not connected to the <a class="el" href="structRedis.html" title="Structure that represents a Redis database instance, with one or more RedisClient connections.">Redis</a> server on the requested channel, or if send() failed, or else X_NO_INIT if the client was not initialized. </dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>X_SUCCESS (0) on success or X_NULL if the client is NULL, or else X_NO_SERVICE if not connected to the <a class="el" href="structRedis.html" title="Structure that represents a Redis database instance, with one or more RedisClient connections.">Redis</a> server on the requested channel, or if send() failed, or else X_NO_INIT if the client was not initialized.</dd></dl>
+<dl class="section see"><dt>See also</dt><dd>redixSendRequestAsync() </dd>
+<dd>
+<a class="el" href="redisx-client_8c.html#a17de2c4323d3da4b3a3d386d85c12d8e">redisxSendArrayRequestAsync()</a> </dd>
+<dd>
+redisxGetLockedConnected() </dd></dl>
 
 <p class="reference">References <a class="elRef" href="../../xchange/apidoc/html/xchange_8h.html#aa8cecfc5c5c054d2875c03e77b7be15d">TRUE</a>, and <a class="elRef" href="../../xchange/apidoc/html/xchange_8h.html#a7b2679c964ea5f2160380ed55654b873">X_SUCCESS</a>.</p>
 
@@ -782,7 +825,8 @@ redisxGetAvailavleAsync() </dd></dl>
         </tr>
       </table>
 </div><div class="memdoc">
-<p>Starts an atomic <a class="el" href="structRedis.html" title="Structure that represents a Redis database instance, with one or more RedisClient connections.">Redis</a> transaction block, by sending <code>MULTI</code> on the specified client connection. <a class="el" href="structRedis.html" title="Structure that represents a Redis database instance, with one or more RedisClient connections.">Redis</a> transaction blocks behave just like scripts (in fact they are effectively improptu scripts themselves). As such the rules of <a class="el" href="structRedis.html" title="Structure that represents a Redis database instance, with one or more RedisClient connections.">Redis</a> scripting apply, such as you cannot call LUA from within a transaction block (which is a real pity...)</p>
+<p>Starts an atomic <a class="el" href="structRedis.html" title="Structure that represents a Redis database instance, with one or more RedisClient connections.">Redis</a> transaction block, by sending <code>MULTI</code> on the specified client connection. This function should be called with an exclusive lock on a connected client.</p>
+<p><a class="el" href="structRedis.html" title="Structure that represents a Redis database instance, with one or more RedisClient connections.">Redis</a> transaction blocks behave just like scripts (in fact they are effectively improptu scripts themselves). As such the rules of <a class="el" href="structRedis.html" title="Structure that represents a Redis database instance, with one or more RedisClient connections.">Redis</a> scripting apply, such as you cannot call LUA from within a transaction block (which is a real pity...)</p>
 <p>Once you start a transaction block you may ignore all acknowledgedments such as <code>OK</code> and <code>QUEUED</code> responses that <a class="el" href="structRedis.html" title="Structure that represents a Redis database instance, with one or more RedisClient connections.">Redis</a> sends back. These will be 'processed' in bulk by redisEndBlockAsync(), at the end of the transaction block.</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
@@ -793,7 +837,9 @@ redisxGetAvailavleAsync() </dd></dl>
 <dl class="section return"><dt>Returns</dt><dd>X_SUCCESS (0) if successful, or X_NULL if the <a class="el" href="structRedis.html" title="Structure that represents a Redis database instance, with one or more RedisClient connections.">Redis</a> client is NULL, or X_NO_SERVICE if not connected to the client server or if send() failed, or X_NO_INIT if the client was not initialized.</dd></dl>
 <dl class="section see"><dt>See also</dt><dd><a class="el" href="redisx-client_8c.html#a766ad80d9b84f4ca16be3da08e1968c9">redisxExecBlockAsync()</a> </dd>
 <dd>
-<a class="el" href="redisx-client_8c.html#ab98b0e71d2d0941920e3097a66eae7b8">redisxAbortBlockAsync()</a> </dd></dl>
+<a class="el" href="redisx-client_8c.html#ab98b0e71d2d0941920e3097a66eae7b8">redisxAbortBlockAsync()</a> </dd>
+<dd>
+redisxGetLockedConnected() </dd></dl>
 
 <p class="reference">References <a class="elRef" href="../../xchange/apidoc/html/xchange_8h.html#aa8cecfc5c5c054d2875c03e77b7be15d">TRUE</a>, and <a class="elRef" href="../../xchange/apidoc/html/xchange_8h.html#a7b2679c964ea5f2160380ed55654b873">X_SUCCESS</a>.</p>
 

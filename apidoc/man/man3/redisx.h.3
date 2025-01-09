@@ -761,7 +761,7 @@ RESP3 dictionary of attributes (metadata)
 .SH "Function Documentation"
 .PP 
 .SS "int redisxAbortBlockAsync (\fBRedisClient\fP * cl)"
-Abort an atomic transaction block\&. It sends \fCDISCARD\fP\&.
+Abort an atomic transaction block\&. It sends \fCDISCARD\fP\&. This function should be called with an exclusive lock on a connected client, and after starting an execution block with \fBredisxStartBlockAsync()\fP\&.
 .PP
 \fBParameters\fP
 .RS 4
@@ -967,7 +967,7 @@ X_SUCCESS (0) if successful, or else X_NULL if the client is NULL\&.
 .PP
 \fBredisxReadReplyAsync()\fP 
 .PP
-\fBredisxLockClient()\fP 
+redisxGetLockedConnected() 
 .RE
 .PP
 
@@ -1501,7 +1501,7 @@ A constant string with the error description\&.
 .PP
 References \fBREDIS_ERROR\fP, \fBREDIS_INCOMPLETE_TRANSFER\fP, \fBREDIS_INVALID_CHANNEL\fP, \fBREDIS_NULL\fP, \fBREDIS_UNEXPECTED_ARRAY_SIZE\fP, \fBREDIS_UNEXPECTED_RESP\fP, and \fBxErrorDescription()\fP\&.
 .SS "\fBRESP\fP * redisxExecBlockAsync (\fBRedisClient\fP * cl, int * pStatus)"
-Finish and execute an atomic transaction block\&. It sends \fCEXEC\fP, skips through all \fCOK\fP and \fCQUEUED\fP acknowledgements, and returns the reply to the transaction block itself\&.
+Finish and execute an atomic transaction block\&. It sends \fCEXEC\fP, skips through all \fCOK\fP and \fCQUEUED\fP acknowledgements, and returns the reply to the transaction block itself\&. This function should be called with an exclusive lock on a connected client\&.
 .PP
 \fBParameters\fP
 .RS 4
@@ -1520,6 +1520,8 @@ The array \fBRESP\fP returned by EXEC, or NULL if there was an error\&.
 \fBredisxStartBlockAsync()\fP 
 .PP
 \fBredisxAbortBlockAsync()\fP 
+.PP
+redisxGetLockedConnected() 
 .RE
 .PP
 
@@ -1582,7 +1584,7 @@ The attributes last received (possibly NULL)\&.
 .PP
 \fBredisxReadReplyAsync()\fP 
 .PP
-\fBredisxLockClient()\fP 
+redisxGetLockedConnected() 
 .RE
 .PP
 
@@ -1626,7 +1628,7 @@ the number of bytes of response available on the client, or else an error code <
 .RS 4
 \fBredisxGetAvailable()\fP 
 .PP
-\fBredisxLockConnected()\fP 
+redisxGetLockConnected() 
 .PP
 \fBredisxReadReplyAsync()\fP 
 .RE
@@ -2004,7 +2006,7 @@ TRUE (1) if the pipeline client is enabled on the \fBRedis\fP intance, or FALSE 
 .PP
 References \fBRedis::pipeline\fP, \fBredisxCheckValid()\fP, \fBredisxLockClient()\fP, and \fBredisxUnlockClient()\fP\&.
 .SS "int redisxIgnoreReplyAsync (\fBRedisClient\fP * cl)"
-Silently consumes a reply from the specified \fBRedis\fP channel\&.
+Silently consumes a reply from the specified \fBRedis\fP channel\&. This function should be called with an exclusive lock on a connected client\&.
 .PP
 \fBParameters\fP
 .RS 4
@@ -2013,7 +2015,14 @@ Silently consumes a reply from the specified \fBRedis\fP channel\&.
 .PP
 \fBReturns\fP
 .RS 4
-X_SUCCESS if a response was successfully consumed, or REDIS_NULL if a valid response could not be obtained\&. 
+X_SUCCESS if a response was successfully consumed, or REDIS_NULL if a valid response could not be obtained\&.
+.RE
+.PP
+\fBSee also\fP
+.RS 4
+\fBredisxReadReplyAsync()\fP 
+.PP
+redisxGetLockedConnected() 
 .RE
 .PP
 
@@ -2561,7 +2570,9 @@ X_SUCCESS (0) if successful, or else X_NULL if the redis instance is NULL X_NAME
 .PP
 References \fBRedis::interactive\fP, \fBredisxCheckValid()\fP, \fBredisxSendArrayRequestAsync()\fP, \fBredisxSkipReplyAsync()\fP, \fBx_error()\fP, \fBX_NULL\fP, and \fBX_SUCCESS\fP\&.
 .SS "\fBRESP\fP * redisxReadReplyAsync (\fBRedisClient\fP * cl, int * pStatus)"
-Reads a response from \fBRedis\fP and returns it\&.
+Reads a response from \fBRedis\fP and returns it\&. It should be used with an exclusive lock on a connected client, to collect responses for requests sent previously\&. It is up to the caller to keep track of what request the response is for\&. The responses arrive in the same order (and same nummber) as the requests that were sent out\&.
+.PP
+To follow cluster MOVED or ASK redirections, the caller should check the reponse for redirections (e\&.g\&. via redisxIsRedirected()) and then act accordingly to re-submit the corresponding request, as is or with an ASKING directive to follow the redirection\&.
 .PP
 \fBParameters\fP
 .RS 4
@@ -2577,9 +2588,21 @@ The \fBRESP\fP structure for the reponse received from \fBRedis\fP, or NULL if a
 .PP
 \fBSee also\fP
 .RS 4
+\fBredisxIgnoreReplyAsync()\fP 
+.PP
 \fBredisxSetReplyTimeout()\fP 
 .PP
-redisxGetAvailavleAsync() 
+\fBredisxGetAvailableAsync()\fP 
+.PP
+\fBredisxSendRequestAsync()\fP 
+.PP
+\fBredisxSendArrayRequestAsync()\fP 
+.PP
+redisxGetLockedConnected() 
+.PP
+\fBredisxCheckRESP()\fP 
+.PP
+redisxIsRedirected() 
 .RE
 .PP
 
@@ -2901,7 +2924,9 @@ X_SUCCESS (0) if successful, or X_NULL if the redis argument is NULL, X_INCOMPLE
 .PP
 References \fBREDIS_INVALID_CHANNEL\fP, \fBREDISX_CHANNELS\fP, \fBREDISX_PIPELINE_CHANNEL\fP, \fBREDISX_SUBSCRIPTION_CHANNEL\fP, \fBredisxAddConnectHook()\fP, \fBredisxGetClient()\fP, \fBredisxIsConnected()\fP, \fBredisxLockConnected()\fP, \fBredisxRemoveConnectHook()\fP, \fBredisxUnlockClient()\fP, \fBX_INCOMPLETE\fP, \fBX_SUCCESS\fP, and \fBx_trace()\fP\&.
 .SS "int redisxSendArrayRequestAsync (\fBRedisClient\fP * cl, const char ** args, const int * lengths, int n)"
-Send a \fBRedis\fP request with an arbitrary number of arguments\&.
+Send a \fBRedis\fP request with an arbitrary number of arguments\&. This function should be called with an exclusive lock on a connected client\&.
+.PP
+Unlike its interactive counterpart, \fBredisxArrayRequest()\fP, this method does not follow cluster MOVED or ASK redirections automatically\&. It cannot, since it returns without waiting for a response\&. To implement redirections, the caller must keep track of the asynchronous requests sent, and check for redirections when processing responses via \fBredisxReadReplyAsync()\fP\&. If the response is a redirection, then the caller can decide if and how to re-submit the request to follow the redirection\&.
 .PP
 \fBParameters\fP
 .RS 4
@@ -2916,7 +2941,20 @@ Send a \fBRedis\fP request with an arbitrary number of arguments\&.
 .PP
 \fBReturns\fP
 .RS 4
-X_SUCCESS (0) on success or X_NULL if the client is NULL, or X_NO_SERVICE if not connected to the client or if send() failed, or X_NO_INIT if the client was not initialized\&. 
+X_SUCCESS (0) on success or X_NULL if the client is NULL, or X_NO_SERVICE if not connected to the client or if send() failed, or X_NO_INIT if the client was not initialized\&.
+.RE
+.PP
+\fBSee also\fP
+.RS 4
+\fBredisxSendRequestAsync()\fP 
+.PP
+\fBredisxArrayRequest()\fP 
+.PP
+\fBredisxReadReplyAsync()\fP 
+.PP
+redisxGetLockedConnected() 
+.PP
+\fBredisxSkipReplyAsync()\fP 
 .RE
 .PP
 
@@ -2924,6 +2962,8 @@ X_SUCCESS (0) on success or X_NULL if the client is NULL, or X_NO_SERVICE if not
 References \fBFALSE\fP, \fBREDISX_CMDBUF_SIZE\fP, \fBTRUE\fP, \fBx_error()\fP, \fBX_NO_SERVICE\fP, \fBX_SUCCESS\fP, and \fBxvprintf\fP\&.
 .SS "int redisxSendRequestAsync (\fBRedisClient\fP * cl, const char * command, const char * arg1, const char * arg2, const char * arg3)"
 Send a command (with up to 3 arguments) to the \fBRedis\fP server\&. The caller must have an exclusive lock on the client for this version\&. The arguments supplied will be used up to the first non-NULL value\&.
+.PP
+Unlike its interactive counterpart, \fBredisxRequest()\fP, this method does not follow cluster MOVED or ASK redirections automatically\&. It cannot, since it returns without waiting for a response\&. To implement redirections, the caller must keep track of the asynchronous requests sent, and check for redirections when processing responses via \fBredisxReadReplyAsync()\fP\&. If the response is a redirection, then the caller can decide if and how to re-submit the request to follow the redirection\&.
 .PP
 \fBParameters\fP
 .RS 4
@@ -2940,7 +2980,20 @@ Send a command (with up to 3 arguments) to the \fBRedis\fP server\&. The caller 
 .PP
 \fBReturns\fP
 .RS 4
-X_SUCCESS (0) on success or X_NULL if the client is NULL, or else X_NO_SERVICE if not connected to the client or if send() failed 
+X_SUCCESS (0) on success or X_NULL if the client is NULL, or else X_NO_SERVICE if not connected to the client or if send() failed
+.RE
+.PP
+\fBSee also\fP
+.RS 4
+\fBredisxSendArrayRequestAsync()\fP 
+.PP
+\fBredisxRequest()\fP 
+.PP
+\fBredisxReadReplyAsync()\fP 
+.PP
+redisxGetLockedConnected() 
+.PP
+\fBredisxSkipReplyAsync()\fP 
 .RE
 .PP
 
@@ -3515,7 +3568,7 @@ Enable or disable verbose reporting of all \fBRedis\fP operations (and possibly 
 .PP
 References \fBxSetVerbose()\fP\&.
 .SS "int redisxSkipReplyAsync (\fBRedisClient\fP * cl)"
-Instructs \fBRedis\fP to skip sending a reply for the next command\&.
+Instructs \fBRedis\fP to skip sending a reply for the next command\&. This function should be called with an exclusive lock on a connected client, and just before redisxSendRequest() or \fBredisxSendArrayRequestAsync()\fP\&.
 .PP
 Sends \fCCLIENT REPLY SKIP\fP
 .PP
@@ -3526,7 +3579,16 @@ Sends \fCCLIENT REPLY SKIP\fP
 .PP
 \fBReturns\fP
 .RS 4
-X_SUCCESS (0) on success or X_NULL if the client is NULL, or else X_NO_SERVICE if not connected to the \fBRedis\fP server on the requested channel, or if send() failed, or else X_NO_INIT if the client was not initialized\&. 
+X_SUCCESS (0) on success or X_NULL if the client is NULL, or else X_NO_SERVICE if not connected to the \fBRedis\fP server on the requested channel, or if send() failed, or else X_NO_INIT if the client was not initialized\&.
+.RE
+.PP
+\fBSee also\fP
+.RS 4
+redixSendRequestAsync() 
+.PP
+\fBredisxSendArrayRequestAsync()\fP 
+.PP
+redisxGetLockedConnected() 
 .RE
 .PP
 
@@ -3560,7 +3622,9 @@ n the length of the remnant text (<=0), or else X_NULL if the input \fBRESP\fP w
 .PP
 References \fBRESP::n\fP, \fBREDIS_UNEXPECTED_RESP\fP, \fBRESP3_BLOB_ERROR\fP, \fBRESP3_VERBATIM_STRING\fP, \fBRESP_ERROR\fP, \fBRESP::type\fP, \fBRESP::value\fP, \fBx_error()\fP, \fBX_NULL\fP, and \fBX_PARSE_ERROR\fP\&.
 .SS "int redisxStartBlockAsync (\fBRedisClient\fP * cl)"
-Starts an atomic \fBRedis\fP transaction block, by sending \fCMULTI\fP on the specified client connection\&. \fBRedis\fP transaction blocks behave just like scripts (in fact they are effectively improptu scripts themselves)\&. As such the rules of \fBRedis\fP scripting apply, such as you cannot call LUA from within a transaction block (which is a real pity\&.\&.\&.)
+Starts an atomic \fBRedis\fP transaction block, by sending \fCMULTI\fP on the specified client connection\&. This function should be called with an exclusive lock on a connected client\&.
+.PP
+\fBRedis\fP transaction blocks behave just like scripts (in fact they are effectively improptu scripts themselves)\&. As such the rules of \fBRedis\fP scripting apply, such as you cannot call LUA from within a transaction block (which is a real pity\&.\&.\&.)
 .PP
 Once you start a transaction block you may ignore all acknowledgedments such as \fCOK\fP and \fCQUEUED\fP responses that \fBRedis\fP sends back\&. These will be 'processed' in bulk by redisEndBlockAsync(), at the end of the transaction block\&.
 .PP
@@ -3579,6 +3643,8 @@ X_SUCCESS (0) if successful, or X_NULL if the \fBRedis\fP client is NULL, or X_N
 \fBredisxExecBlockAsync()\fP 
 .PP
 \fBredisxAbortBlockAsync()\fP 
+.PP
+redisxGetLockedConnected() 
 .RE
 .PP
 

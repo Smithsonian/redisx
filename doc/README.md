@@ -158,7 +158,8 @@ And at every step, you should check for and [handle errors](#error-handling) as 
 ## Prerequisites
 
 The [Smithsonian/xchange](https://github.com/Smithsonian/xchange) library is both a build and a runtime dependency of 
-RedisX.
+RedisX. OpenSSL (`openssl-devel` on RPM-based, or `libssl-dev` on Debian-based Linux) is also required if built with TLS 
+support.
 
 Additionally `redisx-cli` has the following dependencies on standard GNU/POSIX libraries:
  
@@ -191,13 +192,11 @@ prior to invoking `make`. The following build variables can be configured:
    
  - `LDFLAGS`: Extra linker flags (default is _not set_). Note, `-lm -lxchange` will be added automatically.
 
- - `WITH_OPENMP`: If set to 1 (default), we will compile and link with OpenMP (i.e., `-fopenmp` is added to both 
-   `CFLAGS` and `LDFLAGS` automatically). Since OpenMP is not available on all platforms / compilers, you may want
-   to explicitly set `WITH_OPENMP=0` prior to calling `make` to disable.
+ - `WITH_OPENMP`: If set to 1, we will compile and link with OpenMP (i.e., `-fopenmp` is added to both `CFLAGS` and 
+   `LDFLAGS` automatically). If not explicitly defined, it will be set automatically if `libgomp` is available.
 
- - `WITH_TLS`: If set to 1 (default), we will build with TLS support via OpenSSL (And `-lssl` is added to `LDFLAGS`
-   automatically). Not all platforms may have a suitably recent version of OpenSSL, in which case you may want to
-   disable TLS support by setting `WITH_TLS=0` prior to calling make.
+ - `WITH_TLS`: If set to 1, we will build with TLS support via OpenSSL (And `-lssl` is added to `LDFLAGS` 
+   automatically). If not explicitly defined, it will be set automatically if `libssl` is available.
 
  - `CHECKEXTRA`: Extra options to pass to `cppcheck` for the `make check` target
  
