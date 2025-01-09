@@ -23,6 +23,7 @@
 
 static int initialized = FALSE;
 
+#if WITH_TLS
 /**
  * Clear TLS configuration settings, freeing resources used.
  *
@@ -61,6 +62,7 @@ void rDestroyClientTLS(ClientPrivate *cp) {
     cp->ctx = NULL;
   }
 }
+#endif
 
 /**
  * Loads parameters from a file for DH-based ciphers.

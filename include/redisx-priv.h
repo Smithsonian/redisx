@@ -163,7 +163,9 @@ int rClusterRefresh(RedisCluster *cluster);
 uint16_t rCalcHash(const char *key);
 
 // in redisx-tls.c ------------------------>
+#if WITH_TLS
 void rClearTLSConfig(TLSConfig *tls);
+#endif
 
 // in resp.c ------------------------------>
 int redisxAppendRESP(RESP *resp, RESP *part);

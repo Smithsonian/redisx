@@ -274,8 +274,9 @@ static void rClusterSetShardsAsync(RedisCluster *cluster, RedisShard *shard, int
 static void *ClusterRefreshThread(void *pCluster) {
   RedisCluster *cluster = (RedisCluster *) pCluster;
   ClusterPrivate *p = (ClusterPrivate *) cluster->priv;
+  int i;
 
-  for(int i = 0; i < p->n_shards; i++) {
+  for(i = 0; i < p->n_shards; i++) {
     const RedisShard *s = &p->shard[i];
     int m;
 

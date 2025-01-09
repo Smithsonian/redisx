@@ -24,8 +24,9 @@ static int rStartSubscriptionListenerAsync(Redis *redis);
  *
  */
 static int rSubscriberLock(Redis *redis) {
+  RedisPrivate *p;
   prop_error("rSubscriberLock", redisxCheckValid(redis));
-  RedisPrivate *p = (RedisPrivate *) redis->priv;
+  p = (RedisPrivate *) redis->priv;
   pthread_mutex_lock(&p->subscriberLock);
   return X_SUCCESS;
 }
@@ -37,8 +38,9 @@ static int rSubscriberLock(Redis *redis) {
  *
  */
 static int rSubscriberUnlock(Redis *redis) {
+  RedisPrivate *p;
   prop_error("rSubscriberLock", redisxCheckValid(redis));
-  RedisPrivate *p = (RedisPrivate *) redis->priv;
+  p = (RedisPrivate *) redis->priv;
   pthread_mutex_unlock(&p->subscriberLock);
   return X_SUCCESS;
 }

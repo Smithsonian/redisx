@@ -147,7 +147,7 @@ int rConfirmMasterRole(Redis *redis) {
 
   if(reply->n < 1) {
     redisxDestroyRESP(reply);
-    return x_error(X_FAILURE, EBADE, fn, "Got empty array response");
+    return x_error(X_FAILURE, EBADMSG, fn, "Got empty array response");
   }
 
   component = (RESP **) reply->value;

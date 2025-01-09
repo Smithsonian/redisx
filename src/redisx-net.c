@@ -14,12 +14,13 @@
 #include <errno.h>
 #include <pthread.h>
 #include <sys/utsname.h>
-#include <sys/time.h>
 #include <arpa/inet.h>
 #include <netinet/tcp.h>
 #if __Lynx__
 #  include <socket.h>
+#  include <time.h>
 #else
+#include <sys/time.h>
 #  include <netinet/ip.h>
 #  include <sys/socket.h>
 #  include <fnmatch.h>

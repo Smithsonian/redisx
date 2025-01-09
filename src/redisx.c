@@ -61,8 +61,9 @@ int redisxCheckValid(const Redis *redis) {
  *
  */
 int rConfigLock(Redis *redis) {
+  RedisPrivate *p;
   prop_error("rConfigLock", redisxCheckValid(redis));
-  RedisPrivate *p = (RedisPrivate *) redis->priv;
+  p = (RedisPrivate *) redis->priv;
   pthread_mutex_lock(&p->configLock);
   return X_SUCCESS;
 }
@@ -74,8 +75,9 @@ int rConfigLock(Redis *redis) {
  *
  */
 int rConfigUnlock(Redis *redis) {
+  RedisPrivate *p;
   prop_error("rConfigUnlock", redisxCheckValid(redis));
-  RedisPrivate *p = (RedisPrivate *) redis->priv;
+  p = (RedisPrivate *) redis->priv;
   pthread_mutex_unlock(&p->configLock);
   return X_SUCCESS;
 }
@@ -612,7 +614,9 @@ void rClearConfig(RedisConfig *config) {
   rClearHooks(config->firstConnectCall);
   rClearHooks(config->firstCleanupCall);
 
+#if WITH_TLS
   rClearTLSConfig(&config->tls);
+#endif
 
   memset(config, 0, sizeof(*config));
 }

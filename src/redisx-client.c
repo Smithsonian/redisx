@@ -353,7 +353,7 @@ RedisClient *redisxGetClient(Redis *redis, enum redisx_channel channel) {
 
   p = (RedisPrivate *) redis->priv;
   if(channel < 0 || channel >= REDISX_CHANNELS) {
-    x_error(0, ECHRNG, fn, "channel %d is our of range", channel);
+    x_error(0, EINVAL, fn, "channel %d is our of range", channel);
     return NULL;
   }
   return &p->clients[channel];
