@@ -24,6 +24,26 @@
 static int initialized = FALSE;
 
 /**
+ * Clear TLS configuration settings, freeing resources used.
+ *
+ * @param tls   TLS configuration data
+ */
+void rClearTLSConfig(TLSConfig *tls) {
+  if(!tls) return;
+
+  if(tls->hostname) free(tls->hostname);
+  if(tls->ca_certificate) free(tls->ca_certificate);
+  if(tls->ca_path) free(tls->ca_path);
+  if(tls->certificate) free(tls->certificate);
+  if(tls->key) free(tls->key);
+  if(tls->ciphers) free(tls->ciphers);
+  if(tls->cipher_suites) free(tls->cipher_suites);
+  if(tls->dh_params) free(tls->dh_params);
+
+  memset(tls, 0, sizeof(TLSConfig));
+}
+
+/**
  * Shuts down SSL and frees up the SSL-related resources on a client.
  *
  * @param cp    Private client data.

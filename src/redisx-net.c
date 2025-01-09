@@ -825,10 +825,10 @@ void redisxDestroy(Redis *redis) {
     free(cp);
   }
 
-  rDestroySentinel(p->sentinel);
+
   redisxDestroyRESP(p->helloData);
   redisxClearSubscribers(redis);
-
+  rDestroySentinel(p->sentinel);
   rClearConfig(&p->config);
 
   if(p->clients) free(p->clients);

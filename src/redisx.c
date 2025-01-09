@@ -612,6 +612,8 @@ void rClearConfig(RedisConfig *config) {
   rClearHooks(config->firstConnectCall);
   rClearHooks(config->firstCleanupCall);
 
+  rClearTLSConfig(&config->tls);
+
   memset(config, 0, sizeof(*config));
 }
 

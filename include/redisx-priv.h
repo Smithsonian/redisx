@@ -154,7 +154,6 @@ boolean rIsLowLatency(const ClientPrivate *cp);
 int rCheckClient(const RedisClient *cl);
 int rSetServerAsync(Redis *redis, const char *desc, const char *hostname, int port);
 
-
 // in redisx-hooks.c ---------------------->
 Hook *rCopyHooks(const Hook *list, Redis *owner);
 void rClearHooks(Hook *first);
@@ -162,6 +161,9 @@ void rClearHooks(Hook *first);
 // in redisx-cluster.c -------------------->
 int rClusterRefresh(RedisCluster *cluster);
 uint16_t rCalcHash(const char *key);
+
+// in redisx-tls.c ------------------------>
+void rClearTLSConfig(TLSConfig *tls);
 
 // in resp.c ------------------------------>
 int redisxAppendRESP(RESP *resp, RESP *part);
