@@ -223,7 +223,7 @@ prior to invoking `make`. The following build variables can be configured:
    default `LD_LIBRARY_PATH`.
    
  - `STATICLINK`: Set to 1 to prefer linking tools statically against `libredisx.a`. (It may still link dynamically if 
-   `libredisx.so` is also available.
+   `libredisx.so` is also available.)
  
 After configuring, you can simply run `make`, which will build the `shared` (`lib/libredisx.so[.1]`) and `static` 
 (`lib/libredisx.a`) libraries, local HTML documentation (provided `doxygen` is available), and performs static
@@ -411,8 +411,8 @@ the necessary certificates, keys, and cypher parameters as needed, e.g.:
   Redis *redis = ...
   int status;
   
-  // Use TLS with the specified CA certificate file
-  status = redisxSetTLS(redis, "path/to/ca.crt");
+  // Use TLS with the specified CA certificate file and path
+  status = redisxSetTLS(redis, "path/to/certificates", "ca.crt");
   if(status) {
     // Oops, the CA certificate is not accessible...
     ...
@@ -436,9 +436,9 @@ the necessary certificates, keys, and cypher parameters as needed, e.g.:
   redisxSetTLSCiphers(redisx, "HIGH:!aNULL:!kRSA:!PSK:!SRP:!MD5:!RC4");
   
   // (optional) Set cipher suites to use (TLSv1.3 and later)
-  redisxSetTLSCiphers(redisx, "ECDHE-RSA-AES256-GCM-SHA384:TLS_AES_256_GCM_SHA384");
+  redisxSetTLSCipherSuites(redisx, "ECDHE-RSA-AES256-GCM-SHA384:TLS_AES_256_GCM_SHA384");
   
-  // (optional) Set parameters for DH-based cyphers
+  // (optional) Set parameters for DH-based ciphers
   status = redisxSetDHCypherParams(redisx, "path/to/redis.dh");
   if(status) {
     // Oops, the parameter file is not accessible...

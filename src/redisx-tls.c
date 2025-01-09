@@ -242,7 +242,8 @@ int rConnectTLSClient(ClientPrivate *cp, const TLSConfig *tls) {
  *
  * @param redis     A Redis instance.
  * @param ca_path   Directory containing CA certificates. It may be NULL to use the default locations.
- * @param ca_file   CA certificate file rel. to specified directory. It may be NULL to use default certificate.
+ * @param ca_file   CA certificate file relative to specified directory. It may be NULL to use default
+ *                  certificate.
  * @return          X_SUCCESS (0) if successful, or else an error code &lt;0.
  *
  * @sa redisxSetMutualTLS()
