@@ -30,6 +30,10 @@ $(BIN)/%: $(OBJ)/%.o
 	@$(MAKE) $(BIN)
 	$(CC) -o $@ $^ $(LDFLAGS)
 
+# Link binaries against redisx lib
+$(BIN)/%: LDFLAGS :=  -L$(LIB) $(LDFLAGS) -lredisx -lpopt
+$(BIN)/%: LD_LIBRARY_PATH := $(LIB):$(LD_LIBRARY_PATH)
+
 # Create sub-directories for build targets
 dep $(OBJ) $(LIB) $(BIN) apidoc:
 	mkdir -p $@

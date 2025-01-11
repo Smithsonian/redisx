@@ -49,16 +49,16 @@ static: $(LIB)/libredisx.a
 
 # Command-line tools
 .PHONY: tools
-tools:
-	$(MAKE) -f tools.mk
 
-# Link tools against the static or shared libs
+# Link binaries against the static or shared libs
 ifeq ($(STATICLINK),1)
 tools: static
 else
 tools: shared
 endif
 
+# The actual tools to build
+tools: $(BIN)/redisx-cli
 
 # Examples
 .PHONY: examples
@@ -111,6 +111,8 @@ $(LIB)/libredisx.so.$(SO_VERSION): $(SOURCES)
 # Static library
 $(LIB)/libredisx.a: $(OBJECTS)
 
+# redisx-cli assitional link libraries...
+$(BIN)/redisx-cli: LDFLAGS += -lreadline -lbsd
 
 README-redisx.md: README.md
 	LINE=`sed -n '/\# /{=;q;}' $<` && tail -n +$$((LINE+2)) $< > $@

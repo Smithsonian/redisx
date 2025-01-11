@@ -24,6 +24,7 @@
 static int initialized = FALSE;
 
 #if WITH_TLS
+
 /**
  * Clear TLS configuration settings, freeing resources used.
  *
