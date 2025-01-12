@@ -143,10 +143,17 @@ int rConfirmMasterRoleAsync(Redis *redis) {
   prop_error(fn, status);
 
   if(redisxCheckDestroyRESP(reply, RESP_ARRAY, 0) != X_SUCCESS) {
-    // Fallback to using INFO replication...
-    XLookupTable *info = redisxGetInfoAsync(redis->interactive, "replication");
+    XLookupTable *info;
     const XField *role;
 
+    // Fallback to using INFO replication...
+    status = redisxSendRequestAsync(redis->interactive, "INFO", "replication", NULL, NULL);
+    prop_error(fn, status);
+
+    reply = redisxReadReplyAsync(redis->interactive, &status);
+    prop_error(fn, status);
+
+    info = rConsumeInfoReply(reply);
     if(!info) return x_trace(fn, NULL, X_FAILURE);
 
     role = xLookupField(info, "role");

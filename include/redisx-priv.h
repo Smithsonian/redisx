@@ -141,6 +141,7 @@ typedef struct {
 // in redisx.c ---------------------------->
 int rCopyConfig(const RedisConfig *src, Redis *dst);
 void rClearConfig(RedisConfig *config);
+XLookupTable *rConsumeInfoReply(RESP *reply);
 
 // in redisx-sub.c ------------------------>
 int rConfigLock(Redis *redis);

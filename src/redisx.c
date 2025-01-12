@@ -865,14 +865,14 @@ RESP *redisxGetHelloData(Redis *redis) {
  * @param reply   The response to an `INFO` query
  * @return        An allocated lookup table containing the key/value pairs extracted
  */
-static XLookupTable *rProcessInfoReply(const RESP *reply) {
+XLookupTable *rConsumeInfoReply(RESP *reply) {
   static const char *fn = "rProcessInfoReply";
 
   XStructure *s;
   XLookupTable *lookup;
   const char *line;
 
-  if(redisxCheckRESP(reply, RESP_BULK_STRING, 0) != 0) return x_trace_null(fn, NULL);
+  if(redisxCheckDestroyRESP(reply, RESP_BULK_STRING, 0) != 0) return x_trace_null(fn, NULL);
 
   s = xCreateStruct();
 
@@ -884,11 +884,12 @@ static XLookupTable *rProcessInfoReply(const RESP *reply) {
     char *sep = strchr(line, ':');
     if(sep) {
       *sep = '\0';
-      xSetField(s, xCreateStringField(line, xStringCopyOf(sep + 1)));
+      xSetField(s, xCreateStringField(line, sep + 1));
     }
     line = strtok(NULL, "\n");
   }
 
+  redisxDestroyRESP(reply);
 
   lookup = xCreateLookup(s, FALSE);
   free(s);
@@ -919,41 +920,7 @@ XLookupTable *redisxGetInfo(Redis *redis, const char *parameter) {
   reply = redisxRequest(redis, "INFO", parameter, NULL, NULL, &status);
   if(status) return x_trace_null(fn, NULL);
 
-  lookup = rProcessInfoReply(reply);
-  if(!lookup) return x_trace_null(fn, NULL);
-
-  redisxDestroyRESP(reply);
-
-  return lookup;
-}
-
-/**
- * Returns the result of an INFO query (with the optional parameter) as a lookup table
- * of keywords and string values. The caller should have exclusive access to the given
- * client.
- *
- * @param cl          A locked and connected Redis client instance.
- * @param parameter   Optional parameter to pass with INFO, or NULL.
- * @return            a newly created lookup table with the string key/value pairs of the
- *                    response from the Redis server, or NULL if there was an error.
- *                    The caller should destroy the lookup table after using it.
- *
- * @sa redisxGetInfo()
- */
-XLookupTable *redisxGetInfoAsync(RedisClient *cl, const char *parameter) {
-  static const char *fn = "redisxGetInfo";
-
-  RESP *reply;
-  XLookupTable *lookup;
-  int status;
-
-  status = redisxSendRequestAsync(cl, "INFO", parameter, NULL, NULL);
-  if(status) return x_trace_null(fn, NULL);
-
-  reply = redisxReadReplyAsync(cl, &status);
-  if(status) return x_trace_null(fn, NULL);
-
-  lookup = rProcessInfoReply(reply);
+  lookup = rConsumeInfoReply(reply);
   if(!lookup) return x_trace_null(fn, NULL);
 
   redisxDestroyRESP(reply);
