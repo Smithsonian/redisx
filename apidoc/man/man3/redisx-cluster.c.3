@@ -210,7 +210,7 @@ Parses a \fC-MOVED\fP or \fC-ASK\fP redirection response from a \fBRedis\fP clus
 .PP
 \fBReturns\fP
 .RS 4
-the migrated server, from which the keyword should be queried now\&.
+the migrated server, from which the keyword should be queried now, or NULL if either pointer argument is NULL or if the \fBRESP\fP is not a redirection response (errno will be set to EINVAL), or if the redirected address is not part of a the cluster configuration (errno set to ENXIO if the cluster is not initialized, or else to EAGAIN)\&.
 .RE
 .PP
 \fBSee also\fP
@@ -249,7 +249,7 @@ A connected \fBRedis\fP server (cluster shard), which can be used for queries on
 .PP
 
 .PP
-References \fBRedisCluster::priv\fP, \fBredisxConnect()\fP, \fBredisxIsConnected()\fP, \fBx_error()\fP, \fBX_NO_INIT\fP, \fBX_NULL\fP, and \fBX_SUCCESS\fP\&.
+References \fBRedisCluster::priv\fP, \fBrConnectAsync()\fP, \fBredisxIsConnected()\fP, \fBx_error()\fP, \fBX_NO_INIT\fP, \fBX_NULL\fP, and \fBX_SUCCESS\fP\&.
 .SS "\fBRedisCluster\fP * redisxClusterInit (\fBRedis\fP * node)"
 Initializes a \fBRedis\fP cluster configuration using a known cluster node\&. The call will connect to the specified node (if not already connected), and will query the cluster configuration from it\&. On return the input node's connection state remains what it was prior to the call\&.
 .PP
@@ -289,7 +289,7 @@ Checks if the reply is an error indicating that the query is for a slot that is 
 .PP
 \fBReturns\fP
 .RS 4
-TRUE (1) if the reply is an error indicating that the cluster has been reconfigured and the key has moved to another shard\&.
+TRUE (1) if the reply is an error indicating that the cluster has been reconfigured and the key has moved to another shard, or else FALSE (0)\&.
 .RE
 .PP
 \fBSee also\fP
@@ -314,7 +314,7 @@ Checks if the reply is an error indicating that the query should be redirected t
 .PP
 \fBReturns\fP
 .RS 4
-TRUE (1) if the reply is an error indicating that the query should be directed to another node\&.
+TRUE (1) if the reply is an error indicating that the query should be directed to another node, or else FALSE (0)\&.
 .RE
 .PP
 \fBSee also\fP
@@ -337,7 +337,7 @@ Checks if the reply is an error indicating that the cluster has been reconfigure
 .PP
 \fBReturns\fP
 .RS 4
-TRUE (1) if the reply is an error indicating that the cluster has been reconfigured and the key has moved to another shard\&.
+TRUE (1) if the reply is an error indicating that the cluster has been reconfigured and the key has moved to another shard, or else FALSE (0)\&.
 .RE
 .PP
 \fBSee also\fP

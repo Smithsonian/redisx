@@ -122,6 +122,10 @@ $(document).ready(function(){initNavTree('redisx-net_8c.html',''); initResizable
 Functions</h2></td></tr>
 <tr class="memitem:abc9dd988935375c5459bcaa09c17fa47" id="r_abc9dd988935375c5459bcaa09c17fa47"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="redisx-net_8c.html#abc9dd988935375c5459bcaa09c17fa47">rCloseClientAsync</a> (<a class="el" href="structRedisClient.html">RedisClient</a> *cl)</td></tr>
 <tr class="separator:abc9dd988935375c5459bcaa09c17fa47"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ad4065e4f45daee4c9a4ce04e11a8cc11" id="r_ad4065e4f45daee4c9a4ce04e11a8cc11"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="redisx-net_8c.html#ad4065e4f45daee4c9a4ce04e11a8cc11">rConnectAsync</a> (<a class="el" href="structRedis.html">Redis</a> *redis, <a class="elRef" href="../../xchange/apidoc/html/xchange_8h.html#a621c38f1f10a1c565d897e3178b16d6e">boolean</a> usePipeline)</td></tr>
+<tr class="separator:ad4065e4f45daee4c9a4ce04e11a8cc11"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a42981dc95de662c10e96bdbc9dfc980e" id="r_a42981dc95de662c10e96bdbc9dfc980e"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="redisx-net_8c.html#a42981dc95de662c10e96bdbc9dfc980e">rDisconnectAsync</a> (<a class="el" href="structRedis.html">Redis</a> *redis)</td></tr>
+<tr class="separator:a42981dc95de662c10e96bdbc9dfc980e"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a124e24b5cfba8172ed3f548b8056deb2" id="r_a124e24b5cfba8172ed3f548b8056deb2"><td class="memItemLeft" align="right" valign="top">void *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="redisx-net_8c.html#a124e24b5cfba8172ed3f548b8056deb2">RedisPipelineListener</a> (void *pRedis)</td></tr>
 <tr class="separator:a124e24b5cfba8172ed3f548b8056deb2"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ad71822356ffd40ed4b1c71d065f48809" id="r_ad71822356ffd40ed4b1c71d065f48809"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="redisx-net_8c.html#ad71822356ffd40ed4b1c71d065f48809">redisxConnect</a> (<a class="el" href="structRedis.html">Redis</a> *redis, <a class="elRef" href="../../xchange/apidoc/html/xchange_8h.html#a621c38f1f10a1c565d897e3178b16d6e">boolean</a> usePipeline)</td></tr>
@@ -174,6 +178,73 @@ Functions</h2></td></tr>
   </table>
   </dd>
 </dl>
+
+</div>
+</div>
+<a id="ad4065e4f45daee4c9a4ce04e11a8cc11" name="ad4065e4f45daee4c9a4ce04e11a8cc11"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ad4065e4f45daee4c9a4ce04e11a8cc11">&#9670;&#160;</a></span>rConnectAsync()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">int rConnectAsync </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="structRedis.html">Redis</a> *&#160;</td>
+          <td class="paramname"><em>redis</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="elRef" href="../../xchange/apidoc/html/xchange_8h.html#a621c38f1f10a1c565d897e3178b16d6e">boolean</a>&#160;</td>
+          <td class="paramname"><em>usePipeline</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>Same as rConnectClient() but called with the client's mutex already locked.</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">redis</td><td>Pointer to a <a class="el" href="structRedis.html" title="Structure that represents a Redis database instance, with one or more RedisClient connections.">Redis</a> instance. </td></tr>
+    <tr><td class="paramname">usePipeline</td><td>TRUE (non-zero) if a pipeline client should be connected also, or FALSE to create an interactive connection only.</td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>X_SUCCESS (0) if successful, or X_ALREADY_OPEN if the <a class="el" href="structRedis.html" title="Structure that represents a Redis database instance, with one or more RedisClient connections.">Redis</a> instance is alreast connected. X_NO_SERVICE if there was an error connecting to <a class="el" href="structRedis.html" title="Structure that represents a Redis database instance, with one or more RedisClient connections.">Redis</a>, or else an error (&lt;0) returned by rConnectClientAsync().</dd></dl>
+<dl class="section see"><dt>See also</dt><dd>rConnectClient() </dd></dl>
+
+<p class="reference">References <a class="elRef" href="../../xchange/apidoc/html/xchange_8h.html#aa93f0eb578d23995850d61f7d61c55c1">FALSE</a>, <a class="el" href="structRedis.html#aecb3b0d045ada529257a2fbf8f829599">Redis::id</a>, <a class="el" href="structRedis.html#af51011d99955d6f036a9f2c291577749">Redis::interactive</a>, <a class="el" href="structRedis.html#a59d367a240bf9c00366465d842402de8">Redis::pipeline</a>, <a class="el" href="redisx_8h.html#a5349b7340813fbd1e32d04ed650bc3d9a65b4f2926885665960480d008ab2a456">REDISX_INTERACTIVE_CHANNEL</a>, <a class="el" href="redisx_8h.html#a5349b7340813fbd1e32d04ed650bc3d9a7a240839c1e943706535b8d69a605f0c">REDISX_PIPELINE_CHANNEL</a>, <a class="el" href="redisx_8c.html#a38f3de77ad5a48d37b302bce2e3cd25b">redisxErrorDescription()</a>, <a class="el" href="redisx-net_8c.html#a94326ebfa5868579c8448cdbb941b3da">redisxIsConnected()</a>, <a class="elRef" href="../../xchange/apidoc/html/xchange_8h.html#aa8cecfc5c5c054d2875c03e77b7be15d">TRUE</a>, <a class="elRef" href="../../xchange/apidoc/html/xchange_8h.html#a9e947ab368178c7e248b3cf8b26defa1">X_ALREADY_OPEN</a>, <a class="elRef" href="../../xchange/apidoc/html/xchange_8h.html#a7aeb707470a6d1a45626c123e84abe86">X_NO_SERVICE</a>, <a class="elRef" href="../../xchange/apidoc/html/xchange_8h.html#a7b2679c964ea5f2160380ed55654b873">X_SUCCESS</a>, <a class="elRef" href="../../xchange/apidoc/html/xchange_8c.html#a9b61b8b8b3ef0f7cc0b96ab499265c74">x_trace()</a>, <a class="elRef" href="../../xchange/apidoc/html/xchange_8c.html#af771fbf7ea96f8051db140b1750d3a20">x_warn()</a>, and <a class="elRef" href="../../xchange/apidoc/html/xchange_8h.html#a1f038bf7ddb58819805cfc44162cb403">xvprintf</a>.</p>
+
+</div>
+</div>
+<a id="a42981dc95de662c10e96bdbc9dfc980e" name="a42981dc95de662c10e96bdbc9dfc980e"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a42981dc95de662c10e96bdbc9dfc980e">&#9670;&#160;</a></span>rDisconnectAsync()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void rDisconnectAsync </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="structRedis.html">Redis</a> *&#160;</td>
+          <td class="paramname"><em>redis</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>Same as rCloseClient() except without the exlusive locking mechanism of the client's IO.</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">redis</td><td>Pointer to a <a class="el" href="structRedis.html" title="Structure that represents a Redis database instance, with one or more RedisClient connections.">Redis</a> instance. </td></tr>
+  </table>
+  </dd>
+</dl>
+
+<p class="reference">References <a class="elRef" href="../../xchange/apidoc/html/xchange_8h.html#aa93f0eb578d23995850d61f7d61c55c1">FALSE</a>, <a class="el" href="structRedis.html#af51011d99955d6f036a9f2c291577749">Redis::interactive</a>, <a class="el" href="structRedis.html#a59d367a240bf9c00366465d842402de8">Redis::pipeline</a>, and <a class="elRef" href="../../xchange/apidoc/html/xchange_8h.html#a1f038bf7ddb58819805cfc44162cb403">xvprintf</a>.</p>
 
 </div>
 </div>
@@ -253,7 +324,7 @@ Functions</h2></td></tr>
 <dd>
 <a class="el" href="redisx-net_8c.html#acae5ab8af4db1c4ab13c4069aa744a44">redisxDisconnect()</a> </dd></dl>
 
-<p class="reference">References <a class="elRef" href="../../xchange/apidoc/html/xchange_8h.html#a7b2679c964ea5f2160380ed55654b873">X_SUCCESS</a>.</p>
+<p class="reference">References <a class="el" href="redisx-net_8c.html#ad4065e4f45daee4c9a4ce04e11a8cc11">rConnectAsync()</a>, and <a class="elRef" href="../../xchange/apidoc/html/xchange_8h.html#a7b2679c964ea5f2160380ed55654b873">X_SUCCESS</a>.</p>
 
 </div>
 </div>
@@ -307,7 +378,7 @@ Functions</h2></td></tr>
   </dd>
 </dl>
 
-<p class="reference">References <a class="el" href="redisx_8c.html#a0cdebfd895ab4c61c0fc9e0863a66419">redisxCheckValid()</a>, and <a class="elRef" href="../../xchange/apidoc/html/xchange_8h.html#a7b2679c964ea5f2160380ed55654b873">X_SUCCESS</a>.</p>
+<p class="reference">References <a class="el" href="redisx-net_8c.html#a42981dc95de662c10e96bdbc9dfc980e">rDisconnectAsync()</a>, <a class="el" href="redisx_8c.html#a0cdebfd895ab4c61c0fc9e0863a66419">redisxCheckValid()</a>, and <a class="elRef" href="../../xchange/apidoc/html/xchange_8h.html#a7b2679c964ea5f2160380ed55654b873">X_SUCCESS</a>.</p>
 
 </div>
 </div>

@@ -55,7 +55,7 @@ Sets parameters for DH-based cyphers when using a TLS encrypted connection to \f
 .RS 4
 \fIredis\fP A \fBRedis\fP instance\&. 
 .br
-\fIdh_params_file\fP Path to the DH-based cypher parameters file,or NULL for no params\&. 
+\fIdh_params_file\fP Path to the DH-based cypher parameters file (in PEM format; we don't support the old DER format), or NULL for no params\&. 
 .RE
 .PP
 \fBReturns\fP

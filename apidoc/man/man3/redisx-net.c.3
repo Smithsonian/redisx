@@ -13,6 +13,12 @@ src/redisx-net.c
 .RI "void \fBrCloseClientAsync\fP (\fBRedisClient\fP *cl)"
 .br
 .ti -1c
+.RI "int \fBrConnectAsync\fP (\fBRedis\fP *redis, \fBboolean\fP usePipeline)"
+.br
+.ti -1c
+.RI "void \fBrDisconnectAsync\fP (\fBRedis\fP *redis)"
+.br
+.ti -1c
 .RI "void * \fBRedisPipelineListener\fP (void *pRedis)"
 .br
 .ti -1c
@@ -75,6 +81,40 @@ Closes the \fBRedis\fP client on the specified communication channel\&. This cal
 .RE
 .PP
 
+.SS "int rConnectAsync (\fBRedis\fP * redis, \fBboolean\fP usePipeline)"
+Same as rConnectClient() but called with the client's mutex already locked\&.
+.PP
+\fBParameters\fP
+.RS 4
+\fIredis\fP Pointer to a \fBRedis\fP instance\&. 
+.br
+\fIusePipeline\fP TRUE (non-zero) if a pipeline client should be connected also, or FALSE to create an interactive connection only\&.
+.RE
+.PP
+\fBReturns\fP
+.RS 4
+X_SUCCESS (0) if successful, or X_ALREADY_OPEN if the \fBRedis\fP instance is alreast connected\&. X_NO_SERVICE if there was an error connecting to \fBRedis\fP, or else an error (<0) returned by rConnectClientAsync()\&.
+.RE
+.PP
+\fBSee also\fP
+.RS 4
+rConnectClient() 
+.RE
+.PP
+
+.PP
+References \fBFALSE\fP, \fBRedis::id\fP, \fBRedis::interactive\fP, \fBRedis::pipeline\fP, \fBREDISX_INTERACTIVE_CHANNEL\fP, \fBREDISX_PIPELINE_CHANNEL\fP, \fBredisxErrorDescription()\fP, \fBredisxIsConnected()\fP, \fBTRUE\fP, \fBX_ALREADY_OPEN\fP, \fBX_NO_SERVICE\fP, \fBX_SUCCESS\fP, \fBx_trace()\fP, \fBx_warn()\fP, and \fBxvprintf\fP\&.
+.SS "void rDisconnectAsync (\fBRedis\fP * redis)"
+Same as rCloseClient() except without the exlusive locking mechanism of the client's IO\&.
+.PP
+\fBParameters\fP
+.RS 4
+\fIredis\fP Pointer to a \fBRedis\fP instance\&. 
+.RE
+.PP
+
+.PP
+References \fBFALSE\fP, \fBRedis::interactive\fP, \fBRedis::pipeline\fP, and \fBxvprintf\fP\&.
 .SS "void * RedisPipelineListener (void * pRedis)"
 The listener function that processes pipelined responses in the background\&. It is started when \fBRedis\fP is connected with the pipeline enabled\&.
 .PP
@@ -125,7 +165,7 @@ X_SUCCESS (0) if successfully connected to the \fBRedis\fP server\&. X_NO_INIT i
 .PP
 
 .PP
-References \fBX_SUCCESS\fP\&.
+References \fBrConnectAsync()\fP, and \fBX_SUCCESS\fP\&.
 .SS "void redisxDestroy (\fBRedis\fP * redis)"
 Destroys a \fBRedis\fP intance, disconnecting any clients that may be connected, and freeing all resources used by that \fBRedis\fP instance\&.
 .PP
@@ -147,7 +187,7 @@ Disconnect all clients from the \fBRedis\fP server\&.
 .PP
 
 .PP
-References \fBredisxCheckValid()\fP, and \fBX_SUCCESS\fP\&.
+References \fBrDisconnectAsync()\fP, \fBredisxCheckValid()\fP, and \fBX_SUCCESS\fP\&.
 .SS "\fBRedis\fP * redisxInit (const char * server)"
 Initializes the \fBRedis\fP client library, and sets the hostname or IP address for the \fBRedis\fP server\&.
 .PP

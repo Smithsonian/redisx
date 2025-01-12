@@ -1475,6 +1475,20 @@
       <arglist>(RedisClient *cl)</arglist>
     </member>
     <member kind="function">
+      <type>int</type>
+      <name>rConnectAsync</name>
+      <anchorfile>redisx-net_8c.html</anchorfile>
+      <anchor>ad4065e4f45daee4c9a4ce04e11a8cc11</anchor>
+      <arglist>(Redis *redis, boolean usePipeline)</arglist>
+    </member>
+    <member kind="function">
+      <type>void</type>
+      <name>rDisconnectAsync</name>
+      <anchorfile>redisx-net_8c.html</anchorfile>
+      <anchor>a42981dc95de662c10e96bdbc9dfc980e</anchor>
+      <arglist>(Redis *redis)</arglist>
+    </member>
+    <member kind="function">
       <type>void *</type>
       <name>RedisPipelineListener</name>
       <anchorfile>redisx-net_8c.html</anchorfile>

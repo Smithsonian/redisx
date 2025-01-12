@@ -1547,7 +1547,7 @@ redisxClusterGetRedirect() </dd>
   </table>
   </dd>
 </dl>
-<dl class="section return"><dt>Returns</dt><dd>the migrated server, from which the keyword should be queried now.</dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>the migrated server, from which the keyword should be queried now, or NULL if either pointer argument is NULL or if the <a class="el" href="structRESP.html" title="Structure that represents a Redis response (RESP format).">RESP</a> is not a redirection response (errno will be set to EINVAL), or if the redirected address is not part of a the cluster configuration (errno set to ENXIO if the cluster is not initialized, or else to EAGAIN).</dd></dl>
 <dl class="section see"><dt>See also</dt><dd><a class="el" href="redisx-cluster_8c.html#a19fc54725ba4725e0281cff59b642e15">redisxClusterMoved()</a> </dd>
 <dd>
 <a class="el" href="redisx-cluster_8c.html#a57a19ba90951b891677b1be3af8a8f36">redisxClusterIsMigrating()</a> </dd>
@@ -1596,7 +1596,7 @@ redisxClusterGetRedirect() </dd>
 <dd>
 <a class="el" href="redisx-cluster_8c.html#a19fc54725ba4725e0281cff59b642e15">redisxClusterMoved()</a> </dd></dl>
 
-<p class="reference">References <a class="el" href="structRedisCluster.html#a8b6505c37d4ff95854b8b00527e4d9fa">RedisCluster::priv</a>, <a class="el" href="redisx-net_8c.html#ad71822356ffd40ed4b1c71d065f48809">redisxConnect()</a>, <a class="el" href="redisx-net_8c.html#a94326ebfa5868579c8448cdbb941b3da">redisxIsConnected()</a>, <a class="elRef" href="../../xchange/apidoc/html/xchange_8c.html#ae73aaf705dc4e7d58dfb0fd81f4805c7">x_error()</a>, <a class="elRef" href="../../xchange/apidoc/html/xchange_8h.html#a1324cef45d5b26097bf488ad3b7f9e7b">X_NO_INIT</a>, <a class="elRef" href="../../xchange/apidoc/html/xchange_8h.html#aadbbe3ae01369cbddf4d57d430b33133">X_NULL</a>, and <a class="elRef" href="../../xchange/apidoc/html/xchange_8h.html#a7b2679c964ea5f2160380ed55654b873">X_SUCCESS</a>.</p>
+<p class="reference">References <a class="el" href="structRedisCluster.html#a8b6505c37d4ff95854b8b00527e4d9fa">RedisCluster::priv</a>, <a class="el" href="redisx-net_8c.html#ad4065e4f45daee4c9a4ce04e11a8cc11">rConnectAsync()</a>, <a class="el" href="redisx-net_8c.html#a94326ebfa5868579c8448cdbb941b3da">redisxIsConnected()</a>, <a class="elRef" href="../../xchange/apidoc/html/xchange_8c.html#ae73aaf705dc4e7d58dfb0fd81f4805c7">x_error()</a>, <a class="elRef" href="../../xchange/apidoc/html/xchange_8h.html#a1324cef45d5b26097bf488ad3b7f9e7b">X_NO_INIT</a>, <a class="elRef" href="../../xchange/apidoc/html/xchange_8h.html#aadbbe3ae01369cbddf4d57d430b33133">X_NULL</a>, and <a class="elRef" href="../../xchange/apidoc/html/xchange_8h.html#a7b2679c964ea5f2160380ed55654b873">X_SUCCESS</a>.</p>
 
 </div>
 </div>
@@ -1657,7 +1657,7 @@ redisxClusterGetRedirect() </dd>
   </table>
   </dd>
 </dl>
-<dl class="section return"><dt>Returns</dt><dd>TRUE (1) if the reply is an error indicating that the cluster has been reconfigured and the key has moved to another shard.</dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>TRUE (1) if the reply is an error indicating that the cluster has been reconfigured and the key has moved to another shard, or else FALSE (0).</dd></dl>
 <dl class="section see"><dt>See also</dt><dd><a class="el" href="redisx-cluster_8c.html#a19fc54725ba4725e0281cff59b642e15">redisxClusterMoved()</a> </dd>
 <dd>
 <a class="el" href="redisx-cluster_8c.html#a537ed3806a44fb40f6e8dccd813ad0da">redisxClusterIsRedirected()</a> </dd>
@@ -1690,7 +1690,7 @@ redisxClusterGetRedirect() </dd>
   </table>
   </dd>
 </dl>
-<dl class="section return"><dt>Returns</dt><dd>TRUE (1) if the reply is an error indicating that the query should be directed to another node.</dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>TRUE (1) if the reply is an error indicating that the query should be directed to another node, or else FALSE (0).</dd></dl>
 <dl class="section see"><dt>See also</dt><dd><a class="el" href="redisx-cluster_8c.html#a19fc54725ba4725e0281cff59b642e15">redisxClusterMoved()</a> </dd>
 <dd>
 <a class="el" href="redisx-cluster_8c.html#a57a19ba90951b891677b1be3af8a8f36">redisxClusterIsMigrating()</a> </dd></dl>
@@ -1721,7 +1721,7 @@ redisxClusterGetRedirect() </dd>
   </table>
   </dd>
 </dl>
-<dl class="section return"><dt>Returns</dt><dd>TRUE (1) if the reply is an error indicating that the cluster has been reconfigured and the key has moved to another shard.</dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>TRUE (1) if the reply is an error indicating that the cluster has been reconfigured and the key has moved to another shard, or else FALSE (0).</dd></dl>
 <dl class="section see"><dt>See also</dt><dd><a class="el" href="redisx-cluster_8c.html#a57a19ba90951b891677b1be3af8a8f36">redisxClusterIsMigrating()</a> </dd>
 <dd>
 <a class="el" href="redisx-cluster_8c.html#a537ed3806a44fb40f6e8dccd813ad0da">redisxClusterIsRedirected()</a> </dd>
@@ -1780,7 +1780,7 @@ redisxClusterGetRedirect() </dd>
 <dd>
 <a class="el" href="redisx-net_8c.html#acae5ab8af4db1c4ab13c4069aa744a44">redisxDisconnect()</a> </dd></dl>
 
-<p class="reference">References <a class="elRef" href="../../xchange/apidoc/html/xchange_8h.html#a7b2679c964ea5f2160380ed55654b873">X_SUCCESS</a>.</p>
+<p class="reference">References <a class="el" href="redisx-net_8c.html#ad4065e4f45daee4c9a4ce04e11a8cc11">rConnectAsync()</a>, and <a class="elRef" href="../../xchange/apidoc/html/xchange_8h.html#a7b2679c964ea5f2160380ed55654b873">X_SUCCESS</a>.</p>
 
 </div>
 </div>
@@ -1999,7 +1999,7 @@ redisxClusterGetRedirect() </dd>
   </dd>
 </dl>
 
-<p class="reference">References <a class="el" href="redisx_8c.html#a0cdebfd895ab4c61c0fc9e0863a66419">redisxCheckValid()</a>, and <a class="elRef" href="../../xchange/apidoc/html/xchange_8h.html#a7b2679c964ea5f2160380ed55654b873">X_SUCCESS</a>.</p>
+<p class="reference">References <a class="el" href="redisx-net_8c.html#a42981dc95de662c10e96bdbc9dfc980e">rDisconnectAsync()</a>, <a class="el" href="redisx_8c.html#a0cdebfd895ab4c61c0fc9e0863a66419">redisxCheckValid()</a>, and <a class="elRef" href="../../xchange/apidoc/html/xchange_8h.html#a7b2679c964ea5f2160380ed55654b873">X_SUCCESS</a>.</p>
 
 </div>
 </div>
@@ -4626,7 +4626,7 @@ redisxGetLockedConnected() </dd>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">redis</td><td>A <a class="el" href="structRedis.html" title="Structure that represents a Redis database instance, with one or more RedisClient connections.">Redis</a> instance. </td></tr>
-    <tr><td class="paramname">dh_params_file</td><td>Path to the DH-based cypher parameters file,or NULL for no params. </td></tr>
+    <tr><td class="paramname">dh_params_file</td><td>Path to the DH-based cypher parameters file (in PEM format; we don't support the old DER format), or NULL for no params. </td></tr>
   </table>
   </dd>
 </dl>
