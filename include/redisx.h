@@ -515,6 +515,7 @@ int redisxUnlockClient(RedisClient *cl);
 int redisxSendRequestAsync(RedisClient *cl, const char *command, const char *arg1, const char *arg2, const char *arg3);
 int redisxSendArrayRequestAsync(RedisClient *cl, const char **args, const int *length, int n);
 int redisxClusterAskMigratingAsync(RedisClient *cl, const char **args, const int *lengths, int n);
+XLookupTable *redisxGetInfoAsync(RedisClient *cl, const char *parameter);
 int redisxSetValueAsync(RedisClient *cl, const char *table, const char *key, const char *value, boolean confirm);
 int redisxMultiSetAsync(RedisClient *cl, const char *table, const RedisEntry *entries, int n, boolean confirm);
 int redisxGetAvailableAsync(RedisClient *cl);

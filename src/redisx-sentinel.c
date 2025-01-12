@@ -144,7 +144,7 @@ int rConfirmMasterRoleAsync(Redis *redis) {
 
   if(redisxCheckDestroyRESP(reply, RESP_ARRAY, 0) != X_SUCCESS) {
     // Fallback to using INFO replication...
-    XLookupTable *info = redisxGetInfo(redis, "replication");
+    XLookupTable *info = redisxGetInfoAsync(redis->interactive, "replication");
     const XField *role;
 
     if(!info) return x_trace(fn, NULL, X_FAILURE);
@@ -180,7 +180,8 @@ int rConfirmMasterRoleAsync(Redis *redis) {
 }
 
 /**
- * Configures the current Sentinel master from the given participating node.
+ * Configures the current Sentinel master from the given participating node. The caller
+ * should have exclusive access to the configuration of the Redis instance.
  *
  * @param redis     A Redis server instance
  * @return          X_SUCCESS (0) if successful, or else an error code &lt;0.
@@ -216,7 +217,6 @@ int rDiscoverSentinelAsync(Redis *redis) {
       int port = (int) strtol((char *) component[1]->value, NULL, 10);
 
       status = rSetServerAsync(redis, "sentinel master", (char *) component[0]->value, port);
-
       redisxDestroyRESP(reply);
       prop_error(fn, status);
 
