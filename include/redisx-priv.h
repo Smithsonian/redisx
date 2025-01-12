@@ -147,12 +147,14 @@ int rConfigLock(Redis *redis);
 int rConfigUnlock(Redis *redis);
 
 // in redisx-net.c ------------------------>
-int rConnectClient(Redis *redis, enum redisx_channel channel);
+int rConnectAsync(Redis *redis, boolean usePipeline);
+int rConnectClientAsync(Redis *redis, enum redisx_channel channel);
 void rCloseClient(RedisClient *cl);
 void rCloseClientAsync(RedisClient *cl);
 boolean rIsLowLatency(const ClientPrivate *cp);
 int rCheckClient(const RedisClient *cl);
 int rSetServerAsync(Redis *redis, const char *desc, const char *hostname, int port);
+void rDisconnectAsync(Redis *redis);
 
 // in redisx-hooks.c ---------------------->
 Hook *rCopyHooks(const Hook *list, Redis *owner);

@@ -17,13 +17,14 @@
 
 /**
  * Attemps to connect to a given Redis sentinel server. The Redis instance is assumed to be
- * unconnected at the time of the call.
+ * unconnected at the time of the call, and the caller must have an exclusive lock on the
+ * Redis configuration mutex.
  *
  * @param redis         A Redis server instance
  * @param serverIndex   the current array index of the server among the sentinels
  * @return              X_SUCCESS (0) if successful, or else an error code &lt;0.
  */
-static int rTryConnectSentinel(Redis *redis, int serverIndex) {
+static int rTryConnectSentinelAsync(Redis *redis, int serverIndex) {
   static const char *fn = "rTryConnectSentinel";
 
   RedisPrivate *p = (RedisPrivate *) redis->priv;
@@ -32,15 +33,12 @@ static int rTryConnectSentinel(Redis *redis, int serverIndex) {
   char desc[80];
   int status;
 
-  // Since we'll set a new address / port, we should ensure we aren't connected to something else...
-  redisxDisconnect(redis);
-
   sprintf(desc, "sentinel server %d", serverIndex);
   xvprintf("Redis-X> Connect to %s.\n", desc);
 
   prop_error(fn, rSetServerAsync(redis, desc, server.host, server.port));
 
-  status = rConnectClient(redis, REDISX_INTERACTIVE_CHANNEL);
+  status = rConnectClientAsync(redis, REDISX_INTERACTIVE_CHANNEL);
   if(status != X_SUCCESS) return status; // No error propagation. It's OK if server is down...
 
   return X_SUCCESS;
@@ -50,6 +48,7 @@ static int rTryConnectSentinel(Redis *redis, int serverIndex) {
 
 /**
  * Moves a server from its current position in the Sentinel server list to the top.
+ * the caller must have an exclusive lock on the Redis configuration mutex.
  *
  * @param s     The Redis Sentinel configuration
  * @param idx   The current zero-based index of the server in the list
@@ -74,6 +73,16 @@ static int rSetTopSentinelAsync(RedisSentinel *s, int idx) {
   return X_SUCCESS;
 }
 
+/**
+ * Moves or adds the master server, specified by host name and port number, to the top of
+ * the list of known Sentinel servers, so next time we try it first when connecting.
+ * The caller must have an exclusive lock on the Redis configuration mutex.
+ *
+ * @param s         Redis Sentinel configuration
+ * @param hostname  Host name or IP address of the master node
+ * @param port      Port number of master server on node
+ * @return          X_SUCCESS (0) if successful, or else an error code &lt;0.
+ */
 static int rIncludeMasterAsync(RedisSentinel *s, char *hostname, int port) {
   int i;
   void *old = s->servers;
@@ -111,7 +120,7 @@ static int rIncludeMasterAsync(RedisSentinel *s, char *hostname, int port) {
 /**
  * Verifies that a given Redis instance is in the master role. Users should always communicate
  * to the master, not to replicas. It assumes that we have a live interactive connection to the
- * server already.
+ * server already, and the caller must have an exclusive lock on the Redis configuration mutex.
  *
  * Upon successful return the current master is added or moved to the top of the sentinel server
  * list, so it is the first to try next time.
@@ -120,14 +129,17 @@ static int rIncludeMasterAsync(RedisSentinel *s, char *hostname, int port) {
  * @return          X_SUCCESS (0) if the server is confirmed to be the master, or else an error
  *                  code &lt;0.
  */
-int rConfirmMasterRole(Redis *redis) {
+int rConfirmMasterRoleAsync(Redis *redis) {
   static const char *fn = "rConfirmMasterRole";
 
   RESP *reply, **component;
   int status;
 
   // Try ROLE command first (available since Redis 4)
-  reply = redisxRequest(redis, "ROLE", NULL, NULL, NULL, &status);
+  status = redisxSendRequestAsync(redis->interactive, "ROLE", NULL, NULL, NULL);
+  prop_error(fn, status);
+
+  reply = redisxReadReplyAsync(redis->interactive, &status);
   prop_error(fn, status);
 
   if(redisxCheckDestroyRESP(reply, RESP_ARRAY, 0) != X_SUCCESS) {
@@ -185,15 +197,18 @@ int rDiscoverSentinelAsync(Redis *redis) {
 
   xvprintf("Redis-X> Looking for the Sentinel master...\n");
 
-  for(i = 0; i < s->nServers; i++) if(rTryConnectSentinel(redis, i) == X_SUCCESS) {
+  for(i = 0; i < s->nServers; i++) if(rTryConnectSentinelAsync(redis, i) == X_SUCCESS) {
     RESP *reply;
     int status;
 
     // Check if this is master...
-    if(rConfirmMasterRole(redis)) goto success; // @suppress("Goto statement used")
+    if(rConfirmMasterRoleAsync(redis)) goto success; // @suppress("Goto statement used")
 
     // Get the name of the master...
-    reply = redisxRequest(redis, "SENTINEL", "get-master-addr-by-name", s->serviceName, NULL, &status);
+    status = redisxSendRequestAsync(redis->interactive, "SENTINEL", "get-master-addr-by-name", s->serviceName, NULL);
+    if(status) continue;
+
+    reply = redisxReadReplyAsync(redis->interactive, &status);
     if(status) continue;
 
     if(redisxCheckDestroyRESP(reply, RESP_ARRAY, 2) == X_SUCCESS) {

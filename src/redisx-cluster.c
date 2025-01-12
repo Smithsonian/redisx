@@ -144,7 +144,8 @@ static void rDiscardShardsAsync(RedisShard *shards, int n_shards) {
 }
 
 /**
- * Returns the current cluster configuration obtained from the specified node
+ * Returns the current cluster configuration obtained from the specified node. The caller must have
+ * an exclusive lock on the Redis configuration mutex.
  *
  * @param redis             The node to use for discovery. It need not be in a connected state.
  * @param[out] n_shards     Pointer to integer in which to return the number of shards discovered
@@ -156,20 +157,25 @@ static void rDiscardShardsAsync(RedisShard *shards, int n_shards) {
 static RedisShard *rClusterDiscoverAsync(Redis *redis, int *n_shards) {
   static const char *fn = "rClusterDiscoverAsync";
 
-  RESP *reply;
+  RESP *reply = NULL;
   RedisShard *shards = NULL;
   int isConnected;
 
   isConnected = redisxIsConnected(redis);
-
   if(!isConnected) {
-    *n_shards = redisxConnect(redis, FALSE);
+    *n_shards = rConnectClientAsync(redis, REDISX_INTERACTIVE_CHANNEL);
     if(*n_shards) return x_trace_null(fn, NULL);
   }
 
+  *n_shards = redisxLockConnected(redis->interactive);
+  if(*n_shards) return x_trace_null(fn, NULL);
+
   xvprintf("Redis-X> Discovering cluster configuration...\n");
 
-  reply = redisxRequest(redis, "CLUSTER", "SLOTS", NULL, NULL, n_shards);
+  *n_shards = redisxSendRequestAsync(redis->interactive, "CLUSTER", "SLOTS", NULL, NULL);
+  if(*n_shards == X_SUCCESS) reply = redisxReadReplyAsync(redis->interactive, n_shards);
+  redisxUnlockClient(redis->interactive);
+
   if(*n_shards) {
     redisxDestroyRESP(reply);
     return x_trace_null(fn, NULL);
@@ -206,20 +212,20 @@ static RedisShard *rClusterDiscoverAsync(Redis *redis, int *n_shards) {
       }
 
       for(m = 0; m < s->n_servers; s++) {
-        Redis *r;
         RESP **node = (RESP **) desc[2]->value;
+        Redis *r = s->redis[m] = redisxInit((char *) node[0]->value);
+        RedisPrivate *p = (RedisPrivate *) r->priv;
 
-        r = s->redis[m] = redisxInit((char *) node[0]->value);
-        redisxSetPort(s->redis[m], node[1]->n);
-        rCopyConfig(&((RedisPrivate *) redis->priv)->config, r);
-        redisxSelectDB(r, 0); // Only DB 0 is allowed for clusters.
+        p->port = node[1]->n;
+        rCopyConfig(&p->config, r);
+        p->config.dbIndex = 0; // Only DB 0 is allowed for clusters.
       }
     }
   }
 
   redisxDestroyRESP(reply);
 
-  if(!isConnected) redisxDisconnect(redis);
+  if(!isConnected) rDisconnectAsync(redis);
 
   if(*n_shards < 0) x_trace(fn, NULL, *n_shards);
 
@@ -229,7 +235,8 @@ static RedisShard *rClusterDiscoverAsync(Redis *redis, int *n_shards) {
 /**
  * Sets a new set of shards for a cluster. All servers in the shards will have the cluster registered
  * as a parent, so they may all initiate reconfiguration if the hashes have `MOVED`. Normally this
- * should be called after rClusterDiscoverAsync()
+ * should be called after rClusterDiscoverAsync(). The caller must have an exclusive lock on the Redis
+ * configuration mutex.
  *
  * @param cluster     Pointer to a Redis cluster configuration
  * @param shard       New array of shards to set
@@ -250,11 +257,8 @@ static void rClusterSetShardsAsync(RedisCluster *cluster, RedisShard *shard, int
     int m;
     for(m = 0; m < s->n_servers; m++) {
       Redis *r = s->redis[m];
-      RedisPrivate *np;
-      if(rConfigLock(r) != X_SUCCESS) continue;
-      np = (RedisPrivate *) r->priv;
+      RedisPrivate *np = (RedisPrivate *) r->priv;
       np->cluster = cluster;
-      rConfigUnlock(r);
     }
   }
 
@@ -402,7 +406,13 @@ Redis *redisxClusterGetShard(RedisCluster *cluster, const char *key) {
 
       for(m = 0; m < s->n_servers; m++) {
         Redis *r = s->redis[m];
-        if(!redisxIsConnected(r)) if(redisxConnect(r, p->usePipeline) != X_SUCCESS) continue;
+
+        if(rConfigLock(r) != X_SUCCESS) continue;
+        if(!redisxIsConnected(r)) if(rConnectAsync(r, p->usePipeline) != X_SUCCESS) {
+          rConfigUnlock(r);
+          continue;
+        }
+        rConfigUnlock(r);
         pthread_mutex_unlock(&p->mutex);
         return r;
       }
@@ -471,7 +481,12 @@ static Redis *rClusterGetShardByAddress(RedisCluster *cluster, const char *host,
       const RedisPrivate *np = (RedisPrivate *) r->priv;
 
       if(np->port == port && strcmp(np->hostname, host) == 0) {
-        if(!redisxIsConnected(r)) if(redisxConnect(r, p->usePipeline) != X_SUCCESS) continue;
+        if(rConfigLock(r) != X_SUCCESS) continue;
+        if(!redisxIsConnected(r)) if(rConnectAsync(r, p->usePipeline) != X_SUCCESS) {
+          rConfigUnlock(r);
+          continue;
+        }
+        rConfigUnlock(r);
         pthread_mutex_unlock(&p->mutex);
         return r;
       }

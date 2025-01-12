@@ -148,7 +148,7 @@ void rDestroyClientTLS(ClientPrivate *cp) {
  * @param tls   TLS configuration.
  * @return      X_SUCCESS (0) if successful, or else an error code &lt;0.
  */
-int rConnectTLSClient(ClientPrivate *cp, const TLSConfig *tls) {
+int rConnectTLSClientAsync(ClientPrivate *cp, const TLSConfig *tls) {
   static const char *fn = "rConnectClientTLS";
   static pthread_mutex_t mutex = PTHREAD_MUTEX_INITIALIZER;
 
@@ -327,6 +327,7 @@ int redisxSetTLS(Redis *redis, const char *ca_path, const char *ca_file) {
   return X_SUCCESS;
 #else
   (void) redis;
+  (void) ca_path;
   (void) ca_file;
 
   return x_error(X_FAILURE, ENOSYS, fn, "RedisX was built without TLS support");
@@ -566,6 +567,7 @@ int redisxSetTLSSkipVerify(Redis *redis, boolean value) {
   return X_SUCCESS;
 #else
   (void) redis;
+  (void) value;
 
   return x_error(X_FAILURE, ENOSYS, fn, "RedisX was built without TLS support");
 #endif

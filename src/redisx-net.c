@@ -31,7 +31,7 @@
 
 /// \cond PRIVATE
 extern int rDiscoverSentinelAsync(Redis *redis);
-extern int rConfirmMasterRole(Redis *redis);
+extern int rConfirmMasterRoleAsync(Redis *redis);
 extern void rDestroySentinel(RedisSentinel *sentinel);
 /// \endcond
 
@@ -237,7 +237,7 @@ static int rRegisterServer(Redis *redis) {
 }
 
 /**
- * Same as connectRedis() except without the exlusive locking mechanism...
+ * Same as rConnectClient() but called with the client's mutex already locked.
  *
  * \param redis         Pointer to a Redis instance.
  * \param usePipeline   TRUE (non-zero) if a pipeline client should be connected also, or FALSE to create an interactive
@@ -248,10 +248,10 @@ static int rRegisterServer(Redis *redis) {
  *              X_NO_SERVICE        if there was an error connecting to Redis,
  *              or else an error (&lt;0) returned by rConnectClientAsync().
  *
- * \sa rConnectClientAsync()
+ * \sa rConnectClient()
  *
  */
-static int rConnectAsync(Redis *redis, boolean usePipeline) {
+int rConnectAsync(Redis *redis, boolean usePipeline) {
   static const char *fn = "rConnectAsync";
 
   int status = X_SUCCESS;
@@ -271,7 +271,7 @@ static int rConnectAsync(Redis *redis, boolean usePipeline) {
     static int warnedInteractive;
 
     xvprintf("Redis-X> Connect interactive client.\n");
-    status = rConnectClient(redis, REDISX_INTERACTIVE_CHANNEL);
+    status = rConnectClientAsync(redis, REDISX_INTERACTIVE_CHANNEL);
 
     if(status) {
       if(!warnedInteractive) {
@@ -284,7 +284,7 @@ static int rConnectAsync(Redis *redis, boolean usePipeline) {
   }
 
   if(p->sentinel) {
-    if(rConfirmMasterRole(redis) != X_SUCCESS) prop_error(fn, rReconnectAsync(redis, usePipeline));
+    if(rConfirmMasterRoleAsync(redis) != X_SUCCESS) prop_error(fn, rReconnectAsync(redis, usePipeline));
   }
 
   if(usePipeline) {
@@ -292,7 +292,7 @@ static int rConnectAsync(Redis *redis, boolean usePipeline) {
       static int warnedPipeline;
 
       xvprintf("Redis-X> Connect pipeline client.\n");
-      status = rConnectClient(redis, REDISX_PIPELINE_CHANNEL);
+      status = rConnectClientAsync(redis, REDISX_PIPELINE_CHANNEL);
 
       if(status) {
         if(!warnedPipeline) {
@@ -395,12 +395,13 @@ void rCloseClient(RedisClient *cl) {
 /// \endcond
 
 /**
- * Same as disconnectRedis() except without the exlusive locking mechanism...
+ * Same as rCloseClient() except without the exlusive locking mechanism of the client's
+ * IO.
  *
  * \param redis         Pointer to a Redis instance.
  *
  */
-static void rDisconnectAsync(Redis *redis) {
+void rDisconnectAsync(Redis *redis) {
   RedisPrivate *p = (RedisPrivate *) redis->priv;
   Hook *f;
 
@@ -605,7 +606,8 @@ static int rHelloAsync(RedisClient *cl, char *clientID) {
 
 
 /**
- * Connects the specified Redis client to the Redis server.
+ * Connects the specified Redis client to the Redis server. It should be called with the the configuration
+ * mutex of the Redis instance locked.
  *
  * \param redis         Pointer to a Redis instance.
  * \param channel       REDISX_INTERACTIVE_CHANNEL, REDISX_PIPELINE_CHANNEL, or REDISX_SUBSCRIPTION_CHANNEL
@@ -617,12 +619,14 @@ static int rHelloAsync(RedisClient *cl, char *clientID) {
  *                          X_NAME_INVALID     if the redis server address is invalid.
  *                          X_ALREADY_OPEN     if the client on that channels is already connected.
  *                          X_NO_SERVICE       if the socket or connection could not be opened.
+ *
+ * @sa rConfigLock()
  */
-int rConnectClient(Redis *redis, enum redisx_channel channel) {
+int rConnectClientAsync(Redis *redis, enum redisx_channel channel) {
   static const char *fn = "rConnectClient";
 
 #if WITH_TLS
-  extern int rConnectTLSClient(ClientPrivate *cp, const TLSConfig *tls);
+  extern int rConnectTLSClientAsync(ClientPrivate *cp, const TLSConfig *tls);
 #endif
 
   struct sockaddr_in serverAddress;
@@ -661,7 +665,7 @@ int rConnectClient(Redis *redis, enum redisx_channel channel) {
   }
 
 #if WITH_TLS
-  if(config->tls.enabled && rConnectTLSClient(cp, &config->tls) != X_SUCCESS) {
+  if(config->tls.enabled && rConnectTLSClientAsync(cp, &config->tls) != X_SUCCESS) {
     close(sock);
     return x_error(X_NO_INIT, errno, fn, "failed to connect (with TLS) to %s:%hu: %s", redis->id, port, strerror(errno));
   }
