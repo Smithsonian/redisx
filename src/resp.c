@@ -709,7 +709,7 @@ XField *redisxRESP2XField(const char *name, const RESP *resp) {
     case RESP3_BLOB_ERROR:
     case RESP3_VERBATIM_STRING:
     case RESP3_BIG_NUMBER: {
-      XField *f = xCreateStringField(name, xStringCopyOf((char *) resp->value));
+      XField *f = xCreateStringField(name, (char *) resp->value);
       rSetRESPType(f, resp->type);
       return f;
     }
