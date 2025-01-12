@@ -143,10 +143,10 @@ int rConfirmMasterRoleAsync(Redis *redis) {
   prop_error(fn, status);
 
   if(redisxCheckDestroyRESP(reply, RESP_ARRAY, 0) != X_SUCCESS) {
+    // Fallback to using INFO replication...
     XLookupTable *info;
     const XField *role;
 
-    // Fallback to using INFO replication...
     status = redisxSendRequestAsync(redis->interactive, "INFO", "replication", NULL, NULL);
     prop_error(fn, status);
 
@@ -174,16 +174,14 @@ int rConfirmMasterRoleAsync(Redis *redis) {
 
   redisxDestroyRESP(reply);
 
-  if(status) return x_error(X_FAILURE, EAGAIN, fn, "server is a replica, not the master");
-
-  // Make sure the current master is included at the top of the sentinels server list
-  if(rConfigLock(redis) == X_SUCCESS) {
+  if(status == X_SUCCESS) {
     RedisPrivate *p = (RedisPrivate *) redis->priv;
     xvprintf("Redis-X> Confirmed master at %s:%d.\n", p->hostname, p->port);
     if(p->sentinel) rIncludeMasterAsync(p->sentinel, p->hostname, p->port);
+    return X_SUCCESS;
   }
 
-  return X_SUCCESS;
+  return x_error(X_FAILURE, EAGAIN, fn, "server is a replica, not the master");
 }
 
 /**
