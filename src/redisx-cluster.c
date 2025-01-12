@@ -183,7 +183,7 @@ static RedisShard *rClusterDiscoverAsync(Redis *redis, int *n_shards) {
   }
 
   if(redisxCheckRESP(reply, RESP_ARRAY, 0) == X_SUCCESS) {
-    RESP **array = (RESP **) reply->value;
+    const RESP **array = (const RESP **) reply->value;
     int k;
 
     if(reply->n > 0) {
@@ -195,10 +195,9 @@ static RedisShard *rClusterDiscoverAsync(Redis *redis, int *n_shards) {
     }
 
     for(k = 0; k < reply->n; k++) {
-      RESP **desc = (RESP **) array[k]->value;
+      const RedisPrivate *p0 = (RedisPrivate *) redis->priv;
+      const RESP **desc = (const RESP **) array[k]->value;
       RedisShard *s = &shards[k];
-      RedisPrivate *p0 = (RedisPrivate *) redis->priv;
-
       int m;
 
       s->start = desc[0]->n;
@@ -215,7 +214,7 @@ static RedisShard *rClusterDiscoverAsync(Redis *redis, int *n_shards) {
       }
 
       for(m = 0; m < s->n_servers; s++) {
-        RESP **node = (RESP **) desc[2 + m]->value;
+        const RESP **node = (const RESP **) desc[2 + m]->value;
         s->redis[m] = redisxInit((char *) node[0]->value);
 
         redisxSetPort(s->redis[m], node[1]->n);
