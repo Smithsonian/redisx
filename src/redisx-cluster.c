@@ -688,7 +688,7 @@ int redisxClusterDisconnect(RedisCluster *cluster) {
  *
  * @param reply   The response obtained from the Redis shard / server.
  * @return        TRUE (1) if the reply is an error indicating that the cluster has been
- *                reconfigured and the key has moved to another shard.
+ *                reconfigured and the key has moved to another shard, or else FALSE (0).
  *
  * @sa redisxClusterIsMigrating()
  * @sa redisxClusterIsRedirected()
@@ -709,7 +709,7 @@ boolean redisxClusterMoved(const RESP *reply) {
  *
  * @param reply   The response obtained from the Redis shard / server.
  * @return        TRUE (1) if the reply is an error indicating that the cluster has been
- *                reconfigured and the key has moved to another shard.
+ *                reconfigured and the key has moved to another shard, or else FALSE (0).
  *
  * @sa redisxClusterMoved()
  * @sa redisxClusterIsRedirected()
@@ -729,7 +729,7 @@ boolean redisxClusterIsMigrating(const RESP *reply) {
  *
  * @param reply   The response obtained from the Redis shard / server.
  * @return        TRUE (1) if the reply is an error indicating that the query should be
- *                directed to another node.
+ *                directed to another node, or else FALSE (0).
  *
  * @sa redisxClusterMoved()
  * @sa redisxClusterIsMigrating()
@@ -746,7 +746,11 @@ boolean redisxClusterIsRedirected(const RESP *reply) {
  * @param redirect    the redirection response sent to a keyword query
  * @param refresh     whether it should refresh the cluster configuration and try again if the
  *                    redirection target is not found in the current cluster configuration.
- * @return            the migrated server, from which the keyword should be queried now.
+ * @return            the migrated server, from which the keyword should be queried now, or
+ *                    NULL if either pointer argument is NULL or if the RESP is not a
+ *                    redirection response (errno will be set to EINVAL), or if the redirected
+ *                    address is not part of a the cluster configuration (errno set to ENXIO
+ *                    if the cluster is not initialized, or else to EAGAIN).
  *
  * @sa redisxClusterMoved()
  * @sa redisxClusterIsMigrating()
