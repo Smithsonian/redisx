@@ -146,7 +146,7 @@ static void rDiscardShards(RedisShard *shards, int n_shards) {
 
 /**
  * Returns the current cluster configuration obtained from the specified node. The caller must have
- * an exclusive lock on the Redis configuration mutex.
+ * an exclusive lock on the configuration mutex of the initializing Redis instance.
  *
  * @param redis             The node to use for discovery. It need not be in a connected state.
  * @param[out] n_shards     Pointer to integer in which to return the number of shards discovered
@@ -197,6 +197,8 @@ static RedisShard *rClusterDiscoverAsync(Redis *redis, int *n_shards) {
     for(k = 0; k < reply->n; k++) {
       RESP **desc = (RESP **) array[k]->value;
       RedisShard *s = &shards[k];
+      RedisPrivate *p0 = (RedisPrivate *) redis->priv;
+
       int m;
 
       s->start = desc[0]->n;
@@ -213,13 +215,12 @@ static RedisShard *rClusterDiscoverAsync(Redis *redis, int *n_shards) {
       }
 
       for(m = 0; m < s->n_servers; s++) {
-        RESP **node = (RESP **) desc[2]->value;
-        Redis *r = s->redis[m] = redisxInit((char *) node[0]->value);
-        RedisPrivate *p = (RedisPrivate *) r->priv;
+        RESP **node = (RESP **) desc[2 + m]->value;
+        s->redis[m] = redisxInit((char *) node[0]->value);
 
-        p->port = node[1]->n;
-        rCopyConfig(&p->config, r);
-        p->config.dbIndex = 0; // Only DB 0 is allowed for clusters.
+        redisxSetPort(s->redis[m], node[1]->n);
+        rCopyConfig(&p0->config, s->redis[m]);
+        redisxSelectDB(s->redis[m], 0); // Only DB 0 is allowed for clusters.
       }
     }
   }
@@ -297,7 +298,6 @@ static void *ClusterRefreshThread(void *pCluster) {
   }
 
   cp->reconfiguring = FALSE;
-
   pthread_mutex_unlock(&cp->mutex);
 
   return NULL;
