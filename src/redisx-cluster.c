@@ -162,17 +162,20 @@ static RedisShard *rClusterDiscoverAsync(Redis *redis, int *n_shards) {
   RedisShard *shards = NULL;
   int isConnected;
 
+  // Connect to the known node if necessary
   isConnected = redisxIsConnected(redis);
   if(!isConnected) {
     *n_shards = rConnectClientAsync(redis, REDISX_INTERACTIVE_CHANNEL);
     if(*n_shards) return x_trace_null(fn, NULL);
   }
 
+  // Get exclusive access to the connection
   *n_shards = redisxLockConnected(redis->interactive);
   if(*n_shards) return x_trace_null(fn, NULL);
 
   xvprintf("Redis-X> Discovering cluster configuration...\n");
 
+  // Query the cluster layout
   *n_shards = redisxSendRequestAsync(redis->interactive, "CLUSTER", "SLOTS", NULL, NULL);
   if(*n_shards == X_SUCCESS) reply = redisxReadReplyAsync(redis->interactive, n_shards);
   redisxUnlockClient(redis->interactive);
@@ -183,6 +186,7 @@ static RedisShard *rClusterDiscoverAsync(Redis *redis, int *n_shards) {
   }
 
   if(redisxCheckRESP(reply, RESP_ARRAY, 0) == X_SUCCESS) {
+    // Process the response, indetifying the shards.
     const RESP **array = (const RESP **) reply->value;
     int k;
 
@@ -194,9 +198,10 @@ static RedisShard *rClusterDiscoverAsync(Redis *redis, int *n_shards) {
       else *n_shards = reply->n;
     }
 
+    // For each shard identify the range of hashes served, and the servers that serve them.
     for(k = 0; k < reply->n; k++) {
-      const RedisPrivate *p0 = (RedisPrivate *) redis->priv;
-      const RESP **desc = (const RESP **) array[k]->value;
+      const RedisPrivate *p0 = (RedisPrivate *) redis->priv;  // The configuration of the initial node.
+      const RESP **desc = (const RESP **) array[k]->value;    // Description of the k'th shard
       RedisShard *s = &shards[k];
       int m;
 
@@ -210,23 +215,28 @@ static RedisShard *rClusterDiscoverAsync(Redis *redis, int *n_shards) {
         x_error(0, errno, fn, "alloc error (%d servers)\n", s->n_servers);
         rDiscardShards(shards, *n_shards);
         *n_shards = X_FAILURE;
+
+
+        if(!isConnected) rDisconnectAsync(redis);   // Restore th connection state of the configuring node.
+
         return NULL;
       }
 
+      // Identify the servers for this shard.
       for(m = 0; m < s->n_servers; s++) {
         const RESP **node = (const RESP **) desc[2 + m]->value;
         s->redis[m] = redisxInit((char *) node[0]->value);
 
         redisxSetPort(s->redis[m], node[1]->n);
-        rCopyConfig(&p0->config, s->redis[m]);
-        redisxSelectDB(s->redis[m], 0); // Only DB 0 is allowed for clusters.
+        rCopyConfig(&p0->config, s->redis[m]);  // Inherit the configuration from the initial node...
+        redisxSelectDB(s->redis[m], 0);         // ... Except, that only DB 0 is allowed for clusters.
       }
     }
   }
 
   redisxDestroyRESP(reply);
 
-  if(!isConnected) rDisconnectAsync(redis);
+  if(!isConnected) rDisconnectAsync(redis);   // Restore the connection state of the configuring node.
 
   if(*n_shards < 0) x_trace(fn, NULL, *n_shards);
 

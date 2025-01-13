@@ -16,24 +16,24 @@
 #include "redisx-priv.h"
 
 /**
- * Attemps to connect to a given Redis sentinel server. The Redis instance is assumed to be
- * unconnected at the time of the call, and the caller must have an exclusive lock on the
- * Redis configuration mutex.
+ * Attemps an interactive-only connection to a given Redis sentinel node. The Redis
+ * instance is assumed to be unconnected at the time of the call, and the caller must
+ * have an exclusive lock on the Redis configuration mutex.
  *
  * @param redis         A Redis server instance
  * @param serverIndex   the current array index of the server among the sentinels
  * @return              X_SUCCESS (0) if successful, or else an error code &lt;0.
  */
-static int rTryConnectSentinelAsync(Redis *redis, int serverIndex) {
+static int rConnectNodeAsync(Redis *redis, int serverIndex) {
   static const char *fn = "rTryConnectSentinel";
 
   RedisPrivate *p = (RedisPrivate *) redis->priv;
   RedisSentinel *s = p->sentinel;
   RedisServer server = s->servers[serverIndex];  // A copy, not a reference...
-  char desc[80];
+  char desc[40];
   int status;
 
-  sprintf(desc, "sentinel server %d", serverIndex);
+  sprintf(desc, "sentinel %d", serverIndex);
   xvprintf("Redis-X> Connect to %s.\n", desc);
 
   prop_error(fn, rSetServerAsync(redis, desc, server.host, server.port));
@@ -83,12 +83,12 @@ static int rSetTopSentinelAsync(RedisSentinel *s, int idx) {
  * @param port      Port number of master server on node
  * @return          X_SUCCESS (0) if successful, or else an error code &lt;0.
  */
-static int rIncludeMasterAsync(RedisSentinel *s, char *hostname, int port) {
+static int rIncludeMasterAsync(RedisSentinel *s, const char *hostname, int port) {
   int i;
   void *old = s->servers;
 
   for(i = 0; i < s->nServers; i++) {
-    RedisServer *server = &s->servers[i];
+    const RedisServer *server = &s->servers[i];
     int sport = server->port > 0 ? server->port : REDISX_TCP_PORT;
     if(sport == port && strcmp(server->host, hostname) == 0) {
       // Found master on server list, move it to the top...
@@ -97,7 +97,7 @@ static int rIncludeMasterAsync(RedisSentinel *s, char *hostname, int port) {
     }
   }
 
-  xvprintf("Redis-X> Adding master at %s:%d to top of Sentinels.\n", hostname, port);
+  xvprintf("Redis-X> Adding new sentinel master %s:%d to top of the list.\n", hostname, port);
 
   // Current master does not seem to be on our list, so let's add it to the top.
   s->servers = (RedisServer *) realloc(s->servers, (s->nServers + 1) * sizeof(RedisServer));
@@ -109,7 +109,7 @@ static int rIncludeMasterAsync(RedisSentinel *s, char *hostname, int port) {
   else {
     // Bump the existing list, and add the new master on top
     memmove(&s->servers[1], s->servers, s->nServers * sizeof(RedisServer));
-    s->servers[0].host = hostname;
+    s->servers[0].host = (char *) hostname;
     s->servers[0].port = port;
     s->nServers++;
   }
@@ -199,11 +199,12 @@ int rDiscoverSentinelAsync(Redis *redis) {
   RedisSentinel *s = p->sentinel;
   int i, savedTimeout = config->timeoutMillis;
 
+  // Use the Sentinel socket timeout, which is usually way shorter than the regular timeout value...
   config->timeoutMillis = s->timeoutMillis > 0 ? s->timeoutMillis : REDISX_DEFAULT_SENTINEL_TIMEOUT_MILLIS;
 
   xvprintf("Redis-X> Looking for the Sentinel master...\n");
 
-  for(i = 0; i < s->nServers; i++) if(rTryConnectSentinelAsync(redis, i) == X_SUCCESS) {
+  for(i = 0; i < s->nServers; i++) if(rConnectNodeAsync(redis, i) == X_SUCCESS) {
     RESP *reply;
     int status;
 
@@ -227,7 +228,7 @@ int rDiscoverSentinelAsync(Redis *redis) {
 
       if(i > 0) rSetTopSentinelAsync(s, i);
 
-      // TODO update sentinel server list?...
+      // TODO (optional) update sentinel server list? -- it's not necessary and a bit tedious...
 
       goto success; // @suppress("Goto statement used")
     }
@@ -239,7 +240,7 @@ int rDiscoverSentinelAsync(Redis *redis) {
   // --------------------------------------------------------------------------------------------------
   success:
 
-  config->timeoutMillis = savedTimeout;
+  config->timeoutMillis = savedTimeout; // Restore the original timeout value.
   return X_SUCCESS;
 
 }
