@@ -3,8 +3,12 @@
  *
  * \date May 4, 2018
  * \author Attila Kovacs
+ * @version 1.0
  *
- *   RedisX public constant, data types and function prototypes.
+ *  RedisX is a completely free Redis / Valkey client library, available on Github as:
+ *
+ *   https://github.com/Smithsonian/redisx
+ *
  */
 
 #ifndef REDISX_H_
@@ -13,6 +17,21 @@
 #include <xchange.h>
 #include <pthread.h>
 #include <stdint.h>
+
+// API version constants --------------------------------------------------------->
+
+/// API major version
+#define REDISX_MAJOR_VERSION  1
+
+/// API minor version
+#define REDISX_MINOR_VERSION  0
+
+/// Integer sub version of the release
+#define REDISX_PATCHLEVEL     0
+
+/// Additional release information in version, e.g. "-1", or "-rc1".
+#define REDISX_RELEASE_STRING "-rc1"
+
 
 
 // Configuration constants ------------------------------------------------------->
@@ -58,18 +77,6 @@
 #endif
 
 // Various exposed constants ----------------------------------------------------->
-
-/// API major version
-#define REDISX_MAJOR_VERSION  0
-
-/// API minor version
-#define REDISX_MINOR_VERSION  9
-
-/// Integer sub version of the release
-#define REDISX_PATCHLEVEL     4
-
-/// Additional release information in version, e.g. "-1", or "-rc1".
-#define REDISX_RELEASE_STRING "-devel"
 
 /// \cond PRIVATE
 
