@@ -1,21 +1,15 @@
 var searchData=
 [
-  ['scan_5finitial_5fstore_5fcapacity_0',['SCAN_INITIAL_STORE_CAPACITY',['../redisx-tab_8c.html#a5766edfc8d12682de3f57f1ad76f413b',1,'redisx-tab.c']]],
-  ['scanning_1',['Listing and Scanning',['../index.html#autotoc_md38',1,'']]],
-  ['script_20loading_20and_20execution_2',['LUA script loading and execution',['../index.html#autotoc_md46',1,'']]],
-  ['scripts_3',['Atomic execution blocks and LUA scripts',['../index.html#autotoc_md44',1,'']]],
-  ['sentinel_4',['Sentinel',['../index.html#autotoc_md21',1,'']]],
-  ['server_20connections_5',['Managing Redis server connections',['../index.html#autotoc_md19',1,'']]],
-  ['setting_20keyed_20values_6',['Getting and setting keyed values',['../index.html#autotoc_md37',1,'']]],
-  ['simple_20example_7',['A simple example',['../index.html#autotoc_md5',1,'']]],
-  ['simple_20redis_20queries_8',['Simple Redis queries',['../index.html#autotoc_md30',1,'']]],
-  ['sizes_9',['sizes',['../../../xchange/apidoc/html/structXField.html#af743830ee6c7d5e81a0206b07238ca5d',1,'XField']]],
-  ['socket_20level_20configuration_10',['Socket-level configuration',['../index.html#autotoc_md24',1,'']]],
-  ['socket_20level_20errors_11',['Socket-level errors',['../index.html#autotoc_md60',1,'']]],
-  ['sub_20support_12',['Publish / subscribe (PUB/SUB) support',['../index.html#autotoc_md40',1,'']]],
-  ['subscribe_20pub_20sub_20support_13',['Publish / subscribe (PUB/SUB) support',['../index.html#autotoc_md40',1,'']]],
-  ['subscription_14',['subscription',['../structRedis.html#aa4878fb8cef61468ee8e7426a973a75c',1,'Redis']]],
-  ['subscriptions_15',['Subscriptions',['../index.html#autotoc_md42',1,'']]],
-  ['subtype_16',['subtype',['../../../xchange/apidoc/html/structXField.html#a2f076846fbd6b30183ba3ab61e3334e5',1,'XField']]],
-  ['support_17',['support',['../index.html#autotoc_md62',1,'Debug support'],['../index.html#autotoc_md40',1,'Publish / subscribe (PUB/SUB) support']]]
+  ['parent_0',['parent',['../../../xchange/apidoc/html/structXStructure.html#a82ba053944ce97d83d41c05f68ec4f3d',1,'XStructure']]],
+  ['pipeline_1',['pipeline',['../structRedis.html#a59d367a240bf9c00366465d842402de8',1,'Redis']]],
+  ['pipelined_20transactions_2',['Pipelined transactions',['../index.html#autotoc_md52',1,'']]],
+  ['pipelining_3',['Advanced queries and pipelining',['../index.html#autotoc_md49',1,'']]],
+  ['plans_4',['Future plans',['../index.html#autotoc_md64',1,'']]],
+  ['port_5',['port',['../structRedisServer.html#a63c89c04d1feae07ca35558055155ffb',1,'RedisServer']]],
+  ['prerequisites_6',['Prerequisites',['../index.html#autotoc_md11',1,'']]],
+  ['priv_7',['priv',['../../../xchange/apidoc/html/structXLookupTable.html#a8b6505c37d4ff95854b8b00527e4d9fa',1,'XLookupTable::priv'],['../structRedisCluster.html#a8b6505c37d4ff95854b8b00527e4d9fa',1,'RedisCluster::priv']]],
+  ['processing_8',['Asynchronous client processing',['../index.html#autotoc_md50',1,'']]],
+  ['pub_20sub_20support_9',['Publish / subscribe (PUB/SUB) support',['../index.html#autotoc_md40',1,'']]],
+  ['publish_20subscribe_20pub_20sub_20support_10',['Publish / subscribe (PUB/SUB) support',['../index.html#autotoc_md40',1,'']]],
+  ['push_20notifications_11',['Push notifications',['../index.html#autotoc_md33',1,'']]]
 ];

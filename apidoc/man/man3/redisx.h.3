@@ -90,15 +90,15 @@ include/redisx.h
 .RI "#define \fBREDISX_LISTENER_REL_PRIORITY\fP   (0\&.5)"
 .br
 .ti -1c
-.RI "#define \fBREDISX_MAJOR_VERSION\fP   0"
+.RI "#define \fBREDISX_MAJOR_VERSION\fP   1"
 .br
 .RI "API major version\&. "
 .ti -1c
-.RI "#define \fBREDISX_MINOR_VERSION\fP   9"
+.RI "#define \fBREDISX_MINOR_VERSION\fP   0"
 .br
 .RI "API minor version\&. "
 .ti -1c
-.RI "#define \fBREDISX_PATCHLEVEL\fP   4"
+.RI "#define \fBREDISX_PATCHLEVEL\fP   0"
 .br
 .RI "Integer sub version of the release\&. "
 .ti -1c
@@ -106,7 +106,7 @@ include/redisx.h
 .br
 .RI "(bytes) \fBRedis\fP receive buffer size (at most that much is read from the socket in a single call)\&. "
 .ti -1c
-.RI "#define \fBREDISX_RELEASE_STRING\fP   '\-devel'"
+.RI "#define \fBREDISX_RELEASE_STRING\fP   '\-rc1'"
 .br
 .RI "Additional release information in version, e\&.g\&. '-1', or '-rc1'\&. "
 .ti -1c
@@ -539,10 +539,17 @@ May 4, 2018
 .PP
 \fBAuthor\fP
 .RS 4
-Attila Kovacs
+Attila Kovacs 
 .RE
 .PP
-RedisX public constant, data types and function prototypes\&. 
+\fBVersion\fP
+.RS 4
+1\&.0
+.RE
+.PP
+RedisX is a completely free \fBRedis\fP / Valkey client library, available on Github as:
+.PP
+https://github.com/Smithsonian/redisx 
 .SH "Macro Definition Documentation"
 .PP 
 .SS "#define REDISX_LISTENER_REL_PRIORITY   (0\&.5)"
@@ -1699,12 +1706,14 @@ a newly created lookup table with the string key/value pairs of the response fro
 .PP
 \fBSee also\fP
 .RS 4
+redisxGetInfoAsync() 
+.PP
 \fBredisxGetHelloData()\fP 
 .RE
 .PP
 
 .PP
-References \fBFALSE\fP, \fBredisxCheckDestroyRESP()\fP, \fBredisxDestroyRESP()\fP, \fBredisxRequest()\fP, \fBRESP_BULK_STRING\fP, \fBRESP::value\fP, \fBx_trace_null()\fP, \fBxCreateLookup()\fP, \fBxCreateStringField()\fP, \fBxCreateStruct()\fP, \fBxSetField()\fP, and \fBxStringCopyOf()\fP\&.
+References \fBrConsumeInfoReply()\fP, \fBredisxDestroyRESP()\fP, \fBredisxRequest()\fP, \fBX_SUCCESS\fP, and \fBx_trace_null()\fP\&.
 .SS "char ** redisxGetKeys (\fBRedis\fP * redis, const char * table, int * n)"
 Returns all the key names stored in a given hash table
 .PP
@@ -2790,7 +2799,7 @@ An \fBXField\fP with the data from the \fBRESP\fP, or NULL if there was an error
 .PP
 
 .PP
-References \fBRESP::n\fP, \fBRESP3_ATTRIBUTE\fP, \fBRESP3_BIG_NUMBER\fP, \fBRESP3_BLOB_ERROR\fP, \fBRESP3_BOOLEAN\fP, \fBRESP3_DOUBLE\fP, \fBRESP3_MAP\fP, \fBRESP3_NULL\fP, \fBRESP3_PUSH\fP, \fBRESP3_SET\fP, \fBRESP3_VERBATIM_STRING\fP, \fBRESP_ARRAY\fP, \fBRESP_BULK_STRING\fP, \fBRESP_ERROR\fP, \fBRESP_INT\fP, \fBRESP_SIMPLE_STRING\fP, \fBRESP::type\fP, \fBRESP::value\fP, \fBX_UNKNOWN\fP, \fBxCreateBooleanField()\fP, \fBxCreateDoubleField()\fP, \fBxCreateIntField()\fP, \fBxCreateScalarField()\fP, \fBxCreateStringField()\fP, and \fBxStringCopyOf()\fP\&.
+References \fBRESP::n\fP, \fBRESP3_ATTRIBUTE\fP, \fBRESP3_BIG_NUMBER\fP, \fBRESP3_BLOB_ERROR\fP, \fBRESP3_BOOLEAN\fP, \fBRESP3_DOUBLE\fP, \fBRESP3_MAP\fP, \fBRESP3_NULL\fP, \fBRESP3_PUSH\fP, \fBRESP3_SET\fP, \fBRESP3_VERBATIM_STRING\fP, \fBRESP_ARRAY\fP, \fBRESP_BULK_STRING\fP, \fBRESP_ERROR\fP, \fBRESP_INT\fP, \fBRESP_SIMPLE_STRING\fP, \fBRESP::type\fP, \fBRESP::value\fP, \fBX_UNKNOWN\fP, \fBxCreateBooleanField()\fP, \fBxCreateDoubleField()\fP, \fBxCreateIntField()\fP, \fBxCreateScalarField()\fP, and \fBxCreateStringField()\fP\&.
 .SS "\fBRESP\fP * redisxRunScript (\fBRedis\fP * redis, const char * sha1, const char ** keys, const char ** params, int * status)"
 Runs a LUA script that has been loaded into the \fBRedis\fP database, returning the response received, or NULL if there was an error\&.
 .PP

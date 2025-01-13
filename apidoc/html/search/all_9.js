@@ -1,10 +1,8 @@
 var searchData=
 [
-  ['id_0',['id',['../structRedis.html#aecb3b0d045ada529257a2fbf8f829599',1,'Redis']]],
-  ['initializing_1',['Initializing',['../index.html#autotoc_md20',1,'']]],
-  ['interactive_2',['interactive',['../structRedis.html#af51011d99955d6f036a9f2c291577749',1,'Redis']]],
-  ['interactive_20transactions_3',['Interactive transactions',['../index.html#autotoc_md31',1,'']]],
-  ['interface_20tt_20redisx_20cli_20tt_4',['Command-line interface (&lt;tt&gt;redisx-cli&lt;/tt&gt;)',['../index.html#autotoc_md15',1,'']]],
-  ['introduction_5',['Introduction',['../index.html#autotoc_md4',1,'']]],
-  ['isserialized_6',['isSerialized',['../../../xchange/apidoc/html/structXField.html#aaa68a7e140a5370ed0eb52710744c341',1,'XField']]]
+  ['features_0',['features',['../index.html#autotoc_md7',1,'General Features'],['../index.html#autotoc_md8',1,'Redis / Valkey Features']]],
+  ['features_20overview_1',['Features overview',['../index.html#autotoc_md6',1,'']]],
+  ['firstfield_2',['firstField',['../../../xchange/apidoc/html/structXStructure.html#a501ae8af2201d9cfaa60e3af21ff58fc',1,'XStructure']]],
+  ['functions_3',['Custom Redis functions',['../index.html#autotoc_md47',1,'']]],
+  ['future_20plans_4',['Future plans',['../index.html#autotoc_md64',1,'']]]
 ];

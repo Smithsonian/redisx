@@ -1862,6 +1862,13 @@
     <path>src/</path>
     <filename>redisx_8c.html</filename>
     <member kind="function">
+      <type>XLookupTable *</type>
+      <name>rConsumeInfoReply</name>
+      <anchorfile>redisx_8c.html</anchorfile>
+      <anchor>a2fdb234e05f16fb004b34bc016ba9d99</anchor>
+      <arglist>(RESP *reply)</arglist>
+    </member>
+    <member kind="function">
       <type>RESP *</type>
       <name>redisxArrayRequest</name>
       <anchorfile>redisx_8c.html</anchorfile>

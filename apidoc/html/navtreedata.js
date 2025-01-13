@@ -86,7 +86,7 @@ var NAVTREE =
       ] ],
       [ "Debug support", "index.html#autotoc_md62", null ],
       [ "Future plans", "index.html#autotoc_md64", null ],
-      [ "[Unreleased]", "../../xchange/apidoc/html/md_CHANGELOG.html#autotoc_md1", null ]
+      [ "[1.0.0-rc1] - 2025-01-13", "../../xchange/apidoc/html/md_CHANGELOG.html#autotoc_md1", null ]
     ] ],
     [ "Contributing to RedisX", "../../xchange/apidoc/html/md_CONTRIBUTING.html", null ],
     [ "Data Structures", "annotated.html", [
@@ -114,7 +114,7 @@ var NAVTREE =
 var NAVTREEINDEX =
 [
 "annotated.html",
-"redisx_8h.html#a576bb47774aaf4d5d735a5ef18253048"
+"redisx_8h.html#a55a2efad7c8d8f840f4144a217f58965"
 ];
 
 var SYNCONMSG = 'click to disable panel synchronisation';

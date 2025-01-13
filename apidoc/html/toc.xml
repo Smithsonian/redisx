@@ -60,7 +60,7 @@
     <topic label="Future plans" href="index.html#autotoc_md64"/>
   </topic>
   <topic label="Changelog" href="md_CHANGELOG.html">
-    <topic label="[Unreleased]" href="md_CHANGELOG.html#autotoc_md1"/>
+    <topic label="[1.0.0-rc1] - 2025-01-13" href="md_CHANGELOG.html#autotoc_md1"/>
   </topic>
   <topic label="Contributing to RedisX" href="md_CONTRIBUTING.html"/>
   <topic label="Data Structures" href="annotated.html">
@@ -417,6 +417,7 @@
           <topic label="redisxSetTLSSkipVerify" href="redisx-tls_8c.html#afa24f8a0e389625005685f3ec2dd0bca"/>
         </topic>
         <topic label="redisx.c" href="redisx_8c.html">
+          <topic label="rConsumeInfoReply" href="redisx_8c.html#a2fdb234e05f16fb004b34bc016ba9d99"/>
           <topic label="redisxArrayRequest" href="redisx_8c.html#ac6767cea95b4cc90348796c61ebdac75"/>
           <topic label="redisxCheckValid" href="redisx_8c.html#a0cdebfd895ab4c61c0fc9e0863a66419"/>
           <topic label="redisxDebugTraffic" href="redisx_8c.html#a7cde25fca6ae274d8d0a66d5c8b63ff5"/>

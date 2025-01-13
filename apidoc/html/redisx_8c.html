@@ -123,6 +123,8 @@ $(document).ready(function(){initNavTree('redisx_8c.html',''); initResizable(); 
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="func-members" name="func-members"></a>
 Functions</h2></td></tr>
+<tr class="memitem:a2fdb234e05f16fb004b34bc016ba9d99" id="r_a2fdb234e05f16fb004b34bc016ba9d99"><td class="memItemLeft" align="right" valign="top"><a class="elRef" href="../../xchange/apidoc/html/structXLookupTable.html">XLookupTable</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="redisx_8c.html#a2fdb234e05f16fb004b34bc016ba9d99">rConsumeInfoReply</a> (<a class="el" href="structRESP.html">RESP</a> *reply)</td></tr>
+<tr class="separator:a2fdb234e05f16fb004b34bc016ba9d99"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ac6767cea95b4cc90348796c61ebdac75" id="r_ac6767cea95b4cc90348796c61ebdac75"><td class="memItemLeft" align="right" valign="top"><a class="el" href="structRESP.html">RESP</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="redisx_8c.html#ac6767cea95b4cc90348796c61ebdac75">redisxArrayRequest</a> (<a class="el" href="structRedis.html">Redis</a> *redis, const char **args, const int *lengths, int n, int *status)</td></tr>
 <tr class="separator:ac6767cea95b4cc90348796c61ebdac75"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a0cdebfd895ab4c61c0fc9e0863a66419" id="r_a0cdebfd895ab4c61c0fc9e0863a66419"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="redisx_8c.html#a0cdebfd895ab4c61c0fc9e0863a66419">redisxCheckValid</a> (const <a class="el" href="structRedis.html">Redis</a> *redis)</td></tr>
@@ -179,6 +181,34 @@ Functions</h2></td></tr>
 <dl class="section date"><dt>Date</dt><dd>May 4, 2018 </dd></dl>
 <dl class="section author"><dt>Author</dt><dd>Attila Kovacs</dd></dl>
 </div><h2 class="groupheader">Function Documentation</h2>
+<a id="a2fdb234e05f16fb004b34bc016ba9d99" name="a2fdb234e05f16fb004b34bc016ba9d99"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a2fdb234e05f16fb004b34bc016ba9d99">&#9670;&#160;</a></span>rConsumeInfoReply()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="elRef" href="../../xchange/apidoc/html/structXLookupTable.html">XLookupTable</a> * rConsumeInfoReply </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="structRESP.html">RESP</a> *&#160;</td>
+          <td class="paramname"><em>reply</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>Extract key/value pairs from the bulk string response to an <code>INFO</code> query.</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">reply</td><td>The response to an <code>INFO</code> query </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>An allocated lookup table containing the key/value pairs extracted </dd></dl>
+
+<p class="reference">References <a class="elRef" href="../../xchange/apidoc/html/xchange_8h.html#aa93f0eb578d23995850d61f7d61c55c1">FALSE</a>, <a class="el" href="resp_8c.html#a80d5a305523c51da7bc7cf4c9deca962">redisxCheckDestroyRESP()</a>, <a class="el" href="resp_8c.html#aa4e23a7454f7055711915ec430599011">redisxDestroyRESP()</a>, <a class="el" href="redisx_8h.html#afa5c90630d37c2f77e5d7985932941a0a36dd81166f9ba91db70b1571b25fec9f">RESP_BULK_STRING</a>, <a class="el" href="structRESP.html#a0f61d63b009d0880a89c843bd50d8d76">RESP::value</a>, <a class="elRef" href="../../xchange/apidoc/html/xchange_8c.html#ac39ae03ca89b115d49a12f633522dc31">x_trace_null()</a>, <a class="elRef" href="../../xchange/apidoc/html/xchange_8h.html#af8bee9eeac947d7e36ea436252e8dc2d">xCreateLookup()</a>, <a class="elRef" href="../../xchange/apidoc/html/xchange_8h.html#a9dc77bed0d8b738ba615019721a6a2b6">xCreateStringField()</a>, <a class="elRef" href="../../xchange/apidoc/html/xchange_8h.html#a12112584a34e07f9ef7b08f6ef1bc865">xCreateStruct()</a>, and <a class="elRef" href="../../xchange/apidoc/html/xchange_8h.html#ab1cb91bd6aa14c0dae9d24bfbe7b76f4">xSetField()</a>.</p>
+
+</div>
+</div>
 <a id="ac6767cea95b4cc90348796c61ebdac75" name="ac6767cea95b4cc90348796c61ebdac75"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#ac6767cea95b4cc90348796c61ebdac75">&#9670;&#160;</a></span>redisxArrayRequest()</h2>
 
@@ -474,9 +504,11 @@ Functions</h2></td></tr>
   </dd>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>a newly created lookup table with the string key/value pairs of the response from the <a class="el" href="structRedis.html" title="Structure that represents a Redis database instance, with one or more RedisClient connections.">Redis</a> server, or NULL if there was an error. The caller should destroy the lookup table after using it.</dd></dl>
-<dl class="section see"><dt>See also</dt><dd><a class="el" href="redisx_8c.html#a89fd65118ba731931fe281c83f6fa8ba">redisxGetHelloData()</a> </dd></dl>
+<dl class="section see"><dt>See also</dt><dd>redisxGetInfoAsync() </dd>
+<dd>
+<a class="el" href="redisx_8c.html#a89fd65118ba731931fe281c83f6fa8ba">redisxGetHelloData()</a> </dd></dl>
 
-<p class="reference">References <a class="elRef" href="../../xchange/apidoc/html/xchange_8h.html#aa93f0eb578d23995850d61f7d61c55c1">FALSE</a>, <a class="el" href="resp_8c.html#a80d5a305523c51da7bc7cf4c9deca962">redisxCheckDestroyRESP()</a>, <a class="el" href="resp_8c.html#aa4e23a7454f7055711915ec430599011">redisxDestroyRESP()</a>, <a class="el" href="redisx_8c.html#a09092bd97eead5c5fa73fa0d9241018c">redisxRequest()</a>, <a class="el" href="redisx_8h.html#afa5c90630d37c2f77e5d7985932941a0a36dd81166f9ba91db70b1571b25fec9f">RESP_BULK_STRING</a>, <a class="el" href="structRESP.html#a0f61d63b009d0880a89c843bd50d8d76">RESP::value</a>, <a class="elRef" href="../../xchange/apidoc/html/xchange_8c.html#ac39ae03ca89b115d49a12f633522dc31">x_trace_null()</a>, <a class="elRef" href="../../xchange/apidoc/html/xchange_8h.html#af8bee9eeac947d7e36ea436252e8dc2d">xCreateLookup()</a>, <a class="elRef" href="../../xchange/apidoc/html/xchange_8h.html#a9dc77bed0d8b738ba615019721a6a2b6">xCreateStringField()</a>, <a class="elRef" href="../../xchange/apidoc/html/xchange_8h.html#a12112584a34e07f9ef7b08f6ef1bc865">xCreateStruct()</a>, <a class="elRef" href="../../xchange/apidoc/html/xchange_8h.html#ab1cb91bd6aa14c0dae9d24bfbe7b76f4">xSetField()</a>, and <a class="elRef" href="../../xchange/apidoc/html/xchange_8h.html#a01d730a1a98963816de2dd73e72957a5">xStringCopyOf()</a>.</p>
+<p class="reference">References <a class="el" href="redisx_8c.html#a2fdb234e05f16fb004b34bc016ba9d99">rConsumeInfoReply()</a>, <a class="el" href="resp_8c.html#aa4e23a7454f7055711915ec430599011">redisxDestroyRESP()</a>, <a class="el" href="redisx_8c.html#a09092bd97eead5c5fa73fa0d9241018c">redisxRequest()</a>, <a class="elRef" href="../../xchange/apidoc/html/xchange_8h.html#a7b2679c964ea5f2160380ed55654b873">X_SUCCESS</a>, and <a class="elRef" href="../../xchange/apidoc/html/xchange_8c.html#ac39ae03ca89b115d49a12f633522dc31">x_trace_null()</a>.</p>
 
 </div>
 </div>

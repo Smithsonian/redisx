@@ -11,6 +11,9 @@ src/redisx.c \- A \fBRedis\fP client library that compiles on older and newer pl
 
 .in +1c
 .ti -1c
+.RI "\fBXLookupTable\fP * \fBrConsumeInfoReply\fP (\fBRESP\fP *reply)"
+.br
+.ti -1c
 .RI "\fBRESP\fP * \fBredisxArrayRequest\fP (\fBRedis\fP *redis, const char **args, const int *lengths, int n, int *status)"
 .br
 .ti -1c
@@ -105,6 +108,22 @@ Attila Kovacs
 
 .SH "Function Documentation"
 .PP 
+.SS "\fBXLookupTable\fP * rConsumeInfoReply (\fBRESP\fP * reply)"
+Extract key/value pairs from the bulk string response to an \fCINFO\fP query\&.
+.PP
+\fBParameters\fP
+.RS 4
+\fIreply\fP The response to an \fCINFO\fP query 
+.RE
+.PP
+\fBReturns\fP
+.RS 4
+An allocated lookup table containing the key/value pairs extracted 
+.RE
+.PP
+
+.PP
+References \fBFALSE\fP, \fBredisxCheckDestroyRESP()\fP, \fBredisxDestroyRESP()\fP, \fBRESP_BULK_STRING\fP, \fBRESP::value\fP, \fBx_trace_null()\fP, \fBxCreateLookup()\fP, \fBxCreateStringField()\fP, \fBxCreateStruct()\fP, and \fBxSetField()\fP\&.
 .SS "\fBRESP\fP * redisxArrayRequest (\fBRedis\fP * redis, const char ** args, const int * lengths, int n, int * status)"
 Returns the result of the most generic type of \fBRedis\fP request with any number of arguments\&. This is not the highest throughput mode (that would be sending asynchronous pipeline request, and then asynchronously collecting the results such as with \fBredisxSendArrayRequestAsync()\fP / \fBredisxReadReplyAsync()\fP, because it requires separate network roundtrips for each and every request\&. But, it is simple and perfectly good method when one needs to retrieve only a few (<1000) variables per second\&.\&.\&.
 .PP
@@ -284,12 +303,14 @@ a newly created lookup table with the string key/value pairs of the response fro
 .PP
 \fBSee also\fP
 .RS 4
+redisxGetInfoAsync() 
+.PP
 \fBredisxGetHelloData()\fP 
 .RE
 .PP
 
 .PP
-References \fBFALSE\fP, \fBredisxCheckDestroyRESP()\fP, \fBredisxDestroyRESP()\fP, \fBredisxRequest()\fP, \fBRESP_BULK_STRING\fP, \fBRESP::value\fP, \fBx_trace_null()\fP, \fBxCreateLookup()\fP, \fBxCreateStringField()\fP, \fBxCreateStruct()\fP, \fBxSetField()\fP, and \fBxStringCopyOf()\fP\&.
+References \fBrConsumeInfoReply()\fP, \fBredisxDestroyRESP()\fP, \fBredisxRequest()\fP, \fBX_SUCCESS\fP, and \fBx_trace_null()\fP\&.
 .SS "enum \fBredisx_protocol\fP redisxGetProtocol (\fBRedis\fP * redis)"
 Returns the actual protocol used with the \fBRedis\fP server\&. If HELLO was used during connection it will be the protocol that was confirmed in the response of HELLO (and which hopefully matches the protocol requested)\&. Otherwise, RedisX will default to RESP2\&.
 .PP

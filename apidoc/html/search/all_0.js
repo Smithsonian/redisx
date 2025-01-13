@@ -1,4 +1,5 @@
 var searchData=
 [
-  ['_5fdefault_5fsource_0',['_DEFAULT_SOURCE',['../resp_8c.html#a8fb447618db946a9e2a596d9ea18763f',1,'resp.c']]]
+  ['0_200_20rc1_202025_2001_2013_0',['[1.0.0-rc1] - 2025-01-13',['../md_CHANGELOG.html#autotoc_md1',1,'']]],
+  ['01_2013_1',['[1.0.0-rc1] - 2025-01-13',['../md_CHANGELOG.html#autotoc_md1',1,'']]]
 ];
