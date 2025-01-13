@@ -423,7 +423,7 @@ int redisxSetTLSCiphers(Redis *redis, const char *cipher_list);
 int redisxSetTLSCipherSuites(Redis *redis, const char *list);
 int redisxSetDHCipherParams(Redis *redis, const char *dh_params_file);
 int redisxSetTLSServerName(Redis *redis, const char *host);
-int redisxSetTLSSkipVerify(Redis *redis, boolean value);
+int redisxSetTLSVerify(Redis *redis, boolean value);
 
 RedisCluster *redisxClusterInit(Redis *node);
 Redis *redisxClusterGetShard(RedisCluster *cluster, const char *key);

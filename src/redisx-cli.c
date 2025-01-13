@@ -420,7 +420,7 @@ int main(int argc, const char *argv[]) {
 
   if(tls) {
 #if WITH_TLS
-    if(skip_verify) redisxSetTLSSkipVerify(redis, TRUE);
+    if(skip_verify) redisxSetTLSVerify(redis, FALSE);
     if(sni) redisxSetTLSServerName(redis, sni);
     if(ca_path || ca_file) redisxSetTLS(redis, ca_path, ca_file);
     if(cert_file && key_file) redisxSetMutualTLS(redis, cert_file, key_file);
