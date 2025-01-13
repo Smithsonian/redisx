@@ -1,5 +1,5 @@
 # sudo apt install $(grep -v ^# requirements.apt)
-libgomp1
+libomp-dev
 libssl-dev
 libpopt-dev
 libreadline-dev

@@ -80,7 +80,7 @@ ifneq ($(shell which ldconfig), )
 
   # Detect OpenMP automatically, and enable WITH_OPENMP support if present
   ifndef WITH_OPENMP 
-    ifneq ($(shell ldconfig -p | grep libgomp), )
+    ifneq ($(shell ldconfig -p | grep libomp), )
       $(info INFO: OpenMP optimizations are enabled automatically.)
       WITH_OPENMP = 1
     else

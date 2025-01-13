@@ -179,7 +179,7 @@ RedisX. There are some optional dependencies, depending on the build configurati
 
  - OpenSSL (`openssl-devel` on RPM-based, or `libssl-dev` on Debian-based Linux) to build with TLS support. 
   
- - OpenMP (`libgomp` on RPM-based, or `libgomp1` on Debian-based Linux) is needed to build with parallelization
+ - OpenMP (`libomp-devel` on RPM-based, or `libomp-dev` on Debian-based Linux) is needed to build with parallelization
    support (for parallelized cluster connection / disconnection). 
 
 Additionally `redisx-cli` has the following dependencies on standard GNU/POSIX libraries:
