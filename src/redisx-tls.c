@@ -297,7 +297,7 @@ int rConnectTLSClientAsync(ClientPrivate *cp, const TLSConfig *tls) {
  * @sa redisxSetTLSCiphers()
  * @sa redisxSetTLSCipherSuites()
  * @sa redisxSetTLSServerName()
- * @sa redisxTLSSkipVerify()
+ * @sa redisxSetTLSVerify()
  */
 int redisxSetTLS(Redis *redis, const char *ca_path, const char *ca_file) {
   static const char *fn = "redisxSetTLS";
@@ -341,6 +341,8 @@ int redisxSetTLS(Redis *redis, const char *ca_path, const char *ca_file) {
  * configure Redis servers to verify one way only with a CA certificate, in which case you don't need to call this to
  * configure the client.
  *
+ * To disable mutual TLS, set both file name arguments to NULL.
+ *
  * @param redis       A Redis instance.
  * @param cert_file   Path to the server's certificate file.
  * @param key_file    Path to the server'sprivate key file.
@@ -355,10 +357,15 @@ int redisxSetMutualTLS(Redis *redis, const char *cert_file, const char *key_file
   RedisPrivate *p;
   TLSConfig *tls;
 
-  if(!cert_file || !key_file) return x_error(X_NULL, EINVAL, fn, "Null parameter(s): cert_file=%p, key_file=%p", cert_file, key_file);
+  if(cert_file || key_file) {
+    if(!cert_file)
+      return x_error(X_NULL, EINVAL, fn, "private key without certificate");
+    if(!key_file)
+      return x_error(X_NULL, EINVAL, fn, "certificate without private key");
 
-  if(access(cert_file, R_OK) != 0) return x_error(X_FAILURE, errno, fn, "Certificate file not readable: %s", cert_file);
-  if(access(key_file, R_OK) != 0) return x_error(X_FAILURE, errno, fn, "Private key file not readable: %s", key_file);
+    if(access(cert_file, R_OK) != 0) return x_error(X_FAILURE, errno, fn, "Certificate file not readable: %s", cert_file);
+    if(access(key_file, R_OK) != 0) return x_error(X_FAILURE, errno, fn, "Private key file not readable: %s", key_file);
+  }
 
   prop_error(fn, rConfigLock(redis));
 
@@ -540,16 +547,16 @@ int redisxSetTLSServerName(Redis *redis, const char *host) {
 }
 
 /**
- * Sets whether to verify the the certificate.
+ * Sets whether to verify the the certificate. Certificates are verified by default.
  *
  * @param redis   A Redis instance.
- * @param value   TRUE (non-zero) or FALSE (0)
+ * @param value   TRUE (non-zero) to verify certificates, or else FALSE (0)
  * @return        X_SUCCESS (0)
  *
  * @sa redisxSetTLS()
  */
-int redisxSetTLSSkipVerify(Redis *redis, boolean value) {
-  static const char *fn = "redisxTLSSkipVerify";
+int redisxSetTLSVerify(Redis *redis, boolean value) {
+  static const char *fn = "redisxTLSVerify";
 
 #if WITH_TLS
   RedisPrivate *p;
@@ -560,7 +567,7 @@ int redisxSetTLSSkipVerify(Redis *redis, boolean value) {
   p = (RedisPrivate *) redis->priv;
   tls = &p->config.tls;
 
-  tls->skip_verify = (value != 0);
+  tls->skip_verify = !value;
 
   rConfigUnlock(redis);
 
