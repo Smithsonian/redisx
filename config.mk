@@ -64,7 +64,9 @@ CHECKOPTS += --inline-suppr $(CHECKEXTRA)
 # Below are some generated constants based on the one that were set above
 # ============================================================================
 
-ifneq ($(shell which ldconfig > /dev/null 2>&1), )
+ifneq ($(shell which ldconfig), )
+  $(info Checking SSL libs...)
+
   # Detect OpenSSL automatically, and enable TLS support if present
   ifndef WITH_TLS 
     ifneq ($(shell ldconfig -p | grep libssl), )
