@@ -170,7 +170,7 @@ var redisx_8h =
     [ "redisxSetTLSCiphers", "redisx_8h.html#a11828fc2962a62c27bf8b5627f69a8a0", null ],
     [ "redisxSetTLSCipherSuites", "redisx_8h.html#aece815a388c13dfa9381d194fc65526a", null ],
     [ "redisxSetTLSServerName", "redisx_8h.html#a9cafd12ab9ff4df77c7fc9d6bac33c1a", null ],
-    [ "redisxSetTLSSkipVerify", "redisx_8h.html#afa24f8a0e389625005685f3ec2dd0bca", null ],
+    [ "redisxSetTLSVerify", "redisx_8h.html#a9c8cf16eba455874111651f59f86a6e7", null ],
     [ "redisxSetUser", "redisx_8h.html#a3beff3a9e373a0f1de626a8e64da98cf", null ],
     [ "redisxSetValue", "redisx_8h.html#a1465b1a965ddd685e16bccbf0b34f08b", null ],
     [ "redisxSetValueAsync", "redisx_8h.html#a9e784632598b0c418a3ae3a87aa09fe4", null ],

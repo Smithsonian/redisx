@@ -1113,9 +1113,9 @@
     </member>
     <member kind="function">
       <type>int</type>
-      <name>redisxSetTLSSkipVerify</name>
+      <name>redisxSetTLSVerify</name>
       <anchorfile>redisx_8h.html</anchorfile>
-      <anchor>afa24f8a0e389625005685f3ec2dd0bca</anchor>
+      <anchor>a9c8cf16eba455874111651f59f86a6e7</anchor>
       <arglist>(Redis *redis, boolean value)</arglist>
     </member>
     <member kind="function">
@@ -1851,9 +1851,9 @@
     </member>
     <member kind="function">
       <type>int</type>
-      <name>redisxSetTLSSkipVerify</name>
+      <name>redisxSetTLSVerify</name>
       <anchorfile>redisx-tls_8c.html</anchorfile>
-      <anchor>afa24f8a0e389625005685f3ec2dd0bca</anchor>
+      <anchor>a9c8cf16eba455874111651f59f86a6e7</anchor>
       <arglist>(Redis *redis, boolean value)</arglist>
     </member>
   </compound>

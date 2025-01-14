@@ -281,7 +281,7 @@ Prerequisites</h2>
 <p>The <a href="https://github.com/Smithsonian/xchange">Smithsonian/xchange</a> library is both a build and a runtime dependency of RedisX. There are some optional dependencies, depending on the build configuration:</p>
 <ul>
 <li>OpenSSL (<code>openssl-devel</code> on RPM-based, or <code>libssl-dev</code> on Debian-based Linux) to build with TLS support.</li>
-<li>OpenMP (<code>libgomp</code> on RPM-based, or <code>libgomp1</code> on Debian-based Linux) is needed to build with parallelization support (for parallelized cluster connection / disconnection).</li>
+<li>OpenMP (<code>libomp-devel</code> on RPM-based, or <code>libomp-dev</code> on Debian-based Linux) is needed to build with parallelization support (for parallelized cluster connection / disconnection).</li>
 </ul>
 <p>Additionally <code>redisx-cli</code> has the following dependencies on standard GNU/POSIX libraries:</p>
 <ul>
@@ -428,7 +428,7 @@ TLS configuration</h4>
 <div class="line">}</div>
 <div class="line"> </div>
 <div class="line"><span class="comment">// (optional) Skip verification of the certificate (insecure!)</span></div>
-<div class="line">redisxSkipVerify(redis, TRUE);</div>
+<div class="line"><a class="code hl_function" href="redisx-tls_8c.html#a9c8cf16eba455874111651f59f86a6e7">redisxSetTLSVerify</a>(redis, FALSE);</div>
 <div class="line"> </div>
 <div class="line"><span class="comment">// (optional) Set server name for SNI</span></div>
 <div class="line"><a class="code hl_function" href="redisx-tls_8c.html#a9cafd12ab9ff4df77c7fc9d6bac33c1a">redisxSetTLSServerName</a>(redis, <span class="stringliteral">&quot;my.redis-server.com&quot;</span>);</div>
@@ -445,11 +445,12 @@ TLS configuration</h4>
 <div class="line">  <span class="comment">// Oops, the parameter file is not accessible...</span></div>
 <div class="line">  ...</div>
 <div class="line">}</div>
-<div class="ttc" id="aredisx-tls_8c_html_a11828fc2962a62c27bf8b5627f69a8a0"><div class="ttname"><a href="redisx-tls_8c.html#a11828fc2962a62c27bf8b5627f69a8a0">redisxSetTLSCiphers</a></div><div class="ttdeci">int redisxSetTLSCiphers(Redis *redis, const char *cipher_list)</div><div class="ttdef"><b>Definition</b> redisx-tls.c:397</div></div>
+<div class="ttc" id="aredisx-tls_8c_html_a11828fc2962a62c27bf8b5627f69a8a0"><div class="ttname"><a href="redisx-tls_8c.html#a11828fc2962a62c27bf8b5627f69a8a0">redisxSetTLSCiphers</a></div><div class="ttdeci">int redisxSetTLSCiphers(Redis *redis, const char *cipher_list)</div><div class="ttdef"><b>Definition</b> redisx-tls.c:404</div></div>
 <div class="ttc" id="aredisx-tls_8c_html_a1820331a34d40c9dcc894480e22d90e7"><div class="ttname"><a href="redisx-tls_8c.html#a1820331a34d40c9dcc894480e22d90e7">redisxSetTLS</a></div><div class="ttdeci">int redisxSetTLS(Redis *redis, const char *ca_path, const char *ca_file)</div><div class="ttdef"><b>Definition</b> redisx-tls.c:302</div></div>
-<div class="ttc" id="aredisx-tls_8c_html_a9cafd12ab9ff4df77c7fc9d6bac33c1a"><div class="ttname"><a href="redisx-tls_8c.html#a9cafd12ab9ff4df77c7fc9d6bac33c1a">redisxSetTLSServerName</a></div><div class="ttdeci">int redisxSetTLSServerName(Redis *redis, const char *host)</div><div class="ttdef"><b>Definition</b> redisx-tls.c:516</div></div>
-<div class="ttc" id="aredisx-tls_8c_html_ad62a82cdab6e2fd11da87b1bdcc1604b"><div class="ttname"><a href="redisx-tls_8c.html#ad62a82cdab6e2fd11da87b1bdcc1604b">redisxSetMutualTLS</a></div><div class="ttdeci">int redisxSetMutualTLS(Redis *redis, const char *cert_file, const char *key_file)</div><div class="ttdef"><b>Definition</b> redisx-tls.c:351</div></div>
-<div class="ttc" id="aredisx-tls_8c_html_aece815a388c13dfa9381d194fc65526a"><div class="ttname"><a href="redisx-tls_8c.html#aece815a388c13dfa9381d194fc65526a">redisxSetTLSCipherSuites</a></div><div class="ttdeci">int redisxSetTLSCipherSuites(Redis *redis, const char *list)</div><div class="ttdef"><b>Definition</b> redisx-tls.c:434</div></div>
+<div class="ttc" id="aredisx-tls_8c_html_a9c8cf16eba455874111651f59f86a6e7"><div class="ttname"><a href="redisx-tls_8c.html#a9c8cf16eba455874111651f59f86a6e7">redisxSetTLSVerify</a></div><div class="ttdeci">int redisxSetTLSVerify(Redis *redis, boolean value)</div><div class="ttdef"><b>Definition</b> redisx-tls.c:558</div></div>
+<div class="ttc" id="aredisx-tls_8c_html_a9cafd12ab9ff4df77c7fc9d6bac33c1a"><div class="ttname"><a href="redisx-tls_8c.html#a9cafd12ab9ff4df77c7fc9d6bac33c1a">redisxSetTLSServerName</a></div><div class="ttdeci">int redisxSetTLSServerName(Redis *redis, const char *host)</div><div class="ttdef"><b>Definition</b> redisx-tls.c:523</div></div>
+<div class="ttc" id="aredisx-tls_8c_html_ad62a82cdab6e2fd11da87b1bdcc1604b"><div class="ttname"><a href="redisx-tls_8c.html#ad62a82cdab6e2fd11da87b1bdcc1604b">redisxSetMutualTLS</a></div><div class="ttdeci">int redisxSetMutualTLS(Redis *redis, const char *cert_file, const char *key_file)</div><div class="ttdef"><b>Definition</b> redisx-tls.c:353</div></div>
+<div class="ttc" id="aredisx-tls_8c_html_aece815a388c13dfa9381d194fc65526a"><div class="ttname"><a href="redisx-tls_8c.html#aece815a388c13dfa9381d194fc65526a">redisxSetTLSCipherSuites</a></div><div class="ttdeci">int redisxSetTLSCipherSuites(Redis *redis, const char *list)</div><div class="ttdef"><b>Definition</b> redisx-tls.c:441</div></div>
 </div><!-- fragment --><p>The TLS support is still experimental and requires testing. You can help by submitting bug reports in the GitHub repository.</p>
 <p><a class="anchor" id="socket-configuration"></a> </p>
 <h4><a class="anchor" id="autotoc_md24"></a>

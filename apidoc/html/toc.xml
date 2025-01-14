@@ -295,7 +295,7 @@
           <topic label="redisxSetTLSCiphers" href="redisx_8h.html#a11828fc2962a62c27bf8b5627f69a8a0"/>
           <topic label="redisxSetTLSCipherSuites" href="redisx_8h.html#aece815a388c13dfa9381d194fc65526a"/>
           <topic label="redisxSetTLSServerName" href="redisx_8h.html#a9cafd12ab9ff4df77c7fc9d6bac33c1a"/>
-          <topic label="redisxSetTLSSkipVerify" href="redisx_8h.html#afa24f8a0e389625005685f3ec2dd0bca"/>
+          <topic label="redisxSetTLSVerify" href="redisx_8h.html#a9c8cf16eba455874111651f59f86a6e7"/>
           <topic label="redisxSetUser" href="redisx_8h.html#a3beff3a9e373a0f1de626a8e64da98cf"/>
           <topic label="redisxSetValue" href="redisx_8h.html#a1465b1a965ddd685e16bccbf0b34f08b"/>
           <topic label="redisxSetValueAsync" href="redisx_8h.html#a9e784632598b0c418a3ae3a87aa09fe4"/>
@@ -414,7 +414,7 @@
           <topic label="redisxSetTLSCiphers" href="redisx-tls_8c.html#a11828fc2962a62c27bf8b5627f69a8a0"/>
           <topic label="redisxSetTLSCipherSuites" href="redisx-tls_8c.html#aece815a388c13dfa9381d194fc65526a"/>
           <topic label="redisxSetTLSServerName" href="redisx-tls_8c.html#a9cafd12ab9ff4df77c7fc9d6bac33c1a"/>
-          <topic label="redisxSetTLSSkipVerify" href="redisx-tls_8c.html#afa24f8a0e389625005685f3ec2dd0bca"/>
+          <topic label="redisxSetTLSVerify" href="redisx-tls_8c.html#a9c8cf16eba455874111651f59f86a6e7"/>
         </topic>
         <topic label="redisx.c" href="redisx_8c.html">
           <topic label="rConsumeInfoReply" href="redisx_8c.html#a2fdb234e05f16fb004b34bc016ba9d99"/>

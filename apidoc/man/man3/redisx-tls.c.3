@@ -28,7 +28,7 @@ src/redisx-tls.c
 .RI "int \fBredisxSetTLSServerName\fP (\fBRedis\fP *redis, const char *host)"
 .br
 .ti -1c
-.RI "int \fBredisxSetTLSSkipVerify\fP (\fBRedis\fP *redis, \fBboolean\fP value)"
+.RI "int \fBredisxSetTLSVerify\fP (\fBRedis\fP *redis, \fBboolean\fP value)"
 .br
 .in -1c
 .SH "Detailed Description"
@@ -75,6 +75,8 @@ X_SUCCESS (0) if successful, or else an error code <0\&.
 References \fBx_error()\fP, \fBX_FAILURE\fP, \fBX_SUCCESS\fP, and \fBxStringCopyOf()\fP\&.
 .SS "int redisxSetMutualTLS (\fBRedis\fP * redis, const char * cert_file, const char * key_file)"
 Set a TLS certificate and private key for mutual TLS\&. You will still need to call \fBredisxSetTLS()\fP also to create a complete TLS configuration\&. \fBRedis\fP normally uses mutual TLS, which requires both the client and the server to authenticate themselves\&. For this you need the server's TLS certificate and private key also\&. It is possible to configure \fBRedis\fP servers to verify one way only with a CA certificate, in which case you don't need to call this to configure the client\&.
+.PP
+To disable mutual TLS, set both file name arguments to NULL\&.
 .PP
 \fBParameters\fP
 .RS 4
@@ -127,7 +129,7 @@ X_SUCCESS (0) if successful, or else an error code <0\&.
 .PP
 \fBredisxSetTLSServerName()\fP 
 .PP
-redisxTLSSkipVerify() 
+\fBredisxSetTLSVerify()\fP 
 .RE
 .PP
 
@@ -210,14 +212,14 @@ X_SUCCESS (0)
 
 .PP
 References \fBx_error()\fP, \fBX_FAILURE\fP, \fBX_SUCCESS\fP, and \fBxStringCopyOf()\fP\&.
-.SS "int redisxSetTLSSkipVerify (\fBRedis\fP * redis, \fBboolean\fP value)"
-Sets whether to verify the the certificate\&.
+.SS "int redisxSetTLSVerify (\fBRedis\fP * redis, \fBboolean\fP value)"
+Sets whether to verify the the certificate\&. Certificates are verified by default\&.
 .PP
 \fBParameters\fP
 .RS 4
 \fIredis\fP A \fBRedis\fP instance\&. 
 .br
-\fIvalue\fP TRUE (non-zero) or FALSE (0) 
+\fIvalue\fP TRUE (non-zero) to verify certificates, or else FALSE (0) 
 .RE
 .PP
 \fBReturns\fP

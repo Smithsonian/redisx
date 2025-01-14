@@ -212,7 +212,7 @@ Macros</h2></td></tr>
 <tr class="memdesc:a57e8fa49f964f2ce738eeb0d9c0c89bf"><td class="mdescLeft">&#160;</td><td class="mdescRight">(bytes) <a class="el" href="structRedis.html" title="Structure that represents a Redis database instance, with one or more RedisClient connections.">Redis</a> receive buffer size (at most that much is read from the socket in a single call). <br /></td></tr>
 <tr class="separator:a57e8fa49f964f2ce738eeb0d9c0c89bf"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a275d8232b3f701eaba97b6f57ef0f65e" id="r_a275d8232b3f701eaba97b6f57ef0f65e"><td class="memItemLeft" align="right" valign="top"><a id="a275d8232b3f701eaba97b6f57ef0f65e" name="a275d8232b3f701eaba97b6f57ef0f65e"></a>
-#define&#160;</td><td class="memItemRight" valign="bottom"><b>REDISX_RELEASE_STRING</b>&#160;&#160;&#160;&quot;-rc1&quot;</td></tr>
+#define&#160;</td><td class="memItemRight" valign="bottom"><b>REDISX_RELEASE_STRING</b>&#160;&#160;&#160;&quot;-devel&quot;</td></tr>
 <tr class="memdesc:a275d8232b3f701eaba97b6f57ef0f65e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Additional release information in version, e.g. "-1", or "-rc1". <br /></td></tr>
 <tr class="separator:a275d8232b3f701eaba97b6f57ef0f65e"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:adc3981d6b06cc87e563e77584765eb19" id="r_adc3981d6b06cc87e563e77584765eb19"><td class="memItemLeft" align="right" valign="top"><a id="adc3981d6b06cc87e563e77584765eb19" name="adc3981d6b06cc87e563e77584765eb19"></a>
@@ -501,8 +501,8 @@ Functions</h2></td></tr>
 <tr class="separator:aece815a388c13dfa9381d194fc65526a"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a9cafd12ab9ff4df77c7fc9d6bac33c1a" id="r_a9cafd12ab9ff4df77c7fc9d6bac33c1a"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="redisx_8h.html#a9cafd12ab9ff4df77c7fc9d6bac33c1a">redisxSetTLSServerName</a> (<a class="el" href="structRedis.html">Redis</a> *redis, const char *host)</td></tr>
 <tr class="separator:a9cafd12ab9ff4df77c7fc9d6bac33c1a"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:afa24f8a0e389625005685f3ec2dd0bca" id="r_afa24f8a0e389625005685f3ec2dd0bca"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="redisx_8h.html#afa24f8a0e389625005685f3ec2dd0bca">redisxSetTLSSkipVerify</a> (<a class="el" href="structRedis.html">Redis</a> *redis, <a class="elRef" href="../../xchange/apidoc/html/xchange_8h.html#a621c38f1f10a1c565d897e3178b16d6e">boolean</a> value)</td></tr>
-<tr class="separator:afa24f8a0e389625005685f3ec2dd0bca"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a9c8cf16eba455874111651f59f86a6e7" id="r_a9c8cf16eba455874111651f59f86a6e7"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="redisx_8h.html#a9c8cf16eba455874111651f59f86a6e7">redisxSetTLSVerify</a> (<a class="el" href="structRedis.html">Redis</a> *redis, <a class="elRef" href="../../xchange/apidoc/html/xchange_8h.html#a621c38f1f10a1c565d897e3178b16d6e">boolean</a> value)</td></tr>
+<tr class="separator:a9c8cf16eba455874111651f59f86a6e7"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a3beff3a9e373a0f1de626a8e64da98cf" id="r_a3beff3a9e373a0f1de626a8e64da98cf"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="redisx_8h.html#a3beff3a9e373a0f1de626a8e64da98cf">redisxSetUser</a> (<a class="el" href="structRedis.html">Redis</a> *redis, const char *username)</td></tr>
 <tr class="separator:a3beff3a9e373a0f1de626a8e64da98cf"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a1465b1a965ddd685e16bccbf0b34f08b" id="r_a1465b1a965ddd685e16bccbf0b34f08b"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="redisx_8h.html#a1465b1a965ddd685e16bccbf0b34f08b">redisxSetValue</a> (<a class="el" href="structRedis.html">Redis</a> *redis, const char *table, const char *key, const char *value, <a class="elRef" href="../../xchange/apidoc/html/xchange_8h.html#a621c38f1f10a1c565d897e3178b16d6e">boolean</a> confirm)</td></tr>
@@ -4675,6 +4675,7 @@ redisxGetLockedConnected() </dd>
       </table>
 </div><div class="memdoc">
 <p>Set a TLS certificate and private key for mutual TLS. You will still need to call <a class="el" href="redisx-tls_8c.html#a1820331a34d40c9dcc894480e22d90e7">redisxSetTLS()</a> also to create a complete TLS configuration. <a class="el" href="structRedis.html" title="Structure that represents a Redis database instance, with one or more RedisClient connections.">Redis</a> normally uses mutual TLS, which requires both the client and the server to authenticate themselves. For this you need the server's TLS certificate and private key also. It is possible to configure <a class="el" href="structRedis.html" title="Structure that represents a Redis database instance, with one or more RedisClient connections.">Redis</a> servers to verify one way only with a CA certificate, in which case you don't need to call this to configure the client.</p>
+<p>To disable mutual TLS, set both file name arguments to NULL.</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">redis</td><td>A <a class="el" href="structRedis.html" title="Structure that represents a Redis database instance, with one or more RedisClient connections.">Redis</a> instance. </td></tr>
@@ -5259,7 +5260,7 @@ The client on which the push is originated will be locked, thus the implementati
 <dd>
 <a class="el" href="redisx-tls_8c.html#a9cafd12ab9ff4df77c7fc9d6bac33c1a">redisxSetTLSServerName()</a> </dd>
 <dd>
-redisxTLSSkipVerify() </dd></dl>
+<a class="el" href="redisx-tls_8c.html#a9c8cf16eba455874111651f59f86a6e7">redisxSetTLSVerify()</a> </dd></dl>
 
 <p class="reference">References <a class="elRef" href="../../xchange/apidoc/html/xchange_8h.html#aa8cecfc5c5c054d2875c03e77b7be15d">TRUE</a>, <a class="elRef" href="../../xchange/apidoc/html/xchange_8c.html#ae73aaf705dc4e7d58dfb0fd81f4805c7">x_error()</a>, <a class="elRef" href="../../xchange/apidoc/html/xchange_8h.html#a1d4a0c99f979fd0ecf0e9dcb7191a8d7">X_FAILURE</a>, <a class="elRef" href="../../xchange/apidoc/html/xchange_8h.html#a7b2679c964ea5f2160380ed55654b873">X_SUCCESS</a>, and <a class="elRef" href="../../xchange/apidoc/html/xchange_8h.html#a01d730a1a98963816de2dd73e72957a5">xStringCopyOf()</a>.</p>
 
@@ -5393,14 +5394,14 @@ redisxTLSSkipVerify() </dd></dl>
 
 </div>
 </div>
-<a id="afa24f8a0e389625005685f3ec2dd0bca" name="afa24f8a0e389625005685f3ec2dd0bca"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#afa24f8a0e389625005685f3ec2dd0bca">&#9670;&#160;</a></span>redisxSetTLSSkipVerify()</h2>
+<a id="a9c8cf16eba455874111651f59f86a6e7" name="a9c8cf16eba455874111651f59f86a6e7"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a9c8cf16eba455874111651f59f86a6e7">&#9670;&#160;</a></span>redisxSetTLSVerify()</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">int redisxSetTLSSkipVerify </td>
+          <td class="memname">int redisxSetTLSVerify </td>
           <td>(</td>
           <td class="paramtype"><a class="el" href="structRedis.html">Redis</a> *&#160;</td>
           <td class="paramname"><em>redis</em>, </td>
@@ -5418,11 +5419,11 @@ redisxTLSSkipVerify() </dd></dl>
         </tr>
       </table>
 </div><div class="memdoc">
-<p>Sets whether to verify the the certificate.</p>
+<p>Sets whether to verify the the certificate. Certificates are verified by default.</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">redis</td><td>A <a class="el" href="structRedis.html" title="Structure that represents a Redis database instance, with one or more RedisClient connections.">Redis</a> instance. </td></tr>
-    <tr><td class="paramname">value</td><td>TRUE (non-zero) or FALSE (0) </td></tr>
+    <tr><td class="paramname">value</td><td>TRUE (non-zero) to verify certificates, or else FALSE (0) </td></tr>
   </table>
   </dd>
 </dl>
