@@ -2327,22 +2327,22 @@
     <title>RedisX</title>
     <filename>index.html</filename>
     <docanchor file="index.html">md_README-redisx</docanchor>
-    <docanchor file="index.html">introduction</docanchor>
-    <docanchor file="index.html">example</docanchor>
-    <docanchor file="index.html">features</docanchor>
-    <docanchor file="index.html">related-links</docanchor>
-    <docanchor file="index.html">prerequisites</docanchor>
+    <docanchor file="index.html">redisx-introduction</docanchor>
+    <docanchor file="index.html">redisx-example</docanchor>
+    <docanchor file="index.html">redisx-features</docanchor>
+    <docanchor file="index.html">redisx-related-links</docanchor>
+    <docanchor file="index.html">redisx-prerequisites</docanchor>
     <docanchor file="index.html">building-redisx</docanchor>
     <docanchor file="index.html">redisx-cli</docanchor>
-    <docanchor file="index.html">linking</docanchor>
+    <docanchor file="index.html">redisx-linking</docanchor>
     <docanchor file="index.html">managing-redis-server-connections</docanchor>
-    <docanchor file="index.html">initializing</docanchor>
-    <docanchor file="index.html">configuring</docanchor>
+    <docanchor file="index.html">redisx-initializing</docanchor>
+    <docanchor file="index.html">redisx-configuring</docanchor>
     <docanchor file="index.html">socket-configuration</docanchor>
     <docanchor file="index.html">connection-hooks</docanchor>
-    <docanchor file="index.html">connecting</docanchor>
-    <docanchor file="index.html">disconnecting</docanchor>
-    <docanchor file="index.html">reconnecting</docanchor>
+    <docanchor file="index.html">redisx-connecting</docanchor>
+    <docanchor file="index.html">redisx-disconnecting</docanchor>
+    <docanchor file="index.html">redisx-reconnecting</docanchor>
     <docanchor file="index.html">simple-redis-queries</docanchor>
     <docanchor file="index.html">interactive-transactions</docanchor>
     <docanchor file="index.html">attributes</docanchor>
@@ -2366,8 +2366,8 @@
     <docanchor file="index.html">cluster-basics</docanchor>
     <docanchor file="index.html">cluster-reconfiguration</docanchor>
     <docanchor file="index.html">cluster-explicit-connect</docanchor>
-    <docanchor file="index.html">error-handling</docanchor>
-    <docanchor file="index.html">debug-support</docanchor>
-    <docanchor file="index.html">future-plans</docanchor>
+    <docanchor file="index.html">redisx-error-handling</docanchor>
+    <docanchor file="index.html">redisx-debug-support</docanchor>
+    <docanchor file="index.html">redisx-future-plans</docanchor>
   </compound>
 </tagfile>
