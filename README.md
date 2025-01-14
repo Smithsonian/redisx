@@ -431,7 +431,7 @@ the necessary certificates, keys, and cypher parameters as needed, e.g.:
   }
 
   // (optional) Skip verification of the certificate (insecure!)
-  redisxSkipVerify(redis, TRUE);
+  redisxSetTLSVerify(redis, FALSE);
 
   // (optional) Set server name for SNI
   redisxSetTLSServerName(redis, "my.redis-server.com");
