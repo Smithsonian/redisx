@@ -28,11 +28,11 @@ Last Updated: 8 January 2025
 
 ## Table of Contents
 
- - [Introduction](#introduction)
- - [Prerequisites](#prerequisites)
+ - [Introduction](#redisx-introduction)
+ - [Prerequisites](#redisx-prerequisites)
  - [Building RedisX](#building-redisx)
  - [Command-line interface (`redisx-cli`)](#redisx-cli)
- - [Linking your application against RedisX](#linking)
+ - [Linking your application against RedisX](#redisx-linking)
  - [Managing Redis server connections](#managing-redis-server-connections)
  - [Simple Redis queries](#simple-redis-queries)
  - [Accessing key / value data](#accessing-key-value-data)
@@ -40,17 +40,17 @@ Last Updated: 8 January 2025
  - [Atomic execution blocks and LUA scripts](#atomic-transaction-blocks-and-lua-scripts)
  - [Advanced queries and pipelining](#advanced-queries)
  - [Redis clusters](#cluster-support)
- - [Error handling](#error-handling)
- - [Debug support](#debug-support)
- - [Future plans](#future-plans)
+ - [Error handling](#redisx-error-handling)
+ - [Debug support](#redisx-debug-support)
+ - [Future plans](#redisx-future-plans)
  
 
-<a name="introduction"></a>
+<a name="redisx-introduction"></a>
 ## Introduction
 
- - [A simple example](#example)
- - [Features overview](#features)
- - [Related links](#related-links)
+ - [A simple example](#redisx-example)
+ - [Features overview](#redisx-features)
+ - [Related links](#redisx-related-links)
 
 __RedisX__ is a free, light-weight [Redis](https://redis.io) client library for C/C++. As such, it should work with 
 Redis forks / clones like [Dragonfly](https://dragonfly.io) or [Valkey](https://valkey.io) also. It supports both 
@@ -73,7 +73,7 @@ repository on GitHub.
 There are no official releases of __RedisX__ yet. An initial 1.0.0 release is expected in early 2025. Before then the 
 API may undergo slight changes and tweaks. Use the repository as is at your own risk for now.
 
-<a name="example"></a>
+<a name="redisx-example"></a>
 ### A simple example
 
 Below is a minimal example of a program snippet, which connects to a Redis server (without authentication) and runs a 
@@ -113,16 +113,19 @@ You may find more details about each step further below. And, of course there ar
 that allow you to customize your interactions with a Redis / Valkey server. But the basic principle, and the steps,
 follow the same pattern in general:
 
- 1. [Initialize](#initializing) a Redis instance.
- 2. [Configure](#configuring) the server properties: port, authentication, protocol, socket parameters etc. (not shown in above example).
- 3. [Connect](#connecting) to the Redis / Valkey server.
- 4. Interact with the server: run queries [interactively](#simple-redis-queries) or in [batch mode](#pipelined-transactions), process [push notifications](#push-notifications), [publish](#broadcasting-messages) or [subscribe](#subscriptions)...
- 5. [Disconnect](#disconnecting) from the server.
+ 1. [Initialize](#redisx-initializing) a Redis instance.
+ 2. [Configure](#redisx-configuring) the server properties: port, authentication, protocol, socket parameters etc. 
+    (not shown in above example).
+ 3. [Connect](#redisx-connecting) to the Redis / Valkey server.
+ 4. Interact with the server: run queries [interactively](#simple-redis-queries) or in 
+    [batch mode](#pipelined-transactions), process [push notifications](#push-notifications), 
+    [publish](#broadcasting-messages) or [subscribe](#subscriptions)...
+ 5. [Disconnect](#redisx-disconnecting) from the server.
  
-And at every step, you should check for and [handle errors](#error-handling) as appropriate.
+And at every step, you should check for and [handle errors](#redisx-error-handling) as appropriate.
 
 
-<a name="features"></a>
+<a name="redisx-features"></a>
 ### Features overview
 
 #### General Features
@@ -157,7 +160,7 @@ And at every step, you should check for and [handle errors](#error-handling) as 
  | TLS support                       |  __yes__   | _help me test it_                                            |
 
 
-<a name="related-links"></a>
+<a name="redisx-related-links"></a>
 ### Related links
 
  - [Redis commands](https://redis.io/docs/latest/commands/) (reference documentation)
@@ -171,7 +174,7 @@ And at every step, you should check for and [handle errors](#error-handling) as 
 
 -----------------------------------------------------------------------------
 
-<a name="prerequisites"></a>
+<a name="redisx-prerequisites"></a>
 ## Prerequisites
 
 The [Smithsonian/xchange](https://github.com/Smithsonian/xchange) library is both a build and a runtime dependency of 
@@ -279,7 +282,7 @@ trace). It can also be used in interactive mode if no Redis command arguments ar
 
 -----------------------------------------------------------------------------
 
-<a name="linking"></a>
+<a name="redisx-linking"></a>
 ## Linking your application against RedisX
 
 Provided you have installed the shared (`libredisx.so` and `libxchange.so`) or static (`libredisx.a` and 
@@ -300,10 +303,11 @@ to linking.
 <a name="managing-redis-server-connections"></a>
 ## Managing Redis server connections
 
- - [Initializing](#initializing)
- - [Configuring](#configuring)
- - [Connecting](#connecting)
- - [Disconnecting](#disconnecting)
+ - [Initializing](#redisx-initializing)
+ - [Configuring](#redisx-configuring)
+ - [Connecting](#redisx-connecting)
+ - [Disconnecting](#redisx-disconnecting)
+ - [Reconnecting](#redisx-reconnecting)
 
 The library maintains up to three separate connections (channels) for each separate Redis server instance used: (1) an 
 interactive client for sequential round-trip transactions, (2) a pipeline client for bulk queries and asynchronous 
@@ -311,7 +315,7 @@ background processing, and (3) a subscription client for PUB/SUB requests and no
 always connected, the pipeline client is connected only if explicitly requested at the time of establishing the server 
 connection, while the subscription client is connected only as needed.
 
-<a name="initializing"></a>
+<a name="redisx-initializing"></a>
 ### Initializing
 
 The first step is to create a `Redis` object, with the server name or IP address.
@@ -355,13 +359,13 @@ server connection.
 
 One thing to keep in mind about Sentinel is that once the connection to the master is established, it works just like
 a regular server connection, including the possibility of that connection being broken. It is up to the application
-to initiate reconnection and recovery as appropriate in case of errors. (See more in on [Reconnecting](#reconnecting)
-further below).
+to initiate reconnection and recovery as appropriate in case of errors. (See more in on 
+[Reconnecting](#redisx-reconnecting) further below).
 
 The Sentinel support is still experimental and requires testing. You can help by submitting bug reports in the GitHub
 repository.
 
-<a name="configuring"></a>
+<a name="redisx-configuring"></a>
 ### Configuring
 
 Before connecting to the Redis server, you may configure the database authentication (if any):
@@ -515,7 +519,7 @@ a particular function to be called any more in the even.
 The same goes for disconnect hooks, using `redisxAddDisconnectHook()` / `redisxRemoveDisconnectHook()` instead.
 
 
-<a name="connecting"></a>
+<a name="redisx-connecting"></a>
 ### Connecting
 
 Once configured, you can connect to the server as:
@@ -540,7 +544,7 @@ synchronous and asynchronous requests (and responses). For
 `X_SUCCESS` only after having located and connected to the master server, and confirmed that it is indeed the master.
 
 
-<a name="disconnecting"></a>
+<a name="redisx-disconnecting"></a>
 ### Disconnecting
 
 When you are done with a specific Redis server, you should disconnect from it:
@@ -561,7 +565,7 @@ And then to free up all resources used by the `Redis` instance, you might also c
   redis = NULL;
 ```
 
-<a name="reconnecting"></a>
+<a name="redisx-reconnecting"></a>
 ### Reconnecting
 
 Reconnections to the Redis servers are never automatic, and there is no automatic failover for __RedisX__ clients
@@ -1575,7 +1579,7 @@ You may continue to use the cluster after calling `redisxClusterDisconnect()`, a
 
 -----------------------------------------------------------------------------
 
-<a name="error-handling"></a>
+<a name="redisx-error-handling"></a>
 ## Error handling
 
 The principal error handling of __RedisX__ is an extension of that of __xchange__, with further error codes defined in 
@@ -1649,7 +1653,7 @@ above mentioned methods.
 
 -----------------------------------------------------------------------------
 
-<a name="debug-support"></a>
+<a name="redisx-debug-support"></a>
 ## Debug support
 
 You can enable verbose output of the __RedisX__ library with `xSetVerbose(boolean)`. When enabled, it will produce 
@@ -1672,7 +1676,7 @@ settings.
 
 -----------------------------------------------------------------------------
 
-<a name="future-plans"></a>
+<a name="redisx-future-plans"></a>
 ## Future plans
 
 Some obvious ways the library could evolve and grow in the not too distant future:
