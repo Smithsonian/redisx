@@ -402,6 +402,7 @@ int redisxSetSentinelTimeout(Redis *redis, int millis);
 int redisxSetSocketConfigurator(Redis *redis, RedisSocketConfigurator func);
 int redisxSetSocketErrorHandler(Redis *redis, RedisErrorHandler f);
 
+int redisxSetHostname(Redis *redis, const char *host);
 int redisxSetPort(Redis *redis, int port);
 int redisxSetUser(Redis *redis, const char *username);
 int redisxSetPassword(Redis *redis, const char *passwd);
