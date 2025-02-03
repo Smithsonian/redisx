@@ -631,7 +631,7 @@ int redisxClusterConnect(RedisCluster *cluster) {
 
   pthread_mutex_lock(&p->mutex);
 
-#if WITH_OPENMP
+#ifdef _OPENMP
 #  pragma omp parallel for
 #endif
   for(i = 0; i < p->n_shards; i++) {
@@ -677,7 +677,7 @@ int redisxClusterDisconnect(RedisCluster *cluster) {
 
   pthread_mutex_lock(&cp->mutex);
 
-#if WITH_OPENMP
+#ifdef _OPENMP
 #  pragma omp parallel for
 #endif
   for(i = 0; i < cp->n_shards; i++) {
