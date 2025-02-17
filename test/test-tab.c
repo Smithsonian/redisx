@@ -74,9 +74,9 @@ int main() {
   }
   redisxDestroyEntries(e, n1);
 
-  e = redisxScanTable(redis, "_test_", "*", &n2, &status);
-  if(n2 <= 0 || status) {
-    fprintf(stderr, "ERROR! scan table: n = %d, status = %d\n", n2, status);
+  e = redisxScanTable(redis, "_test_", "*", &n2);
+  if(n2 < 0) {
+    fprintf(stderr, "ERROR! scan table: n = %d\n", n2);
     return 1;
   }
   redisxDestroyEntries(e, n2);
@@ -103,9 +103,9 @@ int main() {
   redisxDestroyKeys(keys, n1);
 
   // Scanned top-level keys
-  keys = redisxScanKeys(redis, "*", &n2, &status);
+  keys = redisxScanKeys(redis, "*", &n2);
   if(n2 <= 0 || keys == NULL) {
-    fprintf(stderr, "ERROR! scan keys: n = %d, status = %d\n", n2, status);
+    fprintf(stderr, "ERROR! scan keys: n = %d\n", n2);
     return 1;
   }
   redisxDestroyKeys(keys, n2);

@@ -450,18 +450,18 @@ int main(int argc, const char *argv[]) {
     prop_error(fn, redisxConnect(redis, FALSE));
 
     if(scan) {
-      int n = 0, status = X_SUCCESS;
+      int n = 0;
       char **keys;
 
       prop_error(fn, redisxSetScanCount(redis, scanCount));
 
-      keys = redisxScanKeys(redis, pattern, &n, &status);
-      prop_error(fn, status);
+      keys = redisxScanKeys(redis, pattern, &n);
+      prop_error(fn, n);
 
       for(i = 0; i < n; i++) printf("\"%s\"\n", keys[i]);
       redisxDestroyKeys(keys, n);
 
-      if(!cmdargs) return status;
+      if(!cmdargs) return X_SUCCESS;
     }
   }
 

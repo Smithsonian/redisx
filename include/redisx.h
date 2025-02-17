@@ -464,10 +464,10 @@ int redisxSetValue(Redis *redis, const char *table, const char *key, const char 
 RESP *redisxGetValue(Redis*redis, const char *table, const char *key, int *status);
 char *redisxGetStringValue(Redis *redis, const char *table, const char *key, int *len);
 RedisEntry *redisxGetTable(Redis *redis, const char *table, int *n);
-RedisEntry *redisxScanTable(Redis *redis, const char *table, const char *pattern, int *n, int *status);
+RedisEntry *redisxScanTable(Redis *redis, const char *table, const char *pattern, int *n);
 int redisxMultiSet(Redis *redis, const char *table, const RedisEntry *entries, int n, boolean confirm);
 char **redisxGetKeys(Redis *redis, const char *table, int *n);
-char **redisxScanKeys(Redis *redis, const char *pattern, int *n, int *status);
+char **redisxScanKeys(Redis *redis, const char *pattern, int *n);
 int redisxSetScanCount(Redis *redis, int count);
 int redisxGetScanCount(Redis *redis);
 void redisxDestroyEntries(RedisEntry *entries, int count);

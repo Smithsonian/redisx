@@ -34,7 +34,7 @@ int main() {
 
   role = xLookupField(info, "role");
   if(!role) {
-    fprintf(stderr, "ERROR! role not found (count = %ld)", xLookupCount(info));
+    fprintf(stderr, "ERROR! role not found (count = %ld)\n", xLookupCount(info));
     return 1;
   }
 

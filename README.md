@@ -925,11 +925,10 @@ something like:
   Redis *redis = ...
   
   int nMatches;  // We'll return the number of matching Redis keys here...
-  int status;    // We'll return the error status here...
-  
+
   //  Return all Redis top-level keywords starting with "system:"
-  char **keys = redisxScanKeys(redis, "system:*", &nMatches, &status);
-  if (status != X_SUCCESS) {
+  char **keys = redisxScanKeys(redis, "system:*", &nMatches);
+  if (nMatches < 0) {
     // Oops something went wrong...
     ...
   }
@@ -948,8 +947,8 @@ Or, to retrieve the values from a hash table for a set of keywords that match a 
   ...
   
   // Scan all key/value pairs in hash table "system:subsystem"
-  RedisEntry *entries = redisxScanTable(redis, "system:subsystem", "*", &nMatches, &status);
-  if (status != X_SUCCESS) {
+  RedisEntry *entries = redisxScanTable(redis, "system:subsystem", "*", &nMatches);
+  if (nMatches < 0) {
     // Oops something went wrong.
     ... 
   }

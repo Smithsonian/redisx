@@ -877,7 +877,7 @@ XLookupTable *rConsumeInfoReply(RESP *reply) {
   s = xCreateStruct();
 
   // Go line by line...
-  line = strtok((char *) reply->value, "\n");
+  line = strtok((char *) reply->value, "\r\n");
 
   // Parse key:value lines into a structure.
   while(line) {
@@ -886,12 +886,11 @@ XLookupTable *rConsumeInfoReply(RESP *reply) {
       *sep = '\0';
       xSetField(s, xCreateStringField(line, sep + 1));
     }
-    line = strtok(NULL, "\n");
+    line = strtok(NULL, "\r\n");
   }
 
-  redisxDestroyRESP(reply);
-
   lookup = xCreateLookup(s, FALSE);
+  redisxDestroyRESP(reply);
   free(s);
 
   return lookup;
@@ -922,8 +921,6 @@ XLookupTable *redisxGetInfo(Redis *redis, const char *parameter) {
 
   lookup = rConsumeInfoReply(reply);
   if(!lookup) return x_trace_null(fn, NULL);
-
-  redisxDestroyRESP(reply);
 
   return lookup;
 }
