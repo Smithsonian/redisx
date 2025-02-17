@@ -1,6 +1,5 @@
 var resp_8c =
 [
-    [ "_DEFAULT_SOURCE", "resp_8c.html#a8fb447618db946a9e2a596d9ea18763f", null ],
     [ "redisxAppendRESP", "resp_8c.html#aea5830b9c06c6603c0fc04bf10238b83", null ],
     [ "redisxCheckDestroyRESP", "resp_8c.html#a80d5a305523c51da7bc7cf4c9deca962", null ],
     [ "redisxCheckRESP", "resp_8c.html#a4b5674d08da07250c0ca6116a4c48ccf", null ],

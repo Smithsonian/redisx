@@ -954,15 +954,15 @@
       <type>char **</type>
       <name>redisxScanKeys</name>
       <anchorfile>redisx_8h.html</anchorfile>
-      <anchor>a67dd05115ae75dac9637ac04220d73b6</anchor>
-      <arglist>(Redis *redis, const char *pattern, int *n, int *status)</arglist>
+      <anchor>a2536b2244c4d05ca5d595ed00826abd4</anchor>
+      <arglist>(Redis *redis, const char *pattern, int *n)</arglist>
     </member>
     <member kind="function">
       <type>RedisEntry *</type>
       <name>redisxScanTable</name>
       <anchorfile>redisx_8h.html</anchorfile>
-      <anchor>a47d28fd9f2f35f0af5abd67a1ae7b987</anchor>
-      <arglist>(Redis *redis, const char *table, const char *pattern, int *n, int *status)</arglist>
+      <anchor>a838e534835b9b345925e652e3b053815</anchor>
+      <arglist>(Redis *redis, const char *table, const char *pattern, int *n)</arglist>
     </member>
     <member kind="function">
       <type>int</type>
@@ -991,6 +991,13 @@
       <anchorfile>redisx_8h.html</anchorfile>
       <anchor>ab1f40a05c3c74c55f0f92066cbc7db09</anchor>
       <arglist>(Redis *redis, const char *dh_params_file)</arglist>
+    </member>
+    <member kind="function">
+      <type>int</type>
+      <name>redisxSetHostname</name>
+      <anchorfile>redisx_8h.html</anchorfile>
+      <anchor>a16a0aa9545e7dd5fd290dd2b4ee968f1</anchor>
+      <arglist>(Redis *redis, const char *host)</arglist>
     </member>
     <member kind="function">
       <type>int</type>
@@ -1771,15 +1778,15 @@
       <type>char **</type>
       <name>redisxScanKeys</name>
       <anchorfile>redisx-tab_8c.html</anchorfile>
-      <anchor>a67dd05115ae75dac9637ac04220d73b6</anchor>
-      <arglist>(Redis *redis, const char *pattern, int *n, int *status)</arglist>
+      <anchor>a2536b2244c4d05ca5d595ed00826abd4</anchor>
+      <arglist>(Redis *redis, const char *pattern, int *n)</arglist>
     </member>
     <member kind="function">
       <type>RedisEntry *</type>
       <name>redisxScanTable</name>
       <anchorfile>redisx-tab_8c.html</anchorfile>
-      <anchor>a47d28fd9f2f35f0af5abd67a1ae7b987</anchor>
-      <arglist>(Redis *redis, const char *table, const char *pattern, int *n, int *status)</arglist>
+      <anchor>a838e534835b9b345925e652e3b053815</anchor>
+      <arglist>(Redis *redis, const char *table, const char *pattern, int *n)</arglist>
     </member>
     <member kind="function">
       <type>int</type>
@@ -2048,13 +2055,6 @@
     <name>resp.c</name>
     <path>src/</path>
     <filename>resp_8c.html</filename>
-    <member kind="define">
-      <type>#define</type>
-      <name>_DEFAULT_SOURCE</name>
-      <anchorfile>resp_8c.html</anchorfile>
-      <anchor>a8fb447618db946a9e2a596d9ea18763f</anchor>
-      <arglist></arglist>
-    </member>
     <member kind="function">
       <type>int</type>
       <name>redisxAppendRESP</name>

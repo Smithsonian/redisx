@@ -10,8 +10,8 @@ var redisx_tab_8c =
     [ "redisxGetValue", "redisx-tab_8c.html#a01bf1f5d830d1af19456ab78457a54ab", null ],
     [ "redisxMultiSet", "redisx-tab_8c.html#aa8fd65a355394af08c86b4f0e943d3a6", null ],
     [ "redisxMultiSetAsync", "redisx-tab_8c.html#a750023f759dd5192dd3c802a542af770", null ],
-    [ "redisxScanKeys", "redisx-tab_8c.html#a67dd05115ae75dac9637ac04220d73b6", null ],
-    [ "redisxScanTable", "redisx-tab_8c.html#a47d28fd9f2f35f0af5abd67a1ae7b987", null ],
+    [ "redisxScanKeys", "redisx-tab_8c.html#a2536b2244c4d05ca5d595ed00826abd4", null ],
+    [ "redisxScanTable", "redisx-tab_8c.html#a838e534835b9b345925e652e3b053815", null ],
     [ "redisxSetScanCount", "redisx-tab_8c.html#a3bd0d2964966ed6655358ff2fe0802c0", null ],
     [ "redisxSetValue", "redisx-tab_8c.html#a1465b1a965ddd685e16bccbf0b34f08b", null ],
     [ "redisxSetValueAsync", "redisx-tab_8c.html#a9e784632598b0c418a3ae3a87aa09fe4", null ]

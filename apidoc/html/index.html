@@ -115,7 +115,8 @@ $(document).ready(function(){initNavTree('index.html',''); initResizable(); });
   <div class="headertitle"><div class="title">RedisX </div></div>
 </div><!--header-->
 <div class="contents">
-<div class="textblock"><p><a class="anchor" id="md_README-redisx"></a> A free, simple, and light-weight C/C++ <a class="el" href="structRedis.html" title="Structure that represents a Redis database instance, with one or more RedisClient connections.">Redis</a> / Valkey client library.</p>
+<div class="textblock"><p><a class="anchor" id="md_README-redisx"></a> <a href="https://doi.org/10.5281/zenodo.14639302"><img src="https://zenodo.org/badge/796202270.svg" alt="DOI" style="pointer-events: none;" class="inline"/></a></p>
+<p>A free, simple, and light-weight C/C++ <a class="el" href="structRedis.html" title="Structure that represents a Redis database instance, with one or more RedisClient connections.">Redis</a> / Valkey client library.</p>
 <ul>
 <li><a href="https://smithsonian.github.io/redisx/apidoc/html/files.html">API documentation</a></li>
 <li><a href="https://smithsonian.github.io/redisx">Project page</a> on github.io</li>
@@ -191,8 +192,8 @@ A simple example</h3>
 <div class="ttc" id="aredisx_8c_html_a09092bd97eead5c5fa73fa0d9241018c"><div class="ttname"><a href="redisx_8c.html#a09092bd97eead5c5fa73fa0d9241018c">redisxRequest</a></div><div class="ttdeci">RESP * redisxRequest(Redis *redis, const char *command, const char *arg1, const char *arg2, const char *arg3, int *status)</div><div class="ttdef"><b>Definition</b> redisx.c:655</div></div>
 <div class="ttc" id="aredisx_8h_html"><div class="ttname"><a href="redisx_8h.html">redisx.h</a></div></div>
 <div class="ttc" id="aredisx_8h_html_afa5c90630d37c2f77e5d7985932941a0a36dd81166f9ba91db70b1571b25fec9f"><div class="ttname"><a href="redisx_8h.html#afa5c90630d37c2f77e5d7985932941a0a36dd81166f9ba91db70b1571b25fec9f">RESP_BULK_STRING</a></div><div class="ttdeci">@ RESP_BULK_STRING</div><div class="ttdoc">RESP bulk string type.</div><div class="ttdef"><b>Definition</b> redisx.h:115</div></div>
-<div class="ttc" id="aresp_8c_html_a4b5674d08da07250c0ca6116a4c48ccf"><div class="ttname"><a href="resp_8c.html#a4b5674d08da07250c0ca6116a4c48ccf">redisxCheckRESP</a></div><div class="ttdeci">int redisxCheckRESP(const RESP *resp, enum resp_type expectedType, int expectedSize)</div><div class="ttdef"><b>Definition</b> resp.c:158</div></div>
-<div class="ttc" id="aresp_8c_html_aa4e23a7454f7055711915ec430599011"><div class="ttname"><a href="resp_8c.html#aa4e23a7454f7055711915ec430599011">redisxDestroyRESP</a></div><div class="ttdeci">void redisxDestroyRESP(RESP *resp)</div><div class="ttdef"><b>Definition</b> resp.c:36</div></div>
+<div class="ttc" id="aresp_8c_html_a4b5674d08da07250c0ca6116a4c48ccf"><div class="ttname"><a href="resp_8c.html#a4b5674d08da07250c0ca6116a4c48ccf">redisxCheckRESP</a></div><div class="ttdeci">int redisxCheckRESP(const RESP *resp, enum resp_type expectedType, int expectedSize)</div><div class="ttdef"><b>Definition</b> resp.c:150</div></div>
+<div class="ttc" id="aresp_8c_html_aa4e23a7454f7055711915ec430599011"><div class="ttname"><a href="resp_8c.html#aa4e23a7454f7055711915ec430599011">redisxDestroyRESP</a></div><div class="ttdeci">void redisxDestroyRESP(RESP *resp)</div><div class="ttdef"><b>Definition</b> resp.c:28</div></div>
 <div class="ttc" id="astructRESP_html"><div class="ttname"><a href="structRESP.html">RESP</a></div><div class="ttdoc">Structure that represents a Redis response (RESP format).</div><div class="ttdef"><b>Definition</b> redisx.h:180</div></div>
 <div class="ttc" id="astructRESP_html_a0f61d63b009d0880a89c843bd50d8d76"><div class="ttname"><a href="structRESP.html#a0f61d63b009d0880a89c843bd50d8d76">RESP::value</a></div><div class="ttdeci">void * value</div><div class="ttdef"><b>Definition</b> redisx.h:184</div></div>
 <div class="ttc" id="astructRedis_html"><div class="ttname"><a href="structRedis.html">Redis</a></div><div class="ttdoc">Structure that represents a Redis database instance, with one or more RedisClient connections.</div><div class="ttdef"><b>Definition</b> redisx.h:253</div></div>
@@ -669,7 +670,7 @@ RESP data type</h3>
 <div class="line">   <a class="code hl_function" href="resp_8c.html#aa4e23a7454f7055711915ec430599011">redisxDestroyRESP</a>(reply);</div>
 <div class="line">}</div>
 <div class="ttc" id="aredisx_8h_html_afa5c90630d37c2f77e5d7985932941a0ad16eee767b19b1c4bb650deea0dd0b30"><div class="ttname"><a href="redisx_8h.html#afa5c90630d37c2f77e5d7985932941a0ad16eee767b19b1c4bb650deea0dd0b30">RESP_ARRAY</a></div><div class="ttdeci">@ RESP_ARRAY</div><div class="ttdoc">RESP array type.</div><div class="ttdef"><b>Definition</b> redisx.h:111</div></div>
-<div class="ttc" id="aresp_8c_html_a80d5a305523c51da7bc7cf4c9deca962"><div class="ttname"><a href="resp_8c.html#a80d5a305523c51da7bc7cf4c9deca962">redisxCheckDestroyRESP</a></div><div class="ttdeci">int redisxCheckDestroyRESP(RESP *resp, enum resp_type expectedType, int expectedSize)</div><div class="ttdef"><b>Definition</b> resp.c:190</div></div>
+<div class="ttc" id="aresp_8c_html_a80d5a305523c51da7bc7cf4c9deca962"><div class="ttname"><a href="resp_8c.html#a80d5a305523c51da7bc7cf4c9deca962">redisxCheckDestroyRESP</a></div><div class="ttdeci">int redisxCheckDestroyRESP(RESP *resp, enum resp_type expectedType, int expectedSize)</div><div class="ttdef"><b>Definition</b> resp.c:182</div></div>
 </div><!-- fragment --><p>Before destroying a <a class="el" href="structRESP.html" title="Structure that represents a Redis response (RESP format).">RESP</a> structure, the caller may want to dereference values within it if they are to be used as is (without making copies), e.g.:</p>
 <div class="fragment"><div class="line"><a class="code hl_struct" href="structRESP.html">RESP</a> *reply = ...</div>
 <div class="line">char *stringValue = NULL;   <span class="comment">// to be extracted from &#39;reply&#39;</span></div>
@@ -707,7 +708,7 @@ RESP data type</h3>
 <div class="line"><span class="comment">// Clean up</span></div>
 <div class="line">redisxDestroyRESP(resp);</div>
 <div class="ttc" id="aredisx_8c_html_a89fd65118ba731931fe281c83f6fa8ba"><div class="ttname"><a href="redisx_8c.html#a89fd65118ba731931fe281c83f6fa8ba">redisxGetHelloData</a></div><div class="ttdeci">RESP * redisxGetHelloData(Redis *redis)</div><div class="ttdef"><b>Definition</b> redisx.c:849</div></div>
-<div class="ttc" id="aresp_8c_html_a7f4e74ee03cebf38eb9c1fb873784a35"><div class="ttname"><a href="resp_8c.html#a7f4e74ee03cebf38eb9c1fb873784a35">redisxRESP2JSON</a></div><div class="ttdeci">char * redisxRESP2JSON(const char *name, const RESP *resp)</div><div class="ttdef"><b>Definition</b> resp.c:749</div></div>
+<div class="ttc" id="aresp_8c_html_a7f4e74ee03cebf38eb9c1fb873784a35"><div class="ttname"><a href="resp_8c.html#a7f4e74ee03cebf38eb9c1fb873784a35">redisxRESP2JSON</a></div><div class="ttdeci">char * redisxRESP2JSON(const char *name, const RESP *resp)</div><div class="ttdef"><b>Definition</b> resp.c:741</div></div>
 </div><!-- fragment --><p>All <a class="el" href="structRESP.html" title="Structure that represents a Redis response (RESP format).">RESP</a> can be represented in JSON format. This is trivial for map entries, which have strings as their keywords &ndash; which is the case for all <a class="el" href="structRESP.html" title="Structure that represents a Redis response (RESP format).">RESP</a> sent by <a class="el" href="structRedis.html" title="Structure that represents a Redis database instance, with one or more RedisClient connections.">Redis</a>. And, it is also possible for map entries with non-string keys, albeit via a more tedious (and less standard) JSON representation, stored under the <code>.non-string-keys</code> keyword.</p>
 <hr  />
 <p><a class="anchor" id="accessing-key-value-data"></a> </p>
@@ -765,11 +766,10 @@ Listing and Scanning</h3>
 <div class="fragment"><div class="line"><a class="code hl_struct" href="structRedis.html">Redis</a> *redis = ...</div>
 <div class="line"> </div>
 <div class="line">int nMatches;  <span class="comment">// We&#39;ll return the number of matching Redis keys here...</span></div>
-<div class="line"><span class="keywordtype">int</span> status;    <span class="comment">// We&#39;ll return the error status here...</span></div>
 <div class="line"> </div>
 <div class="line"><span class="comment">//  Return all Redis top-level keywords starting with &quot;system:&quot;</span></div>
-<div class="line"><span class="keywordtype">char</span> **keys = <a class="code hl_function" href="redisx-tab_8c.html#a67dd05115ae75dac9637ac04220d73b6">redisxScanKeys</a>(redis, <span class="stringliteral">&quot;system:*&quot;</span>, &amp;nMatches, &amp;status);</div>
-<div class="line"><span class="keywordflow">if</span> (status != X_SUCCESS) {</div>
+<div class="line"><span class="keywordtype">char</span> **keys = <a class="code hl_function" href="redisx-tab_8c.html#a2536b2244c4d05ca5d595ed00826abd4">redisxScanKeys</a>(redis, <span class="stringliteral">&quot;system:*&quot;</span>, &amp;nMatches);</div>
+<div class="line"><span class="keywordflow">if</span> (nMatches &lt; 0) {</div>
 <div class="line">  <span class="comment">// Oops something went wrong...</span></div>
 <div class="line">  ...</div>
 <div class="line">}</div>
@@ -780,13 +780,13 @@ Listing and Scanning</h3>
 <div class="line"> </div>
 <div class="line"><span class="comment">// Once done using the &#39;keys&#39; array, we should destroy it</span></div>
 <div class="line">redisxDestroyKeys(keys, nMatches);</div>
-<div class="ttc" id="aredisx-tab_8c_html_a67dd05115ae75dac9637ac04220d73b6"><div class="ttname"><a href="redisx-tab_8c.html#a67dd05115ae75dac9637ac04220d73b6">redisxScanKeys</a></div><div class="ttdeci">char ** redisxScanKeys(Redis *redis, const char *pattern, int *n, int *status)</div><div class="ttdef"><b>Definition</b> redisx-tab.c:605</div></div>
+<div class="ttc" id="aredisx-tab_8c_html_a2536b2244c4d05ca5d595ed00826abd4"><div class="ttname"><a href="redisx-tab_8c.html#a2536b2244c4d05ca5d595ed00826abd4">redisxScanKeys</a></div><div class="ttdeci">char ** redisxScanKeys(Redis *redis, const char *pattern, int *n)</div><div class="ttdef"><b>Definition</b> redisx-tab.c:604</div></div>
 </div><!-- fragment --><p>Or, to retrieve the values from a hash table for a set of keywords that match a glob pattern:</p>
 <div class="fragment"><div class="line">...</div>
 <div class="line"> </div>
 <div class="line"><span class="comment">// Scan all key/value pairs in hash table &quot;system:subsystem&quot;</span></div>
-<div class="line">RedisEntry *entries = <a class="code hl_function" href="redisx-tab_8c.html#a47d28fd9f2f35f0af5abd67a1ae7b987">redisxScanTable</a>(redis, <span class="stringliteral">&quot;system:subsystem&quot;</span>, <span class="stringliteral">&quot;*&quot;</span>, &amp;nMatches, &amp;status);</div>
-<div class="line"><span class="keywordflow">if</span> (status != X_SUCCESS) {</div>
+<div class="line">RedisEntry *entries = <a class="code hl_function" href="redisx-tab_8c.html#a838e534835b9b345925e652e3b053815">redisxScanTable</a>(redis, <span class="stringliteral">&quot;system:subsystem&quot;</span>, <span class="stringliteral">&quot;*&quot;</span>, &amp;nMatches);</div>
+<div class="line"><span class="keywordflow">if</span> (nMatches &lt; 0) {</div>
 <div class="line">  <span class="comment">// Oops something went wrong.</span></div>
 <div class="line">  ... </div>
 <div class="line">}</div>
@@ -797,7 +797,7 @@ Listing and Scanning</h3>
 <div class="line"> </div>
 <div class="line"><span class="comment">// Once done using the &#39;keys&#39; array, we should destroy it</span></div>
 <div class="line">redisxDestroyEntries(entries, nMatches);</div>
-<div class="ttc" id="aredisx-tab_8c_html_a47d28fd9f2f35f0af5abd67a1ae7b987"><div class="ttname"><a href="redisx-tab_8c.html#a47d28fd9f2f35f0af5abd67a1ae7b987">redisxScanTable</a></div><div class="ttdeci">RedisEntry * redisxScanTable(Redis *redis, const char *table, const char *pattern, int *n, int *status)</div><div class="ttdef"><b>Definition</b> redisx-tab.c:772</div></div>
+<div class="ttc" id="aredisx-tab_8c_html_a838e534835b9b345925e652e3b053815"><div class="ttname"><a href="redisx-tab_8c.html#a838e534835b9b345925e652e3b053815">redisxScanTable</a></div><div class="ttdeci">RedisEntry * redisxScanTable(Redis *redis, const char *table, const char *pattern, int *n)</div><div class="ttdef"><b>Definition</b> redisx-tab.c:767</div></div>
 </div><!-- fragment --><p>Finally, you may use <code><a class="el" href="redisx-tab_8c.html#a3bd0d2964966ed6655358ff2fe0802c0">redisxSetScanCount()</a></code> to tune just how many results should individual scan queries should return (but only if you are really itching to tweak it). Please refer to the <a class="el" href="structRedis.html" title="Structure that represents a Redis database instance, with one or more RedisClient connections.">Redis</a> documentation on the behavior of the <code>SCAN</code> and <code>HSCAN</code> commands to learn more.</p>
 <hr  />
 <p><a class="anchor" id="publish-subscribe-support"></a> </p>

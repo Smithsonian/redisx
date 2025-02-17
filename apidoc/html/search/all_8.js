@@ -1,9 +1,8 @@
 var searchData=
 [
-  ['error_20handling_0',['Error handling',['../index.html#autotoc_md59',1,'']]],
-  ['errors_1',['Socket-level errors',['../index.html#autotoc_md60',1,'']]],
-  ['example_2',['A simple example',['../index.html#autotoc_md5',1,'']]],
-  ['execution_3',['LUA script loading and execution',['../index.html#autotoc_md46',1,'']]],
-  ['execution_20blocks_4',['Execution blocks',['../index.html#autotoc_md45',1,'']]],
-  ['execution_20blocks_20and_20lua_20scripts_5',['Atomic execution blocks and LUA scripts',['../index.html#autotoc_md44',1,'']]]
+  ['features_0',['features',['../index.html#autotoc_md7',1,'General Features'],['../index.html#autotoc_md8',1,'Redis / Valkey Features']]],
+  ['features_20overview_1',['Features overview',['../index.html#autotoc_md6',1,'']]],
+  ['firstfield_2',['firstField',['../../../xchange/apidoc/html/structXStructure.html#a501ae8af2201d9cfaa60e3af21ff58fc',1,'XStructure']]],
+  ['functions_3',['Custom Redis functions',['../index.html#autotoc_md47',1,'']]],
+  ['future_20plans_4',['Future plans',['../index.html#autotoc_md64',1,'']]]
 ];

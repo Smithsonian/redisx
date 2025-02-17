@@ -45,10 +45,10 @@ src/redisx-tab.c
 .RI "int \fBredisxMultiSetAsync\fP (\fBRedisClient\fP *cl, const char *table, const \fBRedisEntry\fP *entries, int n, \fBboolean\fP confirm)"
 .br
 .ti -1c
-.RI "char ** \fBredisxScanKeys\fP (\fBRedis\fP *redis, const char *pattern, int *n, int *status)"
+.RI "char ** \fBredisxScanKeys\fP (\fBRedis\fP *redis, const char *pattern, int *n)"
 .br
 .ti -1c
-.RI "\fBRedisEntry\fP * \fBredisxScanTable\fP (\fBRedis\fP *redis, const char *table, const char *pattern, int *n, int *status)"
+.RI "\fBRedisEntry\fP * \fBredisxScanTable\fP (\fBRedis\fP *redis, const char *table, const char *pattern, int *n)"
 .br
 .ti -1c
 .RI "int \fBredisxSetScanCount\fP (\fBRedis\fP *redis, int count)"
@@ -313,7 +313,7 @@ X_SUCCESS (0) on success or an error code (<0) from \fBredisx\&.h\fP / \fBxchang
 
 .PP
 References \fBredisxSendArrayRequestAsync()\fP, \fBredisxSkipReplyAsync()\fP, \fBX_FAILURE\fP, \fBX_SUCCESS\fP, and \fBx_trace()\fP\&.
-.SS "char ** redisxScanKeys (\fBRedis\fP * redis, const char * pattern, int * n, int * status)"
+.SS "char ** redisxScanKeys (\fBRedis\fP * redis, const char * pattern, int * n)"
 Returns an alphabetical list of the \fBRedis\fP keys using the \fBRedis\fP SCAN command\&. Because it uses the scan command, it is guaranteed to not hog the database for excessive periods, and hence it is preferable to redisxGetKeys(table=NULL)\&.
 .PP
 Some data may be returned even if there was an error, and the caller is responsible for cleaning up the returned srotage elements\&.
@@ -326,12 +326,10 @@ The caller may adjust the amount of work performed in each scan call via the \fB
 .br
 \fIpattern\fP keyword pattern to match, or NULL for all keys\&. 
 .br
-\fIn\fP Pointer to the integer in which the number of elements 
-.br
-\fIstatus\fP integer in which to return the status, which is X_SUCCESS (0) if successful, or may an error value from \fBredisxRequest()\fP, or:
+\fIn\fP Pointer to the integer in which the number of elements (>=0), or else an error code (<0), such as:
 .RE
 .PP
-X_NULL If one of the arguments is NULL REDIS_NULL If got a null or empty response from \fBRedis\fP UNEXPECTED_RESP If the response from \fBRedis\fP was not the expected array type
+X_NULL If one of the arguments is NULL REDIS_NULL If got a null or empty response from \fBRedis\fP UNEXPECTED_RESP If the response from \fBRedis\fP was not the expected array type lt 
 .PP
 \fBReturns\fP
 .RS 4
@@ -349,8 +347,8 @@ An array with pointers to key names from this table or NULL\&.
 .PP
 
 .PP
-References \fBRESP::n\fP, \fBredisxArrayRequest()\fP, \fBredisxCheckRESP()\fP, \fBredisxDestroyRESP()\fP, \fBredisxGetScanCount()\fP, \fBRESP_ARRAY\fP, \fBRESP_BULK_STRING\fP, \fBSCAN_INITIAL_STORE_CAPACITY\fP, \fBRESP::value\fP, \fBx_error()\fP, \fBX_NULL\fP, \fBX_SUCCESS\fP, \fBx_trace()\fP, \fBxStringCopyOf()\fP, and \fBxvprintf\fP\&.
-.SS "\fBRedisEntry\fP * redisxScanTable (\fBRedis\fP * redis, const char * table, const char * pattern, int * n, int * status)"
+References \fBRESP::n\fP, \fBredisxArrayRequest()\fP, \fBredisxCheckRESP()\fP, \fBredisxDestroyKeys()\fP, \fBredisxDestroyRESP()\fP, \fBredisxGetScanCount()\fP, \fBRESP_ARRAY\fP, \fBRESP_BULK_STRING\fP, \fBSCAN_INITIAL_STORE_CAPACITY\fP, \fBRESP::value\fP, \fBx_error()\fP, \fBX_SUCCESS\fP, \fBx_trace_null()\fP, \fBxStringCopyOf()\fP, and \fBxvprintf\fP\&.
+.SS "\fBRedisEntry\fP * redisxScanTable (\fBRedis\fP * redis, const char * table, const char * pattern, int * n)"
 Returns an alphabetical list of the \fBRedis\fP hash table data using the \fBRedis\fP HSCAN command\&. Because it uses the scan command, it is guaranteed to not hog the database for excessive periods, and hence it is preferable to \fBredisxGetTable()\fP\&.
 .PP
 Some data may be returned even if there was an error, and the caller is responsible for cleaning up the returned srotage elements\&.
@@ -365,12 +363,10 @@ The caller may adjust the amount of work performed in each scan call via the \fB
 .br
 \fIpattern\fP keyword pattern to match, or NULL for all keys\&. 
 .br
-\fIn\fP Pointer to the integer in which the number of elements 
-.br
-\fIstatus\fP integer in which to return the status, which is X_SUCCESS (0) if successful, or may an error value from \fBredisxRequest()\fP, or:
+\fIn\fP Pointer to the integer in which the number of elements (>=0) or else an error code (<0), such as:
 .RE
 .PP
-X_NULL If one of the arguments is NULL REDIS_NULL If got a null or empty response from \fBRedis\fP UNEXPECTED_RESP If the response from \fBRedis\fP was not the expected array type
+X_NULL if one of the arguments is NULL X_GROUP_INVALID if the table name is empty REDIS_NULL if got a null or empty response from \fBRedis\fP UNEXPECTED_RESP if the response from \fBRedis\fP was not the expected array type
 .PP
 \fBReturns\fP
 .RS 4
@@ -388,7 +384,7 @@ A \fBRedisEntry\fP[] array or NULL\&.
 .PP
 
 .PP
-References \fBRedisEntry::key\fP, \fBRedisEntry::length\fP, \fBRESP::n\fP, \fBredisxArrayRequest()\fP, \fBredisxCheckRESP()\fP, \fBredisxDestroyRESP()\fP, \fBredisxGetScanCount()\fP, \fBRESP_ARRAY\fP, \fBRESP_BULK_STRING\fP, \fBSCAN_INITIAL_STORE_CAPACITY\fP, \fBRESP::value\fP, \fBRedisEntry::value\fP, \fBx_error()\fP, \fBX_GROUP_INVALID\fP, \fBX_NULL\fP, \fBX_SUCCESS\fP, \fBx_trace()\fP, \fBxStringCopyOf()\fP, and \fBxvprintf\fP\&.
+References \fBRedisEntry::key\fP, \fBRedisEntry::length\fP, \fBRESP::n\fP, \fBredisxArrayRequest()\fP, \fBredisxCheckRESP()\fP, \fBredisxDestroyEntries()\fP, \fBredisxDestroyRESP()\fP, \fBredisxGetScanCount()\fP, \fBRESP_ARRAY\fP, \fBRESP_BULK_STRING\fP, \fBSCAN_INITIAL_STORE_CAPACITY\fP, \fBRESP::value\fP, \fBRedisEntry::value\fP, \fBx_error()\fP, \fBX_GROUP_INVALID\fP, \fBX_NULL\fP, \fBX_SUCCESS\fP, \fBx_trace_null()\fP, \fBxStringCopyOf()\fP, and \fBxvprintf\fP\&.
 .SS "int redisxSetScanCount (\fBRedis\fP * redis, int count)"
 Sets the COUNT parameter to use with \fBRedis\fP SCAN type commands\&. COUNT specifies how much work \fBRedis\fP should do in a single scan iteration\&. 0 (or negative) values can be used to scan with defaults (without the COUNT option), which is usually equivalent to COUNT=10\&. When scanning large datasets, it may take many scan calls to go through all the data\&. When networking has limited bandwidth, or large latencies it may be desirable to do more work per call on the server side to reduce traffic\&. However, the cost of larger COUNT values is that it may increase server latencies for other queries\&.
 .PP

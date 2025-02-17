@@ -310,7 +310,7 @@ redisxGetInfoAsync()
 .PP
 
 .PP
-References \fBrConsumeInfoReply()\fP, \fBredisxDestroyRESP()\fP, \fBredisxRequest()\fP, \fBX_SUCCESS\fP, and \fBx_trace_null()\fP\&.
+References \fBrConsumeInfoReply()\fP, \fBredisxRequest()\fP, \fBX_SUCCESS\fP, and \fBx_trace_null()\fP\&.
 .SS "enum \fBredisx_protocol\fP redisxGetProtocol (\fBRedis\fP * redis)"
 Returns the actual protocol used with the \fBRedis\fP server\&. If HELLO was used during connection it will be the protocol that was confirmed in the response of HELLO (and which hopefully matches the protocol requested)\&. Otherwise, RedisX will default to RESP2\&.
 .PP

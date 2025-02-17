@@ -272,12 +272,13 @@
           <topic label="redisxRESP2JSON" href="redisx_8h.html#a7f4e74ee03cebf38eb9c1fb873784a35"/>
           <topic label="redisxRESP2XField" href="redisx_8h.html#adc7235cd1b6be038b9f3c7beb11a13ef"/>
           <topic label="redisxRunScript" href="redisx_8h.html#aebd84c84082d2367d8cbe233cfe14535"/>
-          <topic label="redisxScanKeys" href="redisx_8h.html#a67dd05115ae75dac9637ac04220d73b6"/>
-          <topic label="redisxScanTable" href="redisx_8h.html#a47d28fd9f2f35f0af5abd67a1ae7b987"/>
+          <topic label="redisxScanKeys" href="redisx_8h.html#a2536b2244c4d05ca5d595ed00826abd4"/>
+          <topic label="redisxScanTable" href="redisx_8h.html#a838e534835b9b345925e652e3b053815"/>
           <topic label="redisxSelectDB" href="redisx_8h.html#aec99fb8b19d6751038bf9c4c6d04f8d0"/>
           <topic label="redisxSendArrayRequestAsync" href="redisx_8h.html#a9b869bd8912f647f4abe5c98abf3a88d"/>
           <topic label="redisxSendRequestAsync" href="redisx_8h.html#afc7b28288c07baf0b3c8fdc9d8ddf263"/>
           <topic label="redisxSetDHCipherParams" href="redisx_8h.html#ab1f40a05c3c74c55f0f92066cbc7db09"/>
+          <topic label="redisxSetHostname" href="redisx_8h.html#a16a0aa9545e7dd5fd290dd2b4ee968f1"/>
           <topic label="redisxSetMutualTLS" href="redisx_8h.html#ad62a82cdab6e2fd11da87b1bdcc1604b"/>
           <topic label="redisxSetPassword" href="redisx_8h.html#a0e9eda38aa6f084ac151cbebe2886c2f"/>
           <topic label="redisxSetPipelineConsumer" href="redisx_8h.html#a0799a0a79705d1a7579bdf57879d1fec"/>
@@ -401,8 +402,8 @@
           <topic label="redisxGetValue" href="redisx-tab_8c.html#a01bf1f5d830d1af19456ab78457a54ab"/>
           <topic label="redisxMultiSet" href="redisx-tab_8c.html#aa8fd65a355394af08c86b4f0e943d3a6"/>
           <topic label="redisxMultiSetAsync" href="redisx-tab_8c.html#a750023f759dd5192dd3c802a542af770"/>
-          <topic label="redisxScanKeys" href="redisx-tab_8c.html#a67dd05115ae75dac9637ac04220d73b6"/>
-          <topic label="redisxScanTable" href="redisx-tab_8c.html#a47d28fd9f2f35f0af5abd67a1ae7b987"/>
+          <topic label="redisxScanKeys" href="redisx-tab_8c.html#a2536b2244c4d05ca5d595ed00826abd4"/>
+          <topic label="redisxScanTable" href="redisx-tab_8c.html#a838e534835b9b345925e652e3b053815"/>
           <topic label="redisxSetScanCount" href="redisx-tab_8c.html#a3bd0d2964966ed6655358ff2fe0802c0"/>
           <topic label="redisxSetValue" href="redisx-tab_8c.html#a1465b1a965ddd685e16bccbf0b34f08b"/>
           <topic label="redisxSetValueAsync" href="redisx-tab_8c.html#a9e784632598b0c418a3ae3a87aa09fe4"/>
@@ -445,7 +446,6 @@
           <topic label="redisxSetVerbose" href="redisx_8c.html#a11454a2359f43b6fd024d25a8148644e"/>
         </topic>
         <topic label="resp.c" href="resp_8c.html">
-          <topic label="_DEFAULT_SOURCE" href="resp_8c.html#a8fb447618db946a9e2a596d9ea18763f"/>
           <topic label="redisxAppendRESP" href="resp_8c.html#aea5830b9c06c6603c0fc04bf10238b83"/>
           <topic label="redisxCheckDestroyRESP" href="resp_8c.html#a80d5a305523c51da7bc7cf4c9deca962"/>
           <topic label="redisxCheckRESP" href="resp_8c.html#a4b5674d08da07250c0ca6116a4c48ccf"/>
@@ -470,8 +470,7 @@
     </topic>
     <topic label="Globals" href="globals.html">
       <topic label="All" href="globals.html">
-        <topic label="_" href="globals.html"/>
-        <topic label="r" href="globals_r.html"/>
+        <topic label="r" href="globals.html"/>
         <topic label="s" href="globals_s.html"/>
       </topic>
       <topic label="Functions" href="globals_func.html">

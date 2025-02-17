@@ -423,10 +423,10 @@ include/redisx.h
 .RI "\fBRESP\fP * \fBredisxRunScript\fP (\fBRedis\fP *redis, const char *sha1, const char **keys, const char **params, int *status)"
 .br
 .ti -1c
-.RI "char ** \fBredisxScanKeys\fP (\fBRedis\fP *redis, const char *pattern, int *n, int *status)"
+.RI "char ** \fBredisxScanKeys\fP (\fBRedis\fP *redis, const char *pattern, int *n)"
 .br
 .ti -1c
-.RI "\fBRedisEntry\fP * \fBredisxScanTable\fP (\fBRedis\fP *redis, const char *table, const char *pattern, int *n, int *status)"
+.RI "\fBRedisEntry\fP * \fBredisxScanTable\fP (\fBRedis\fP *redis, const char *table, const char *pattern, int *n)"
 .br
 .ti -1c
 .RI "int \fBredisxSelectDB\fP (\fBRedis\fP *redis, int idx)"
@@ -439,6 +439,9 @@ include/redisx.h
 .br
 .ti -1c
 .RI "int \fBredisxSetDHCipherParams\fP (\fBRedis\fP *redis, const char *dh_params_file)"
+.br
+.ti -1c
+.RI "int \fBredisxSetHostname\fP (\fBRedis\fP *redis, const char *host)"
 .br
 .ti -1c
 .RI "int \fBredisxSetMutualTLS\fP (\fBRedis\fP *redis, const char *cert_file, const char *key_file)"
@@ -1713,7 +1716,7 @@ redisxGetInfoAsync()
 .PP
 
 .PP
-References \fBrConsumeInfoReply()\fP, \fBredisxDestroyRESP()\fP, \fBredisxRequest()\fP, \fBX_SUCCESS\fP, and \fBx_trace_null()\fP\&.
+References \fBrConsumeInfoReply()\fP, \fBredisxRequest()\fP, \fBX_SUCCESS\fP, and \fBx_trace_null()\fP\&.
 .SS "char ** redisxGetKeys (\fBRedis\fP * redis, const char * table, int * n)"
 Returns all the key names stored in a given hash table
 .PP
@@ -2831,7 +2834,7 @@ The response received from the script or the EVALSHA request, or NULL if there w
 
 .PP
 References \fBredisxArrayRequest()\fP, \fBredisxCheckValid()\fP, \fBx_error()\fP, \fBX_NULL\fP, \fBX_SUCCESS\fP, and \fBx_trace_null()\fP\&.
-.SS "char ** redisxScanKeys (\fBRedis\fP * redis, const char * pattern, int * n, int * status)"
+.SS "char ** redisxScanKeys (\fBRedis\fP * redis, const char * pattern, int * n)"
 Returns an alphabetical list of the \fBRedis\fP keys using the \fBRedis\fP SCAN command\&. Because it uses the scan command, it is guaranteed to not hog the database for excessive periods, and hence it is preferable to redisxGetKeys(table=NULL)\&.
 .PP
 Some data may be returned even if there was an error, and the caller is responsible for cleaning up the returned srotage elements\&.
@@ -2844,12 +2847,10 @@ The caller may adjust the amount of work performed in each scan call via the \fB
 .br
 \fIpattern\fP keyword pattern to match, or NULL for all keys\&. 
 .br
-\fIn\fP Pointer to the integer in which the number of elements 
-.br
-\fIstatus\fP integer in which to return the status, which is X_SUCCESS (0) if successful, or may an error value from \fBredisxRequest()\fP, or:
+\fIn\fP Pointer to the integer in which the number of elements (>=0), or else an error code (<0), such as:
 .RE
 .PP
-X_NULL If one of the arguments is NULL REDIS_NULL If got a null or empty response from \fBRedis\fP UNEXPECTED_RESP If the response from \fBRedis\fP was not the expected array type
+X_NULL If one of the arguments is NULL REDIS_NULL If got a null or empty response from \fBRedis\fP UNEXPECTED_RESP If the response from \fBRedis\fP was not the expected array type lt 
 .PP
 \fBReturns\fP
 .RS 4
@@ -2867,8 +2868,8 @@ An array with pointers to key names from this table or NULL\&.
 .PP
 
 .PP
-References \fBRESP::n\fP, \fBredisxArrayRequest()\fP, \fBredisxCheckRESP()\fP, \fBredisxDestroyRESP()\fP, \fBredisxGetScanCount()\fP, \fBRESP_ARRAY\fP, \fBRESP_BULK_STRING\fP, \fBSCAN_INITIAL_STORE_CAPACITY\fP, \fBRESP::value\fP, \fBx_error()\fP, \fBX_NULL\fP, \fBX_SUCCESS\fP, \fBx_trace()\fP, \fBxStringCopyOf()\fP, and \fBxvprintf\fP\&.
-.SS "\fBRedisEntry\fP * redisxScanTable (\fBRedis\fP * redis, const char * table, const char * pattern, int * n, int * status)"
+References \fBRESP::n\fP, \fBredisxArrayRequest()\fP, \fBredisxCheckRESP()\fP, \fBredisxDestroyKeys()\fP, \fBredisxDestroyRESP()\fP, \fBredisxGetScanCount()\fP, \fBRESP_ARRAY\fP, \fBRESP_BULK_STRING\fP, \fBSCAN_INITIAL_STORE_CAPACITY\fP, \fBRESP::value\fP, \fBx_error()\fP, \fBX_SUCCESS\fP, \fBx_trace_null()\fP, \fBxStringCopyOf()\fP, and \fBxvprintf\fP\&.
+.SS "\fBRedisEntry\fP * redisxScanTable (\fBRedis\fP * redis, const char * table, const char * pattern, int * n)"
 Returns an alphabetical list of the \fBRedis\fP hash table data using the \fBRedis\fP HSCAN command\&. Because it uses the scan command, it is guaranteed to not hog the database for excessive periods, and hence it is preferable to \fBredisxGetTable()\fP\&.
 .PP
 Some data may be returned even if there was an error, and the caller is responsible for cleaning up the returned srotage elements\&.
@@ -2883,12 +2884,10 @@ The caller may adjust the amount of work performed in each scan call via the \fB
 .br
 \fIpattern\fP keyword pattern to match, or NULL for all keys\&. 
 .br
-\fIn\fP Pointer to the integer in which the number of elements 
-.br
-\fIstatus\fP integer in which to return the status, which is X_SUCCESS (0) if successful, or may an error value from \fBredisxRequest()\fP, or:
+\fIn\fP Pointer to the integer in which the number of elements (>=0) or else an error code (<0), such as:
 .RE
 .PP
-X_NULL If one of the arguments is NULL REDIS_NULL If got a null or empty response from \fBRedis\fP UNEXPECTED_RESP If the response from \fBRedis\fP was not the expected array type
+X_NULL if one of the arguments is NULL X_GROUP_INVALID if the table name is empty REDIS_NULL if got a null or empty response from \fBRedis\fP UNEXPECTED_RESP if the response from \fBRedis\fP was not the expected array type
 .PP
 \fBReturns\fP
 .RS 4
@@ -2906,7 +2905,7 @@ A \fBRedisEntry\fP[] array or NULL\&.
 .PP
 
 .PP
-References \fBRedisEntry::key\fP, \fBRedisEntry::length\fP, \fBRESP::n\fP, \fBredisxArrayRequest()\fP, \fBredisxCheckRESP()\fP, \fBredisxDestroyRESP()\fP, \fBredisxGetScanCount()\fP, \fBRESP_ARRAY\fP, \fBRESP_BULK_STRING\fP, \fBSCAN_INITIAL_STORE_CAPACITY\fP, \fBRESP::value\fP, \fBRedisEntry::value\fP, \fBx_error()\fP, \fBX_GROUP_INVALID\fP, \fBX_NULL\fP, \fBX_SUCCESS\fP, \fBx_trace()\fP, \fBxStringCopyOf()\fP, and \fBxvprintf\fP\&.
+References \fBRedisEntry::key\fP, \fBRedisEntry::length\fP, \fBRESP::n\fP, \fBredisxArrayRequest()\fP, \fBredisxCheckRESP()\fP, \fBredisxDestroyEntries()\fP, \fBredisxDestroyRESP()\fP, \fBredisxGetScanCount()\fP, \fBRESP_ARRAY\fP, \fBRESP_BULK_STRING\fP, \fBSCAN_INITIAL_STORE_CAPACITY\fP, \fBRESP::value\fP, \fBRedisEntry::value\fP, \fBx_error()\fP, \fBX_GROUP_INVALID\fP, \fBX_NULL\fP, \fBX_SUCCESS\fP, \fBx_trace_null()\fP, \fBxStringCopyOf()\fP, and \fBxvprintf\fP\&.
 .SS "int redisxSelectDB (\fBRedis\fP * redis, int idx)"
 Switches to another database index on the \fBRedis\fP server\&. Note that you cannot change the database on an active PUB/SUB channel, hence the call will return X_INCOMPLETE if attempted\&. You should instead switch DB when there are no active subscriptions\&.
 .PP
@@ -3033,6 +3032,31 @@ X_SUCCESS (0) if successful, or else an error code <0\&.
 
 .PP
 References \fBx_error()\fP, \fBX_FAILURE\fP, \fBX_SUCCESS\fP, and \fBxStringCopyOf()\fP\&.
+.SS "int redisxSetHostname (\fBRedis\fP * redis, const char * host)"
+Changes the host name for the \fBRedis\fP server, prior to calling \fC\fBredisxConnect()\fP\fP\&.
+.PP
+\fBParameters\fP
+.RS 4
+\fIredis\fP Pointer to a \fBRedis\fP instance\&. 
+.br
+\fIhost\fP New host name or IP address to use\&.
+.RE
+.PP
+\fBReturns\fP
+.RS 4
+X_SUCCESS (0) if successful, or else X_NULL if the redis instance or the host name is NULL, or X_NO_INIT if the redis instance is not initialized, X_ALREADY_OPEN if the redis instance is currently in a connected state, or X_FAILURE if \fBRedis\fP was initialized in Sentinel configuration\&.
+.RE
+.PP
+\fBSee also\fP
+.RS 4
+\fBredisxSetPort()\fP 
+.PP
+\fBredisxConnect()\fP 
+.RE
+.PP
+
+.PP
+References \fBredisxIsConnected()\fP, \fBrSetServerAsync()\fP, \fBX_ALREADY_OPEN\fP, \fBx_error()\fP, \fBX_FAILURE\fP, \fBX_NULL\fP, and \fBX_SUCCESS\fP\&.
 .SS "int redisxSetMutualTLS (\fBRedis\fP * redis, const char * cert_file, const char * key_file)"
 Set a TLS certificate and private key for mutual TLS\&. You will still need to call \fBredisxSetTLS()\fP also to create a complete TLS configuration\&. \fBRedis\fP normally uses mutual TLS, which requires both the client and the server to authenticate themselves\&. For this you need the server's TLS certificate and private key also\&. It is possible to configure \fBRedis\fP servers to verify one way only with a CA certificate, in which case you don't need to call this to configure the client\&.
 .PP
