@@ -86,7 +86,7 @@ var NAVTREE =
       ] ],
       [ "Debug support", "index.html#autotoc_md62", null ],
       [ "Future plans", "index.html#autotoc_md64", null ],
-      [ "[1.0.0-rc1] - 2025-01-13", "../../xchange/apidoc/html/md_CHANGELOG.html#autotoc_md1", null ]
+      [ "[1.0.0-rc2] - 2025-03-11", "../../xchange/apidoc/html/md_CHANGELOG.html#autotoc_md1", null ]
     ] ],
     [ "Contributing to RedisX", "../../xchange/apidoc/html/md_CONTRIBUTING.html", null ],
     [ "Data Structures", "annotated.html", [

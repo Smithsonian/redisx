@@ -1,6 +1,6 @@
 var searchData=
 [
-  ['rc1_202025_2001_2013_0',['[1.0.0-rc1] - 2025-01-13',['../md_CHANGELOG.html#autotoc_md1',1,'']]],
+  ['rc2_202025_2003_2011_0',['[1.0.0-rc2] - 2025-03-11',['../md_CHANGELOG.html#autotoc_md1',1,'']]],
   ['rcloseclientasync_1',['rCloseClientAsync',['../redisx-net_8c.html#abc9dd988935375c5459bcaa09c17fa47',1,'redisx-net.c']]],
   ['rconnectasync_2',['rConnectAsync',['../redisx-net_8c.html#ad4065e4f45daee4c9a4ce04e11a8cc11',1,'redisx-net.c']]],
   ['rconsumeinforeply_3',['rConsumeInfoReply',['../redisx_8c.html#a2fdb234e05f16fb004b34bc016ba9d99',1,'redisx.c']]],
