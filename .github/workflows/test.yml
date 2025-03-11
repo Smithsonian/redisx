@@ -69,3 +69,56 @@ jobs:
     - name: Run tests
       run: make test
 
+  test-platforms:
+    name: ${{ matrix.arch }}
+    # The host should always be linux
+    runs-on: ubuntu-latest
+
+    # Run steps on a matrix of 4 arch/distro combinations
+    strategy:
+      matrix:
+        include:
+          - arch: armv7
+            distro: ubuntu_latest
+# ! Can't connect to redis server on aarch64, for some reason...
+#          - arch: aarch64
+#           distro: ubuntu_latest
+          - arch: riscv64
+            distro: ubuntu_latest
+          - arch: s390x
+            distro: ubuntu_latest
+          - arch: ppc64le
+            distro: ubuntu_latest
+    steps:
+      - name: Check out RedisX
+        uses: actions/checkout@v4
+        
+      - name: Check out xchange 
+        uses: actions/checkout@v4
+        with:
+          repository: Smithsonian/xchange
+          path: xchange
+          
+      - uses: uraimo/run-on-arch-action@v3
+        name: Run regression tests
+        id: test
+        with:
+          arch: ${{ matrix.arch }}
+          distro: ${{ matrix.distro }}
+          env: |
+            CC: gcc
+            CFLAGS: -Os -Wall -Wextra -Werror -std=c99
+            LIB: ${{ github.workspace }}/lib
+            LD_LIBRARY_PATH: ${{ github.workspace }}/lib
+            XCHANGE: ${{ github.workspace }}/xchange
+          install: |
+            apt-get update -q -y
+            apt-get install -q -y make gcc libpopt-dev libreadline-dev libbsd-dev libssl-dev redis
+            sed -i "s:^protected mode[[:blank:]]*yes:protected mode no:g" /etc/redis/redis.conf
+          run: |
+            service redis-server start
+            make -C xchange shared
+            make tools
+            make test
+            bin/redisx-cli hello
+
