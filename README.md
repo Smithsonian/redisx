@@ -1,4 +1,5 @@
 ![Build Status](https://github.com/Smithsonian/redisx/actions/workflows/build.yml/badge.svg)
+![Test Status](https://github.com/Smithsonian/redisx/actions/workflows/test.yml/badge.svg)
 ![Static Analysis](https://github.com/Smithsonian/redisx/actions/workflows/analyze.yml/badge.svg)
 <a href="https://smithsonian.github.io/redisx/apidoc/html/files.html">
  ![API documentation](https://github.com/Smithsonian/redisx/actions/workflows/dox.yml/badge.svg)
