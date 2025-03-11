@@ -889,8 +889,9 @@ XLookupTable *rConsumeInfoReply(RESP *reply) {
     line = strtok(NULL, "\r\n");
   }
 
-  lookup = xCreateLookup(s, FALSE);
   redisxDestroyRESP(reply);
+
+  lookup = xCreateLookup(s, FALSE);
   free(s);
 
   return lookup;
