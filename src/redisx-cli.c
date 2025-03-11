@@ -100,7 +100,9 @@ static void printResult(const RESP *reply, const RESP *attr, const RESP *push) {
    }
 }
 
-static void *ListenerThread() {
+static void *ListenerThread(void *nil) {
+  (void) nil;
+
   while(TRUE) {
     struct timespec nap;
 
