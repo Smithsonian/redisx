@@ -58,7 +58,7 @@ jobs:
       run: sudo apt-get install redis
 
     - name: Configure Redis
-      run: sudo sed -i "s:^protected mode\s*yes:protected mode no:g" /etc/redis/redis.conf
+      run: sudo sed -i "s:^protected mode[[:blank:]]*yes:protected mode no:g" /etc/redis/redis.conf
       
     - name: Start Redis
       run: sudo systemctl start redis-server
