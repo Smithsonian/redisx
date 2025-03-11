@@ -1,0 +1,71 @@
+name: Tests
+
+on: 
+  push:
+    branches:
+      - main
+    paths:
+      - 'src/**'
+      - 'test/**'
+      - 'include/**'
+      - 'Makefile'
+      - '*.mk'
+      - '.github/workflows/test.yml'
+
+  pull_request:
+    paths:
+      - 'src/**'
+      - 'test/**'
+      - 'include/**'
+      - 'Makefile'
+      - '*.mk'
+      - '.github/workflows/test.yml'
+
+jobs:
+
+  build:
+    name: Regression Tests
+
+    runs-on: ubuntu-latest
+    env:
+      CC: gcc
+      CFLAGS: -Os -Wall -Wextra -Werror -std=c99
+      LIB: ${{ github.workspace }}/lib
+      LD_LIBRARY_PATH: ${{ github.workspace }}/lib
+    steps:
+    - name: Check out RedisX
+      uses: actions/checkout@v4
+
+    - name: Check out xchange 
+      uses: actions/checkout@v4
+      with:
+        repository: Smithsonian/xchange
+        path: xchange
+
+    - name: Install build dependencies
+      run: sudo apt-get install libpopt-dev libreadline-dev libbsd-dev libssl-dev
+
+    - name: Build xchange dependency
+      run: make -C xchange shared
+
+    - name: Install xchange dependency
+      run: sudo make -C xchange install
+
+    - name: Build shared library and cli
+      run: make tools
+
+    - name: Install Redis
+      run: sudo apt-get install redis
+
+    - name: Configure Redis
+      run: sudo sed -i "s:^protected mode\s*yes:protected mode no:g" /etc/redis/redis.conf
+      
+    - name: Start Redis
+      run: sudo systemctl start redis-server
+
+    - name: Check redisx-cli hello
+      run: bin/redisx-cli hello
+
+    - name: Run tests
+      run: make test
+
