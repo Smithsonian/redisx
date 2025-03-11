@@ -251,7 +251,7 @@ The __RedisX__ library provides its own command-line tool, called `redisx-cli`. 
 except that our client has somewhat fewer bells and whistles.
 
 ```bash
- $ redisx-cli ping "Hello World"
+ $ redisx-cli ping "Hello World!"
 ```
 will print:
 
@@ -1673,4 +1673,4 @@ If you have an idea for a must have feature, please let me (Attila) know. Pull r
 existing ones, are especially welcome! 
  
 -----------------------------------------------------------------------------
-Copyright (C) 2024 Attila Kovács
+Copyright (C) 2025 Attila Kovács
