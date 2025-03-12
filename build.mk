@@ -26,7 +26,7 @@ $(LIB)/%.a:
 	ranlib $@
 
 # Simple binaries
-$(BIN)/%: $(OBJ)/%.o
+$(BIN)/%: $(OBJ)/%.o $(LIBREDISX)
 	@$(MAKE) $(BIN)
 	$(CC) -o $@ $< $(LDFLAGS) -lpopt -lredisx
 

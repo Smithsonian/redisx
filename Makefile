@@ -28,19 +28,12 @@ else
   $(info WARNING! Doxygen is not availafitfggible. Will skip 'dox' target) 
 endif
 
-# Build static or shared libs
-ifeq ($(STATICLINK),1)
-  LIBSTYLE = static
-else
-  LIBSTYLE = shared
-endif
-
 # Link against thread libs
 LDFLAGS += -lpthread
 
 # Build for distribution
 .PHONY: distro
-distro: $(LIBSTYLE) tools $(DOC_TARGETS)
+distro: $(LIBREDISX) tools $(DOC_TARGETS)
 
 # Build everything...
 .PHONY: all
@@ -111,7 +104,6 @@ $(LIB)/libredisx.a: $(OBJECTS)
 
 # redisx-cli assitional link libraries...
 $(BIN)/redisx-cli: LDFLAGS += -lreadline -lbsd
-$(BIN)/redisx-cli: $(LIBSTYLE)
 
 README-redisx.md: README.md
 	LINE=`sed -n '/\# /{=;q;}' $<` && tail -n +$$((LINE+2)) $< > $@

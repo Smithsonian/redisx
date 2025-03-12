@@ -118,6 +118,14 @@ ifdef XCHANGE
   LDFLAGS += -L$(XCHANGE)/lib
 endif
 
+# Build static or shared libs
+ifeq ($(STATICLINK),1)
+  LIBREDISX = $(LIB)/libredisx.a
+else
+  LIBREDISX = $(LIB)/libredisx.so
+endif
+
+
 # Search for files in the designated locations
 vpath %.h $(INC)
 vpath %.c $(SRC)
