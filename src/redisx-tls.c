@@ -206,15 +206,15 @@ int rConnectTLSClientAsync(ClientPrivate *cp, const TLSConfig *tls) {
     }
   }
 
-  if(tls->ciphers) if(!SSL_CTX_set_cipher_list(cp->ctx, tls->ciphers)) {
-    x_error(0, errno, fn, "Failed to set ciphers %s", tls->ciphers);
-    goto abort; // @suppress("Goto statement used")
-  }
-
 #if OPENSSL_VERSION_NUMBER >= 0x1010100f
   // Since OpenSSL version 1.1.1
   if(tls->cipher_suites) if(!SSL_CTX_set_ciphersuites(cp->ctx, tls->cipher_suites)) {
     x_error(0, errno, fn, "Failed to set ciphers= suites %s", tls->ciphers);
+    goto abort; // @suppress("Goto statement used")
+  }
+#else
+  if(tls->ciphers) if(!SSL_CTX_set_cipher_list(cp->ctx, tls->ciphers)) {
+    x_error(0, errno, fn, "Failed to set ciphers %s", tls->ciphers);
     goto abort; // @suppress("Goto statement used")
   }
 #endif
@@ -391,7 +391,9 @@ int redisxSetMutualTLS(Redis *redis, const char *cert_file, const char *key_file
 }
 
 /**
- * Sets the TLS ciphers to try (TLSv1.2 and earlier).
+ * Sets the TLS ciphers to try (TLSv1.2 and earlier). This function will return an error (-1) if
+ * RedisX is built against OpenSSL >= 1.1.1, for which `redisxSetTLSCipherSuites()` should be used
+ * instead.
  *
  * @param redis            A Redis instance.
  * @param cipher_list      a colon (:) separated list of ciphers, or NULL for default ciphers.
@@ -400,11 +402,13 @@ int redisxSetMutualTLS(Redis *redis, const char *cert_file, const char *key_file
  * @sa redisxSetTLSCipherSuites()
  * @sa redisxSetTLS()
  * @sa redisxSetDHCipherParams()
+ *
+ * @deprecated For OpenSSL >= 1.1.1, `redisxSetTLSCipherSuites()` should be used instead.
  */
 int redisxSetTLSCiphers(Redis *redis, const char *cipher_list) {
   static const char *fn = "redisxSetTLSCiphers";
 
-#if WITH_TLS
+#if WITH_TLS && OPENSSL_VERSION_NUMBER < 0x1010100f
   RedisPrivate *p;
   TLSConfig *tls;
 
@@ -419,6 +423,11 @@ int redisxSetTLSCiphers(Redis *redis, const char *cipher_list) {
   rConfigUnlock(redis);
 
   return X_SUCCESS;
+#elif WITH_TLS
+  (void) redis;
+  (void) cipher_list;
+
+  return x_error(X_FAILURE, ENOSYS, fn, "Deprecated starting SSL 1.1.1. Use redisxSetTLSCipherSuites() instead.");
 #else
   (void) redis;
   (void) cipher_list;

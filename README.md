@@ -55,11 +55,11 @@ Last Updated: 8 January 2025
  - [Features overview](#redisx-features)
  - [Related links](#redisx-related-links)
 
-__RedisX__ is a free, light-weight [Redis](https://redis.io) client library for C/C++. As such, it should work with 
-Redis forks / clones like [Dragonfly](https://dragonfly.io) or [Valkey](https://valkey.io) also. It supports both 
-interactive and pipelined Redis queries, managing and processing subscriptions, atomic execution blocks, and LUA 
-scripts loading. It can be used with multiple Redis servers simultaneously also. __RedisX__ is free to use, in any 
-way you like, without licensing restrictions.
+__RedisX__ is a free, light-weight [Redis](https://redis.io) client library for C/C++. It works with Redis forks / 
+clones like [Dragonfly](https://dragonfly.io) or [Valkey](https://valkey.io) also. It supports both interactive and 
+pipelined Redis queries, managing and processing subscriptions, atomic execution blocks, and LUA scripts loading. It 
+can be used with multiple Redis servers simultaneously also. __RedisX__ is free to use, in any way you like, without 
+licensing restrictions.
 
 While there are other C/C++ Redis clients available, this one is C99 compatible, and hence can be used on older 
 platforms also. It is also small and fast, but still capable and versatile.
