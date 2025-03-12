@@ -56,7 +56,7 @@ static: $(LIB)/libredisx.a
 
 # Command-line tools
 .PHONY: tools
-tools: $(LIBSTYLE) $(BIN)/redisx-cli
+tools: $(BIN)/redisx-cli
 
 # Examples
 .PHONY: examples
@@ -111,6 +111,7 @@ $(LIB)/libredisx.a: $(OBJECTS)
 
 # redisx-cli assitional link libraries...
 $(BIN)/redisx-cli: LDFLAGS += -lreadline -lbsd
+$(BIN)/redisx-cli: $(LIBSTYLE)
 
 README-redisx.md: README.md
 	LINE=`sed -n '/\# /{=;q;}' $<` && tail -n +$$((LINE+2)) $< > $@

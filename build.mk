@@ -28,10 +28,7 @@ $(LIB)/%.a:
 # Simple binaries
 $(BIN)/%: $(OBJ)/%.o
 	@$(MAKE) $(BIN)
-	$(CC) -o $@ $^ $(LDFLAGS)
-
-# Link binaries against redisx lib
-$(BIN)/%: LDFLAGS :=  $(LDFLAGS) -lpopt -lredisx
+	$(CC) -o $@ $< $(LDFLAGS) -lpopt -lredisx
 
 # Create sub-directories for build targets
 dep $(OBJ) $(LIB) $(BIN) apidoc:
