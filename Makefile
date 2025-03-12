@@ -28,12 +28,19 @@ else
   $(info WARNING! Doxygen is not availafitfggible. Will skip 'dox' target) 
 endif
 
-# Link against thread lib
+# Build static or shared libs
+ifeq ($(STATICLINK),1)
+  LIBSTYLE = static
+else
+  LIBSTYLE = shared
+endif
+
+# Link against thread libs
 LDFLAGS += -lpthread
 
 # Build for distribution
 .PHONY: distro
-distro: tools $(DOC_TARGETS)
+distro: $(LIBSTYLE) tools $(DOC_TARGETS)
 
 # Build everything...
 .PHONY: all
@@ -49,16 +56,7 @@ static: $(LIB)/libredisx.a
 
 # Command-line tools
 .PHONY: tools
-
-# Link binaries against the static or shared libs
-ifeq ($(STATICLINK),1)
-tools: static
-else
-tools: shared
-endif
-
-# The actual tools to build
-tools: $(BIN)/redisx-cli
+tools: $(LIBSTYLE) $(BIN)/redisx-cli
 
 # Examples
 .PHONY: examples
