@@ -7,6 +7,8 @@
  *   Network layer management functions for the RedisX library.
  */
 
+#define _POSIX_C_SOURCE 200112L   ///< for getaddrinfo()
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
@@ -20,8 +22,9 @@
 #  include <socket.h>
 #  include <time.h>
 #else
-#include <sys/time.h>
+#  include <sys/time.h>
 #  include <netinet/ip.h>
+#  include <sys/types.h>    // getaddrinfo()
 #  include <sys/socket.h>
 #  include <fnmatch.h>
 #endif
@@ -72,25 +75,49 @@ static pthread_mutex_t serverLock = PTHREAD_MUTEX_INITIALIZER;
 static int hostnameToIP(const char *hostName, char *ip) {
   static const char *fn = "hostnameToIP";
 
-  struct hostent *h;
+  *ip = '\0';
+
+  if(hostName == NULL) return x_error(X_NULL, EINVAL, fn, "input hostName is NULL");
+  if(!hostName[0]) return x_error(X_NULL, EINVAL, fn, "input hostName is empty");
+
+#if __linux__
+  struct addrinfo *infList, *inf;
+
+  if(getaddrinfo(hostName, NULL, NULL, &infList) != 0)
+    return x_error(X_NAME_INVALID, errno, fn, "host lookup failed for: %s.", hostName);
+
+  for(inf = infList; inf != NULL; inf = inf->ai_next)
+    if(inf->ai_family == AF_INET && inf->ai_addrlen >= sizeof(struct in_addr)) break;
+
+  if(!inf || !inf->ai_addr) {
+    freeaddrinfo(infList);
+    return x_error(X_NAME_INVALID, errno, fn, "host has no address: %s.", hostName);
+  }
+
+  strcpy(ip, inet_ntoa(((struct sockaddr_in *) inf->ai_addr)->sin_addr));
+  freeaddrinfo(inf);
+
+  return X_SUCCESS;
+
+#else
+  const struct hostent  *server;
   struct in_addr **addresses;
   int i;
 
-  *ip = '\0';
-  if(hostName == NULL) return x_error(X_NULL, EINVAL, fn, "input hostName is NULL");
-
-  if ((h = gethostbyname((char *) hostName)) == NULL)
+  server = gethostbyname((char *) hostName);
+  if (server == NULL)
     return x_error(X_NAME_INVALID, errno, fn, "host lookup failed for: %s.", hostName);
 
   addresses = (struct in_addr **) h->h_addr_list;
 
   for(i = 0; addresses[i] != NULL; i++) {
-    //Return the first one;
+    // Return the first one...
     strcpy(ip, inet_ntoa(*addresses[i]));
     return X_SUCCESS;
   }
 
   return x_error(X_NULL, ENODEV, fn, "no valid address for host %s", hostName);
+#endif
 }
 
 /**
