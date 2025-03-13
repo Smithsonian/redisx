@@ -79,7 +79,7 @@ static int hostnameToIP(const char *hostName, char *ip) {
   // getaddrinfo() is POSIX-1.2001, so it appears in GCC 3.0, more or less...
   struct addrinfo *infList, *inf;
 #  else
-  // For non-GCC or earlier GCC use gethostbyname() instead.
+  // For earlier GCC use gethostbyname() instead.
   const struct hostent  *server;
   struct in_addr **addresses;
   int i;
