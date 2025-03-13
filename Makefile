@@ -37,7 +37,7 @@ distro: $(LIBREDISX) tools $(DOC_TARGETS)
 
 # Build everything...
 .PHONY: all
-all: shared static tools examples $(DOC_TARGETS) check
+all: $(LIBREDISX) tools examples $(DOC_TARGETS) check
 
 # Shared libraries (versioned and unversioned)
 .PHONY: shared
@@ -53,7 +53,7 @@ tools: $(BIN)/redisx-cli
 
 # Examples
 .PHONY: examples
-examples: shared
+examples: $(LIBREDISX)
 	$(MAKE) -f examples.mk
 
 # Run regression tests
@@ -68,7 +68,7 @@ check: test analyze
 # Static code analysis via Facebook's infer
 .PHONY: infer
 infer: clean
-	infer run -- $(MAKE) shared
+	infer run -- $(MAKE) $(LIBREDISX)
 
 # Remove intermediates
 .PHONY: clean

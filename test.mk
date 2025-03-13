@@ -42,7 +42,7 @@ else
 	$(BIN)/redisx-cli --help
 endif
 
-$(BIN)/test-%: $(OBJ)/test-%.o $(LIB)/libredisx.a
+$(BIN)/test-%: $(OBJ)/test-%.o $(LIBREDISX)
 	$(MAKE) $(BIN)
 	$(CC) -o $@ $^ $(LDFLAGS) -lredisx
 
