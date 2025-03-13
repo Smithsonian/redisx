@@ -75,14 +75,22 @@ static pthread_mutex_t serverLock = PTHREAD_MUTEX_INITIALIZER;
 static int hostnameToIP(const char *hostName, char *ip) {
   static const char *fn = "hostnameToIP";
 
+#  if !defined(__GNUC__) || __GNUC__ >= 3
+  // getaddrinfo() is POSIX-1.2001, so it appears in GCC 3.0, more or less...
+  struct addrinfo *infList, *inf;
+#  else
+  // For non-GCC or earlier GCC use gethostbyname() instead.
+  const struct hostent  *server;
+  struct in_addr **addresses;
+  int i;
+#  endif
+
   *ip = '\0';
 
   if(hostName == NULL) return x_error(X_NULL, EINVAL, fn, "input hostName is NULL");
   if(!hostName[0]) return x_error(X_NULL, EINVAL, fn, "input hostName is empty");
 
-#if __linux__
-  struct addrinfo *infList, *inf;
-
+#  if !defined(__GNUC__) || __GNUC__ >= 3
   if(getaddrinfo(hostName, NULL, NULL, &infList) != 0)
     return x_error(X_NAME_INVALID, errno, fn, "host lookup failed for: %s.", hostName);
 
@@ -98,17 +106,12 @@ static int hostnameToIP(const char *hostName, char *ip) {
   freeaddrinfo(inf);
 
   return X_SUCCESS;
-
 #else
-  const struct hostent  *server;
-  struct in_addr **addresses;
-  int i;
-
   server = gethostbyname((char *) hostName);
   if (server == NULL)
     return x_error(X_NAME_INVALID, errno, fn, "host lookup failed for: %s.", hostName);
 
-  addresses = (struct in_addr **) h->h_addr_list;
+  addresses = (struct in_addr **) server->h_addr_list;
 
   for(i = 0; addresses[i] != NULL; i++) {
     // Return the first one...
