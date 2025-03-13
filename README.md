@@ -57,17 +57,17 @@ Last Updated: 8 January 2025
 
 __RedisX__ is a free, light-weight [Redis](https://redis.io) client library for C/C++. It works with Redis forks / 
 clones like [Dragonfly](https://dragonfly.io) or [Valkey](https://valkey.io) also. It supports both interactive and 
-pipelined Redis queries, managing and processing subscriptions, atomic execution blocks, and LUA scripts loading. It 
-can be used with multiple Redis servers simultaneously also. __RedisX__ is free to use, in any way you like, without 
-licensing restrictions.
+batch queries, managing and processing subscriptions, atomic execution blocks, and LUA script loading. It can be used 
+with multiple Redis servers simultaneously also. __RedisX__ is free to use, in any way you like, without licensing 
+restrictions.
 
 While there are other C/C++ Redis clients available, this one is C99 compatible, and hence can be used on older 
 platforms also. It is also small and fast, but still capable and versatile.
 
-Rather than providing high-level support for every possible Redis command (which would probably be impossible given 
-the pace new commands are being introduced all the time), it provides a basic framework for synchronous and 
-asynchronous queries, with some higher-level functions, such as for managing key/value storage types (including hash 
-tables) and PUB/SUB. Future releases may add further higher-level functionality based on demand for such features.
+Rather than providing high-level support for every possible Redis command (which would be challenging given the pace 
+new commands are being introduced all the time), it provides a basic framework for synchronous and asynchronous 
+queries, with some higher-level functions, such as for managing key/value storage types (including hash tables) and 
+PUB/SUB. Future releases may add further higher-level functionality based on demand for such features.
 
 The __RedisX__ library was created, and is maintained, by Attila Kovács at the Center for Astrophysics \| Harvard 
 &amp; Smithsonian, and it is available through the [Smithsonian/redisx](https://github.com/Smithsonian/redisx) 
@@ -80,8 +80,8 @@ API may undergo slight changes and tweaks. Use the repository as is at your own 
 ### A simple example
 
 Below is a minimal example of a program snippet, which connects to a Redis server (without authentication) and runs a 
-simple `PING` comand with a message, printing out the result on the console, while also following best practices of checking
-for errors, and handling them -- in this case by printing informative error messages:
+simple `PING` comand with a message, printing out the result on the console, while also following best practices of 
+checking for errors, and handling them -- in this case by printing informative error messages:
 
 ```c
   #include <redisx.h>
