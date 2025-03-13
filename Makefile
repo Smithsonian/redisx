@@ -58,7 +58,7 @@ examples: shared
 
 # Run regression tests
 .PHONY: test
-test: shared tools
+test: $(LIBREDISX) tools
 	$(MAKE) -f test.mk
 
 # 'test' + 'analyze'
