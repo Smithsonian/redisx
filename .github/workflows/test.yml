@@ -29,7 +29,8 @@ jobs:
     runs-on: ubuntu-latest
     env:
       CC: gcc
-      CFLAGS: -Os -Wall -Wextra -Werror -std=c99
+      CFLAGS: -Os -Wall -Werror
+      FORTIFY: 3
       LIB: ${{ github.workspace }}/lib
       LD_LIBRARY_PATH: ${{ github.workspace }}/lib
     steps:
