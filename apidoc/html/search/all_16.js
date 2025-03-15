@@ -1,9 +1,7 @@
 var searchData=
 [
-  ['table_20of_20contents_0',['Table of Contents',['../index.html#autotoc_md3',1,'']]],
-  ['tls_20configuration_1',['TLS configuration',['../index.html#autotoc_md23',1,'']]],
-  ['to_20redisx_2',['Contributing to RedisX',['../../../xchange/apidoc/html/md_CONTRIBUTING.html',1,'']]],
-  ['transactions_3',['transactions',['../index.html#autotoc_md31',1,'Interactive transactions'],['../index.html#autotoc_md52',1,'Pipelined transactions']]],
-  ['tt_20redisx_20cli_20tt_4',['Command-line interface (&lt;tt&gt;redisx-cli&lt;/tt&gt;)',['../index.html#autotoc_md15',1,'']]],
-  ['type_5',['type',['../index.html#autotoc_md34',1,'RESP data type'],['../../../xchange/apidoc/html/structXField.html#a6535ecc7e6d29e64f0d34cd926823fd9',1,'XField::type'],['../structRESP.html#a93869a69154ac2297800b0afff64d600',1,'RESP::type']]]
+  ['valkey_20features_0',['Redis / Valkey Features',['../index.html#autotoc_md8',1,'']]],
+  ['value_1',['value',['../../../xchange/apidoc/html/structXField.html#a0f61d63b009d0880a89c843bd50d8d76',1,'XField::value'],['../structRESP.html#a0f61d63b009d0880a89c843bd50d8d76',1,'RESP::value'],['../structRedisMap.html#a449b0c7dacd31c5e7edf071da3bda96a',1,'RedisMap::value'],['../structRedisEntry.html#a4e9aec275e566b978a3ccb4e043d8c61',1,'RedisEntry::value']]],
+  ['value_20data_2',['Accessing key / value data',['../index.html#autotoc_md36',1,'']]],
+  ['values_3',['Getting and setting keyed values',['../index.html#autotoc_md37',1,'']]]
 ];

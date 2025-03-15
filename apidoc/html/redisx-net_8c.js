@@ -1,6 +1,5 @@
 var redisx_net_8c =
 [
-    [ "_POSIX_C_SOURCE", "redisx-net_8c.html#a3024ccd4a9af5109d24e6c57565d74a1", null ],
     [ "rCloseClientAsync", "redisx-net_8c.html#abc9dd988935375c5459bcaa09c17fa47", null ],
     [ "rConnectAsync", "redisx-net_8c.html#ad4065e4f45daee4c9a4ce04e11a8cc11", null ],
     [ "rDisconnectAsync", "redisx-net_8c.html#a42981dc95de662c10e96bdbc9dfc980e", null ],
