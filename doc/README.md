@@ -197,7 +197,7 @@ prior to invoking `make`. The following build variables can be configured:
  - `CSTANDARD`: Optionally, specify the C standard to compile for, e.g. `c11` to compile for the C11 standard. If
    defined then `-std=$(CSTANDARD)` is added to `CFLAGS` automatically. Note, that some pattern matching functions,
    which use `fnmatch()` may not be available in the C99 standard, but can still be enabled if you add 
-   `-D_POSIX_SOURCE=200112L` to `CPPFLAGS` also.
+   `-D_POSIX_C_SOURCE=200112L` to `CPPFLAGS` also.
    
  - `WEXTRA`: If set to 1, `-Wextra` is added to `CFLAGS` automatically.
 
