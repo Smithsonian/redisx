@@ -18,7 +18,7 @@
 #include <sys/utsname.h>
 #include <arpa/inet.h>
 #include <netinet/tcp.h>
-#if __Lynx__
+#if __Lynx__ && __powerpc__
 #  include <socket.h>
 #  include <time.h>
 #else
@@ -26,7 +26,6 @@
 #  include <netinet/ip.h>
 #  include <sys/types.h>    // getaddrinfo()
 #  include <sys/socket.h>
-#  include <fnmatch.h>
 #endif
 #include <netdb.h>
 

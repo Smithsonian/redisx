@@ -212,8 +212,10 @@ prior to invoking `make`. The following build variables can be configured:
  - `CFLAGS`: Flags to pass onto the C compiler (default: `-g -Os -Wall`). Note, `-Iinclude` will be added 
    automatically.
    
- - `CSTANDARD`: Optionally, specify the C standard to compile for, e.g. `c99` to compile for the C99 standard. If
-   defined then `-std=$(CSTANDARD)` is added to `CFLAGS` automatically.
+ - `CSTANDARD`: Optionally, specify the C standard to compile for, e.g. `c11` to compile for the C11 standard. If
+   defined then `-std=$(CSTANDARD)` is added to `CFLAGS` automatically. Note, that some pattern matching functions,
+   which use `fnmatch()` may not be available in the C99 standard, but can still be enabled if you add 
+   `-D_POSIX_C_SOURCE=200112L` to `CPPFLAGS` also.
    
  - `WEXTRA`: If set to 1, `-Wextra` is added to `CFLAGS` automatically.
 
@@ -223,7 +225,7 @@ prior to invoking `make`. The following build variables can be configured:
  - `LDFLAGS`: Extra linker flags (default is _not set_). Note, `-lm -lpthread -lxchange` will be added automatically.
 
  - `WITH_OPENMP`: If set to 1, we will compile and link with OpenMP (i.e., `-fopenmp` is added to both `CFLAGS` and 
-   `LDFLAGS` automatically). If not explicitly defined, it will be set automatically if `libgomp` is available.
+   `LDFLAGS` automatically). If not explicitly defined, it will be set automatically if `libomp` is available.
 
  - `WITH_TLS`: If set to 1, we will build with TLS support via OpenSSL (And `-lssl` is added to `LDFLAGS` 
    automatically). If not explicitly defined, it will be set automatically if `libssl` is available.

@@ -12,7 +12,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <errno.h>
-#if !(__Lynx__ && __powerpc__)
+#if _POSIX_C_SOURCE >= 200112L
 #  include <fnmatch.h>
 #endif
 
@@ -965,15 +965,25 @@ void redisxDestroyKeys(char **keys, int count) {
   free(keys);
 }
 
-// The following is not available on prior to the POSIX.1-2001 standard
+// The following is not available prior to the POSIX.1-2001 standard
 #if _POSIX_C_SOURCE >= 200112L
 
 /**
  * Removes all Redis entries that match the specified table:field name pattern.
  *
+ * NOTES:
+ * <ol>
+ * <li>This function uses the `fnmatch()` function of LIBC, which is part of the
+ * POSIX.1-2001 standard, and is hence not available in C99 in general. Hence, when
+ * compiling the library for the C99 standard, this function is disabled by default
+ * unless you set `_POSIX_C_SOURCE` to a value larger than, or equal to, 200112L
+ * also.</li>
+ * </ol>
+ *
  * \param redis     Pointer to the Redis instance.
  * \param pattern   Glob pattern of aggregate table:field IDs to delete
- * \return          The number of tables + fields that were matched and deleted, or else an xchange error code (&lt;0).
+ * \return          The number of tables + fields that were matched and deleted, or
+ *                  else an xchange error code (&lt;0).
  */
 int redisxDeleteEntries(Redis *redis, const char *pattern) {
   static const char *fn = "redisxDeleteEntries";

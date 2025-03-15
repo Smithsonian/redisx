@@ -4,7 +4,10 @@
  */
 
 #define _GNU_SOURCE                   ///< for strcasecmp()
-#define _POSIX_C_SOURCE  199309L      ///< for nanosleep()
+
+#ifndef _POSIX_C_SOURCE
+#  define _POSIX_C_SOURCE  199309L    ///< for nanosleep()
+#endif
 
 #include <stdio.h>
 #include <stdlib.h>
