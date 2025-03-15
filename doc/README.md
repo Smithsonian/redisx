@@ -207,7 +207,7 @@ prior to invoking `make`. The following build variables can be configured:
  - `LDFLAGS`: Extra linker flags (default is _not set_). Note, `-lm -lpthread -lxchange` will be added automatically.
 
  - `WITH_OPENMP`: If set to 1, we will compile and link with OpenMP (i.e., `-fopenmp` is added to both `CFLAGS` and 
-   `LDFLAGS` automatically). If not explicitly defined, it will be set automatically if `libomp` is available.
+   `LDFLAGS` automatically). If not explicitly defined, it will be set automatically if `libgomp` is available.
 
  - `WITH_TLS`: If set to 1, we will build with TLS support via OpenSSL (And `-lssl` is added to `LDFLAGS` 
    automatically). If not explicitly defined, it will be set automatically if `libssl` is available.
