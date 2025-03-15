@@ -7,8 +7,6 @@
  *   Network layer management functions for the RedisX library.
  */
 
-#define _POSIX_C_SOURCE 200112L   ///< for getaddrinfo()
-
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
@@ -74,7 +72,7 @@ static pthread_mutex_t serverLock = PTHREAD_MUTEX_INITIALIZER;
 static int hostnameToIP(const char *hostName, char *ip) {
   static const char *fn = "hostnameToIP";
 
-#  if !defined(__GNUC__) || __GNUC__ >= 3
+#  if _POSIX_C_SOURCE >= 200112L
   // getaddrinfo() is POSIX-1.2001, so it appears in GCC 3.0, more or less...
   struct addrinfo *infList, *inf;
 #  else
@@ -89,7 +87,7 @@ static int hostnameToIP(const char *hostName, char *ip) {
   if(hostName == NULL) return x_error(X_NULL, EINVAL, fn, "input hostName is NULL");
   if(!hostName[0]) return x_error(X_NULL, EINVAL, fn, "input hostName is empty");
 
-#  if !defined(__GNUC__) || __GNUC__ >= 3
+#  if _POSIX_C_SOURCE >= 200112L
   if(getaddrinfo(hostName, NULL, NULL, &infList) != 0)
     return x_error(X_NAME_INVALID, errno, fn, "host lookup failed for: %s.", hostName);
 
