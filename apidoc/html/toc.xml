@@ -63,6 +63,7 @@
     <topic label="[1.0.0-rc2] - 2025-03-11" href="md_CHANGELOG.html#autotoc_md1"/>
   </topic>
   <topic label="Contributing to RedisX" href="md_CONTRIBUTING.html"/>
+  <topic label="Deprecated List" href="deprecated.html"/>
   <topic label="Data Structures" href="annotated.html">
     <topic label="Data Structures" href="annotated.html">
       <topic label="Redis" href="structRedis.html">
@@ -354,6 +355,7 @@
           <topic label="redisxRemoveDisconnectHook" href="redisx-hooks_8c.html#a7d57699ce7c728a4c936a4ba040b12f0"/>
         </topic>
         <topic label="redisx-net.c" href="redisx-net_8c.html">
+          <topic label="_POSIX_C_SOURCE" href="redisx-net_8c.html#a3024ccd4a9af5109d24e6c57565d74a1"/>
           <topic label="rCloseClientAsync" href="redisx-net_8c.html#abc9dd988935375c5459bcaa09c17fa47"/>
           <topic label="rConnectAsync" href="redisx-net_8c.html#ad4065e4f45daee4c9a4ce04e11a8cc11"/>
           <topic label="rDisconnectAsync" href="redisx-net_8c.html#a42981dc95de662c10e96bdbc9dfc980e"/>
@@ -470,7 +472,8 @@
     </topic>
     <topic label="Globals" href="globals.html">
       <topic label="All" href="globals.html">
-        <topic label="r" href="globals.html"/>
+        <topic label="_" href="globals.html"/>
+        <topic label="r" href="globals_r.html"/>
         <topic label="s" href="globals_s.html"/>
       </topic>
       <topic label="Functions" href="globals_func.html">

@@ -1474,6 +1474,13 @@
     <name>redisx-net.c</name>
     <path>src/</path>
     <filename>redisx-net_8c.html</filename>
+    <member kind="define">
+      <type>#define</type>
+      <name>_POSIX_C_SOURCE</name>
+      <anchorfile>redisx-net_8c.html</anchorfile>
+      <anchor>a3024ccd4a9af5109d24e6c57565d74a1</anchor>
+      <arglist></arglist>
+    </member>
     <member kind="function">
       <type>void</type>
       <name>rCloseClientAsync</name>

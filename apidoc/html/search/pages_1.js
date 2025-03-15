@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['redisx_0',['redisx',['../../../xchange/apidoc/html/md_CONTRIBUTING.html',1,'Contributing to RedisX'],['../index.html',1,'RedisX']]]
+  ['deprecated_20list_0',['Deprecated List',['../deprecated.html',1,'']]]
 ];

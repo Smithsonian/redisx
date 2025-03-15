@@ -311,7 +311,7 @@ Functions</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
-<p>Sets the TLS ciphers to try (TLSv1.2 and earlier).</p>
+<p>Sets the TLS ciphers to try (TLSv1.2 and earlier). This function will return an error (-1) if RedisX is built against OpenSSL &gt;= 1.1.1, for which <code><a class="el" href="redisx-tls_8c.html#aece815a388c13dfa9381d194fc65526a">redisxSetTLSCipherSuites()</a></code> should be used instead.</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">redis</td><td>A <a class="el" href="structRedis.html" title="Structure that represents a Redis database instance, with one or more RedisClient connections.">Redis</a> instance. </td></tr>
@@ -324,7 +324,8 @@ Functions</h2></td></tr>
 <dd>
 <a class="el" href="redisx-tls_8c.html#a1820331a34d40c9dcc894480e22d90e7">redisxSetTLS()</a> </dd>
 <dd>
-<a class="el" href="redisx-tls_8c.html#ab1f40a05c3c74c55f0f92066cbc7db09">redisxSetDHCipherParams()</a> </dd></dl>
+<a class="el" href="redisx-tls_8c.html#ab1f40a05c3c74c55f0f92066cbc7db09">redisxSetDHCipherParams()</a></dd></dl>
+<dl class="deprecated"><dt><b><a class="el" href="deprecated.html#_deprecated000001">Deprecated:</a></b></dt><dd>For OpenSSL &gt;= 1.1.1, <code><a class="el" href="redisx-tls_8c.html#aece815a388c13dfa9381d194fc65526a">redisxSetTLSCipherSuites()</a></code> should be used instead. </dd></dl>
 
 <p class="reference">References <a class="elRef" href="../../xchange/apidoc/html/xchange_8c.html#ae73aaf705dc4e7d58dfb0fd81f4805c7">x_error()</a>, <a class="elRef" href="../../xchange/apidoc/html/xchange_8h.html#a1d4a0c99f979fd0ecf0e9dcb7191a8d7">X_FAILURE</a>, <a class="elRef" href="../../xchange/apidoc/html/xchange_8h.html#a7b2679c964ea5f2160380ed55654b873">X_SUCCESS</a>, and <a class="elRef" href="../../xchange/apidoc/html/xchange_8h.html#a01d730a1a98963816de2dd73e72957a5">xStringCopyOf()</a>.</p>
 

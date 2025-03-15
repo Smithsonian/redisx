@@ -1,6 +1,6 @@
 var indexSectionsWithContent =
 {
-  0: "012abcdefghiklmnopqrstvxy",
+  0: "012_abcdefghiklmnopqrstvxy",
   1: "rx",
   2: "rx",
   3: "r",
@@ -8,8 +8,8 @@ var indexSectionsWithContent =
   5: "r",
   6: "r",
   7: "r",
-  8: "rs",
-  9: "crt"
+  8: "_rs",
+  9: "cdlrt"
 };
 
 var indexSectionNames =

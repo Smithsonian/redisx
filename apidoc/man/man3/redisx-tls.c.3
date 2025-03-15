@@ -136,7 +136,7 @@ X_SUCCESS (0) if successful, or else an error code <0\&.
 .PP
 References \fBTRUE\fP, \fBx_error()\fP, \fBX_FAILURE\fP, \fBX_SUCCESS\fP, and \fBxStringCopyOf()\fP\&.
 .SS "int redisxSetTLSCiphers (\fBRedis\fP * redis, const char * cipher_list)"
-Sets the TLS ciphers to try (TLSv1\&.2 and earlier)\&.
+Sets the TLS ciphers to try (TLSv1\&.2 and earlier)\&. This function will return an error (-1) if RedisX is built against OpenSSL >= 1\&.1\&.1, for which \fC\fBredisxSetTLSCipherSuites()\fP\fP should be used instead\&.
 .PP
 \fBParameters\fP
 .RS 4
@@ -156,7 +156,12 @@ X_SUCCESS (0) if successful, or else an error code <0\&.
 .PP
 \fBredisxSetTLS()\fP 
 .PP
-\fBredisxSetDHCipherParams()\fP 
+\fBredisxSetDHCipherParams()\fP
+.RE
+.PP
+\fBDeprecated\fP
+.RS 4
+For OpenSSL >= 1\&.1\&.1, \fC\fBredisxSetTLSCipherSuites()\fP\fP should be used instead\&. 
 .RE
 .PP
 

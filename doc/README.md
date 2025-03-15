@@ -37,19 +37,19 @@ Last Updated: 8 January 2025
  - [Features overview](#redisx-features)
  - [Related links](#redisx-related-links)
 
-__RedisX__ is a free, light-weight [Redis](https://redis.io) client library for C/C++. As such, it should work with 
-Redis forks / clones like [Dragonfly](https://dragonfly.io) or [Valkey](https://valkey.io) also. It supports both 
-interactive and pipelined Redis queries, managing and processing subscriptions, atomic execution blocks, and LUA 
-scripts loading. It can be used with multiple Redis servers simultaneously also. __RedisX__ is free to use, in any 
-way you like, without licensing restrictions.
+__RedisX__ is a free, light-weight [Redis](https://redis.io) client library for C/C++. It works with Redis forks / 
+clones like [Dragonfly](https://dragonfly.io) or [Valkey](https://valkey.io) also. It supports both interactive and 
+batch queries, managing and processing subscriptions, atomic execution blocks, and LUA script loading. It can be used 
+with multiple Redis servers simultaneously also. __RedisX__ is free to use, in any way you like, without licensing 
+restrictions.
 
 While there are other C/C++ Redis clients available, this one is C99 compatible, and hence can be used on older 
 platforms also. It is also small and fast, but still capable and versatile.
 
-Rather than providing high-level support for every possible Redis command (which would probably be impossible given 
-the pace new commands are being introduced all the time), it provides a basic framework for synchronous and 
-asynchronous queries, with some higher-level functions, such as for managing key/value storage types (including hash 
-tables) and PUB/SUB. Future releases may add further higher-level functionality based on demand for such features.
+Rather than providing high-level support for every possible Redis command (which would be challenging given the pace 
+new commands are being introduced all the time), it provides a basic framework for synchronous and asynchronous 
+queries, with some higher-level functions, such as for managing key/value storage types (including hash tables) and 
+PUB/SUB. Future releases may add further higher-level functionality based on demand for such features.
 
 The __RedisX__ library was created, and is maintained, by Attila Kovács at the Center for Astrophysics \| Harvard 
 &amp; Smithsonian, and it is available through the [Smithsonian/redisx](https://github.com/Smithsonian/redisx) 
@@ -62,8 +62,8 @@ API may undergo slight changes and tweaks. Use the repository as is at your own 
 ### A simple example
 
 Below is a minimal example of a program snippet, which connects to a Redis server (without authentication) and runs a 
-simple `PING` comand with a message, printing out the result on the console, while also following best practices of checking
-for errors, and handling them -- in this case by printing informative error messages:
+simple `PING` comand with a message, printing out the result on the console, while also following best practices of 
+checking for errors, and handling them -- in this case by printing informative error messages:
 
 ```c
   #include <redisx.h>
@@ -194,10 +194,15 @@ prior to invoking `make`. The following build variables can be configured:
  - `CFLAGS`: Flags to pass onto the C compiler (default: `-g -Os -Wall`). Note, `-Iinclude` will be added 
    automatically.
    
- - `CSTANDARD`: Optionally, specify the C standard to compile for, e.g. `c99` to compile for the C99 standard. If
-   defined then `-std=$(CSTANDARD)` is added to `CFLAGS` automatically.
+ - `CSTANDARD`: Optionally, specify the C standard to compile for, e.g. `c11` to compile for the C11 standard. If
+   defined then `-std=$(CSTANDARD)` is added to `CFLAGS` automatically. Note, that some pattern matching functions,
+   which use `fnmatch()` may not be available in the C99 standard, but can still be enabled if you add 
+   `-D_POSIX_SOURCE=200112L` to `CPPFLAGS` also.
    
  - `WEXTRA`: If set to 1, `-Wextra` is added to `CFLAGS` automatically.
+
+ - `FORTIFY`: If set it will set the `_FORTIFY_SOURCE` macro to the specified value (`gcc` supports values 1 
+   through 3). It affords varying levels of extra compile time / runtime checks.
    
  - `LDFLAGS`: Extra linker flags (default is _not set_). Note, `-lm -lpthread -lxchange` will be added automatically.
 
