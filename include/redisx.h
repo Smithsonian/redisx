@@ -30,7 +30,7 @@
 #define REDISX_PATCHLEVEL     0
 
 /// Additional release information in version, e.g. "-1", or "-rc1".
-#define REDISX_RELEASE_STRING "-devel"
+#define REDISX_RELEASE_STRING "-rc3"
 
 
 
