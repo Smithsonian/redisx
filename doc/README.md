@@ -9,7 +9,7 @@ A free, simple, and light-weight C/C++ Redis / Valkey client library.
  
 Author: Attila Kovacs
 
-Last Updated: 15 March 2025
+Updated for 1.0 and later releases.
 
 ## Table of Contents
 
@@ -55,8 +55,6 @@ The __RedisX__ library was created, and is maintained, by Attila Kovács at the 
 &amp; Smithsonian, and it is available through the [Smithsonian/redisx](https://github.com/Smithsonian/redisx) 
 repository on GitHub. 
 
-There are no official releases of __RedisX__ yet. An initial 1.0.0 release is expected in early 2025. Before then the 
-API may undergo slight changes and tweaks. Use the repository as is at your own risk for now.
 
 <a name="redisx-example"></a>
 ### A simple example
