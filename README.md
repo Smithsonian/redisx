@@ -231,6 +231,10 @@ prior to invoking `make`. The following build variables can be configured:
 
  - `CHECKEXTRA`: Extra options to pass to `cppcheck` for the `make check` target
  
+ - `DOXYGEN`: Specify the `doxygen` executable to use for generating documentation. If not set (default), `make` will
+   use `doxygen` in your `PATH` (if any). You can also set it to `none` to disable document generation and the
+   checking for a usable `doxygen` version entirely.
+ 
  - `XCHANGE`: If the [Smithsonian/xchange](https://github.com/Smithsonian/xchange) library is not installed on your
    system (e.g. under `/usr`) set `XCHANGE` to where the distribution can be found. The build will expect to find 
    `xchange.h` under `$(XCHANGE)/include` and `libxchange.so` / `libxchange.a` under `$(XCHANGE)/lib` or else in the 
