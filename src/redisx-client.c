@@ -100,8 +100,10 @@ static int rTransmitErrorAsync(ClientPrivate *cp, const char *op) {
  */
 static int rReadChunkAsync(ClientPrivate *cp) {
   const int sock = cp->socket;      // Local copy of socket fd that won't possibly change mid-call.
-  struct pollfd pfd = {};
+  struct pollfd pfd;
   int status;
+
+  memset(&pfd, 0, sizeof(pfd));
 
   if(sock < 0) return x_error(X_NO_SERVICE, ENOTCONN, "rReadChunkAsync", "client %d: not connected", cp->idx);
 
