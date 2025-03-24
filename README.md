@@ -229,6 +229,11 @@ prior to invoking `make`. The following build variables can be configured:
  - `WITH_TLS`: If set to 1, we will build with TLS support via OpenSSL (And `-lssl` is added to `LDFLAGS` 
    automatically). If not explicitly defined, it will be set automatically if `libssl` is available.
 
+ - `FNMATCH_C`: (for older platforms) Optional full path to `fnmatch.c` to use. Normally `fnmatch()` (POSIX-1.2001) 
+   is part of LIBC, but for older systems, or if `CSTANDARD` is set to `c99`, is will be assumed as not present, and 
+   hence the `redisxDeleteEntries()` function will not be available, unless you set `FNMATCH_C` to point to a suitable 
+   `fnmatch.c` implementation to link against.
+   
  - `CHECKEXTRA`: Extra options to pass to `cppcheck` for the `make check` target
  
  - `DOXYGEN`: Specify the `doxygen` executable to use for generating documentation. If not set (default), `make` will

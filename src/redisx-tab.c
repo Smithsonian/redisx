@@ -12,17 +12,18 @@
 #include <stdlib.h>
 #include <string.h>
 #include <errno.h>
-#if _POSIX_C_SOURCE >= 200112L
-#  include <fnmatch.h>
-#endif
 
 #include "redisx-priv.h"
-
 
 #define SCAN_INITIAL_STORE_CAPACITY   256   ///< Number of Redis keys to allocate initially when using SCAN to get list of keywords
 
 /// \cond PRIVATE
 #define SCAN_INITIAL_CURSOR         "0"     ///< Initial cursor value for SCAN command.
+
+#if FNMATCH || _POSIX_C_SOURCE >= 200112L
+// fnmatch() is POSIX-1.2001
+int fnmatch(const char *pattern, const char *string, int flags);
+#endif
 /// \endcond
 
 /**
@@ -966,7 +967,7 @@ void redisxDestroyKeys(char **keys, int count) {
 }
 
 // The following is not available prior to the POSIX.1-2001 standard
-#if _POSIX_C_SOURCE >= 200112L
+#if FNMATCH || _POSIX_C_SOURCE >= 200112L
 
 /**
  * Removes all Redis entries that match the specified table:field name pattern.

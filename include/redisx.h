@@ -539,7 +539,7 @@ int redisxError(const char *func, int errorCode);
 const char* redisxErrorDescription(int code);
 
 // The following is not available on prior to the POSIX.1-2001 standard
-#if _POSIX_C_SOURCE >= 200112L
+#if FNMATCH || _POSIX_C_SOURCE >= 200112L
 int redisxDeleteEntries(Redis *redis, const char *pattern);
 #endif
 

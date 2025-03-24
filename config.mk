@@ -105,6 +105,10 @@ ifeq ($(WEXTRA),1)
   CFLAGS += -Wextra
 endif
 
+ifdef FNMATCH_C
+  CPPFLAGS += -DFNMATCH=1
+endif
+
 ifeq ($(WITH_OPENMP),1)
   CFLAGS += -fopenmp
   LDFLAGS += -fopenmp
