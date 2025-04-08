@@ -18,7 +18,7 @@
 
 # RedisX
 
-[![DOI](https://zenodo.org/badge/796202270.svg)](https://doi.org/10.5281/zenodo.14639302)
+[![DOI](resources/796202270.svg)](https://doi.org/10.5281/zenodo.14639302)
 
 A free, simple, and light-weight C/C++ Redis / Valkey client library.
 
