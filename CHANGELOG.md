@@ -7,6 +7,6 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 
-## [1.0.0-rc4] - 2025-03-25
+## [1.0.0] - 2025-05-06
 
-Release candidate for initial public release.
+Initial public release.
