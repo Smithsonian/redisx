@@ -100,7 +100,7 @@ static int hostnameToIP(const char *hostName, char *ip) {
   }
 
   strcpy(ip, inet_ntoa(((struct sockaddr_in *) inf->ai_addr)->sin_addr));
-  freeaddrinfo(inf);
+  freeaddrinfo(infList);
 
   return X_SUCCESS;
 #else
@@ -179,7 +179,7 @@ static void rConfigSocket(int socket, int timeoutMillis, int tcpBufSize, boolean
     // It is faster than the 'proper' handshaking close if the server can handle it properly.
     linger.l_onoff = FALSE;
     linger.l_linger = 0;
-    if(setsockopt(socket, SOL_SOCKET, SO_LINGER, & linger, sizeof(struct timeval)))
+    if(setsockopt(socket, SOL_SOCKET, SO_LINGER, & linger, sizeof(struct linger)))
       xvprintf("WARNING! Redis-X: socket linger not set: %s", strerror(errno));
   }
 
