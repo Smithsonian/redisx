@@ -163,9 +163,17 @@ int rSetServerAsync(Redis *redis, const char *desc, const char *hostname, int po
  */
 static void rConfigSocket(int socket, int timeoutMillis, int tcpBufSize, boolean lowLatency) {
   const boolean enable = TRUE;
+  struct linger linger;
+
+  // Redis recommends simply dropping the connection. By turning SO_LINGER off, we'll
+  // end up with a 'connection reset' error on Redis, avoiding the TIME_WAIT state.
+  // It is faster than the 'proper' handshaking close if the server can handle it properly.
+  linger.l_onoff = FALSE;
+  linger.l_linger = 0;
+  if(setsockopt(socket, SOL_SOCKET, SO_LINGER, & linger, sizeof(struct linger)))
+    xvprintf("WARNING! Redis-X: socket linger not set: %s", strerror(errno));
 
   if(timeoutMillis > 0) {
-    struct linger linger;
     struct timeval timeout;
 
     // Set a time limit for sending.
@@ -173,14 +181,6 @@ static void rConfigSocket(int socket, int timeoutMillis, int tcpBufSize, boolean
     timeout.tv_usec = 1000 * (timeoutMillis % 1000);
     if(setsockopt(socket, SOL_SOCKET, SO_SNDTIMEO, & timeout, sizeof(struct timeval)))
       xvprintf("WARNING! Redix-X: socket send timeout not set: %s", strerror(errno));
-
-    // Redis recommends simply dropping the connection. By turning SO_LINGER off, we'll
-    // end up with a 'connection reset' error on Redis, avoiding the TIME_WAIT state.
-    // It is faster than the 'proper' handshaking close if the server can handle it properly.
-    linger.l_onoff = FALSE;
-    linger.l_linger = 0;
-    if(setsockopt(socket, SOL_SOCKET, SO_LINGER, & linger, sizeof(struct linger)))
-      xvprintf("WARNING! Redis-X: socket linger not set: %s", strerror(errno));
   }
 
 #if __linux__

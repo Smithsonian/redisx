@@ -9,6 +9,11 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ## [Unreleased]
 
+### Changed
+
+ - Sockets are now always initialized with `SO_LINGER` disabled. Previously that was the case only when a timeout 
+   value was configured.
+
 
 ## [1.0.0] - 2025-05-06
 
