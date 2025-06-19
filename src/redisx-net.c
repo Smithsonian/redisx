@@ -92,7 +92,7 @@ static int hostnameToIP(const char *hostName, char *ip) {
     return x_error(X_NAME_INVALID, errno, fn, "host lookup failed for: %s.", hostName);
 
   for(inf = infList; inf != NULL; inf = inf->ai_next)
-    if(inf->ai_family == AF_INET && inf->ai_addrlen >= sizeof(struct in_addr)) break;
+    if((inf->ai_family == AF_INET ||  inf->ai_family == AF_INET6) && inf->ai_addrlen >= sizeof(struct in_addr)) break;
 
   if(!inf || !inf->ai_addr) {
     freeaddrinfo(infList);
