@@ -26,67 +26,71 @@ var NAVTREE =
 [
   [ "RedisX", "index.html", [
     [ "Changelog", "../../xchange/apidoc/html/md_CHANGELOG.html", [
-      [ "Table of Contents", "index.html#autotoc_md3", null ],
-      [ "Introduction", "index.html#autotoc_md4", [
-        [ "A simple example", "index.html#autotoc_md5", null ],
-        [ "Features overview", "index.html#autotoc_md6", [
-          [ "General Features", "index.html#autotoc_md7", null ],
-          [ "Redis / Valkey Features", "index.html#autotoc_md8", null ]
+      [ "Table of Contents", "index.html#autotoc_md6", null ],
+      [ "Introduction", "index.html#autotoc_md7", [
+        [ "A simple example", "index.html#autotoc_md8", null ],
+        [ "Features overview", "index.html#autotoc_md9", [
+          [ "General Features", "index.html#autotoc_md10", null ],
+          [ "Redis / Valkey Features", "index.html#autotoc_md11", null ]
         ] ],
-        [ "Related links", "index.html#autotoc_md9", null ]
+        [ "Related links", "index.html#autotoc_md12", null ]
       ] ],
-      [ "Prerequisites", "index.html#autotoc_md11", null ],
-      [ "Building RedisX", "index.html#autotoc_md13", null ],
-      [ "Command-line interface (<tt>redisx-cli</tt>)", "index.html#autotoc_md15", null ],
-      [ "Linking your application against RedisX", "index.html#autotoc_md17", null ],
-      [ "Managing Redis server connections", "index.html#autotoc_md19", [
-        [ "Initializing", "index.html#autotoc_md20", [
-          [ "Sentinel", "index.html#autotoc_md21", null ]
+      [ "Prerequisites", "index.html#autotoc_md14", null ],
+      [ "Building RedisX", "index.html#autotoc_md16", null ],
+      [ "Command-line interface (<tt>redisx-cli</tt>)", "index.html#autotoc_md18", null ],
+      [ "Linking your application against RedisX", "index.html#autotoc_md20", null ],
+      [ "Managing Redis server connections", "index.html#autotoc_md22", [
+        [ "Initializing", "index.html#autotoc_md23", [
+          [ "Sentinel", "index.html#autotoc_md24", null ]
         ] ],
-        [ "Configuring", "index.html#autotoc_md22", [
-          [ "TLS configuration", "index.html#autotoc_md23", null ],
-          [ "Socket-level configuration", "index.html#autotoc_md24", null ],
-          [ "Connection & disconnection hooks", "index.html#autotoc_md25", null ]
+        [ "Configuring", "index.html#autotoc_md25", [
+          [ "TLS configuration", "index.html#autotoc_md26", null ],
+          [ "Socket-level configuration", "index.html#autotoc_md27", null ],
+          [ "Connection & disconnection hooks", "index.html#autotoc_md28", null ]
         ] ],
-        [ "Connecting", "index.html#autotoc_md26", null ],
-        [ "Disconnecting", "index.html#autotoc_md27", null ],
-        [ "Reconnecting", "index.html#autotoc_md28", null ]
+        [ "Connecting", "index.html#autotoc_md29", null ],
+        [ "Disconnecting", "index.html#autotoc_md30", null ],
+        [ "Reconnecting", "index.html#autotoc_md31", null ]
       ] ],
-      [ "Simple Redis queries", "index.html#autotoc_md30", [
-        [ "Interactive transactions", "index.html#autotoc_md31", null ],
-        [ "Bundled Attributes", "index.html#autotoc_md32", null ],
-        [ "Push notifications", "index.html#autotoc_md33", null ],
-        [ "RESP data type", "index.html#autotoc_md34", null ]
+      [ "Simple Redis queries", "index.html#autotoc_md33", [
+        [ "Interactive transactions", "index.html#autotoc_md34", null ],
+        [ "Bundled Attributes", "index.html#autotoc_md35", null ],
+        [ "Push notifications", "index.html#autotoc_md36", null ],
+        [ "RESP data type", "index.html#autotoc_md37", null ]
       ] ],
-      [ "Accessing key / value data", "index.html#autotoc_md36", [
-        [ "Getting and setting keyed values", "index.html#autotoc_md37", null ],
-        [ "Listing and Scanning", "index.html#autotoc_md38", null ]
+      [ "Accessing key / value data", "index.html#autotoc_md39", [
+        [ "Getting and setting keyed values", "index.html#autotoc_md40", null ],
+        [ "Listing and Scanning", "index.html#autotoc_md41", null ]
       ] ],
-      [ "Publish / subscribe (PUB/SUB) support", "index.html#autotoc_md40", [
-        [ "Broadcasting messages", "index.html#autotoc_md41", null ],
-        [ "Subscriptions", "index.html#autotoc_md42", null ]
+      [ "Publish / subscribe (PUB/SUB) support", "index.html#autotoc_md43", [
+        [ "Broadcasting messages", "index.html#autotoc_md44", null ],
+        [ "Subscriptions", "index.html#autotoc_md45", null ]
       ] ],
-      [ "Atomic execution blocks and LUA scripts", "index.html#autotoc_md44", [
-        [ "Execution blocks", "index.html#autotoc_md45", null ],
-        [ "LUA script loading and execution", "index.html#autotoc_md46", null ],
-        [ "Custom Redis functions", "index.html#autotoc_md47", null ]
+      [ "Atomic execution blocks and LUA scripts", "index.html#autotoc_md47", [
+        [ "Execution blocks", "index.html#autotoc_md48", null ],
+        [ "LUA script loading and execution", "index.html#autotoc_md49", null ],
+        [ "Custom Redis functions", "index.html#autotoc_md50", null ]
       ] ],
-      [ "Advanced queries and pipelining", "index.html#autotoc_md49", [
-        [ "Asynchronous client processing", "index.html#autotoc_md50", null ],
-        [ "Bundled Attributes", "index.html#autotoc_md51", null ],
-        [ "Pipelined transactions", "index.html#autotoc_md52", null ]
+      [ "Advanced queries and pipelining", "index.html#autotoc_md52", [
+        [ "Asynchronous client processing", "index.html#autotoc_md53", null ],
+        [ "Bundled Attributes", "index.html#autotoc_md54", null ],
+        [ "Pipelined transactions", "index.html#autotoc_md55", null ]
       ] ],
-      [ "Redis clusters", "index.html#autotoc_md54", [
-        [ "Cluster basics", "index.html#autotoc_md55", null ],
-        [ "Detecting cluster reconfiguration", "index.html#autotoc_md56", null ],
-        [ "Manual connection management", "index.html#autotoc_md57", null ]
+      [ "Redis clusters", "index.html#autotoc_md57", [
+        [ "Cluster basics", "index.html#autotoc_md58", null ],
+        [ "Detecting cluster reconfiguration", "index.html#autotoc_md59", null ],
+        [ "Manual connection management", "index.html#autotoc_md60", null ]
       ] ],
-      [ "Error handling", "index.html#autotoc_md59", [
-        [ "Socket-level errors", "index.html#autotoc_md60", null ]
+      [ "Error handling", "index.html#autotoc_md62", [
+        [ "Socket-level errors", "index.html#autotoc_md63", null ]
       ] ],
-      [ "Debug support", "index.html#autotoc_md62", null ],
-      [ "Future plans", "index.html#autotoc_md64", null ],
-      [ "[1.0.0] - 2025-05-06", "../../xchange/apidoc/html/md_CHANGELOG.html#autotoc_md1", null ]
+      [ "Debug support", "index.html#autotoc_md65", null ],
+      [ "Future plans", "index.html#autotoc_md67", null ],
+      [ "[1.0.1-rc1] - 2025-06-19", "../../xchange/apidoc/html/md_CHANGELOG.html#autotoc_md1", [
+        [ "Fixed", "../../xchange/apidoc/html/md_CHANGELOG.html#autotoc_md2", null ],
+        [ "Changed", "../../xchange/apidoc/html/md_CHANGELOG.html#autotoc_md3", null ]
+      ] ],
+      [ "[1.0.0] - 2025-05-06", "../../xchange/apidoc/html/md_CHANGELOG.html#autotoc_md4", null ]
     ] ],
     [ "Contributing to RedisX", "../../xchange/apidoc/html/md_CONTRIBUTING.html", null ],
     [ "Deprecated List", "deprecated.html", null ],
@@ -115,7 +119,7 @@ var NAVTREE =
 var NAVTREEINDEX =
 [
 "annotated.html",
-"redisx_8h.html#a537ed3806a44fb40f6e8dccd813ad0da"
+"redisx_8h.html#a5349b7340813fbd1e32d04ed650bc3d9a65b4f2926885665960480d008ab2a456"
 ];
 
 var SYNCONMSG = 'click to disable panel synchronisation';
