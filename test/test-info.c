@@ -38,7 +38,7 @@ int main() {
     return 1;
   }
 
-  xDestroyLookup(info);
+  xDestroyLookupAndData(info);
   redisxDisconnect(redis);
   redisxDestroy(redis);
 
