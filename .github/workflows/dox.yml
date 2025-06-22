@@ -1,4 +1,7 @@
 name: API documentation
+permissions:
+  contents: write
+  pull-requests: write
 
 on:
   release:
