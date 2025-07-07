@@ -13,9 +13,9 @@ name: "CodeQL Advanced"
 
 on:
   push:
-    branches: [ "main" ]
+    branches: ["main"]
   pull_request:
-    branches: [ "main" ]
+    branches: ["main"]
   schedule:
     - cron: '35 18 * * 5'
 
@@ -81,7 +81,7 @@ jobs:
         make -C xchange shared
         make shared
         make tools
-    
+
     - name: Perform CodeQL Analysis
       uses: github/codeql-action/analyze@v3
       with:

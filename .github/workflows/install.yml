@@ -1,6 +1,6 @@
 name: Test install
 
-on: 
+on:
   push:
     branches:
       - main
@@ -34,7 +34,7 @@ jobs:
     - name: Check out RedisX
       uses: actions/checkout@v4
 
-    - name: Check out xchange 
+    - name: Check out xchange
       uses: actions/checkout@v4
       with:
         repository: Smithsonian/xchange
@@ -50,6 +50,4 @@ jobs:
       run: make distro
 
     - name: Install RedisX in default location
-      run: sudo make install   
-
-
+      run: sudo make install

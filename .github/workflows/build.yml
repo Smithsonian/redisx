@@ -1,6 +1,6 @@
 name: Build
 
-on: 
+on:
   push:
     branches:
       - main
@@ -37,7 +37,7 @@ jobs:
     - name: Check out RedisX
       uses: actions/checkout@v4
 
-    - name: Check out xchange 
+    - name: Check out xchange
       uses: actions/checkout@v4
       with:
         repository: Smithsonian/xchange
@@ -46,15 +46,14 @@ jobs:
     - name: Install build dependencies
       run: sudo apt-get install libpopt-dev libreadline-dev libbsd-dev libssl-dev
 
-    - name: Build static library	
+    - name: Build static library
       run: make static
 
     - name: Build xchange dependency
       run: make -C xchange shared
 
     - name: Build shared library
-      run: make shared   
+      run: make shared
 
     - name: Build tools
       run: make tools
-

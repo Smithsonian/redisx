@@ -29,18 +29,18 @@ jobs:
       CC: gcc
       XCHANGE: xchange
     steps:
-    
+
     - name: Check out RedisX
       uses: actions/checkout@v4
-    
-    - name: Check out xchange 
+
+    - name: Check out xchange
       uses: actions/checkout@v4
       with:
         repository: Smithsonian/xchange
         path: xchange
-    
+
     - name: install dependencies
       run: sudo apt-get install -y cppcheck
-    
+
     - name: Run cppcheck
       run: make analyze

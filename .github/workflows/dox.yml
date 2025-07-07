@@ -53,7 +53,7 @@ jobs:
 
     runs-on: ubuntu-latest
     steps:
-    
+
     - name: install doxygen
       run: sudo apt-get install doxygen
 
@@ -70,7 +70,7 @@ jobs:
         path: xchange
 
     - name: Generate docs
-      run: make -C xchange local-dox 
+      run: make -C xchange local-dox
 
     - name: Generate headless README for RedisX
       run: make -C redisx README-redisx.md
@@ -140,4 +140,3 @@ jobs:
         git config --global user.name "github-actions"
         git add -A
         git commit -m "[automated site update]" && git push || true
-

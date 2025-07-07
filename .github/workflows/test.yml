@@ -1,6 +1,6 @@
 name: Tests
 
-on: 
+on:
   push:
     branches:
       - main
@@ -37,7 +37,7 @@ jobs:
     - name: Check out RedisX
       uses: actions/checkout@v4
 
-    - name: Check out xchange 
+    - name: Check out xchange
       uses: actions/checkout@v4
       with:
         repository: Smithsonian/xchange
@@ -60,7 +60,7 @@ jobs:
 
     - name: Configure Redis
       run: sudo sed -i "s:^protected mode[[:blank:]]*yes:protected mode no:g" /etc/redis/redis.conf
-      
+
     - name: Start Redis
       run: sudo systemctl start redis-server
 
@@ -93,13 +93,13 @@ jobs:
     steps:
       - name: Check out RedisX
         uses: actions/checkout@v4
-        
-      - name: Check out xchange 
+
+      - name: Check out xchange
         uses: actions/checkout@v4
         with:
           repository: Smithsonian/xchange
           path: xchange
-          
+
       - uses: uraimo/run-on-arch-action@v3
         name: Run regression tests
         id: test
@@ -122,4 +122,3 @@ jobs:
             make tools
             make test
             bin/redisx-cli hello
-
