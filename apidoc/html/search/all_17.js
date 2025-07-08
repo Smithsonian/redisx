@@ -1,7 +1,12 @@
 var searchData=
 [
-  ['valkey_20features_0',['Redis / Valkey Features',['../index.html#autotoc_md11',1,'']]],
-  ['value_1',['value',['../../../xchange/apidoc/html/structXField.html#a0f61d63b009d0880a89c843bd50d8d76',1,'XField::value'],['../structRESP.html#a0f61d63b009d0880a89c843bd50d8d76',1,'RESP::value'],['../structRedisMap.html#a449b0c7dacd31c5e7edf071da3bda96a',1,'RedisMap::value'],['../structRedisEntry.html#a4e9aec275e566b978a3ccb4e043d8c61',1,'RedisEntry::value']]],
-  ['value_20data_2',['Accessing key / value data',['../index.html#autotoc_md39',1,'']]],
-  ['values_3',['Getting and setting keyed values',['../index.html#autotoc_md40',1,'']]]
+  ['xchange_2ec_0',['xchange.c',['../../../xchange/apidoc/html/xchange_8c.html',1,'']]],
+  ['xchange_2eh_1',['xchange.h',['../../../xchange/apidoc/html/xchange_8h.html',1,'']]],
+  ['xfield_2',['XField',['../../../xchange/apidoc/html/structXField.html',1,'']]],
+  ['xjson_2ec_3',['xjson.c',['../../../xchange/apidoc/html/xjson_8c.html',1,'']]],
+  ['xjson_2eh_4',['xjson.h',['../../../xchange/apidoc/html/xjson_8h.html',1,'']]],
+  ['xlookup_2ec_5',['xlookup.c',['../../../xchange/apidoc/html/xlookup_8c.html',1,'']]],
+  ['xlookuptable_6',['XLookupTable',['../../../xchange/apidoc/html/structXLookupTable.html',1,'']]],
+  ['xstruct_2ec_7',['xstruct.c',['../../../xchange/apidoc/html/xstruct_8c.html',1,'']]],
+  ['xstructure_8',['XStructure',['../../../xchange/apidoc/html/structXStructure.html',1,'']]]
 ];
