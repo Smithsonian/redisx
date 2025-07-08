@@ -162,6 +162,8 @@ int rSetServerAsync(Redis *redis, const char *desc, const char *hostname, int po
  *
  */
 static void rConfigSocket(int socket, int timeoutMillis, int tcpBufSize, boolean lowLatency) {
+  static const char *fn = "RedisX";
+
   const boolean enable = TRUE;
   struct linger linger;
 
@@ -171,7 +173,7 @@ static void rConfigSocket(int socket, int timeoutMillis, int tcpBufSize, boolean
   linger.l_onoff = FALSE;
   linger.l_linger = 0;
   if(setsockopt(socket, SOL_SOCKET, SO_LINGER, & linger, sizeof(struct linger)))
-    xvprintf("WARNING! Redis-X: socket linger not set: %s", strerror(errno));
+    x_warn(fn, "socket linger not set: %s", strerror(errno));
 
   if(timeoutMillis > 0) {
     struct timeval timeout;
@@ -180,7 +182,7 @@ static void rConfigSocket(int socket, int timeoutMillis, int tcpBufSize, boolean
     timeout.tv_sec = timeoutMillis / 1000;
     timeout.tv_usec = 1000 * (timeoutMillis % 1000);
     if(setsockopt(socket, SOL_SOCKET, SO_SNDTIMEO, & timeout, sizeof(struct timeval)))
-      xvprintf("WARNING! Redix-X: socket send timeout not set: %s", strerror(errno));
+      x_warn(fn, "socket send timeout not set: %s", strerror(errno));
   }
 
 #if __linux__
@@ -190,19 +192,19 @@ static void rConfigSocket(int socket, int timeoutMillis, int tcpBufSize, boolean
     // Optimize service for latency or throughput
     // LynxOS 3.1 does not support IP_TOS option...
     if(setsockopt(socket, IPPROTO_IP, IP_TOS, &tos, sizeof(tos)))
-      xvprintf("WARNING! Redis-X: socket type-of-service not set: %s", strerror(errno));
+      x_warn(fn, "socket type-of-service not set: %s", strerror(errno));
   }
 #endif
 
 #if !(__Lynx__ && __powerpc__)
   // Send packets immediately even if small...
   if(lowLatency) if(setsockopt(socket, IPPROTO_TCP, TCP_NODELAY, & enable, sizeof(int)))
-    xvprintf("WARNING! Redis-X: socket tcpnodelay not enabled: %s", strerror(errno));
+    x_warn(fn, "socket tcpnodelay not enabled: %s", strerror(errno));
 #endif
 
   // Check connection to remote every once in a while to detect if it's down...
   if(setsockopt(socket, SOL_SOCKET, SO_KEEPALIVE, & enable, sizeof(int)))
-    xvprintf("WARNING! Redis-X: socket keep-alive not enabled: %s", strerror(errno));
+    x_warn(fn, "socket keep-alive not enabled: %s", strerror(errno));
 
   // Allow to reconnect to closed RedisX sockets immediately
   //  if(setsockopt(socket, SOL_SOCKET, SO_REUSEADDR, & enable, sizeof(int)))
@@ -211,10 +213,10 @@ static void rConfigSocket(int socket, int timeoutMillis, int tcpBufSize, boolean
   // Set the TCP buffer size to use. Larger buffers facilitate more throughput.
   if(tcpBufSize > 0) {
     if(setsockopt(socket, SOL_SOCKET, SO_SNDBUF, &tcpBufSize, sizeof(int)))
-      xvprintf("WARNING! Redis-X: socket send buf size not set: %s", strerror(errno));
+      x_warn(fn, "socket send buf size not set: %s", strerror(errno));
 
     if(setsockopt(socket, SOL_SOCKET, SO_RCVBUF, &tcpBufSize, sizeof(int)))
-      xvprintf("WARNING! Redis-X: socket send buf size not set: %s", strerror(errno));
+      x_warn(fn, "socket send buf size not set: %s", strerror(errno));
   }
 }
 
@@ -302,7 +304,7 @@ int rConnectAsync(Redis *redis, boolean usePipeline) {
 
     if(status) {
       if(!warnedInteractive) {
-        xvprintf("WARNING! Redis-X : interactive client connection failed: %s\n", redisxErrorDescription(status));
+        x_warn("RedisX", "interactive client connection failed: %s\n", redisxErrorDescription(status));
         warnedInteractive = TRUE;
       }
       return x_trace(fn, "interactive", X_NO_SERVICE);
@@ -323,7 +325,7 @@ int rConnectAsync(Redis *redis, boolean usePipeline) {
 
       if(status) {
         if(!warnedPipeline) {
-          xvprintf("WARNING! Redis-X : pipeline client connection failed: %s\n", redisxErrorDescription(status));
+          x_warn("RedisX", "pipeline client connection failed: %s\n", redisxErrorDescription(status));
           warnedPipeline = TRUE;
         }
         return x_trace(fn, "pipeline", X_NO_SERVICE);
@@ -358,7 +360,7 @@ static void rDisconnectClientAsync(RedisClient *cl) {
   shutdown(sock, SHUT_RD);
   status = close(sock);
 
-  if(status) xdprintf("WARNING! Redis-X: client %d close socket error %d.\n", cp->idx, status);
+  if(status) x_warn("rDisconnectClientAsync", "client %d close() error: %s.\n", (int) cp->idx, strerror(errno));
 }
 
 /**
@@ -1105,7 +1107,7 @@ void *RedisPipelineListener(void *pRedis) {
   xvprintf("Redis-X> Stopped processing pipeline responses (%ld processed)...\n", counter);
 
   pthread_mutex_lock(&cp->pendingLock);
-  if(cp->pendingRequests > 0) xvprintf("WARNING! pipeline disabled with %d pending requests in queue.\n", cp->pendingRequests);
+  if(cp->pendingRequests > 0) x_warn("RedisX", "pipeline disabled with %d pending requests in queue.\n", cp->pendingRequests);
   pthread_mutex_unlock(&cp->pendingLock);
 
   rConfigLock(redis);
