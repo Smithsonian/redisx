@@ -486,7 +486,7 @@ static void rNotifyConsumers(Redis *redis, char *pattern, char *channel, char *m
   RedisSubscriberCall *f = NULL;
   int n = 0;
 
-  xdprintf("NOTIFY: %s | %s\n", channel, msg);
+  xvprintf("NOTIFY: %s | %s\n", channel, msg);
 
   if(rSubscriberLock(redis) != X_SUCCESS) return;
   p = (RedisPrivate *) redis->priv;
