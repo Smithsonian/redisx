@@ -84,8 +84,8 @@ static int rTransmitErrorAsync(ClientPrivate *cp, const char *op) {
     if(p->config.transmitErrorFunc) {
       p->config.transmitErrorFunc(cp->redis, cp->idx, op);
       if(cp->isEnabled) {
-        if(errno == EAGAIN || errno == EWOULDBLOCK) status = x_error(X_TIMEDOUT, errno, "rTransmitErrorAsync", "%s timed out on %s channel %d\n", op, cp->redis->id, cp->idx);
-        else status = x_error(X_NO_SERVICE, errno, "rTransmitErrorAsync", "%s failed on %s channel %d\n", op, cp->redis->id, cp->idx);
+        if(errno == EAGAIN || errno == EWOULDBLOCK) status = x_error(X_TIMEDOUT, errno, "rTransmitErrorAsync", "%s timed out on %s channel %d\n", op, cp->redis->id, (int) cp->idx);
+        else status = x_error(X_NO_SERVICE, errno, "rTransmitErrorAsync", "%s failed on %s channel %d\n", op, cp->redis->id, (int) cp->idx);
       }
     }
   }
@@ -105,7 +105,7 @@ static int rReadChunkAsync(ClientPrivate *cp) {
 
   memset(&pfd, 0, sizeof(pfd));
 
-  if(sock < 0) return x_error(X_NO_SERVICE, ENOTCONN, "rReadChunkAsync", "client %d: not connected", cp->idx);
+  if(sock < 0) return x_error(X_NO_SERVICE, ENOTCONN, "rReadChunkAsync", "client %d: not connected", (int) cp->idx);
 
   // Reset errno prior to the call.
   errno = 0;
@@ -130,7 +130,7 @@ static int rReadChunkAsync(ClientPrivate *cp) {
     else
 #endif
     cp->available = recv(sock, cp->in, REDISX_RCVBUF_SIZE, 0);
-    trprintf(" ... read %d bytes from client %d socket.\n", cp->available, cp->idx);
+    trprintf(" ... read %d bytes from client %d socket.\n", cp->available, (int) cp->idx);
   }
   else cp->available = -1;
 
@@ -292,10 +292,10 @@ static int rSendBytesAsync(ClientPrivate *cp, const char *buf, int length, boole
 
   if(!buf) return x_error(X_NULL, EINVAL, fn, "buffer is NULL");
 
-  trprintf(" >>> '%s'\n", buf);
+  trprintf("\n ... write %d bytes to client %d socket\n%s\n", length, (int) cp->idx, buf);
 
-  if(!cp->isEnabled) return x_error(X_NO_SERVICE, ENOTCONN, fn, "client %d: disabled", cp->idx);
-  if(sock < 0) return x_error(X_NO_SERVICE, ENOTCONN, fn, "client %d: not connected", cp->idx);
+  if(!cp->isEnabled) return x_error(X_NO_SERVICE, ENOTCONN, fn, "client %d: disabled", (int) cp->idx);
+  if(sock < 0) return x_error(X_NO_SERVICE, ENOTCONN, fn, "client %d: not connected", (int) cp->idx);
 
   while(length > 0) {
     int n;
