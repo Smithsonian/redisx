@@ -585,13 +585,17 @@ And then to free up all resources used by the `Redis` instance, you might also c
 ### Reconnecting
 
 Reconnections to the Redis servers are never automatic, and there is no automatic failover for __RedisX__ clients
-(there are good reasons for that). It is up to you to decide when to reconnect and how exactly. For example, the 
-application may reconnect to the same or different server (including Sentinel), and perform a set of necessary 
-recovery steps, to continue where things were left off on the previous connection, such as:
+(there are good reasons for that). It is up to you to decide when to reconnect and what needs to be done exactly to
+ensure continuity after reconnection for your application. For example, the application may reconnect to the same or 
+different server (including Sentinel), and perform a set of necessary recovery steps, to continue where things were 
+left off on the previous connection, such as:
 
- - reload LUA scripts
- - reinstate subscriptions
- - re-submit any request for which no replies have been received before the connection was broken.
+ - reload LUA scripts.
+ - reinstate subscriptions.
+ - check what database changes may have been missed (e.g. `INVALIDATE` or other push notifications or PUB/SUB 
+   messages that may have been sent) while the connection was down. Perhaps you have to fetch some data again to ensure 
+   they are current after reconnecting.
+ - re-submit any request for which no replies have been received prior to the connection being broken.
  - re-publish any notifications on PUB/SUB, which may not have been delivered.
  
 
@@ -606,7 +610,7 @@ recovery steps, to continue where things were left off on the previous connectio
  - [RESP data type](#resp-data-type)
 
 
-Redis queries are sent as strings, according the the specification of the Redis protocol. All responses sent back by 
+Redis queries are sent as strings, according to the specification of the Redis protocol. All responses sent back by 
 the server using the RESP protocol. Specifically, Redis uses version 2 of the RESP protocol (a.k.a. RESP2) by 
 default, with optional support for the newer RESP3 introduced in Redis version 6.0. The __RedisX__ library provides
 support for both RESP2 and RESP3.
