@@ -526,11 +526,12 @@ Disconnecting</h3>
 </div><!-- fragment --><p><a class="anchor" id="redisx-reconnecting"></a> </p>
 <h3><a class="anchor" id="autotoc_md31"></a>
 Reconnecting</h3>
-<p>Reconnections to the <a class="el" href="structRedis.html" title="Structure that represents a Redis database instance, with one or more RedisClient connections.">Redis</a> servers are never automatic, and there is no automatic failover for <b>RedisX</b> clients (there are good reasons for that). It is up to you to decide when to reconnect and how exactly. For example, the application may reconnect to the same or different server (including Sentinel), and perform a set of necessary recovery steps, to continue where things were left off on the previous connection, such as:</p>
+<p>Reconnections to the <a class="el" href="structRedis.html" title="Structure that represents a Redis database instance, with one or more RedisClient connections.">Redis</a> servers are never automatic, and there is no automatic failover for <b>RedisX</b> clients (there are good reasons for that). It is up to you to decide when to reconnect and what needs to be done exactly to ensure continuity after reconnection for your application. For example, the application may reconnect to the same or different server (including Sentinel), and perform a set of necessary recovery steps, to continue where things were left off on the previous connection, such as:</p>
 <ul>
-<li>reload LUA scripts</li>
-<li>reinstate subscriptions</li>
-<li>re-submit any request for which no replies have been received before the connection was broken.</li>
+<li>reload LUA scripts.</li>
+<li>reinstate subscriptions.</li>
+<li>check what database changes may have been missed (e.g. <code>INVALIDATE</code> or other push notifications or PUB/SUB messages that may have been sent) while the connection was down. Perhaps you have to fetch some data again to ensure they are current after reconnecting.</li>
+<li>re-submit any request for which no replies have been received prior to the connection being broken.</li>
 <li>re-publish any notifications on PUB/SUB, which may not have been delivered.</li>
 </ul>
 <hr  />
