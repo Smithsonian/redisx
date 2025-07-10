@@ -592,7 +592,7 @@ left off on the previous connection, such as:
  - [RESP data type](#resp-data-type)
 
 
-Redis queries are sent as strings, according the the specification of the Redis protocol. All responses sent back by 
+Redis queries are sent as strings, according to the specification of the Redis protocol. All responses sent back by 
 the server using the RESP protocol. Specifically, Redis uses version 2 of the RESP protocol (a.k.a. RESP2) by 
 default, with optional support for the newer RESP3 introduced in Redis version 6.0. The __RedisX__ library provides
 support for both RESP2 and RESP3.
