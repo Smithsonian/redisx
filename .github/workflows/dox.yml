@@ -110,7 +110,6 @@ jobs:
         git add -A
         git commit -m "[automated site update]" && git push || true
 
-
   changelog-update:
     name: Update CHANGELOG on github pages
     if: github.repository_owner == 'Smithsonian' && contains(github.event.head_commit.message, 'changelog update')
