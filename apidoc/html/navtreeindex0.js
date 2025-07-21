@@ -63,14 +63,15 @@ var NAVTREEINDEX0 =
 "index.html#autotoc_md63":[13,0],
 "index.html#autotoc_md65":[14],
 "index.html#autotoc_md67":[15],
+"index.html#autotoc_md69":[16],
 "index.html#autotoc_md7":[1],
 "index.html#autotoc_md8":[1,0],
 "index.html#autotoc_md9":[1,1],
 "md_CHANGELOG.html":[0],
-"md_CHANGELOG.html#autotoc_md1":[0,16],
-"md_CHANGELOG.html#autotoc_md2":[0,16,0],
-"md_CHANGELOG.html#autotoc_md3":[0,16,1],
-"md_CHANGELOG.html#autotoc_md4":[0,17],
+"md_CHANGELOG.html#autotoc_md1":[0,17],
+"md_CHANGELOG.html#autotoc_md2":[0,17,0],
+"md_CHANGELOG.html#autotoc_md3":[0,17,1],
+"md_CHANGELOG.html#autotoc_md4":[0,18],
 "md_CONTRIBUTING.html":[1],
 "pages.html":[],
 "redisx-client_8c.html":[4,0,1,0],
@@ -248,6 +249,5 @@ var NAVTREEINDEX0 =
 "redisx_8h.html#a48b6b8949276f59cd2f13d6b13384996":[4,0,0,0,73],
 "redisx_8h.html#a48e370d18ae57f463116e2cfe52570ce":[4,0,0,0,17],
 "redisx_8h.html#a4b5674d08da07250c0ca6116a4c48ccf":[4,0,0,0,44],
-"redisx_8h.html#a4c268c33f23438af67117b09c26ec615":[4,0,0,0,41],
-"redisx_8h.html#a5349b7340813fbd1e32d04ed650bc3d9":[4,0,0,0,35]
+"redisx_8h.html#a4c268c33f23438af67117b09c26ec615":[4,0,0,0,41]
 };

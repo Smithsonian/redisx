@@ -141,6 +141,7 @@ Table of Contents</h2>
 <li><a class="el" href="index.html#redisx-error-handling">Error handling</a></li>
 <li><a class="el" href="index.html#redisx-debug-support">Debug support</a></li>
 <li><a class="el" href="index.html#redisx-future-plans">Future plans</a></li>
+<li><a class="el" href="index.html#release-schedule">Release schedule</a></li>
 </ul>
 <p><a class="anchor" id="redisx-introduction"></a> </p>
 <h2><a class="anchor" id="autotoc_md7"></a>
@@ -1264,6 +1265,14 @@ Future plans</h2>
 <li>Add more high-level <a href="https://redis.io/docs/latest/commands/">Redis commands</a>, e.g. for lists, streams, etc.</li>
 </ul>
 <p>If you have an idea for a must have feature, please let me (Attila) know. Pull requests, for new features or fixes to existing ones, are especially welcome!</p>
+<hr  />
+<p><a class="anchor" id="release-schedule"></a> </p>
+<h2><a class="anchor" id="autotoc_md69"></a>
+Release schedule</h2>
+<p>A predictable release schedule and process can help manage expectations and reduce stress on adopters and developers alike.</p>
+<p><b>RedisX</b> will try to follow a quarterly release schedule. You may expect upcoming releases to be published around <b>February 15</b>, <b>May 15</b>, <b>August 15</b>, and/or <b>November 15</b> each year, on an as-needed basis. That means that if there are outstanding bugs, or new pull requests (PRs), you may expect a release that addresses these in the upcoming quarter. The dates are placeholders only, with no guarantee that a new release will actually be available every quarter. If nothing of note comes up, a potential release date may pass without a release being published.</p>
+<p>New features are generally reserved for the feature releases (e.g. <b>1.x.0</b> version bumps), although they may also be rolled out in bug-fix releases as long as they do not affect the existing API &ndash; in line with the desire to keep bug-fix releases fully backwards compatible with their parent versions.</p>
+<p>In the weeks and month(s) preceding releases one or more <em>release candidates</em> (e.g. <code>1.0.1-rc3</code>) will be published temporarily on GitHub, under <a href="https://github.com/Smithsonian/redisx/releases">Releases</a>, so that changes can be tested by adopters before the releases are finalized. Please use due diligence to test such release candidates with your code when they become available to avoid unexpected surprises when the finalized release is published. Release candidates are typically available for one week only before they are superseded either by another, or by the finalized release.</p>
 <hr  />
 <p> Copyright (C) 2025 Attila Kovács </p>
 </div></div><!-- PageDoc -->
