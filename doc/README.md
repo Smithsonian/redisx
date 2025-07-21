@@ -28,7 +28,7 @@ Updated for 1.0 and later releases.
  - [Error handling](#redisx-error-handling)
  - [Debug support](#redisx-debug-support)
  - [Future plans](#redisx-future-plans)
- - [Release schedule](#redisx-release-schedule)
+ - [Release schedule](#release-schedule)
  
 
 <a name="redisx-introduction"></a>
@@ -1691,7 +1691,7 @@ existing ones, are especially welcome!
 
 -----------------------------------------------------------------------------
 
-<a name="redisx-release-schedule"></a>
+<a name="release-schedule"></a>
 ## Release schedule
 
 A predictable release schedule and process can help manage expectations and reduce stress on adopters and developers 

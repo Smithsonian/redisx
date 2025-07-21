@@ -2369,6 +2369,6 @@
     <docanchor file="index.html">redisx-error-handling</docanchor>
     <docanchor file="index.html">redisx-debug-support</docanchor>
     <docanchor file="index.html">redisx-future-plans</docanchor>
-    <docanchor file="index.html">redisx-release-schedule</docanchor>
+    <docanchor file="index.html">release-schedule</docanchor>
   </compound>
 </tagfile>
