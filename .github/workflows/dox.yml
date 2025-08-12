@@ -41,7 +41,7 @@ jobs:
       run: sudo apt-get install doxygen
 
     - name: Check out RedisX
-      uses: actions/checkout@v4
+      uses: actions/checkout@v5
 
     - name: Generate docs
       run: make local-dox
@@ -58,13 +58,13 @@ jobs:
       run: sudo apt-get install doxygen
 
     - name: Checkout source
-      uses: actions/checkout@v4
+      uses: actions/checkout@v5
       with:
         repository: Smithsonian/redisx
         path: redisx
 
     - name: Check out xchange
-      uses: actions/checkout@v4
+      uses: actions/checkout@v5
       with:
         repository: Smithsonian/xchange
         path: xchange
@@ -82,7 +82,7 @@ jobs:
         working-directory: ./redisx
 
     - name: Checkout gh-pages
-      uses: actions/checkout@v4
+      uses: actions/checkout@v5
       with:
         ref: 'gh-pages'
         path: site
@@ -118,10 +118,10 @@ jobs:
     steps:
 
     - name: Checkout source
-      uses: actions/checkout@v4
+      uses: actions/checkout@v5
 
     - name: Checkout gh-pages
-      uses: actions/checkout@v4
+      uses: actions/checkout@v5
       with:
         ref: 'gh-pages'
         path: site
