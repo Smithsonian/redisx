@@ -5,6 +5,13 @@
  * @author Attila Kovacs
  *
  *   Network layer management functions for the RedisX library.
+ *
+ *
+ * Notes:
+ *
+ *  - Some older platforms (e.g. LynxOS 3.1.0) do not have proper support for IPv6. Therefore
+ *    this source code will assume IPv6 support starting POSIX-1.2001 only. We'll use
+ *    _POSIX_C_SOURCE &lt;= 200112L to decide whether or not to build with IPv6 support.
  */
 
 #include <stdio.h>
@@ -63,60 +70,69 @@ static pthread_mutex_t serverLock = PTHREAD_MUTEX_INITIALIZER;
  * is returned.
  *
  * \param hostName      The host name, e.g. "localhost"
- * \param ip            Pointer to the string buffer to which to write the corresponding IP.
+ * \param[out] ip       Pointer to the string buffer to which to write the corresponding IP.
+ * \param[out] addr     Pointer to sockaddr structure to populate. It should accommodate both
+ *                      in_addr and in6_addr data types.
  *
- * \return              X_SUCESSS       if the name was successfully matched to an IP address.
+ * \return              AF_INET         The host name was matched to an IPv4 address.
+ *                      AF_INET6        The host name was matched to an IPv6 address.
  *                      X_NAME_INVALID  if the no host is known by the specified name.
  *                      X_NULL          if hostName is NULL or if it is not associated to any valid IP address.
  */
-static int hostnameToIP(const char *hostName, char *ip) {
+static int hostnameToIP(const char *hostName, char *ip, void *addr) {
   static const char *fn = "hostnameToIP";
 
-#  if _POSIX_C_SOURCE >= 200112L
+#if _POSIX_C_SOURCE >= 200112L
   // getaddrinfo() is POSIX-1.2001, so it appears in GCC 3.0, more or less...
   struct addrinfo *infList, *inf;
-#  else
-  // For earlier GCC use gethostbyname() instead.
-  const struct hostent  *server;
-  struct in_addr **addresses;
-  int i;
-#  endif
+  int fam;
 
   *ip = '\0';
 
   if(hostName == NULL) return x_error(X_NULL, EINVAL, fn, "input hostName is NULL");
   if(!hostName[0]) return x_error(X_NULL, EINVAL, fn, "input hostName is empty");
 
-#  if _POSIX_C_SOURCE >= 200112L
   if(getaddrinfo(hostName, NULL, NULL, &infList) != 0)
     return x_error(X_NAME_INVALID, errno, fn, "host lookup failed for: %s.", hostName);
 
+  // Use the first IPv4 or IPv6 address
   for(inf = infList; inf != NULL; inf = inf->ai_next)
-    if((inf->ai_family == AF_INET ||  inf->ai_family == AF_INET6) && inf->ai_addrlen >= sizeof(struct in_addr)) break;
+    if(inf->ai_family == AF_INET || inf->ai_family == AF_INET6) break;
 
   if(!inf || !inf->ai_addr) {
     freeaddrinfo(infList);
     return x_error(X_NAME_INVALID, errno, fn, "host has no address: %s.", hostName);
   }
 
-  strcpy(ip, inet_ntoa(((struct sockaddr_in *) inf->ai_addr)->sin_addr));
-  freeaddrinfo(infList);
+  fam = inf->ai_family;
+  if(fam == AF_INET6)
+    *(struct in6_addr *) addr = ((struct sockaddr_in6 *) inf->ai_addr)->sin6_addr;
+  else
+    *(struct in_addr *) addr = ((struct sockaddr_in *) inf->ai_addr)->sin_addr;
 
-  return X_SUCCESS;
+  freeaddrinfo(infList);
+  inet_ntop(fam, addr, ip, IP_ADDRESS_LENGTH);
+
+  return fam;
 #else
+  // For earlier GCC use gethostbyname() instead.
+  const struct hostent  *server;
+  struct in_addr **addresses;
+
   server = gethostbyname((char *) hostName);
   if (server == NULL)
     return x_error(X_NAME_INVALID, errno, fn, "host lookup failed for: %s.", hostName);
 
   addresses = (struct in_addr **) server->h_addr_list;
 
-  for(i = 0; addresses[i] != NULL; i++) {
-    // Return the first one...
-    strcpy(ip, inet_ntoa(*addresses[i]));
-    return X_SUCCESS;
-  }
-
+  if(!addresses || !addresses[0])
   return x_error(X_NULL, ENODEV, fn, "no valid address for host %s", hostName);
+
+  // Return the first one...
+  *(struct in_addr *) addr = *addresses[0];
+  strcpy(ip, inet_ntoa(*addresses[0]));
+
+  return AF_INET;
 #endif
 }
 
@@ -134,15 +150,13 @@ int rSetServerAsync(Redis *redis, const char *desc, const char *hostname, int po
 
   RedisPrivate *p = (RedisPrivate *) redis->priv;
   char ipAddress[IP_ADDRESS_LENGTH] = {'\0'};
-  int status;
 
   if(!hostname) return x_error(X_NULL, EINVAL, fn, "%s address is NULL", desc);
   if(!hostname[0]) return x_error(X_NAME_INVALID, EINVAL, fn, "%s name is empty", desc);
 
-  status = hostnameToIP(hostname, ipAddress);
-  if(status) return x_trace(fn, desc, status);
+  p->in_family = hostnameToIP(hostname, ipAddress, (void *) &p->addr);
+  if(p->in_family < 0) return x_trace(fn, desc, p->in_family);
 
-  p->addr = inet_addr((char *) ipAddress);
   p->hostname = xStringCopyOf(hostname);
   p->port = port > 0 ? port : REDISX_TCP_PORT;
 
@@ -658,7 +672,14 @@ int rConnectClientAsync(Redis *redis, enum redisx_channel channel) {
   extern int rConnectTLSClientAsync(ClientPrivate *cp, const TLSConfig *tls);
 #endif
 
-  struct sockaddr_in serverAddress;
+  union {
+    struct sockaddr_in v4;
+#if _POSIX_C_SOURCE >= 200112L
+    struct sockaddr_in6 v6;
+#endif
+  } serverAddress = {};
+  int addrlen = sizeof(struct sockaddr_in);
+
   struct utsname u;
   RedisPrivate *p;
   RedisClient *cl;
@@ -679,12 +700,25 @@ int rConnectClientAsync(Redis *redis, enum redisx_channel channel) {
 
   port = p->port > 0 ? p->port : REDISX_TCP_PORT;
 
-  serverAddress.sin_family      = AF_INET;
-  serverAddress.sin_port        = htons(port);
-  serverAddress.sin_addr.s_addr = p->addr;
-  memset(serverAddress.sin_zero, 0, sizeof(serverAddress.sin_zero));
+#if _POSIX_C_SOURCE >= 200112L
+  if(p->in_family == AF_INET6) {
+    serverAddress.v6.sin6_family = AF_INET6;
+    serverAddress.v6.sin6_port   = htons(port);
+    serverAddress.v6.sin6_addr   = p->addr.v6;
+    addrlen = sizeof(struct sockaddr_in6);
+  }
+  else {
+#endif
+    serverAddress.v4.sin_family = AF_INET;
+    serverAddress.v4.sin_port   = htons(port);
+    serverAddress.v4.sin_addr   = p->addr.v4;
+    memset(&serverAddress.v4.sin_zero, 0, sizeof(serverAddress.v4.sin_zero));
+#if _POSIX_C_SOURCE >= 200112L
+  }
+#endif
 
-  if((sock = socket(PF_INET, SOCK_STREAM, IPPROTO_TCP)) < 0)
+  sock = socket(p->in_family, SOCK_STREAM, IPPROTO_TCP);
+  if(sock < 0)
     return x_error(X_NO_SERVICE, errno, fn, "client %d socket creation failed", channel);
 
   rConfigSocket(sock, config->timeoutMillis, config->tcpBufSize, rIsLowLatency(cp));
@@ -700,7 +734,9 @@ int rConnectClientAsync(Redis *redis, enum redisx_channel channel) {
   }
   else
 #endif
-  if(connect(sock, (struct sockaddr *) &serverAddress, sizeof(serverAddress)) < 0) {
+
+
+  if(connect(sock, (struct sockaddr *) &serverAddress, addrlen) < 0) {
     close(sock);
     return x_error(X_NO_INIT, errno, fn, "failed to connect to %s:%hu: %s", redis->id, port, strerror(errno));
   }

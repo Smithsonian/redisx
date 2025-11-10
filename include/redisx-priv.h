@@ -15,6 +15,8 @@
 
 #include <pthread.h>
 #include <stdint.h>
+#include <netinet/in.h>
+
 #if WITH_TLS
 #  include <openssl/ssl.h>
 #endif
@@ -117,7 +119,14 @@ typedef struct {
 
   RedisSentinel *sentinel;      ///< Sentinel (high-availability) server configuration.
   RedisCluster *cluster;        ///< Cluster, in which this instance is a member
-  uint32_t addr;                ///< The 32-bit inet address
+
+  int in_family;                ///< AF_INET or AF_INET6
+  union {
+    struct in_addr v4;          ///< IPv4 address
+#if _POSIX_C_SOURCE >= 200112L
+    struct in6_addr v6;         ///< IPv6 address (since POSIX-1.2001)
+#endif
+  } addr;                       ///< IP address
 
   RedisConfig config;
   pthread_mutex_t configLock;
