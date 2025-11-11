@@ -7,6 +7,18 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 
+## [Unreleased]
+
+### Added
+
+ - #13: IPv6 support.
+
+### Changed
+
+ - #13: Replaced deprecated `inet_addr()` and `inet_ntoa()` functions with more modern equivalents, which support IPv6
+   also.
+   
+
 ## [1.0.1] - 2025-08-01
 
 Bug fix release.
