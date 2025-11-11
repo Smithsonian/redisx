@@ -154,7 +154,11 @@ Functions</h2></td></tr>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><dl class="section date"><dt>Date</dt><dd>Created on Aug 26, 2024 </dd></dl>
 <dl class="section author"><dt>Author</dt><dd>Attila Kovacs</dd></dl>
-<p>Network layer management functions for the RedisX library. </p>
+<p>Network layer management functions for the RedisX library.</p>
+<p>Notes:</p>
+<ul>
+<li>Some older platforms (e.g. LynxOS 3.1.0) do not have proper support for IPv6. Therefore this source code will assume IPv6 support starting POSIX-1.2001 only. We'll use _POSIX_C_SOURCE &lt;= 200112L to decide whether or not to build with IPv6 support. </li>
+</ul>
 </div><h2 class="groupheader">Function Documentation</h2>
 <a id="abc9dd988935375c5459bcaa09c17fa47" name="abc9dd988935375c5459bcaa09c17fa47"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#abc9dd988935375c5459bcaa09c17fa47">&#9670;&#160;</a></span>rCloseClientAsync()</h2>
