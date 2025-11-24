@@ -37,10 +37,10 @@ jobs:
       XCHANGE: xchange
     steps:
     - name: Check out RedisX
-      uses: actions/checkout@v5
+      uses: actions/checkout@v6
 
     - name: Check out xchange
-      uses: actions/checkout@v5
+      uses: actions/checkout@v6
       with:
         repository: Smithsonian/xchange
         path: xchange
