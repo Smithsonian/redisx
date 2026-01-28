@@ -409,7 +409,7 @@ will not be used, and RESP2 will be assumed -- which is best for older servers (
 always check the actual protocol used after connecting, using `redisxGetProtocol()`). Note, that after connecting, 
 you may retrieve the set of server properties sent in response to `HELLO` using `redisxGetHelloData()`.
 
-You can also set a timeout for the interative transactions, such as:
+You can also set a timeout for the interactive transactions, such as:
 
 ```c
   // (optional) Set a 1.5 second timeout for interactive replies
@@ -511,7 +511,7 @@ which you can then apply to your Redis instance as:
 The user of the __RedisX__ library might want to know when connections to the server are established, or when clients
 get disconnected (either as intended or as a result of errors), and may want to perform some configuration or clean-up 
 accordingly. For this reason, the library provides support for connection 'hooks' -- that is custom functions that are 
-called in the even of connecting to or disconnecting from a Redis server.
+called in the event of connecting to or disconnecting from a Redis server.
 
 Here is an example of a connection hook, which simply prints a message about the connection to the console.
 
@@ -531,7 +531,7 @@ And, it can be added to a Redis instance, between the `redisxInit()` and the `re
 
 You may add multiple callbacks. All of them will be called (in the same order as added) when connection is 
 established. You may also remove specific connection callbacks via `redisxRemoveConnectHook()` if you now longer want
-a particular function to be called any more in the even.
+a particular function to be called any more in the event.
 
 The same goes for disconnect hooks, using `redisxAddDisconnectHook()` / `redisxRemoveDisconnectHook()` instead.
 

@@ -108,7 +108,7 @@ boolean redisxIsVerbose() {
 
 /**
  * Enable or disable verbose reporting of all Redis bound traffic. It may be useful when debugging
- * programs that use the redisx interface. Verbose reporting is DISABLED by default.
+ * programs that use the redisx interface. Verbose reporting is disabled by default.
  *
  * \param value         TRUE to enable verbose reporting, or FALSE to disable.
  *

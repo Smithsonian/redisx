@@ -438,7 +438,7 @@ void rCloseClient(RedisClient *cl) {
 /// \endcond
 
 /**
- * Same as rCloseClient() except without the exlusive locking mechanism of the client's
+ * Same as redisxDisconnect() except without the exlusive locking mechanism of the client's
  * IO.
  *
  * \param redis         Pointer to a Redis instance.
@@ -452,6 +452,9 @@ void rDisconnectAsync(Redis *redis) {
   p->isPipelineListenerEnabled = FALSE;
 
   // Gracefully end subscriptions and close subscription client
+  p->isSubscriptionListenerEnabled = FALSE;
+
+  rCloseClient(redis->subscription);
   rCloseClient(redis->pipeline);
   rCloseClient(redis->interactive);
 
