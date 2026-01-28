@@ -9,7 +9,14 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ## [Unreleased]
 
+### Fixed
+
  - #26: `redisxDisconnect()` did not close subscription client.
+ 
+### Added
+
+ - New `redisxShutdownClients()` function to force shut down socket communication without closing the sockets. This
+   may be useful prior to reconnecting from a stale / broken connection.
  
 
 ## [1.0.2] - 2025-11-17

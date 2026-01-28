@@ -240,7 +240,7 @@ static char *readScript(const char *eval) {
  * @return          The argument list to pass to Redis , of the form:
  *                  `EVAL <script> <NKEYS> [key1 [key2] ...] [arg1 [arg2 ...]]`
  */
-static const char **setScriptArgs(char *script, const char **args, int *nargs) {
+static const char **setScriptArgs(const char *script, const char **args, int *nargs) {
   int i, to = 0, n = *nargs, nkeys = 0;
   char keys[20];
   const char **a;

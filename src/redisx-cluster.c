@@ -769,7 +769,8 @@ boolean redisxClusterIsRedirected(const RESP *reply) {
 Redis *redisxClusterGetRedirection(RedisCluster *cluster, const RESP *redirect, boolean refresh) {
   static const char *fn = "redisxClusterGetRedirection";
 
-  char *str, *tok;
+  const char *tok;
+  char *str;
 
   if(!cluster) {
     x_error(0, EINVAL, fn, "input cluster is NULL");

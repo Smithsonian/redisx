@@ -24,10 +24,10 @@
 #define REDISX_MAJOR_VERSION  1
 
 /// API minor version
-#define REDISX_MINOR_VERSION  0
+#define REDISX_MINOR_VERSION  1
 
 /// Integer sub version of the release
-#define REDISX_PATCHLEVEL     3
+#define REDISX_PATCHLEVEL     0
 
 /// Additional release information in version, e.g. "-1", or "-rc1".
 #define REDISX_RELEASE_STRING "-devel"
@@ -416,6 +416,7 @@ int redisxCheckValid(const Redis *redis);
 void redisxDestroy(Redis *redis);
 int redisxConnect(Redis *redis, boolean usePipeline);
 void redisxDisconnect(Redis *redis);
+void redisxShutdownClients(Redis *redis);
 int redisxReconnect(Redis *redis, boolean usePipeline);
 
 int redisxSetTLS(Redis *redis, const char *ca_path, const char *ca_file);

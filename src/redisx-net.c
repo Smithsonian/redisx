@@ -361,17 +361,25 @@ int rConnectAsync(Redis *redis, boolean usePipeline) {
   return status;
 }
 
+static void rShutdownClientAsync(RedisClient *cl) {
+  ClientPrivate *cp = (ClientPrivate *) cl->priv;
+  const int sock = cp->socket;      // Local copy of socket fd that won't possibly change mid-call.
+
+  cp->isEnabled = FALSE;            // No new synchronized requests or async reads.
+
+  if(sock < 0) return;
+
+  shutdown(sock, SHUT_RD);
+}
+
 static void rDisconnectClientAsync(RedisClient *cl) {
   ClientPrivate *cp = (ClientPrivate *) cl->priv;
   const int sock = cp->socket;      // Local copy of socket fd that won't possibly change mid-call.
   int status;
 
-  if(sock < 0) return;
+  rShutdownClientAsync(cl);
 
-  cp->isEnabled = FALSE;            // No new synchronized requests or async reads.
   cp->socket = -1;                  // Reset the channel's socket descriptor to 'unassigned'
-
-  shutdown(sock, SHUT_RD);
   status = close(sock);
 
   if(status) x_warn("rDisconnectClientAsync", "client %d close() error: %s.\n", (int) cp->idx, strerror(errno));
@@ -438,8 +446,26 @@ void rCloseClient(RedisClient *cl) {
 /// \endcond
 
 /**
- * Same as redisxDisconnect() except without the exlusive locking mechanism of the client's
- * IO.
+ * Shuts down the client sockets immediately, without waiting for pending transactions to
+ * clear. Use with extreme caution, such as reconnecting when communication is already
+ * disrupted.
+ *
+ * @param redis       Pointer to a Redis instance.
+ */
+void redisxShutdownClients(Redis *redis) {
+  rConfigLock(redis);
+
+  // Shut down clients immediately
+  rShutdownClientAsync(redis->subscription);
+  rShutdownClientAsync(redis->pipeline);
+  rShutdownClientAsync(redis->interactive);
+
+  rConfigUnlock(redis);
+}
+
+/**
+ * Same as redisxDisconnect() except without the exclusive configuration locking of the
+ * Redis instance.
  *
  * \param redis         Pointer to a Redis instance.
  *
@@ -458,8 +484,6 @@ void rDisconnectAsync(Redis *redis) {
   rCloseClient(redis->pipeline);
   rCloseClient(redis->interactive);
 
-  xvprintf("Redis-X> sockets closed.\n");
-
   // Call the cleanup hooks...
   for(f = p->config.firstCleanupCall; f != NULL; f = f->next) f->call(redis);
 
@@ -467,7 +491,7 @@ void rDisconnectAsync(Redis *redis) {
 }
 
 /**
- * Same as reconnectRedis() except without the exlusive locking mechanism.
+ * Same as redisxReconnect() except without the exclusive locking mechanism.
  */
 static int rReconnectAsync(Redis *redis, boolean usePipeline) {
   xvprintf("Redis-X> reconnecting to server...\n");
@@ -605,7 +629,7 @@ boolean rIsLowLatency(const ClientPrivate *cp) {
   return cp->idx != REDISX_PIPELINE_CHANNEL;
 }
 
-static int rHelloAsync(RedisClient *cl, char *clientID) {
+static int rHelloAsync(RedisClient *cl, const char *clientID) {
   ClientPrivate *cp = (ClientPrivate *) cl->priv;
   RedisPrivate *p = (RedisPrivate *) cp->redis->priv;
   RedisConfig *config = &p->config;
