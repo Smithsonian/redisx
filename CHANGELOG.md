@@ -13,10 +13,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
  - #26: `redisxDisconnect()` did not close subscription client.
  
-### Added
+### Changed
 
- - New `redisxShutdownClients()` function to force shut down socket communication without closing the sockets. This
-   may be useful prior to reconnecting from a stale / broken connection.
+ - Disconnecting a Redis instance now shuts down reads on its clients immediately, ensuring that we don't wait
+   forever on blocked reads.
  
 
 ## [1.0.2] - 2025-11-17

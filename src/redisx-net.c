@@ -446,24 +446,6 @@ void rCloseClient(RedisClient *cl) {
 /// \endcond
 
 /**
- * Shuts down the client sockets immediately, without waiting for pending transactions to
- * clear. Use with extreme caution, such as reconnecting when communication is already
- * disrupted.
- *
- * @param redis       Pointer to a Redis instance.
- */
-void redisxShutdownClients(Redis *redis) {
-  rConfigLock(redis);
-
-  // Shut down clients immediately
-  rShutdownClientAsync(redis->subscription);
-  rShutdownClientAsync(redis->pipeline);
-  rShutdownClientAsync(redis->interactive);
-
-  rConfigUnlock(redis);
-}
-
-/**
  * Same as redisxDisconnect() except without the exclusive configuration locking of the
  * Redis instance.
  *
@@ -477,9 +459,17 @@ void rDisconnectAsync(Redis *redis) {
   // Disable pipeline listener...
   p->isPipelineListenerEnabled = FALSE;
 
-  // Gracefully end subscriptions and close subscription client
+  // Gracefully end subscriptions..,.
   p->isSubscriptionListenerEnabled = FALSE;
 
+  // Stop reading from clients immediately.
+  // (stops background threads, releases read locks)
+  // Shut down clients immediately
+  rShutdownClientAsync(redis->subscription);
+  rShutdownClientAsync(redis->pipeline);
+  rShutdownClientAsync(redis->interactive);
+
+  // Close clients after obtaining exclusive locks on them...
   rCloseClient(redis->subscription);
   rCloseClient(redis->pipeline);
   rCloseClient(redis->interactive);
