@@ -1111,7 +1111,7 @@ RESP *redisxReadReplyAsync(RedisClient *cl, int *pStatus) {
 
       // Consistency check. Discard response if incomplete (because of read errors...)
       if(component) for(i = 0; i < resp->n; i++) if(component[i] == NULL || component[i]->type == RESP3_NULL) {
-        fprintf(stderr, "WARNING! Redis-X : incomplete array received (index %d of %d).\n", (i+1), resp->n);
+        if(cp->isEnabled) fprintf(stderr, "WARNING! Redis-X : incomplete array received (index %d of %d).\n", (i+1), resp->n);
         if(!status) status = REDIS_INCOMPLETE_TRANSFER;
         break;
       }
