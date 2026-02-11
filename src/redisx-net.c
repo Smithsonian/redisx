@@ -375,14 +375,14 @@ static void rShutdownClientAsync(RedisClient *cl) {
 static void rDisconnectClientAsync(RedisClient *cl) {
   ClientPrivate *cp = (ClientPrivate *) cl->priv;
   const int sock = cp->socket;      // Local copy of socket fd that won't possibly change mid-call.
-  int status;
 
   rShutdownClientAsync(cl);
 
-  cp->socket = -1;                  // Reset the channel's socket descriptor to 'unassigned'
-  status = close(sock);
-
-  if(status) x_warn("rDisconnectClientAsync", "client %d close() error: %s.\n", (int) cp->idx, strerror(errno));
+  if(sock >= 0) {
+    cp->socket = -1;                  // Reset the channel's socket descriptor to 'unassigned'
+    int status = close(sock);
+    if(status) x_warn("rDisconnectClientAsync", "client %d close() error: %s.\n", (int) cp->idx, strerror(errno));
+  }
 }
 
 /**
