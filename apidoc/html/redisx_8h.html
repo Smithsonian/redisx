@@ -45,7 +45,7 @@
 <table cellspacing="0" cellpadding="0">
  <tbody>
  <tr id="projectrow">
-  <td id="projectlogo"><img alt="Logo" src="smithsonian-logo-55x55.png"/></td>
+  <td id="projectlogo"><img alt="Logo" src="Sigmyne-logo-55x55.png"/></td>
   <td id="projectalign">
    <div id="projectname">RedisX<span id="projectnumber">&#160;v1.0</span>
    </div>
@@ -204,7 +204,7 @@ Macros</h2></td></tr>
 <tr class="memdesc:ab56c292120a99c1e841869b5c8d6dd5d"><td class="mdescLeft">&#160;</td><td class="mdescRight">API minor version. <br /></td></tr>
 <tr class="separator:ab56c292120a99c1e841869b5c8d6dd5d"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aa1c6cddd63b0cee67482cbda6986e8c6" id="r_aa1c6cddd63b0cee67482cbda6986e8c6"><td class="memItemLeft" align="right" valign="top"><a id="aa1c6cddd63b0cee67482cbda6986e8c6" name="aa1c6cddd63b0cee67482cbda6986e8c6"></a>
-#define&#160;</td><td class="memItemRight" valign="bottom"><b>REDISX_PATCHLEVEL</b>&#160;&#160;&#160;2</td></tr>
+#define&#160;</td><td class="memItemRight" valign="bottom"><b>REDISX_PATCHLEVEL</b>&#160;&#160;&#160;3</td></tr>
 <tr class="memdesc:aa1c6cddd63b0cee67482cbda6986e8c6"><td class="mdescLeft">&#160;</td><td class="mdescRight">Integer sub version of the release. <br /></td></tr>
 <tr class="separator:aa1c6cddd63b0cee67482cbda6986e8c6"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a57e8fa49f964f2ce738eeb0d9c0c89bf" id="r_a57e8fa49f964f2ce738eeb0d9c0c89bf"><td class="memItemLeft" align="right" valign="top"><a id="a57e8fa49f964f2ce738eeb0d9c0c89bf" name="a57e8fa49f964f2ce738eeb0d9c0c89bf"></a>
@@ -212,7 +212,7 @@ Macros</h2></td></tr>
 <tr class="memdesc:a57e8fa49f964f2ce738eeb0d9c0c89bf"><td class="mdescLeft">&#160;</td><td class="mdescRight">(bytes) <a class="el" href="structRedis.html" title="Structure that represents a Redis database instance, with one or more RedisClient connections.">Redis</a> receive buffer size (at most that much is read from the socket in a single call). <br /></td></tr>
 <tr class="separator:a57e8fa49f964f2ce738eeb0d9c0c89bf"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a275d8232b3f701eaba97b6f57ef0f65e" id="r_a275d8232b3f701eaba97b6f57ef0f65e"><td class="memItemLeft" align="right" valign="top"><a id="a275d8232b3f701eaba97b6f57ef0f65e" name="a275d8232b3f701eaba97b6f57ef0f65e"></a>
-#define&#160;</td><td class="memItemRight" valign="bottom"><b>REDISX_RELEASE_STRING</b>&#160;&#160;&#160;&quot;&quot;</td></tr>
+#define&#160;</td><td class="memItemRight" valign="bottom"><b>REDISX_RELEASE_STRING</b>&#160;&#160;&#160;&quot;-devel&quot;</td></tr>
 <tr class="memdesc:a275d8232b3f701eaba97b6f57ef0f65e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Additional release information in version, e.g. "-1", or "-rc1". <br /></td></tr>
 <tr class="separator:a275d8232b3f701eaba97b6f57ef0f65e"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:adc3981d6b06cc87e563e77584765eb19" id="r_adc3981d6b06cc87e563e77584765eb19"><td class="memItemLeft" align="right" valign="top"><a id="adc3981d6b06cc87e563e77584765eb19" name="adc3981d6b06cc87e563e77584765eb19"></a>
@@ -1831,7 +1831,7 @@ redisxClusterGetRedirect() </dd>
         </tr>
       </table>
 </div><div class="memdoc">
-<p>Enable or disable verbose reporting of all <a class="el" href="structRedis.html" title="Structure that represents a Redis database instance, with one or more RedisClient connections.">Redis</a> bound traffic. It may be useful when debugging programs that use the redisx interface. Verbose reporting is DISABLED by default.</p>
+<p>Enable or disable verbose reporting of all <a class="el" href="structRedis.html" title="Structure that represents a Redis database instance, with one or more RedisClient connections.">Redis</a> bound traffic. It may be useful when debugging programs that use the redisx interface. Verbose reporting is disabled by default.</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">value</td><td>TRUE to enable verbose reporting, or FALSE to disable.</td></tr>
