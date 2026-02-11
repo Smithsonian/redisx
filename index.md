@@ -2,7 +2,7 @@
 excerpt: RedisX is a light-weight Redis client library for C/C++.
 ---
 
-<img src="/redisx/resources/Sigmyne-logo-200x44.png" alt="CfA logo" width="200" height="44" align="right"><br clear="all">
+<img src="/redisx/resources/Sigmyne-logo-200x44.png" alt="Sigmyne logo" width="200" height="44" align="right"><br clear="all">
 
 <img src="https://img.shields.io/github/v/release/Sigmyne/redisx?label=github" class="badge" alt="GitHub release version" align="left">
 <img src="https://img.shields.io/fedora/v/redisx?color=lightblue" class="badge" alt="Fedora package version" align="left">
