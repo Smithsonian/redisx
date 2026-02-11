@@ -1,19 +1,12 @@
-![Build Status](https://github.com/Smithsonian/redisx/actions/workflows/build.yml/badge.svg)
-![Test Status](https://github.com/Smithsonian/redisx/actions/workflows/test.yml/badge.svg)
-![Static Analysis](https://github.com/Smithsonian/redisx/actions/workflows/analyze.yml/badge.svg)
+![Build Status](https://github.com/Sigmyne/redisx/actions/workflows/build.yml/badge.svg)
+![Test Status](https://github.com/Sigmyne/redisx/actions/workflows/test.yml/badge.svg)
+![Static Analysis](https://github.com/Sigmyne/redisx/actions/workflows/analyze.yml/badge.svg)
 <a href="https://smithsonian.github.io/redisx/apidoc/html/files.html">
- ![API documentation](https://github.com/Smithsonian/redisx/actions/workflows/dox.yml/badge.svg)
+ ![API documentation](https://github.com/Sigmyne/redisx/actions/workflows/dox.yml/badge.svg)
 </a>
 <a href="https://smithsonian.github.io/redisx/index.html">
- ![Project page](https://github.com/Smithsonian/redisx/actions/workflows/pages/pages-build-deployment/badge.svg)
+ ![Project page](https://github.com/Sigmyne/redisx/actions/workflows/pages/pages-build-deployment/badge.svg)
 </a>
-
-<picture>
-  <source srcset="resources/CfA-logo-dark.png" alt="CfA logo" media="(prefers-color-scheme: dark)"/>
-  <source srcset="resources/CfA-logo.png" alt="CfA logo" media="(prefers-color-scheme: light)"/>
-  <img src="resources/CfA-logo.png" alt="CfA logo" width="400" height="67" align="right"/>
-</picture>
-<br clear="all">
 
 
 # RedisX
@@ -70,9 +63,8 @@ new commands are being introduced all the time), it provides a basic framework f
 queries, with some higher-level functions, such as for managing key/value storage types (including hash tables) and 
 PUB/SUB. Future releases may add further higher-level functionality based on demand for such features.
 
-The __RedisX__ library was created, and is maintained, by Attila Kovács at the Center for Astrophysics \| Harvard 
-&amp; Smithsonian, and it is available through the [Smithsonian/redisx](https://github.com/Smithsonian/redisx) 
-repository on GitHub. 
+The __RedisX__ library was created, and is maintained, by Attila Kovács (Sigmyne, LLC), and it is available through 
+the [Sigmyne/redisx](https://github.com/Sigmyne/redisx) repository on GitHub. 
 
 
 <a name="redisx-example"></a>
@@ -168,10 +160,10 @@ And at every step, you should check for and [handle errors](#redisx-error-handli
  - [Redis commands](https://redis.io/docs/latest/commands/) (reference documentation)
  - [SMA eXchange (SMA-X)](https://docs.google.com/document/d/1eYbWDClKkV7JnJxv4MxuNBNV47dFXuUWu7C4Ve_YTf0/edit?usp=sharing) 
    -- A structured realtime database built on Redis / Valkey.
-   * [Smithsonian/smax-server](https://github.com/Smithsonian/smax-server) -- SMA-X server configuration kit
-   * [Smithsonian/smax-clib](https://github.com/Smithsonian/smax-clib) -- A C/C++ client library and toolkit to SMA-X,
+   * [Sigmyne/smax-server](https://github.com/Sigmyne/smax-server) -- SMA-X server configuration kit
+   * [Sigmyne/smax-clib](https://github.com/Sigmyne/smax-clib) -- A C/C++ client library and toolkit to SMA-X,
      based on __RedisX__
-   * [Smithsonian/smax-python](https://github.com/Smithsonian/smax-python) -- A Python 3 client library to SMA-X
+   * [Sigmyne/smax-python](https://github.com/Sigmyne/smax-python) -- A Python 3 client library to SMA-X
 
 
 -----------------------------------------------------------------------------
@@ -179,7 +171,7 @@ And at every step, you should check for and [handle errors](#redisx-error-handli
 <a name="redisx-prerequisites"></a>
 ## Prerequisites
 
-The [Smithsonian/xchange](https://github.com/Smithsonian/xchange) library is both a build and a runtime dependency of 
+The [Sigmyne/xchange](https://github.com/Sigmyne/xchange) library is both a build and a runtime dependency of 
 RedisX. There are some optional dependencies, depending on the build configuration:
 
  - OpenSSL (`openssl-devel` on RPM-based, or `libssl-dev` on Debian-based Linux) to build with TLS support. 
@@ -241,7 +233,7 @@ prior to invoking `make`. The following build variables can be configured:
    use `doxygen` in your `PATH` (if any). You can also set it to `none` to disable document generation and the
    checking for a usable `doxygen` version entirely.
  
- - `XCHANGE`: If the [Smithsonian/xchange](https://github.com/Smithsonian/xchange) library is not installed on your
+ - `XCHANGE`: If the [Sigmyne/xchange](https://github.com/Sigmyne/xchange) library is not installed on your
    system (e.g. under `/usr`) set `XCHANGE` to where the distribution can be found. The build will expect to find 
    `xchange.h` under `$(XCHANGE)/include` and `libxchange.so` / `libxchange.a` under `$(XCHANGE)/lib` or else in the 
    default `LD_LIBRARY_PATH`.
@@ -1726,7 +1718,7 @@ rolled out in bug-fix releases as long as they do not affect the existing API --
 bug-fix releases fully backwards compatible with their parent versions.
 
 In the weeks and month(s) preceding releases one or more _release candidates_ (e.g. `1.0.1-rc3`) will be published 
-temporarily on GitHub, under [Releases](https://github.com/Smithsonian/redisx/releases), so that changes can be 
+temporarily on GitHub, under [Releases](https://github.com/Sigmyne/redisx/releases), so that changes can be 
 tested by adopters before the releases are finalized. Please use due diligence to test such release candidates with 
 your code when they become available to avoid unexpected surprises when the finalized release is published. Release 
 candidates are typically available for one week only before they are superseded either by another, or by the finalized 

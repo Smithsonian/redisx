@@ -62,7 +62,7 @@ jobs:
     - name: Checkout xchange dependency
       uses: actions/checkout@v6
       with:
-        repository: Smithsonian/xchange
+        repository: Sigmyne/xchange
         path: xchange
 
     # Initializes the CodeQL tools for scanning.

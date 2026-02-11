@@ -1,6 +1,6 @@
 # Changelog
 
-All notable changes to the [Smithsonian/redisx](https://github.com/Smithsonian/redisx) library will be 
+All notable changes to the [Sigmyne/redisx](https://github.com/Sigmyne/redisx) library will be 
 documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and this project adheres to 

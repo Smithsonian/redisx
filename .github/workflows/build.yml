@@ -42,7 +42,7 @@ jobs:
     - name: Check out xchange
       uses: actions/checkout@v6
       with:
-        repository: Smithsonian/xchange
+        repository: Sigmyne/xchange
         path: xchange
 
     - name: Install build dependencies
