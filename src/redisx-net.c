@@ -379,8 +379,11 @@ static void rDisconnectClientAsync(RedisClient *cl) {
   rShutdownClientAsync(cl);
 
   if(sock >= 0) {
+    int status;
+
     cp->socket = -1;                  // Reset the channel's socket descriptor to 'unassigned'
-    int status = close(sock);
+
+    status = close(sock);
     if(status) x_warn("rDisconnectClientAsync", "client %d close() error: %s.\n", (int) cp->idx, strerror(errno));
   }
 }
