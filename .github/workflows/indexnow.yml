@@ -1,0 +1,23 @@
+name: IndexNow
+permissions:
+  contents: read
+  pull-requests: write
+
+on:
+  page_build
+
+jobs:
+  indexnow:
+    runs-on: ubuntu-latest
+    steps:
+      - name: create IndexNow key
+        run: echo "${{ secrets.INDEXNOW_KEY }}" > "${{ secrets.INDEXNOW_KEY }}.txt"
+        
+      - name: IndexNow
+        uses: bojieyang/indexnow-action@v2
+        with:
+          sitemap-location: 'https://sigmyne.github.io/redisx/sitemap.xml'
+          key: ${{ secrets.INDEXNOW_KEY }}
+          key-location: 'https://sigmyne.github.io/redisx/${{ secrets.INDEXNOW_KEY }}.txt'
+          limit: 200
+
