@@ -17,6 +17,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
  - Disconnecting a Redis instance now shuts down reads on its clients immediately, ensuring that we don't wait
    forever on blocked reads.
+   
+ - No incomplete array warnings from disabled (closed) clients.
  
 
 ## [1.0.2] - 2025-11-17
