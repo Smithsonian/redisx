@@ -87,7 +87,7 @@ var NAVTREE =
       [ "Debug support", "index.html#autotoc_md70", null ],
       [ "Future plans", "index.html#autotoc_md72", null ],
       [ "Release schedule", "index.html#autotoc_md74", null ],
-      [ "[Unreleased]", "../../xchange/apidoc/html/md_CHANGELOG.html#autotoc_md1", [
+      [ "[1.0.3] - 2026-02-16", "../../xchange/apidoc/html/md_CHANGELOG.html#autotoc_md1", [
         [ "Fixed", "../../xchange/apidoc/html/md_CHANGELOG.html#autotoc_md2", null ],
         [ "Changed", "../../xchange/apidoc/html/md_CHANGELOG.html#autotoc_md3", null ]
       ] ],

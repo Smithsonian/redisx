@@ -1,9 +1,17 @@
 var searchData=
 [
-  ['basics_0',['Cluster basics',['../index.html#autotoc_md63',1,'']]],
-  ['blocks_1',['Execution blocks',['../index.html#autotoc_md53',1,'']]],
-  ['blocks_20and_20lua_20scripts_2',['Atomic execution blocks and LUA scripts',['../index.html#autotoc_md52',1,'']]],
-  ['broadcasting_20messages_3',['Broadcasting messages',['../index.html#autotoc_md49',1,'']]],
-  ['building_20redisx_4',['Building RedisX',['../index.html#autotoc_md21',1,'']]],
-  ['bundled_20attributes_5',['bundled attributes',['../index.html#autotoc_md40',1,'Bundled Attributes'],['../index.html#autotoc_md59',1,'Bundled Attributes']]]
+  ['a_20simple_20example_0',['A simple example',['../index.html#autotoc_md13',1,'']]],
+  ['accessing_20key_20value_20data_1',['Accessing key / value data',['../index.html#autotoc_md44',1,'']]],
+  ['advanced_20queries_20and_20pipelining_2',['Advanced queries and pipelining',['../index.html#autotoc_md57',1,'']]],
+  ['against_20redisx_3',['Linking your application against RedisX',['../index.html#autotoc_md25',1,'']]],
+  ['amp_20disconnection_20hooks_4',['Connection &amp;amp; disconnection hooks',['../index.html#autotoc_md33',1,'']]],
+  ['and_20execution_5',['LUA script loading and execution',['../index.html#autotoc_md54',1,'']]],
+  ['and_20lua_20scripts_6',['Atomic execution blocks and LUA scripts',['../index.html#autotoc_md52',1,'']]],
+  ['and_20pipelining_7',['Advanced queries and pipelining',['../index.html#autotoc_md57',1,'']]],
+  ['and_20scanning_8',['Listing and Scanning',['../index.html#autotoc_md46',1,'']]],
+  ['and_20setting_20keyed_20values_9',['Getting and setting keyed values',['../index.html#autotoc_md45',1,'']]],
+  ['application_20against_20redisx_10',['Linking your application against RedisX',['../index.html#autotoc_md25',1,'']]],
+  ['asynchronous_20client_20processing_11',['Asynchronous client processing',['../index.html#autotoc_md58',1,'']]],
+  ['atomic_20execution_20blocks_20and_20lua_20scripts_12',['Atomic execution blocks and LUA scripts',['../index.html#autotoc_md52',1,'']]],
+  ['attributes_13',['attributes',['../index.html#autotoc_md40',1,'Bundled Attributes'],['../index.html#autotoc_md59',1,'Bundled Attributes']]]
 ];
