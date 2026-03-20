@@ -78,7 +78,7 @@ int rCheckClient(const RedisClient *cl) {
 static int rTransmitErrorAsync(ClientPrivate *cp, const char *op) {
   int status = X_NO_SERVICE;
 
-  if(cp->isEnabled) {
+  if(cp->socket >= 0 && cp->isEnabled) {
     RedisPrivate *p = (RedisPrivate *) cp->redis->priv;
     RedisErrorHandler f = p->config.transmitErrorFunc;
 
@@ -133,7 +133,7 @@ static int rReadChunkAsync(ClientPrivate *cp) {
   }
   else cp->available = -1;
 
-  if(cp->available <= 0) {
+  if(cp->socket >= 0 && cp->available <= 0) {
     status = rTransmitErrorAsync(cp, "read");
     if(cp->available == 0) errno = ECONNRESET;        // 0 return is remote cleared connection. So set ECONNRESET...
     if(cp->isEnabled) x_trace("rReadChunkAsync", NULL, status);
