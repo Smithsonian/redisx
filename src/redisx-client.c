@@ -80,9 +80,11 @@ static int rTransmitErrorAsync(ClientPrivate *cp, const char *op) {
 
   if(cp->isEnabled) {
     RedisPrivate *p = (RedisPrivate *) cp->redis->priv;
+    RedisErrorHandler f = p->config.transmitErrorFunc;
+
     // Let the handler disconnect, if it wants to....
-    if(p->config.transmitErrorFunc) {
-      p->config.transmitErrorFunc(cp->redis, cp->idx, op);
+    if(f) {
+      f(cp->redis, cp->idx, op);
       if(cp->isEnabled) {
         if(errno == EAGAIN || errno == EWOULDBLOCK) status = x_error(X_TIMEDOUT, errno, "rTransmitErrorAsync", "%s timed out on %s channel %d\n", op, cp->redis->id, (int) cp->idx);
         else status = x_error(X_NO_SERVICE, errno, "rTransmitErrorAsync", "%s failed on %s channel %d\n", op, cp->redis->id, (int) cp->idx);
