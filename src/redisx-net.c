@@ -370,6 +370,10 @@ static void rShutdownClientAsync(RedisClient *cl) {
   if(sock < 0) return;
 
   shutdown(sock, SHUT_RD);
+
+  // The above should release any lock on read, so we can confirm that...
+  pthread_mutex_lock(&cp->readLock);
+  pthread_mutex_unlock(&cp->readLock);
 }
 
 static void rDisconnectClientAsync(RedisClient *cl) {
@@ -907,7 +911,6 @@ void redisxDestroy(Redis *redis) {
     if(!cp) continue;
 
     redisxDestroyRESP(cp->attributes);
-
     pthread_mutex_destroy(&cp->readLock);
     pthread_mutex_destroy(&cp->writeLock);
     pthread_mutex_destroy(&cp->pendingLock);
