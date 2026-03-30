@@ -2,8 +2,8 @@
 
 A free, simple, and light-weight C/C++ Redis / Valkey client library.
 
- - [API documentation](https://smithsonian.github.io/redisx/apidoc/html/files.html)
- - [Project page](https://smithsonian.github.io/redisx) on github.io
+ - [API documentation](https://sigmyne.github.io/redisx/apidoc/html/files.html)
+ - [Project page](https://sigmyne.github.io/redisx) on github.io
  
 Author: Attila Kovacs
 
