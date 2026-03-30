@@ -1,22 +1,21 @@
 ![Build Status](https://github.com/Sigmyne/redisx/actions/workflows/build.yml/badge.svg)
 ![Test Status](https://github.com/Sigmyne/redisx/actions/workflows/test.yml/badge.svg)
 ![Static Analysis](https://github.com/Sigmyne/redisx/actions/workflows/analyze.yml/badge.svg)
-<a href="https://smithsonian.github.io/redisx/apidoc/html/files.html">
+<a href="https://sigmyne.github.io/redisx/apidoc/html/files.html">
  ![API documentation](https://github.com/Sigmyne/redisx/actions/workflows/dox.yml/badge.svg)
 </a>
-<a href="https://smithsonian.github.io/redisx/index.html">
+<a href="https://sigmyne.github.io/redisx/index.html">
  ![Project page](https://github.com/Sigmyne/redisx/actions/workflows/pages/pages-build-deployment/badge.svg)
 </a>
 
-
 # RedisX
 
-[![DOI](resources/796202270.svg)](https://doi.org/10.5281/zenodo.14639302)
+[![DOI](https://sigmyne.github.io/redisx/resources/796202270.svg)](https://doi.org/10.5281/zenodo.14639302)
 
 A free, simple, and light-weight C/C++ Redis / Valkey client library.
 
- - [API documentation](https://smithsonian.github.io/redisx/apidoc/html/files.html)
- - [Project page](https://smithsonian.github.io/redisx) on github.io
+ - [API documentation](https://sigmyne.github.io/redisx/apidoc/html/files.html)
+ - [Project page](https://sigmyne.github.io/redisx) on github.io
  
 Author: Attila Kovacs
 

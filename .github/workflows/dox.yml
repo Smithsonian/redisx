@@ -76,10 +76,13 @@ jobs:
       run: make -C redisx README-redisx.md
 
     - name: Generate RedisX apidocs
-      uses: mattnotmitt/doxygen-action@v1.9.8
+      uses: mattnotmitt/doxygen-action@edge
       with:
         additional-packages: font-roboto
         working-directory: ./redisx
+
+    - name: Insert Google analytics tracker
+      run: for file in redisx/apidoc/html/*.html ; do sudo sed -i "/<\/head>/e cat resources/analytics.html" $file ; done
 
     - name: Checkout gh-pages
       uses: actions/checkout@v6
@@ -90,14 +93,11 @@ jobs:
     - name: Assert site/doc/
       run: mkdir -p site/doc
 
-    - name: Copy README
-      run: |
-        echo '<img src="/redisx/resources/CfA-logo.png" alt="CfA logo" width="400" height="67" align="right">' > site/doc/README.md
-        echo '<br clear="all">' >> site/doc/README.md
-        cat redisx/README-redisx.md >> site/doc/README.md
-
     - name: Copy CHANGELOG
       run: cp redisx/CHANGELOG.md site/doc/
+      
+    - name: Copy README
+      run: cp redisx/README-redisx.md site/doc/README.md
 
     - name: Copy API documentation
       run: cp -a redisx/apidoc site/

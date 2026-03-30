@@ -58,7 +58,9 @@ jobs:
       run: make tools
 
     - name: Install Redis
-      run: sudo apt-get install redis
+      run: |
+        sudo apt-get update -q -y
+        sudo apt-get install redis
 
     - name: Configure Redis
       run: sudo sed -i "s:^protected mode[[:blank:]]*yes:protected mode no:g" /etc/redis/redis.conf
