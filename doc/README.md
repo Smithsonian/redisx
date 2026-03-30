@@ -1,5 +1,3 @@
-<img src="/redisx/resources/CfA-logo.png" alt="CfA logo" width="400" height="67" align="right">
-<br clear="all">
 [![DOI](resources/796202270.svg)](https://doi.org/10.5281/zenodo.14639302)
 
 A free, simple, and light-weight C/C++ Redis / Valkey client library.
