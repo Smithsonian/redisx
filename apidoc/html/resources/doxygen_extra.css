@@ -1,0 +1,182 @@
+* {
+  font-family: "Roboto", "Calibri", "Arial", sans-serif;
+}
+
+.headertitle {
+  font-size: 125%;
+}
+
+#nav-tree .label {
+  font-size: 110%;
+}
+
+p, li {
+  font-size: 110%;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  margin-top: 24px;
+  margin-bottom: 16px;
+  font-weight: 600;
+  line-height: 1.25;
+  color: #de0000;
+}
+
+h1 {
+  font-size: 200%;
+  padding-top: 1em;
+  padding-bottom: 0.3em;
+  border-bottom: 2px solid;
+}
+
+h2 {
+  font-size: 170%;
+  padding-top: 0.3em;
+  padding-bottom: 0.2em;
+  border-bottom: 1px solid;
+}
+
+h3 {
+  font-size: 150%;
+}
+
+h4 {
+  font-size: 125%;
+}
+
+h5 {
+  font-size: 110%;
+}
+
+h6 {
+  font-size: 87.5%;
+  color: #283266;
+}
+
+div.fragment {
+  padding: 4px 16px 4px 16px;
+  border: 0px solid;
+}
+
+.line, .keywordflow {
+  font-family: "Roboto Mono", "Calibri Mono", "SFMono-Regular", Consolas, "Liberation Mono", Menlo, Courier, monospace;
+  line-height: 1.8;
+}
+
+span.comment {
+  color: #808080;
+}
+
+
+div.line.glow {
+  background-color: auto;
+  box-shadow: none;
+  font-weight: bold;
+}
+
+hr {
+  display: none;
+}
+
+code {
+  font-family: "Roboto Mono", "Calibri Mono", "SFMono-Regular", Consolas, "Liberation Mono", Menlo, Courier, monospace;
+  margin: 0px 2px 0px 2px;
+  font-size: 87.5%;
+  font-weight: bold;
+}
+
+a.hl_function, a.hl_struct, span.keywordtype, span.keywordflow {
+  font-weight: bold;
+}
+
+
+html {
+  --title-background-color: #D8D8D8;
+  --nav-background-color: #F0F0F0;
+  --memdef-title-background-color: #D8D8D8;
+  --memdef-proto-background-color: #D8D8D8;
+  --memdef-doc-background-color: #F0F0F0;
+  
+  --fragment-foreground-color: #101010;
+  --code-type-keyword-color: #606060;
+  --memdef-proto-text-color: #383838;
+  --memdef-param-name-color: #5040a8;
+  
+  --menu-link-color: #303030;
+  --page-link-color: #de0000;
+  --code-link-color: #de0000;
+  --page-visited-link-color: #bf0000;
+}
+
+html.dark-mode {
+  --page-background-color: black;
+  --nav-background-color: black;
+  --title-background-color: #202020;
+  --memdef-title-background-color: #202020;
+  --memdef-proto-background-color: #202020;
+  --memdef-doc-background-color: #404040;
+ 
+  --fragment-foreground-color: #ffffff; 
+  --code-type-keyword-color: #c0c0c0;
+  --memdef-proto-text-color: #d8d8d8;
+  --memdef-param-name-color: #d6a036;
+  
+  --menu-link-color: #d8d8d8; 
+  --page-link-color: #ff6060;
+  --code-link-color: #ff6060;
+  --page-visited-link-color: #bf0000;
+}
+
+span.keywordflow {
+  color: var(--code-type-keyword-color);
+}
+
+a {
+  color: var(--page-link-color); 
+}
+
+a:visited {
+  color: var(--page-visited-link-color);
+}
+
+#main-nav a {
+  color: var(--menu-link-color);
+}
+
+#main-menu a {
+  color: var(--menu-link-color);
+}
+
+#nav-tree-contents a {
+  color: var(--menu-link-color);
+}
+
+.paramtype {
+   color: var(--code-type-keyword-color);
+}
+
+.paramname {
+   color: var(--memdef-param-name-color);
+}
+
+.paramdefval {
+   color: var(--code-type-keyword-color);
+}
+
+.memtitle {
+  font-weight: bold;
+  color: var(--code-type-keyword-color);
+}
+
+.memname {
+  font-weight: bold;
+  color: var(--fragment-foreground-color);
+}
+
+
+blockquote {
+  border-left: 2px solid #606060;
+  margin: 0 24px 0 4px;
+  padding: 0px 12px 0px 16px;
+}
+
