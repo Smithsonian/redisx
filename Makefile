@@ -114,7 +114,7 @@ dox: README-redisx.md
 
 .INTERMEDIATE: Doxyfile.local
 Doxyfile.local: Doxyfile Makefile
-	sed "s:^TAGFILES.*$$:TAGFILES = :g" Doxyfile > $@
+	sed "s:^TAGFILES.*$$:TAGFILES = :g" $< > $@
 
 # Local documentation without specialized headers. The resulting HTML documents do not have
 # Google Search or Analytics tracking info.
