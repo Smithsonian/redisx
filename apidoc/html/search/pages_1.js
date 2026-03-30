@@ -1,4 +1,11 @@
 var searchData=
 [
-  ['deprecated_20list_0',['Deprecated List',['../deprecated.html',1,'']]]
+  ['1_200_200_202025_2005_2006_0',['[1.0.0] - 2025-05-06',['../md_CHANGELOG.html#autotoc_md11',1,'']]],
+  ['1_200_201_202025_2008_2001_1',['[1.0.1] - 2025-08-01',['../md_CHANGELOG.html#autotoc_md8',1,'']]],
+  ['1_200_202_202025_2011_2017_2',['[1.0.2] - 2025-11-17',['../md_CHANGELOG.html#autotoc_md6',1,'']]],
+  ['1_200_203_202026_2002_2016_3',['[1.0.3] - 2026-02-16',['../md_CHANGELOG.html#autotoc_md3',1,'']]],
+  ['1_202025_2008_2001_4',['[1.0.1] - 2025-08-01',['../md_CHANGELOG.html#autotoc_md8',1,'']]],
+  ['11_2017_5',['[1.0.2] - 2025-11-17',['../md_CHANGELOG.html#autotoc_md6',1,'']]],
+  ['16_6',['[1.0.3] - 2026-02-16',['../md_CHANGELOG.html#autotoc_md3',1,'']]],
+  ['17_7',['[1.0.2] - 2025-11-17',['../md_CHANGELOG.html#autotoc_md6',1,'']]]
 ];

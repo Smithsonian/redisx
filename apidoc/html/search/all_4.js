@@ -13,5 +13,5 @@ var searchData=
   ['application_20against_20redisx_10',['Linking your application against RedisX',['../index.html#autotoc_md27',1,'']]],
   ['asynchronous_20client_20processing_11',['Asynchronous client processing',['../index.html#autotoc_md60',1,'']]],
   ['atomic_20execution_20blocks_20and_20lua_20scripts_12',['Atomic execution blocks and LUA scripts',['../index.html#autotoc_md54',1,'']]],
-  ['attributes_13',['attributes',['../index.html#autotoc_md42',1,'Bundled Attributes'],['../index.html#autotoc_md61',1,'Bundled Attributes']]]
+  ['attributes_13',['Attributes',['../index.html#autotoc_md42',1,'Bundled Attributes'],['../index.html#autotoc_md61',1,'Bundled Attributes']]]
 ];

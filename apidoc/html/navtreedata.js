@@ -25,7 +25,7 @@
 var NAVTREE =
 [
   [ "RedisX", "index.html", [
-    [ "Changelog", "../../xchange/apidoc/html/md_CHANGELOG.html", [
+    [ "Changelog", "md_CHANGELOG.html", [
       [ "Table of Contents", "index.html#autotoc_md13", null ],
       [ "Introduction", "index.html#autotoc_md14", [
         [ "A simple example", "index.html#autotoc_md15", null ],
@@ -37,7 +37,7 @@ var NAVTREE =
       ] ],
       [ "Prerequisites", "index.html#autotoc_md21", null ],
       [ "Building RedisX", "index.html#autotoc_md23", null ],
-      [ "Command-line interface (<tt>redisx-cli</tt>)", "index.html#autotoc_md25", null ],
+      [ "Command-line interface (<span class=\"tt\">redisx-cli</span>)", "index.html#autotoc_md25", null ],
       [ "Linking your application against RedisX", "index.html#autotoc_md27", null ],
       [ "Managing Redis server connections", "index.html#autotoc_md29", [
         [ "Initializing", "index.html#autotoc_md30", [
@@ -46,7 +46,7 @@ var NAVTREE =
         [ "Configuring", "index.html#autotoc_md32", [
           [ "TLS configuration", "index.html#autotoc_md33", null ],
           [ "Socket-level configuration", "index.html#autotoc_md34", null ],
-          [ "Connection & disconnection hooks", "index.html#autotoc_md35", null ]
+          [ "Connection &amp; disconnection hooks", "index.html#autotoc_md35", null ]
         ] ],
         [ "Connecting", "index.html#autotoc_md36", null ],
         [ "Disconnecting", "index.html#autotoc_md37", null ],
@@ -87,23 +87,23 @@ var NAVTREE =
       [ "Debug support", "index.html#autotoc_md72", null ],
       [ "Future plans", "index.html#autotoc_md74", null ],
       [ "Release schedule", "index.html#autotoc_md76", null ],
-      [ "[Unreleased]", "../../xchange/apidoc/html/md_CHANGELOG.html#autotoc_md1", [
-        [ "Fixed", "../../xchange/apidoc/html/md_CHANGELOG.html#autotoc_md2", null ]
+      [ "[Unreleased]", "md_CHANGELOG.html#autotoc_md1", [
+        [ "Fixed", "md_CHANGELOG.html#autotoc_md2", null ]
       ] ],
-      [ "[1.0.3] - 2026-02-16", "../../xchange/apidoc/html/md_CHANGELOG.html#autotoc_md3", [
-        [ "Fixed", "../../xchange/apidoc/html/md_CHANGELOG.html#autotoc_md4", null ],
-        [ "Changed", "../../xchange/apidoc/html/md_CHANGELOG.html#autotoc_md5", null ]
+      [ "[1.0.3] - 2026-02-16", "md_CHANGELOG.html#autotoc_md3", [
+        [ "Fixed", "md_CHANGELOG.html#autotoc_md4", null ],
+        [ "Changed", "md_CHANGELOG.html#autotoc_md5", null ]
       ] ],
-      [ "[1.0.2] - 2025-11-17", "../../xchange/apidoc/html/md_CHANGELOG.html#autotoc_md6", [
-        [ "Changed", "../../xchange/apidoc/html/md_CHANGELOG.html#autotoc_md7", null ]
+      [ "[1.0.2] - 2025-11-17", "md_CHANGELOG.html#autotoc_md6", [
+        [ "Changed", "md_CHANGELOG.html#autotoc_md7", null ]
       ] ],
-      [ "[1.0.1] - 2025-08-01", "../../xchange/apidoc/html/md_CHANGELOG.html#autotoc_md8", [
-        [ "Fixed", "../../xchange/apidoc/html/md_CHANGELOG.html#autotoc_md9", null ],
-        [ "Changed", "../../xchange/apidoc/html/md_CHANGELOG.html#autotoc_md10", null ]
+      [ "[1.0.1] - 2025-08-01", "md_CHANGELOG.html#autotoc_md8", [
+        [ "Fixed", "md_CHANGELOG.html#autotoc_md9", null ],
+        [ "Changed", "md_CHANGELOG.html#autotoc_md10", null ]
       ] ],
-      [ "[1.0.0] - 2025-05-06", "../../xchange/apidoc/html/md_CHANGELOG.html#autotoc_md11", null ]
+      [ "[1.0.0] - 2025-05-06", "md_CHANGELOG.html#autotoc_md11", null ]
     ] ],
-    [ "Contributing to RedisX", "../../xchange/apidoc/html/md_CONTRIBUTING.html", null ],
+    [ "Contributing to RedisX", "md_CONTRIBUTING.html", null ],
     [ "Deprecated List", "deprecated.html", null ],
     [ "Data Structures", "annotated.html", [
       [ "Data Structures", "annotated.html", "annotated_dup" ],
@@ -133,5 +133,6 @@ var NAVTREEINDEX =
 "redisx_8h.html#a460822029ff730cd7a55d64797c329a3"
 ];
 
-var SYNCONMSG = 'click to disable panel synchronisation';
-var SYNCOFFMSG = 'click to enable panel synchronisation';
+var SYNCONMSG = 'click to disable panel synchronization';
+var SYNCOFFMSG = 'click to enable panel synchronization';
+var LISTOFALLMEMBERS = 'List of all members';

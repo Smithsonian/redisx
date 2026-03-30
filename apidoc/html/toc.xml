@@ -9,7 +9,7 @@
     </topic>
     <topic label="Prerequisites" href="index.html#autotoc_md21"/>
     <topic label="Building RedisX" href="index.html#autotoc_md23"/>
-    <topic label="Command-line interface (&lt;tt&gt;redisx-cli&lt;/tt&gt;)" href="index.html#autotoc_md25"/>
+    <topic label="Command-line interface (redisx-cli)" href="index.html#autotoc_md25"/>
     <topic label="Linking your application against RedisX" href="index.html#autotoc_md27"/>
     <topic label="Managing Redis server connections" href="index.html#autotoc_md29">
       <topic label="Initializing" href="index.html#autotoc_md30">
@@ -18,7 +18,7 @@
       <topic label="Configuring" href="index.html#autotoc_md32">
         <topic label="TLS configuration" href="index.html#autotoc_md33"/>
         <topic label="Socket-level configuration" href="index.html#autotoc_md34"/>
-        <topic label="Connection &amp;amp; disconnection hooks" href="index.html#autotoc_md35"/>
+        <topic label="Connection &amp; disconnection hooks" href="index.html#autotoc_md35"/>
       </topic>
       <topic label="Connecting" href="index.html#autotoc_md36"/>
       <topic label="Disconnecting" href="index.html#autotoc_md37"/>

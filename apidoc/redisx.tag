@@ -1,5 +1,5 @@
 <?xml version='1.0' encoding='UTF-8' standalone='yes' ?>
-<tagfile doxygen_version="1.9.8">
+<tagfile doxygen_version="1.16.1">
   <compound kind="file">
     <name>redisx.h</name>
     <path>include/</path>
@@ -2321,6 +2321,16 @@
       <anchor>a0f61d63b009d0880a89c843bd50d8d76</anchor>
       <arglist></arglist>
     </member>
+  </compound>
+  <compound kind="page">
+    <name>md_CHANGELOG</name>
+    <title>Changelog</title>
+    <filename>md_CHANGELOG.html</filename>
+  </compound>
+  <compound kind="page">
+    <name>md_CONTRIBUTING</name>
+    <title>Contributing to RedisX</title>
+    <filename>md_CONTRIBUTING.html</filename>
   </compound>
   <compound kind="page">
     <name>index</name>

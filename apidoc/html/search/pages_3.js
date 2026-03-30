@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['redisx_0',['redisx',['../../../xchange/apidoc/html/md_CONTRIBUTING.html',1,'Contributing to RedisX'],['../index.html',1,'RedisX']]]
+  ['3_202026_2002_2016_0',['[1.0.3] - 2026-02-16',['../md_CHANGELOG.html#autotoc_md3',1,'']]]
 ];
