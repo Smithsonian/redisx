@@ -1,3 +1,5 @@
+[![DOI](https://sigmyne.github.io/redisx/resources/796202270.svg)](https://doi.org/10.5281/zenodo.14639302)
+
 A free, simple, and light-weight C/C++ Redis / Valkey client library.
 
  - [API documentation](https://sigmyne.github.io/redisx/apidoc/html/files.html)
