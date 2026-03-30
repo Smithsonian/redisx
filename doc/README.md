@@ -111,6 +111,7 @@ And at every step, you should check for and [handle errors](#redisx-error-handli
 <a name="redisx-features"></a>
 ### Features overview
 
+
 #### General Features
 
  | Feature                           | supported  | comments                                                     |
