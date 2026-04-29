@@ -17,7 +17,7 @@ $(LIB)/%.so.$(SO_VERSION):
 # Unversioned shared libs (for linking against)
 $(LIB)/lib%.so:
 	@rm -f $@
-	ln -sr $< $@
+	( cd $(dir $@); ln -s $(notdir $<) $(notdir $@) )
 
 # Static library: *.a
 $(LIB)/%.a:
