@@ -59,9 +59,4 @@ analyze:
 	@echo "   [analyze]"
 	@cppcheck $(CPPFLAGS) $(CHECKOPTS) src
 
-# Doxygen documentation (HTML and man pages) under apidocs/
-.PHONY: dox
-dox: README.md Doxyfile apidoc $(SRC) $(INC)
-	@echo "   [doxygen]"
-	@$(DOXYGEN)
 

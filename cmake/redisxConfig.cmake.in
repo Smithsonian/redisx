@@ -1,0 +1,34 @@
+@PACKAGE_INIT@
+
+# RedisX CMake configuration file
+
+include(CMakeFindDependencyMacro)
+
+# Find math library if needed
+if(NOT WIN32)
+    find_library(MATH_LIBRARY m)
+    if(NOT MATH_LIBRARY)
+        message(FATAL_ERROR "Math library not found")
+    endif()
+endif()
+
+# Include targets
+include("${CMAKE_CURRENT_LIST_DIR}/redisxTargets.cmake")
+
+# Get include directories from target properties
+get_target_property(redisx_INCLUDE_DIRS redisx::core INTERFACE_INCLUDE_DIRECTORIES)
+
+find_dependency(xchange)
+find_dependency(Threads)
+
+if(ENABLE_OPENMP)
+    find_dependency(OpenMP)
+endif()
+
+if(ENABLE_TLS)
+    find_dependency(OpenSSL)
+endif()
+
+check_required_components(redisx)
+
+

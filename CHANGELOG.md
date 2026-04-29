@@ -9,9 +9,15 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ## [Unreleased]
 
+Upcoming maintenance release.
+
 ### Fixed
 
  - #29: Occasional segfaults when link is shut down.
+ 
+### Added
+
+ - #30: Added CMake build configuration and CI workflows.
 
 
 ## [1.0.3] - 2026-02-16

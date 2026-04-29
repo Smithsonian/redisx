@@ -78,10 +78,8 @@ ifneq ($(shell which ldconfig), )
   # Detect OpenSSL automatically, and enable TLS support if present
   ifndef WITH_TLS
     ifneq ($(shell ldconfig -p | grep libssl), )
-      $(info INFO: TLS support is enabled automatically.)
       WITH_TLS = 1
     else
-      $(info INFO: optional TLS support is not enabled.)
       WITH_TLS = 0
     endif
   endif
@@ -89,10 +87,8 @@ ifneq ($(shell which ldconfig), )
   # Detect OpenMP automatically, and enable WITH_OPENMP support if present
   ifndef WITH_OPENMP
     ifneq ($(shell ldconfig -p | grep libomp), )
-      $(info INFO: OpenMP optimizations are enabled automatically.)
       WITH_OPENMP = 1
     else
-      $(info INFO: optional OpenMP optimizations are not enabled.)
       WITH_OPENMP = 0
     endif
   endif
