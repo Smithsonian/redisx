@@ -126,3 +126,40 @@ jobs:
             make tools
             make test
             bin/redisx-cli hello
+
+  test-cmake:
+    name: Test with CMake (Ubuntu)
+    runs-on: ubuntu-latest
+    steps:
+      - name: Install Redis
+        run: |
+          sudo apt-get update -q -y
+          sudo apt-get install redis
+      
+      - name: Install OpenSSL / OpenMP
+        run: |
+          sudo apt-get update -q -y
+          sudo apt-get install libpopt-dev libreadline-dev libbsd-dev libssl-dev libomp-dev
+    
+      - name: Check out RedisX
+        uses: actions/checkout@v6
+
+      - name: Check out xchange
+        uses: actions/checkout@v6
+        with:
+          repository: Sigmyne/xchange
+          path: xchange
+
+      - name: Build xchange dependency
+        run: |
+          cd xchange
+          cmake -B build -DBUILD_SHARED_LIBS=ON
+          cmake --build build
+
+      - name: Build
+        run: |
+          cmake -B build -Dxchange_DIR="xchange/build" -DBUILD_TESTING=ON -DBUILD_SHARED_LIBS=ON -DBUILD_EXAMPLES=ON -DENABLE_TLS=ON -DENABLE_OPENMP=ON
+          cmake --build build
+
+      - name: Test
+        run: ctest --test-dir build

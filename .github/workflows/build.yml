@@ -25,37 +25,67 @@ jobs:
 
   build:
     name: Build library
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest, macos-latest]
+        include:
+          - os: ubuntu-latest
+            cc: gcc
+          - os: macos-latest
+            cc: clang
 
+      env:
+        CC: gcc
+        CPPFLAGS: -D_POSIX_C_SOURCE=200112L
+        CFLAGS: -Os -Wall -Werror
+        CSTANDARD: c99
+        WEXTRA: 1
+        FORTIFY: 3
+        XCHANGE: xchange
+      steps:
+      - name: Check out RedisX
+        uses: actions/checkout@v6
+
+      - name: Check out xchange
+        uses: actions/checkout@v6
+        with:
+          repository: Sigmyne/xchange
+          path: xchange
+
+      - name: Install build dependencies
+        run: sudo apt-get install libpopt-dev libreadline-dev libbsd-dev libssl-dev
+
+      - name: Build static library
+        run: make static
+
+      - name: Build xchange dependency
+        run: make -C xchange shared
+
+      - name: Build shared library
+        run: make shared
+
+      - name: Build tools
+        run: make tools
+
+      - name: Build examples
+        run: make examples
+
+build-freebsd:
     runs-on: ubuntu-latest
-    env:
-      CC: gcc
-      CPPFLAGS: -D_POSIX_C_SOURCE=200112L
-      CFLAGS: -Os -Wall -Werror
-      CSTANDARD: c99
-      WEXTRA: 1
-      FORTIFY: 3
-      XCHANGE: xchange
+    name: FreeBSD
     steps:
-    - name: Check out RedisX
-      uses: actions/checkout@v6
+      - uses: actions/checkout@v6
 
-    - name: Check out xchange
-      uses: actions/checkout@v6
-      with:
-        repository: Sigmyne/xchange
-        path: xchange
-
-    - name: Install build dependencies
-      run: sudo apt-get install libpopt-dev libreadline-dev libbsd-dev libssl-dev
-
-    - name: Build static library
-      run: make static
-
-    - name: Build xchange dependency
-      run: make -C xchange shared
-
-    - name: Build shared library
-      run: make shared
-
-    - name: Build tools
-      run: make tools
+      - name: Build on FreeBSD
+        uses: vmactions/freebsd-vm@v1
+        with:
+          release: "14.0"
+          prepare: |
+            pkg install -y gmake
+          run: |
+            echo Building on FreeBSD $(uname -m)
+            gmake static
+            gmake shared
+            gmake tools
+            gmake examples

@@ -23,7 +23,7 @@ endif
 
 # If there is doxygen, build the API documentation also by default
 ifeq ($(.SHELLSTATUS),0)
-  DOC_TARGETS += local-dox
+  DOC_TARGETS += dox
 else
   ifneq ($(DOXYGEN),none)
     $(info WARNING! Doxygen is not available. Will skip 'dox' target)
@@ -56,12 +56,12 @@ tools: $(BIN)/redisx-cli
 # Examples
 .PHONY: examples
 examples: $(LIBREDISX)
-	$(MAKE) -f examples.mk
+	$(MAKE) -C examples
 
 # Run regression tests
 .PHONY: test
 test: $(LIBREDISX) tools
-	$(MAKE) -f test.mk
+	$(MAKE) -C test run
 
 # 'test' + 'analyze'
 .PHONY: check
@@ -75,12 +75,19 @@ infer: clean
 # Remove intermediates
 .PHONY: clean
 clean:
-	rm -f $(OBJECTS) README-redisx.md gmon.out
+	@rm -f $(OBJECTS) README-redisx.md gmon.out
+	@$(MAKE) -s -C test clean
+	@$(MAKE) -s -C examples clean
+	@$(MAKE) -s -C doc clean
 
 # Remove all generated files
 .PHONY: distclean
 distclean:
-	rm -f Doxyfile.local $(LIB)/libredisx.so* $(LIB)/libredisx.a
+	@rm -f $(LIB)/libredisx.so* $(LIB)/libredisx.a
+	@rm -rf build
+	@$(MAKE) -s -C test distclean
+	@$(MAKE) -s -C examples distclean
+	@$(MAKE) -s -C doc distclean
 
 
 # ----------------------------------------------------------------------------
@@ -107,24 +114,14 @@ $(LIB)/libredisx.a: $(OBJECTS)
 # redisx-cli assitional link libraries...
 $(BIN)/redisx-cli: LDFLAGS += -lreadline -lbsd
 
-README-redisx.md: README.md
-	LINE=`sed -n '/\# /{=;q;}' $<` && tail -n +$$((LINE+2)) $< > $@
+.PHONY: dox
+dox:
+	$(MAKE) -C doc
 
-dox: README-redisx.md
-
-.INTERMEDIATE: Doxyfile.local
-Doxyfile.local: Doxyfile Makefile
-	sed "s:^TAGFILES.*$$:TAGFILES = :g" $< > $@
-
-# Local documentation without specialized headers. The resulting HTML documents do not have
-# Google Search or Analytics tracking info.
-.PHONY: local-dox
-local-dox: README-redisx.md Doxyfile.local
-	doxygen Doxyfile.local
 
 # Some standard GNU targets, that should always exist...
 .PHONY: html
-html: local-dox
+html: dox
 
 .PHONY: dvi
 dvi:
@@ -217,7 +214,7 @@ help:
 	@echo "  shared        Builds the shared 'libredisx.so' (linked to versioned)."
 	@echo "  static        Builds the static 'lib/libredisx.a' library."
 	@echo "  tools         Builds redisx-cli application."
-	@echo "  local-dox     Compiles local HTML API documentation using 'doxygen'."
+	@echo "  dox           Compiles HTML documentation using 'doxygen'."
 	@echo "  analyze       Performs static analysis with 'cppcheck'."
 	@echo "  all           All of the above."
 	@echo "  examples      Build example programs."

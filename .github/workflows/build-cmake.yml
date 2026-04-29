@@ -1,0 +1,174 @@
+name: CMake
+permissions:
+  contents: read
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - "src/**"
+      - "include/**"
+      - "CMakeLists.txt"
+      - "cmake/**"
+      - ".github/workflows/build-cmake.yml"
+
+  pull_request:
+    paths:
+      - "src/**"
+      - "include/**"
+      - "CMakeLists.txt"
+      - "cmake/**"
+      - ".github/workflows/build-cmake.yml"
+
+jobs:
+  build:
+    name: Build on ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-latest]
+
+    steps:
+      - name: Check out RedisX
+        uses: actions/checkout@v6
+
+      - name: Check out xchange
+        uses: actions/checkout@v6
+        with:
+          repository: Sigmyne/xchange
+          path: xchange
+
+      - name: Build xchange dependency
+        run: |
+          cd xchange
+          cmake -B build -DBUILD_SHARED_LIBS=ON
+          cmake --build build
+
+      - name: Configure CMake (Unix)
+        run: cmake -B build -Dxchange_DIR="xchange/build" -DBUILD_SHARED_LIBS=ON
+
+      - name: Build (Unix)
+        if: runner.os != 'Windows'
+        run: cmake --build build
+
+      - name: Build (Windows)
+        if: runner.os == 'Windows'
+        run: cmake --build build --config Release
+
+      - name: Install
+        run: cmake --install build --prefix install
+
+      - name: Check Installation (Unix)
+        if: runner.os != 'Windows'
+        run: |
+          echo Installation contents:
+          ls -la install/
+
+      - name: Check Installation (Windows)
+        if: runner.os == 'Windows'
+        run: |
+          echo Installation contents:
+          dir install
+
+  build-full:
+    name: Build with OpenSSL / OpenMP on Ubuntu
+    runs-on: ubuntu-latest
+    steps:
+      - name: Install OpenSSL / OpenMP
+        run: |
+          sudo apt-get update -q -y
+          sudo apt-get install libomp-dev libssl-dev libpopt-dev libreadline-dev libbsd-dev
+
+      - name: Check out RedisX
+        uses: actions/checkout@v6
+
+      - name: Check out xchange
+        uses: actions/checkout@v6
+        with:
+          repository: Sigmyne/xchange
+          path: xchange
+
+      - name: Build xchange dependency
+        run: |
+          cd xchange
+          cmake -B build -DBUILD_SHARED_LIBS=ON
+          cmake --build build
+
+      - name: Configure CMake
+        run: cmake -B build -Dxchange_DIR="xchange/build" -DBUILD_SHARED_LIBS=ON -DENABLE_TLS=ON -DENABLE_OPENMP=ON
+
+      - name: Build
+        run: cmake --build build
+
+      - name: Install
+        run: cmake --install build --prefix install
+
+      - name: Check Installation
+        run: |
+          echo Installation contents:
+          ls -la install/
+
+  build-freebsd:
+    runs-on: ubuntu-latest
+    name: Build on FreeBSD
+    steps:
+      - name: Check out RedisX
+        uses: actions/checkout@v6
+
+      - name: Check out xchange
+        uses: actions/checkout@v6
+        with:
+          repository: Sigmyne/xchange
+          path: xchange
+
+      - name: Build on FreeBSD
+        uses: vmactions/freebsd-vm@v1
+        with:
+          release: "14.0"
+          usesh: true
+          prepare: |
+            pkg install -y cmake
+          run: |
+            echo Building on FreeBSD $(uname -m)
+            cd xchange
+            cmake -B build
+            cmake --build build
+            cd ..
+            cmake -B build -Dxchange_DIR="xchange/build"
+            cmake --build build
+            cmake --install build --prefix install
+            ls -la install/
+
+  build-doc:
+    runs-on: ubuntu-latest
+    name: Build Documentation (Ubuntu)
+    steps:
+      - name: Check out RedisX
+        uses: actions/checkout@v6
+
+      - name: Check out xchange
+        uses: actions/checkout@v6
+        with:
+          repository: Sigmyne/xchange
+          path: xchange
+
+      - name: Install doxygen
+        run: sudo apt-get install doxygen
+
+      - name: Build xchange dependency
+        run: |
+          cd xchange
+          cmake -B build
+          cmake --build build
+
+      - name: Build HTML documentation
+        run: |
+          cmake -B build -Dxchange_DIR="xchange/build" -DBUILD_DOC=ON
+          cmake --build build
+
+      - name: Install docs
+        run: |
+          cmake --install build --prefix install
+          ls -la install/
