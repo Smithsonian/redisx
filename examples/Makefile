@@ -4,15 +4,18 @@
 #
 # Author: Attila Kovacs
 
-# Use the definitions project definitions
-include ../config.mk
-
 EXAMPLES = $(subst .c,,$(wildcard *.c))
 
 LIB ?= ../lib
 
+ifdef XCHANGE
+  CPPFLAGS += -I$(XCHANGE)/include
+  LDFLAGS += -L$(XCHANGE)/lib
+endif
+
 CPPFLAGS += -I../include
-LDFLAGS += -L$(LIB) -lxchange -lpthread
+LDFLAGS += -L$(LIB) -lredisx -lxchange -lpthread
+
 
 .PHONY: all
 all: $(EXAMPLES)

@@ -62,6 +62,9 @@ jobs:
 
     - name: Build tools
       run: make tools
+      
+    - name: Build examples
+      run: make examples
 
   build-freebsd:
     runs-on: ubuntu-latest

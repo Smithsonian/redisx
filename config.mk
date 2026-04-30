@@ -59,6 +59,12 @@ CHECKOPTS += --inline-suppr $(CHECKEXTRA)
 # Below are some generated constants based on the one that were set above
 # ============================================================================
 
+# If XCHANGE is defined convert to absolute path for sub-makes.
+ifdef XCHANGE
+  XCHANGE := $(shell cd $(XCHANGE); pwd)
+  export XCHANGE
+endif
+
 ifneq ($(shell which ldconfig), )
   # Detect OpenSSL automatically, and enable TLS support if present
   ifndef WITH_TLS
