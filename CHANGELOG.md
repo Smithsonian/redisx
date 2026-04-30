@@ -18,6 +18,10 @@ Upcoming maintenance release.
 ### Added
 
  - #30: Added CMake build configuration and CI workflows.
+ 
+### Changed
+
+ - `examples/Makefile` to work standalone, without `config.mk`.
 
 
 ## [1.0.3] - 2026-02-16

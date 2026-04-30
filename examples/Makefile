@@ -1,4 +1,4 @@
-# Part of xchange
+# Part of RedisX
 #
 # Build exammple programs
 #
