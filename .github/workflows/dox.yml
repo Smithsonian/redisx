@@ -59,9 +59,6 @@ jobs:
 
     - name: Checkout source
       uses: actions/checkout@v6
-      with:
-        repository: Sigmyne/redisx
-        path: redisx
 
     - name: Check out xchange
       uses: actions/checkout@v6
@@ -73,7 +70,7 @@ jobs:
       run: make -C xchange dox
 
     - name: Generate headless README for RedisX
-      run: make -C redisx README-redisx.md
+      run: make -C doc README.md
       
     - name: Link to xchange documentation
       run: |
@@ -83,10 +80,10 @@ jobs:
       uses: mattnotmitt/doxygen-action@edge
       with:
         additional-packages: font-roboto
-        working-directory: ./redisx
+        working-directory: 'doc'
 
     - name: Insert Google analytics tracker
-      run: for file in redisx/apidoc/html/*.html ; do sudo sed -i "/<\/head>/e cat resources/analytics.html" $file ; done
+      run: for file in doc/html/*.html ; do sudo sed -i "/<\/head>/e cat resources/analytics.html" $file ; done
 
     - name: Checkout gh-pages
       uses: actions/checkout@v6
@@ -98,13 +95,13 @@ jobs:
       run: mkdir -p site/doc
 
     - name: Copy CHANGELOG
-      run: cp redisx/CHANGELOG.md site/doc/
+      run: cp CHANGELOG.md site/doc/
       
     - name: Copy README
-      run: cp redisx/README-redisx.md site/doc/README.md
+      run: cp doc/README.md site/doc/README.md
 
     - name: Copy API documentation
-      run: cp -a redisx/apidoc site/
+      run: cp -a doc site/apidoc
 
     - name: Push to pages
       run: |
