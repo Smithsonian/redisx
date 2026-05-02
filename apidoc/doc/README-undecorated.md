@@ -271,7 +271,6 @@ As of v1.1.2, __xchange__ can be built using [CMake](https://cmake.org/) also. C
 than the regular GNU `Makefile`. Note, however, that the CMake configuration does not support all of the build options 
 of the GNU `Makefile`, such as code coverage tracking. 
 
-<details>
 
 The basic build recipe for CMake is:
 
@@ -325,7 +324,6 @@ the `Runtime` component:
 ```bash
   $ cmake --install build --component Runtime --prefix /usr/local
 ```
-</details>
 
 -----------------------------------------------------------------------------
 
