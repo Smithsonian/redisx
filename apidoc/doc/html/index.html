@@ -378,10 +378,16 @@ Linking your application against RedisX</h1>
 <p><a class="anchor" id="redisx-makefile-application"></a> </p>
 <h2 class="doxsection"><a class="anchor" id="autotoc_md18"></a>
 Using a GNU <span class="tt">Makefile</span></h2>
+<details >
+<summary >
+Details</summary>
+<p></p>
 <p>Provided you have installed the shared (<span class="tt">libredisx.so</span> and <span class="tt">libxchange.so</span>) or static (<span class="tt">libredisx.a</span> and <span class="tt">libxchange.a</span>) libraries in a location that is in your <span class="tt">LD_LIBRARY_PATH</span> (e.g. in <span class="tt">/usr/lib</span> or <span class="tt">/usr/local/lib</span>) you can simply link your program using the <span class="tt">-lredisx -lxchange</span> flags. Your <span class="tt">Makefile</span> may look like:</p>
 <div class="fragment"><div class="line">myprog: ...</div>
 <div class="line">    $(CC) -o $@ $^ $(LDFLAGS) -lredisx -lxchange </div>
 </div><!-- fragment --><p>(Or, you might simply add <span class="tt">-lredisx -lxchange</span> to <span class="tt">LDFLAGS</span> and use a more standard recipe.) And, in if you installed the <b>RedisX</b> and/or <b>xchange</b> libraries elsewhere, you can simply add their location(s) to <span class="tt">LD_LIBRARY_PATH</span> prior to linking.</p>
+<p></p>
+</details>
 <p><a class="anchor" id="redisx-cmake-application"></a> </p>
 <h2 class="doxsection"><a class="anchor" id="autotoc_md19"></a>
 Using CMake</h2>

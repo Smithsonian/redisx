@@ -373,6 +373,8 @@ trace). It can also be used in interactive mode if no Redis command arguments ar
 <a name="redisx-makefile-application"></a>
 ### Using a GNU `Makefile`
 
+<details>
+
 Provided you have installed the shared (`libredisx.so` and `libxchange.so`) or static (`libredisx.a` and 
 `libxchange.a`) libraries in a location that is in your `LD_LIBRARY_PATH` (e.g. in `/usr/lib` or `/usr/local/lib`) 
 you can simply link your program using the  `-lredisx -lxchange` flags. Your `Makefile` may look like: 
@@ -386,6 +388,7 @@ myprog: ...
 the __RedisX__ and/or __xchange__ libraries elsewhere, you can simply add their location(s) to `LD_LIBRARY_PATH` prior 
 to linking.
 
+</details>
 
 <a name="redisx-cmake-application"></a>
 ### Using CMake

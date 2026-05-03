@@ -369,6 +369,7 @@ trace). It can also be used in interactive mode if no Redis command arguments ar
 <a name="redisx-makefile-application"></a>
 ### Using a GNU `Makefile`
 
+
 Provided you have installed the shared (`libredisx.so` and `libxchange.so`) or static (`libredisx.a` and 
 `libxchange.a`) libraries in a location that is in your `LD_LIBRARY_PATH` (e.g. in `/usr/lib` or `/usr/local/lib`) 
 you can simply link your program using the  `-lredisx -lxchange` flags. Your `Makefile` may look like: 
