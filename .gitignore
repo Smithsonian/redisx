@@ -1,4 +1,3 @@
-**/apidoc
 **/obj
 **/bin
 **/dep
@@ -10,6 +9,7 @@
 README-orig.md
 README-redisx.md
 TODO
+build
 xchange/**
 infer-out
 
