@@ -345,6 +345,7 @@ except that our client has somewhat fewer bells and whistles.
 ```bash
  $ redisx-cli ping "Hello world!"
 ```
+
 will print:
 
 ```bash
