@@ -10,8 +10,8 @@ var index =
       [ "Related links", "index.html#autotoc_md7", null ]
     ] ],
     [ "Prerequisites", "index.html#autotoc_md9", null ],
-    [ "Building and installation", "index.html#autotoc_md11", null ],
-    [ "Building RedisX", "index.html#autotoc_md12", [
+    [ "Building and installation", "index.html#autotoc_md11", [
+      [ "Build / install using GNU make", "index.html#autotoc_md12", null ],
       [ "Build / install using CMake", "index.html#autotoc_md13", null ]
     ] ],
     [ "Command-line interface (<span class=\"tt\">redisx-cli</span>)", "index.html#autotoc_md15", null ],

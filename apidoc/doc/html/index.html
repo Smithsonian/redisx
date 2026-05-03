@@ -290,10 +290,15 @@ Building and installation</h1>
 <li><a class="el" href="#redisx-gnu-build" title="redisx-gnu-build">Build / install using GNU make</a></li>
 <li><a class="el" href="#redisx-cmake-build" title="redisx-cmake-build">Build / install using CMake</a></li>
 </ul>
+<p>The <b>RedisX</b> library can be built either as a shared (<span class="tt">libredisx.so[.1]</span>) or as a static (<span class="tt">libredisx.a</span>) library, depending on what suits your needs best. You can also compile HTML documentation, examples and test programs, using either GNU <span class="tt">make</span> or CMake.</p>
 <p><a class="anchor" id="redisx-gnu-build"></a> </p>
-<h1 class="doxsection"><a class="anchor" id="autotoc_md12"></a>
-Building RedisX</h1>
-<p>The <b>RedisX</b> library can be built either as a shared (<span class="tt">libredisx.so[.1]</span>) or as a static (<span class="tt">libredisx.a</span>) library, depending on what suits your needs best.</p>
+<h2 class="doxsection"><a class="anchor" id="autotoc_md12"></a>
+Build / install using GNU make</h2>
+<p>On POSIX systems you can simply build <b>RedisX</b> with GNU <span class="tt">make</span>.</p>
+<details >
+<summary >
+Details</summary>
+<p></p>
 <p>You can configure the build, either by editing <span class="tt">config.mk</span> or else by defining the relevant environment variables prior to invoking <span class="tt">make</span>. The following build variables can be configured:</p>
 <ul>
 <li><span class="tt">CC</span>: The C compiler to use (default: <span class="tt">gcc</span>).</li>
@@ -318,7 +323,9 @@ Building RedisX</h1>
 <div class="fragment"><div class="line">$ sudo make prefix=&quot;/opt&quot; install</div>
 </div><!-- fragment --><p>Or, to stage the installation (to <span class="tt">/usr</span>) under a 'build root':</p>
 <div class="fragment"><div class="line">$ make DESTDIR=&quot;/tmp/stage&quot; install</div>
-</div><!-- fragment --><p><a class="anchor" id="redisx-cmake-build"></a> </p>
+</div><!-- fragment --><p></p>
+</details>
+<p><a class="anchor" id="redisx-cmake-build"></a> </p>
 <h2 class="doxsection"><a class="anchor" id="autotoc_md13"></a>
 Build / install using CMake</h2>
 <p>As of v1.1.2, <b>xchange</b> can be built using <a href="https://cmake.org/">CMake</a> also. CMake allows for greater portability than the regular GNU <span class="tt">Makefile</span>. Note, however, that the CMake configuration does not support all of the build options of the GNU <span class="tt">Makefile</span>, such as code coverage tracking.</p>
@@ -334,7 +341,9 @@ Details</summary>
 <li><span class="tt">BUILD_SHARED_LIBS=ON|OFF</span> (default: OFF) - Build shared libraries instead of static</li>
 <li><span class="tt">BUILD_DOC=ON|OFF</span> (default: OFF) - Compile HTML documentation. Requires <span class="tt">doxygen</span>.</li>
 <li><span class="tt">BUILD_EXAMPLES=ON|OFF</span> (default: OFF) - Build the included examples</li>
-<li><span class="tt">BUILD_TESTING=ON|OFF</span> (default: ON - Build regression tests</li>
+<li><span class="tt">BUILD_TESTING=ON|OFF</span> (default: ON) - Build regression tests</li>
+<li><span class="tt">ENABLE_TLS</span> (default: OFF) - Build with TLS support</li>
+<li><span class="tt">ENABLE_OPENMP</span> (default: OFF) - Parallelize cluster connect / disconnect with OpenMP.</li>
 <li><span class="tt">xchange_DIR=&lt;path&gt;</span> - Path (absolute or relative) to the <span class="tt">xchange</span> CMake build directory.</li>
 </ul>
 <p>For example, to configure the build of <b>xchange</b> with shared libraries and build local documentations</p>

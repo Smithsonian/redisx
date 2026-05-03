@@ -185,11 +185,16 @@ Additionally `redisx-cli` has the following dependencies on standard GNU/POSIX l
  - [Build / install using GNU make](#redisx-gnu-build)
  - [Build / install using CMake](#redisx-cmake-build)
 
-<a name="redisx-gnu-build"></a>
-## Building RedisX
-
 The __RedisX__ library can be built either as a shared (`libredisx.so[.1]`) or as a static (`libredisx.a`) library, 
-depending on what suits your needs best.
+depending on what suits your needs best. You can also compile HTML documentation, examples and test programs, using
+either GNU `make` or CMake.
+ 
+
+<a name="redisx-gnu-build"></a>
+### Build / install using GNU make 
+
+On POSIX systems you can simply build __RedisX__ with GNU `make`.
+
 
 You can configure the build, either by editing `config.mk` or else by defining the relevant environment variables 
 prior to invoking `make`. The following build variables can be configured:
@@ -264,6 +269,8 @@ Or, to stage the installation (to `/usr`) under a 'build root':
   $ make DESTDIR="/tmp/stage" install
 ```
 
+
+
 <a name="redisx-cmake-build"></a>
 ### Build / install using CMake 
 
@@ -284,7 +291,9 @@ The __xchange__ CMake build supports the following options (in addition to the s
  - `BUILD_SHARED_LIBS=ON|OFF` (default: OFF) - Build shared libraries instead of static
  - `BUILD_DOC=ON|OFF` (default: OFF) - Compile HTML documentation. Requires `doxygen`.
  - `BUILD_EXAMPLES=ON|OFF` (default: OFF) - Build the included examples
- - `BUILD_TESTING=ON|OFF` (default: ON - Build regression tests
+ - `BUILD_TESTING=ON|OFF` (default: ON) - Build regression tests
+ - `ENABLE_TLS` (default: OFF) - Build with TLS support
+ - `ENABLE_OPENMP` (default: OFF) - Parallelize cluster connect / disconnect with OpenMP.
  - `xchange_DIR=<path>` - Path (absolute or relative) to the `xchange` CMake build directory.
 
 For example, to configure the build of __xchange__ with shared libraries and build local documentations

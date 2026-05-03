@@ -10,8 +10,8 @@
       <topic label="Related links" href="index.html#autotoc_md7"/>
     </topic>
     <topic label="Prerequisites" href="index.html#autotoc_md9"/>
-    <topic label="Building and installation" href="index.html#autotoc_md11"/>
-    <topic label="Building RedisX" href="index.html#autotoc_md12">
+    <topic label="Building and installation" href="index.html#autotoc_md11">
+      <topic label="Build / install using GNU make" href="index.html#autotoc_md12"/>
       <topic label="Build / install using CMake" href="index.html#autotoc_md13"/>
     </topic>
     <topic label="Command-line interface (redisx-cli)" href="index.html#autotoc_md15"/>

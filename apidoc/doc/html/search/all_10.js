@@ -32,7 +32,7 @@ var searchData=
   ['redisserver_29',['RedisServer',['../structRedisServer.html',1,'']]],
   ['redissocketconfigurator_30',['RedisSocketConfigurator',['../redisx_8h.html#a356281f9b55b794cb988b44761bbd0ba',1,'redisx.h']]],
   ['redissubscribercall_31',['RedisSubscriberCall',['../redisx_8h.html#aeb7d6976a06d6b51780b1c9d3f927ef8',1,'redisx.h']]],
-  ['redisx_32',['RedisX',['../index.html#autotoc_md12',1,'Building RedisX'],['../index.html#autotoc_md17',1,'Linking your application against RedisX']]],
+  ['redisx_32',['Linking your application against RedisX',['../index.html#autotoc_md17',1,'']]],
   ['redisx_20cli_33',['Command-line interface (&lt;span class=&quot;tt&quot;&gt;redisx-cli&lt;/span&gt;)',['../index.html#autotoc_md15',1,'']]],
   ['redisx_2dclient_2ec_34',['redisx-client.c',['../redisx-client_8c.html',1,'']]],
   ['redisx_2dcluster_2ec_35',['redisx-cluster.c',['../redisx-cluster_8c.html',1,'']]],
