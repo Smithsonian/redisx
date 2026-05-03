@@ -2337,6 +2337,8 @@
     <docanchor file="index.html">redisx-cmake-build</docanchor>
     <docanchor file="index.html">redisx-cli</docanchor>
     <docanchor file="index.html">redisx-linking</docanchor>
+    <docanchor file="index.html">redisx-makefile-application</docanchor>
+    <docanchor file="index.html">redisx-cmake-application</docanchor>
     <docanchor file="index.html">managing-redis-server-connections</docanchor>
     <docanchor file="index.html">redisx-initializing</docanchor>
     <docanchor file="index.html">redisx-configuring</docanchor>

@@ -367,6 +367,12 @@ trace). It can also be used in interactive mode if no Redis command arguments ar
 <a name="redisx-linking"></a>
 ## Linking your application against RedisX
 
+ - [Using a GNU `Makefile`](#redisx-makefile-application)
+ - [Using CMake](#redisx-cmake-application)
+
+<a name="redisx-makefile-application"></a>
+### Using a GNU `Makefile`
+
 Provided you have installed the shared (`libredisx.so` and `libxchange.so`) or static (`libredisx.a` and 
 `libxchange.a`) libraries in a location that is in your `LD_LIBRARY_PATH` (e.g. in `/usr/lib` or `/usr/local/lib`) 
 you can simply link your program using the  `-lredisx -lxchange` flags. Your `Makefile` may look like: 
@@ -379,6 +385,23 @@ myprog: ...
 (Or, you might simply add `-lredisx -lxchange` to `LDFLAGS` and use a more standard recipe.) And, in if you installed 
 the __RedisX__ and/or __xchange__ libraries elsewhere, you can simply add their location(s) to `LD_LIBRARY_PATH` prior 
 to linking.
+
+
+<a name="redisx-cmake-application"></a>
+### Using CMake
+
+<details>
+
+Add the appropriate bits from below to the `CMakeLists.txt` file of your application (`my-application`):
+
+```cmake
+  find_package(redisx REQUIRED)
+  target_include_directories(my-application PRIVATE ${redisx_INCLUDE_DIRS})
+  target_link_libraries(my-application PRIVATE ${redisx_LIBRARIES})
+```
+
+</details>
+
 
 -----------------------------------------------------------------------------
 
