@@ -33,7 +33,7 @@ static FILE *openfile(const char *path, const char *name, const char *mode) {
 }
 
 static void replace(const char *str, const char *from, const char *to) {
-  char *match = (char *) strstr(str, from);
+  char *match = strstr(str, from);
   int lfrom, lto, lrem;
 
   if(!match) return;
