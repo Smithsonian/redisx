@@ -343,7 +343,7 @@ The __RedisX__ library provides its own command-line tool, called `redisx-cli`. 
 except that our client has somewhat fewer bells and whistles.
 
 ```bash
- $ redisx-cli ping "Hello World!"
+ $ redisx-cli ping "Hello world!"
 ```
 will print:
 
